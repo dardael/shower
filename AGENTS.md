@@ -71,5 +71,5 @@ Furthermore, you must follow these specific rules:
 - **Naming**: PascalCase for components/React elements, camelCase for variables/functions, UPPER_SNAKE for constants
 - **Error Handling**: Use try/catch for async operations; throw descriptive Error objects
 - **Components**: Functional components with TypeScript interfaces; use React.FC sparingly
-- **Styling**: Tailwind CSS classes; responsive design with sm/md/lg breakpoints
+- **Styling**: Use Tailwind CSS for utility-first styling. Combine it with Headless UI for accessible, unstyled components. Ensure responsive design with sm/md/lg breakpoints for layouts.
 - **File Structure**: Next.js App Router; components in dedicated directories when reused
