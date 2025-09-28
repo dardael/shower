@@ -1,0 +1,3 @@
+docker compose run --rm -T app npx lint-staged
+docker compose run --rm -T app npm run build:strict
+
