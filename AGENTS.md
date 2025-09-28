@@ -20,34 +20,75 @@ This project aims to create a robust, scalable, and maintainable web application
 This project must follow SOLID principles, DDD architecture, Hexagonal architecture. here a tree structure example to follow :
 
 ```
-src/
-├── presentation/         # Couche de présentation
-│   ├── app/              # Routes définies avec l'App Router
-│   │   ├── cart/         # Domaine "Panier"
-│   │   │   ├── page.tsx          -> Route `/cart`
-│   │   │   ├── layout.tsx        -> Layout spécifique au panier (optionnel)
-│   │   │   └── components/
-│   │   │       └── CartItem.tsx  -> Composant pour un article dans le panier
-│   │   ├── product/      # Domaine "Produit"
-│   │   │   ├── page.tsx          -> Route `/product`
-│   │   │   ├── [id]/             -> Routes dynamiques pour les produits
-│   │   │   │   └── page.tsx      -> Route `/product/:id`
-│   │   │   ├── layout.tsx        -> Layout spécifique au produit (optionnel)
-│   │   │   └── components/
-│   │   │       └── ProductCard.tsx -> Composant pour afficher un produit
-│   │   ├── layout.tsx     -> Layout global pour toutes les pages
+shower/
+├── src/
+│   ├── presentation/         # Presentation Layer
+│   │   ├── app/              # Routes defined using App Router
+│   │   │   ├── admin/        # Admin domain
+│   │   │   │   ├── page.tsx          -> Route `/admin`
+│   │   │   │   └── components/
+│   │   │   │       ├── AdminDashboard.tsx -> Admin dashboard component
+│   │   │   │       └── NotAuthorized.tsx  -> Not authorized component
+│   │   ├── layout.tsx     -> Global layout for all pages
 │   │   └── page.tsx       -> Route `/`
-├── domain/               # Couche de domaine (entités, règles métier)
-├── application/          # Couche application (use-cases, services)
-├── infrastructure/       # Couche infrastructure (adapters, base de données)
-  ├── cart/             # Adaptateurs pour le panier
-  │   │   └── api/          # Routes API associées au panier
-  │   │       └── route.ts  # Route API pour le panier
-  │   ├── product/          # Adaptateurs pour les produits
-  │   │   └── api/          # Routes API associées aux produits
-  │   │       └── route.ts  # Route API pour les produits
-│ └── database/         # Configuration de la base de données (ex. Prisma)
-├── shared/               # Couche partagée (utilitaires, types génériques)
+│   ├── domain/               # Domain Layer (entities, business rules)
+│   │   ├── auth/
+│   │   │   ├── entities/
+│   │   │   │   └── User.ts            -> User entity
+│   │   │   ├── repositories/
+│   │   │   │   └── UserRepository.ts  -> User repository interface
+│   │   │   ├── services/
+│   │   │   │   └── AdminAccessPolicyService.ts -> Business rules for admin access
+│   │   │   └── value-objects/
+│   │   │       └── AdminAccessPolicy.ts -> Value object for admin access policy
+│   ├── application/          # Application Layer (use-cases, services)
+│   │   ├── auth/
+│   │   │   ├── services/
+│   │   │   │   └── OAuthService.ts    -> Service for OAuth integration
+│   │   │   ├── AuthenticateUser.ts    -> Use case for authenticating a user
+│   │   │   ├── AuthorizeAdminAccess.ts -> Use case for authorizing admin access
+│   │   │   ├── IAuthenticateUser.ts   -> Interface for AuthenticateUser use case
+│   │   │   └── IAuthorizeAdminAccess.ts -> Interface for AuthorizeAdminAccess use case
+│   ├── infrastructure/       # Infrastructure Layer (adapters, database)
+│   │   ├── auth/
+│   │   │   ├── adapters/
+│   │   │   │   └── GoogleOAuthAdapter.ts -> Adapter for Google OAuth
+│   │   │   ├── api/
+│   │   │   │   └── NextAuthHandler.ts -> NextAuth API handler
+│   │   │   ├── repositories/
+│   │   │   │   └── InMemoryUserRepository.ts -> In-memory implementation of UserRepository
+│   │   ├── container.ts      -> Dependency injection container
+│   ├── shared/               # Shared Layer (utilities, generic types)
+│   │   ├── components/
+│   │   │   ├── LoginButton.tsx        -> Login button component
+│   │   │   └── LogoutButton.tsx       -> Logout button component
+├── test/                     # Test Layer
+│   ├── application/
+│   │   ├── auth/
+│   │   │   ├── AuthenticateUser.test.ts
+│   │   │   ├── AuthorizeAdminAccess.test.ts
+│   ├── domain/
+│   │   ├── auth/
+│   │   │   ├── value-objects/
+│   │   │   │   ├── AdminAccessPolicy.test.ts
+├── .dockerignore
+├── .gitignore
+├── .prettierignore
+├── .prettierrc.js
+├── AGENTS.md
+├── Dockerfile
+├── README.md
+├── docker-compose.yml
+├── eslint.config.mjs
+├── jest.config.js
+├── middleware.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── tsconfig.json
+```
+
 ```
 
 ## Commands
@@ -57,7 +98,7 @@ src/
 - **Format**: `docker compose run --rm npm run format` (Prettier)
 - **Type Check**: `docker compose run --rm npm run build:strict` (TypeScript strict mode)
 - **Test All**: `docker compose run --rm npm run test` (Jest with ts-jest)
-- **Single Test**: `docker compose run --rm npm run test -- __tests__/file.test.ts` or `docker compose run --rm npm run test -- --testNamePattern="pattern"`
+- **Single Test**: `docker compose run --rm npm run test -- tests/file.test.ts` or `docker compose run --rm npm run test -- --testNamePattern="pattern"`
 
 ## Code Style
 
@@ -68,8 +109,9 @@ Furthermore, you must follow these specific rules:
 - **Imports**: Use absolute imports from `src/` for internal modules
 - **Formatting**: Prettier config (semicolons, single quotes, 4-space indent, 80 char width, ES5 trailing commas)
 - **Types**: Strict TypeScript enabled; use explicit types for function parameters and return values
-- **Naming**: PascalCase for components/React elements, camelCase for variables/functions, UPPER_SNAKE for constants
+- **Naming**: PascalCase for components/React elements, camelCase for variables/functions, UPPER_SNAKE for constants. do not use abbreviations.
 - **Error Handling**: Use try/catch for async operations; throw descriptive Error objects
 - **Components**: Functional components with TypeScript interfaces; use React.FC sparingly
 - **Styling**: Use Tailwind CSS for utility-first styling. Combine it with Headless UI for accessible, unstyled components. Ensure responsive design with sm/md/lg breakpoints for layouts.
 - **File Structure**: Next.js App Router; components in dedicated directories when reused
+```

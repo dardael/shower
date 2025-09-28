@@ -14,6 +14,35 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Admin Access Setup
+
+The `/admin` page is protected and requires Google authentication. Only users with an email address matching the `ADMIN_EMAIL` environment variable can access it.
+
+### Setup Steps
+
+1. **Set up Google OAuth credentials:**
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Create a new project or select an existing one.
+   - Enable the Google+ API.
+   - Create OAuth 2.0 credentials (Client ID and Client Secret).
+   - Add `http://localhost:3000/api/auth/callback/google` to the authorized redirect URIs.
+
+2. **Configure environment variables in `.env`:**
+
+   ```
+   ADMIN_EMAIL=your-admin-email@example.com
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   NEXTAUTH_SECRET=your-random-secret-string
+   ```
+
+3. **Access the admin page:**
+   - Start the development server.
+   - Navigate to `/admin`.
+   - You will be redirected to Google for authentication.
+   - Only the specified admin email can log in and access the page.
+   - Note: The Google OAuth flow is configured to always prompt for consent, ensuring users must explicitly reauthenticate after signing out.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
