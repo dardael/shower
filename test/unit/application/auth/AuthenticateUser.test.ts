@@ -3,6 +3,7 @@ import { AuthenticateUser } from '@/application/auth/AuthenticateUser';
 import { User } from '@/domain/auth/entities/User';
 import type { UserRepository } from '@/domain/auth/repositories/UserRepository';
 import type { OAuthService } from '@/application/auth/services/OAuthService';
+import type { ILogger } from '@/application/shared/ILogger';
 
 // Mock dependencies
 const mockOAuthService: jest.Mocked<OAuthService> = {
@@ -14,12 +15,23 @@ const mockUserRepository: jest.Mocked<UserRepository> = {
   findByEmail: jest.fn(),
 };
 
+const mockLogger: jest.Mocked<ILogger> = {
+  logDebug: jest.fn(),
+  logInfo: jest.fn(),
+  logWarning: jest.fn(),
+  logError: jest.fn(),
+};
+
 describe('AuthenticateUser', () => {
   let useCase: AuthenticateUser;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useCase = new AuthenticateUser(mockOAuthService, mockUserRepository);
+    useCase = new AuthenticateUser(
+      mockOAuthService,
+      mockUserRepository,
+      mockLogger
+    );
   });
 
   it('should authenticate user successfully', async () => {
@@ -35,6 +47,9 @@ describe('AuthenticateUser', () => {
     expect(mockOAuthService.getUser).toHaveBeenCalledWith(oAuthToken);
     expect(mockUserRepository.save).toHaveBeenCalledWith(expectedUser);
     expect(result).toEqual(expectedUser);
+    expect(mockLogger.logInfo).toHaveBeenCalledWith(
+      'User authenticated successfully: user@example.com'
+    );
   });
 
   it('should handle OAuth service error', async () => {
@@ -44,5 +59,9 @@ describe('AuthenticateUser', () => {
     mockOAuthService.getUser.mockRejectedValue(error);
 
     await expect(useCase.execute(oAuthToken)).rejects.toThrow('Invalid token');
+    expect(mockLogger.logError).toHaveBeenCalledWith(
+      'Unexpected error during authentication: Invalid token',
+      { token: oAuthToken }
+    );
   });
 });
