@@ -91,8 +91,6 @@ shower/
 ├── tsconfig.json
 ```
 
-```
-
 ## Commands
 
 - **Build**: `docker compose run --rm app npm run build` (Next.js with Turbopack)
@@ -116,4 +114,8 @@ Furthermore, you must follow these specific rules:
 - **Components**: Functional components with TypeScript interfaces; use React.FC sparingly
 - **Styling**: Use Tailwind CSS for utility-first styling. Combine it with Headless UI for accessible, unstyled components. Ensure responsive design with sm/md/lg breakpoints for layouts.
 - **File Structure**: Next.js App Router; components in dedicated directories when reused
-```
+
+## Github
+
+**User**: dardael
+**repo**: shower
