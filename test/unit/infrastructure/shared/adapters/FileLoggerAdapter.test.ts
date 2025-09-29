@@ -44,8 +44,8 @@ describe('FileLoggerAdapter', () => {
   it('should use fallback folder on invalid path', () => {
     process.env.LOG_LEVEL = 'info';
     process.env.LOG_FOLDER = '/invalid/path';
-    (mkdirSync as jest.Mock).mockImplementation(() => {
-      throw new Error('Invalid path');
+    (mkdirSync as jest.Mock).mockImplementation((path) => {
+      if (path === '/invalid/path') throw new Error('Invalid path');
     });
     const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
     adapter = new FileLoggerAdapter(formatter);
