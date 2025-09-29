@@ -63,14 +63,16 @@ shower/
 │   │   │   ├── LoginButton.tsx        -> Login button component
 │   │   │   └── LogoutButton.tsx       -> Logout button component
 ├── test/                     # Test Layer
-│   ├── application/
-│   │   ├── auth/
-│   │   │   ├── AuthenticateUser.test.ts
-│   │   │   ├── AuthorizeAdminAccess.test.ts
-│   ├── domain/
-│   │   ├── auth/
-│   │   │   ├── value-objects/
-│   │   │   │   ├── AdminAccessPolicy.test.ts
+│   ├── e2e/ # end to end tests
+│   ├── unit/ # unit test following the same structure as src
+    │   ├── application/
+    │   │   ├── auth/
+    │   │   │   ├── AuthenticateUser.test.ts
+    │   │   │   ├── AuthorizeAdminAccess.test.ts
+    │   ├── domain/
+    │   │   ├── auth/
+    │   │   │   ├── value-objects/
+    │   │   │   │   ├── AdminAccessPolicy.test.ts
 ├── .dockerignore
 ├── .gitignore
 ├── .prettierignore
