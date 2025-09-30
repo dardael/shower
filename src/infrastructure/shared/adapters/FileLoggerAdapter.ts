@@ -24,7 +24,7 @@ export class FileLoggerAdapter implements ILogger {
     const envLevel = process.env.LOG_LEVEL || 'info';
     try {
       this.currentLogLevel = LogLevel.fromString(envLevel);
-    } catch (err) {
+    } catch {
       console.warn(`Invalid log level: ${envLevel}. Using default 'info'.`);
       this.currentLogLevel = LogLevel.INFO;
     }

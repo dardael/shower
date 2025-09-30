@@ -13,6 +13,12 @@ import { GoogleOAuthAdapter } from '@/infrastructure/auth/adapters/GoogleOAuthAd
 import { InMemoryUserRepository } from '@/infrastructure/auth/repositories/InMemoryUserRepository';
 import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
 import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
+import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
+import type { IUpdateWebsiteName } from '@/application/settings/IUpdateWebsiteName';
+import type { IGetWebsiteName } from '@/application/settings/IGetWebsiteName';
+import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
+import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
+import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 
 // Register interfaces with implementations
 container.register<UserRepository>('UserRepository', {
@@ -40,6 +46,19 @@ container.register<ILogger>('ILogger', {
   useFactory: () => new FileLoggerAdapter(new LogFormatterService()),
 });
 
+// Register settings services
+container.register<WebsiteSettingsRepository>('WebsiteSettingsRepository', {
+  useClass: MongooseWebsiteSettingsRepository,
+});
+
+container.register<IUpdateWebsiteName>('IUpdateWebsiteName', {
+  useClass: UpdateWebsiteName,
+});
+
+container.register<IGetWebsiteName>('IGetWebsiteName', {
+  useClass: GetWebsiteName,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -48,6 +67,16 @@ export class AuthServiceLocator {
 
   static getAuthenticateUser(): IAuthenticateUser {
     return container.resolve('IAuthenticateUser');
+  }
+}
+
+export class SettingsServiceLocator {
+  static getUpdateWebsiteName(): IUpdateWebsiteName {
+    return container.resolve('IUpdateWebsiteName');
+  }
+
+  static getWebsiteName(): IGetWebsiteName {
+    return container.resolve('IGetWebsiteName');
   }
 }
 

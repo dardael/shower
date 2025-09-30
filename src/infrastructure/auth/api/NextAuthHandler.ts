@@ -16,8 +16,18 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
-      // Check if the user's email matches the admin email
       return user.email === process.env.ADMIN_EMAIL;
+    },
+    async session({ session }) {
+      // You can add extra data to the session here if needed
+      return session;
+    },
+    async jwt({ token, user }) {
+      // Add any additional claims to the JWT
+      if (user) {
+        token.isAdmin = user.email === process.env.ADMIN_EMAIL;
+      }
+      return token;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

@@ -1,7 +1,11 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/infrastructure/auth/api/NextAuthHandler';
 import { User } from '@/domain/auth/entities/User';
-import { AuthServiceLocator } from '@/infrastructure/container';
+import {
+  AuthServiceLocator,
+  SettingsServiceLocator,
+} from '@/infrastructure/container';
+import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
 import LoginButton from '@/presentation/shared/components/LoginButton';
 import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
@@ -25,7 +29,14 @@ export default async function AdminPage() {
   const isAuthorized = authorizeAdminAccess.execute(user);
 
   if (isAuthorized) {
-    return <AdminDashboard />;
+    // Connect to database and fetch website name
+    const dbConnection = DatabaseConnection.getInstance();
+    await dbConnection.connect();
+
+    const getWebsiteName = SettingsServiceLocator.getWebsiteName();
+    const websiteName = await getWebsiteName.execute();
+
+    return <AdminDashboard initialWebsiteName={websiteName} />;
   } else {
     return <NotAuthorized />;
   }

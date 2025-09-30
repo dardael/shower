@@ -77,6 +77,21 @@ Next.js version: 15.5.4 (Turbopack)
 
 ---
 
+## Website Settings Storage
+
+The website settings are stored in MongoDB using Mongoose. Each setting is identified by a unique `key` field, allowing multiple settings to be stored in the same collection.
+
+### Schema
+
+- `key`: String, required, unique - Identifies the setting type (e.g., 'name' for website name)
+- `name`: String, required - The value of the setting (e.g., the website name)
+
+### Migration
+
+When upgrading from the previous singleton pattern, run the migration script `scripts/migrate-website-settings.js` to add the `key` field to existing documents.
+
+---
+
 ## Summary
 
 The technical implementation of the admin page protection combines middleware, server-side authorization, and environment variable configuration to ensure robust security and compliance with best practices.

@@ -93,12 +93,14 @@ shower/
 
 ## Commands
 
+- **Install**: `docker compose run --rm app npm install`
 - **Build**: `docker compose run --rm app npm run build` (Next.js with Turbopack)
-- **Lint**: `docker compose run --rm npm run lint` (ESLint with Next.js, TypeScript, Prettier)
-- **Format**: `docker compose run --rm npm run format` (Prettier)
-- **Type Check**: `docker compose run --rm npm run build:strict` (TypeScript strict mode)
-- **Test All**: `docker compose run --rm npm run test` (Jest with ts-jest)
-- **Single Test**: `docker compose run --rm npm run test -- tests/file.test.ts` or `docker compose run --rm npm run test -- --testNamePattern="pattern"`
+- **Lint**: `docker compose run --rm app npm run lint` (ESLint with Next.js, TypeScript, Prettier)
+- **Format**: `docker compose run --rm app npm run format` (Prettier)
+- **Type Check**: `docker compose run --rm app npm run build:strict` (TypeScript strict mode)
+- **e2etests**: `docker compose run --rm app npm run test:e2e` (Jest with ts-jest)
+- **Test All**: `docker compose run --rm app npm run test` (Jest with ts-jest)
+- **Single Test**: `docker compose run --rm app npm run test -- tests/file.test.ts` or `docker compose run --rm app npm run test -- --testNamePattern="pattern"`
 
 ## Code Style
 

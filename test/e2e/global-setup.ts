@@ -1,0 +1,43 @@
+import { config as dotenvConfig } from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+
+/**
+ * Global setup for Playwright tests
+ * This runs once before all tests
+ */
+async function globalSetup() {
+  // We don't need to set NODE_ENV as Playwright already does this
+  // process.env.NODE_ENV is set to 'test' automatically
+
+  // Load test environment variables
+  const envTestPath = path.join(process.cwd(), '.env.test');
+  const envTestLocalPath = path.join(process.cwd(), '.env.test.local');
+
+  if (fs.existsSync(envTestPath)) {
+    dotenvConfig({ path: envTestPath });
+    console.log('✅ Loaded .env.test environment variables');
+  } else {
+    console.warn('⚠️ .env.test file not found, using default values');
+  }
+
+  if (fs.existsSync(envTestLocalPath)) {
+    dotenvConfig({ path: envTestLocalPath, override: true });
+    console.log('✅ Loaded .env.test.local environment variables');
+  } else {
+    console.warn(
+      '⚠️ .env.test.local file not found, sensitive test variables may be missing'
+    );
+  }
+
+  process.env.MONGODB_URI =
+    process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/shower_test';
+  if (
+    !process.env.MONGODB_URI ||
+    !process.env.MONGODB_URI.includes('shower_test')
+  ) {
+    console.warn('WARNING: MONGODB_URI is not set to a test database');
+  }
+}
+
+export default globalSetup;

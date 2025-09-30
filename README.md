@@ -115,6 +115,7 @@ This project uses Husky for git hooks:
 
 | Command                                        | Description               |
 | ---------------------------------------------- | ------------------------- |
+| `docker compose run --rm app npm install`      | install npm lib           |
 | `docker compose run --rm app npm run dev`      | Start development server  |
 | `docker compose run --rm app npm run build`    | Build for production      |
 | `docker compose run --rm app npm run start`    | Start production server   |
