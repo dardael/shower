@@ -1,41 +1,22 @@
+version: '3.8'
+
 services:
   app:
-    build: .
-    user: '1000:1000'
+    build:
+      context: .
+      dockerfile: Dockerfile.app
     ports:
-      - '3000:3000'
-    volumes:
-      - .:/app
-      - ./.git:/app/.git
+      - "3000:3000"
     environment:
-      - NPM_CONFIG_UPDATE_NOTIFIER=false
-      - NPM_CONFIG_FUND=false
-      - NPM_CONFIG_AUDIT=false
-    command: npm run dev
+      - NODE_ENV=development
 
-  mongodb:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongo_data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-
-  mongo-express:
-    image: mongo-express:latest
-    ports:
-      - '8081:8081'
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-      - ME_CONFIG_MONGODB_PORT=27017
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+  e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
     depends_on:
-      - mongodb
-
-volumes:
-  mongo_data:
+      - app
+    env_file:
+      - .env.test
+    volumes:
+      - ./test/e2e:/usr/src/app/test/e2e
