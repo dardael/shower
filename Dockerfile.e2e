@@ -1,0 +1,17 @@
+# Use the official Playwright image
+FROM mcr.microsoft.com/playwright:v1.40.0-focal
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json for dependencies
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy E2E test files
+COPY test/e2e ./test/e2e
+
+# Default command to run E2E tests
+CMD ["npm", "run", "test:e2e"]
