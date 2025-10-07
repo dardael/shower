@@ -1,0 +1,35 @@
+---
+description: Ensure that the code adheres to the SOLID principles to enhance maintainability, scalability, and readability in the project's architecture.
+globs: src/**/*.ts
+alwaysApply: true
+---
+
+Sub rule 1: Single Responsibility Principle
+
+- Each class, function, or module should have one and only one responsibility.
+- Avoid combining unrelated behaviors in a single unit.
+- Refactor code to isolate concerns in separate units.
+
+Sub rule 2: Open/Closed Principle
+
+- Classes, modules, and functions should be open for extension but closed for modification.
+- Use polymorphism, abstraction, and dependency injection to achieve extensibility.
+- Avoid directly changing existing code to introduce new behaviors or features.
+
+Sub rule 3: Liskov Substitution Principle
+
+- Subtypes should be substitutable for their base types without affecting functionality.
+- Avoid overriding methods in a way that changes expected behavior of the base type.
+- Ensure derived classes respect the contracts of their base classes.
+
+Sub rule 4: Interface Segregation Principle
+
+- Interfaces should define specific, narrow functionalities to avoid forcing classes to implement unused methods.
+- Break down large interfaces into smaller, more focused ones.
+- Avoid creating monolithic interfaces that serve multiple unrelated clients.
+
+Sub rule 5: Dependency Inversion Principle
+
+- Depend on abstractions (e.g., interfaces) instead of concrete implementations.
+- Invert control using dependency injection to decouple high-level modules from low-level modules.
+- Avoid hardcoding dependencies; use factories or DI containers.

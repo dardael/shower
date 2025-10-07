@@ -1,0 +1,38 @@
+---
+description: Ensure consistent and efficient development of e2e tests using Playwright. Defines the structure, patterns, and best practices for writing, organizing, and maintaining Playwright-based end-to-end tests.
+globs: test/e2e/**/*.ts
+alwaysApply: false
+---
+
+Sub rule 1:
+- Place e2e tests in `test/e2e/` directory.
+- Name test files with `.spec.ts` extension.
+
+Sub rule 2:
+- Use Playwright fixtures for shared context setup.
+- Group related tests using `describe` blocks.
+- Name test cases to clearly describe the scenario.
+
+Sub rule 3:
+- Use `beforeEach`/`afterEach` for setup and teardown.
+- Leverage `test.use` for scoped configuration.
+
+Sub rule 4:
+- Prefer page model for complex flows.
+- Create reusable helper functions for repetitive actions.
+
+Sub rule 5:
+- Use `data-testid` attributes for element selectors.
+- Avoid selectors that rely on text, classes, or DOM structure.
+
+Sub rule 6:
+- Run tests in headless mode for CI pipelines.
+- Enable video/screenshots only for failing tests.
+
+Sub rule 7:
+- Mock external network requests if required.
+- Avoid mocking internal API calls; use actual endpoints for internal APIs.
+
+Sub rule 8:
+- Use `expect` for assertions on UI and state.
+- Prefer `toBeVisible`, `toHaveText`, `toHaveAttribute`, etc., for clarity.

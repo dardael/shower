@@ -1,0 +1,24 @@
+---
+description: Ensure alignment of design artifacts with development to facilitate Design Driven Development (DDD) and Hexagonal Architecture. Establish a structured workflow where designs directly influence the structure and implementation of code across all layers in your existing architecture. This rule ensures consistent user experience, adherence to business goals, and efficient development lifecycles.
+globs: apps/frontend/**/*.tsx
+alwaysApply: false
+---
+
+Sub rule 1: Design Integration Workflow
+- Create/validate designs before implementation begins.
+- Review designs with stakeholders (product owners, designers, developers).
+
+Sub rule 2: Design Implementation Guidelines
+- Implement domain-driven design in the `src/domain` layer for entities, value-objects, and services.
+- Implement use cases derived from designs in the `src/application` layer to encapsulate business logic.
+- Translate designs into React components in the `src/presentation` layer.
+- Place reusable components under `src/presentation/shared/components`.
+- Use TailwindCSS for styling in components, and generate classes directly from designs.
+- Add infrastructure-specific implementations in the `src/infrastructure` layer to isolate external dependencies from core logic.
+- Maintain consistent naming conventions from design specs to code (classes, interfaces, and components).
+
+Sub rule 3: Feedback and Iteration
+- Compare implemented UI in `src/presentation` against designs at every milestone.
+- Use e2e tests in `test/e2e` to validate design functionality and usability.
+- Iterate designs if technical constraints arise during development.
+- Update `src/infrastructure` adapters or repositories as needed to reflect feedback without breaking core `src/domain` or `src/application` logic.

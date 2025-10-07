@@ -9,6 +9,16 @@ This project aims to create a robust, scalable, and maintainable web application
 - The user can create it's pages, add sections to the pages, and customize the sections with different components.
 - The user can also manage the website settings, such as the theme, the navigation, and the footer.
 
+## External File Loading for rules
+
+CRITICAL: When you encounter a file reference (e.g., .opencode/rules/01-standards/general.mdc), use your Read tool to load it on a need-to-know basis. They're relevant to the SPECIFIC task at hand.
+
+Instructions:
+
+- Do NOT preemptively load all references - use lazy loading based on actual need
+- When loaded, treat content as mandatory instructions that override defaults
+- Follow references recursively when needed
+
 ## Nextjs
 
 - **React components** Use Next js server components as much as possible, only use client components when necessary (e.g. for interactivity).
@@ -17,7 +27,14 @@ This project aims to create a robust, scalable, and maintainable web application
 
 ## Architecture
 
-This project must follow SOLID principles, DDD architecture, Hexagonal architecture. here a tree structure example to follow :
+This project must follow SOLID principles, DDD architecture, Hexagonal architecture.
+Use the following rules :
+
+- .opencode/rules/01-standards/design-driven-development.mdc
+- .opencode/rules/01-standards/solid-principles.mdc
+- .opencode/rules/01-standards/naming-convention.mdc
+
+Here the current tree structure to follow :
 
 ```
 shower/
@@ -116,6 +133,18 @@ Furthermore, you must follow these specific rules:
 - **Components**: Functional components with TypeScript interfaces; use React.FC sparingly
 - **Styling**: Use Tailwind CSS for utility-first styling. Combine it with Headless UI for accessible, unstyled components. Ensure responsive design with sm/md/lg breakpoints for layouts.
 - **File Structure**: Next.js App Router; components in dedicated directories when reused
+
+## Unit testing
+
+Follow these rules :
+
+- .opencode/rules/07-quality-assurance/jest-unit-testing.mdc
+
+## End to end testing
+
+Follow these rules :
+
+- .opencode/rules/07-quality-assurance/e2e-tests-playwright.mdc
 
 ## Github
 
