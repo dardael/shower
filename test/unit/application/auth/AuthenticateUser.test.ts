@@ -1,13 +1,15 @@
 import 'reflect-metadata';
 import { AuthenticateUser } from '@/application/auth/AuthenticateUser';
-import { User } from '@/domain/auth/entities/User';
 import type { UserRepository } from '@/domain/auth/repositories/UserRepository';
-import type { OAuthService } from '@/application/auth/services/OAuthService';
+import type { IBetterAuthService } from '@/application/auth/services/IBetterAuthService';
 import type { ILogger } from '@/application/shared/ILogger';
+import type { AuthSession } from '@/application/auth/IAuthenticateUser';
 
 // Mock dependencies
-const mockOAuthService: jest.Mocked<OAuthService> = {
-  getUser: jest.fn(),
+const mockBetterAuthService: jest.Mocked<IBetterAuthService> = {
+  getSession: jest.fn(),
+  signInSocial: jest.fn(),
+  signOut: jest.fn(),
 };
 
 const mockUserRepository: jest.Mocked<UserRepository> = {
@@ -28,40 +30,72 @@ describe('AuthenticateUser', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useCase = new AuthenticateUser(
-      mockOAuthService,
+      mockBetterAuthService,
       mockUserRepository,
       mockLogger
     );
   });
 
   it('should authenticate user successfully', async () => {
-    const oAuthToken = 'valid-token';
-    const userData = { email: 'user@example.com' };
-    const expectedUser = new User(userData.email, true);
+    const session = {
+      user: {
+        id: 'test-user-id',
+        email: 'user@example.com',
+        name: 'Test User',
+        image: null,
+      },
+      session: {
+        id: 'test-session-id',
+        userId: 'test-user-id',
+        expiresAt: new Date(),
+        token: 'test-token',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    };
 
-    mockOAuthService.getUser.mockResolvedValue(userData);
     mockUserRepository.save.mockResolvedValue(undefined);
 
-    const result = await useCase.execute(oAuthToken);
+    const result = await useCase.execute(session);
 
-    expect(mockOAuthService.getUser).toHaveBeenCalledWith(oAuthToken);
-    expect(mockUserRepository.save).toHaveBeenCalledWith(expectedUser);
-    expect(result).toEqual(expectedUser);
+    expect(mockUserRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'user@example.com',
+        isAuthenticated: true,
+      })
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        email: 'user@example.com',
+        isAuthenticated: true,
+      })
+    );
     expect(mockLogger.logInfo).toHaveBeenCalledWith(
       'User authenticated successfully: user@example.com'
     );
   });
 
-  it('should handle OAuth service error', async () => {
-    const oAuthToken = 'invalid-token';
-    const error = new Error('Invalid token');
+  it('should handle invalid session error', async () => {
+    const session = null;
 
-    mockOAuthService.getUser.mockRejectedValue(error);
-
-    await expect(useCase.execute(oAuthToken)).rejects.toThrow('Invalid token');
+    await expect(useCase.execute(session)).rejects.toThrow(
+      'Invalid session provided'
+    );
     expect(mockLogger.logError).toHaveBeenCalledWith(
-      'Unexpected error during authentication: Invalid token',
-      { token: oAuthToken }
+      'Unexpected error during authentication: Invalid session provided',
+      { session }
+    );
+  });
+
+  it('should handle session without user error', async () => {
+    const session = { session: {}, user: null } as unknown as AuthSession;
+
+    await expect(useCase.execute(session)).rejects.toThrow(
+      'Invalid session provided'
+    );
+    expect(mockLogger.logError).toHaveBeenCalledWith(
+      'Unexpected error during authentication: Invalid session provided',
+      { session }
     );
   });
 });

@@ -2,14 +2,16 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 import type { UserRepository } from '@/domain/auth/repositories/UserRepository';
 import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAccessPolicyService';
-import type { OAuthService } from '@/application/auth/services/OAuthService';
+import type { IBetterAuthService } from '@/application/auth/services/IBetterAuthService';
+import type { IBetterAuthClientService } from '@/application/auth/services/IBetterAuthClientService';
 import type { IAuthenticateUser } from '@/application/auth/IAuthenticateUser';
 import type { IAuthorizeAdminAccess } from '@/application/auth/IAuthorizeAdminAccess';
 import type { ILogger } from '@/application/shared/ILogger';
 import { AdminAccessPolicy } from '@/domain/auth/value-objects/AdminAccessPolicy';
 import { AuthenticateUser } from '@/application/auth/AuthenticateUser';
 import { AuthorizeAdminAccess } from '@/application/auth/AuthorizeAdminAccess';
-import { GoogleOAuthAdapter } from '@/infrastructure/auth/adapters/GoogleOAuthAdapter';
+import { BetterAuthAdapter } from '@/infrastructure/auth/adapters/BetterAuthAdapter';
+import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 import { InMemoryUserRepository } from '@/infrastructure/auth/repositories/InMemoryUserRepository';
 import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
 import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
@@ -25,8 +27,12 @@ container.register<UserRepository>('UserRepository', {
   useClass: InMemoryUserRepository,
 });
 
-container.register<OAuthService>('OAuthService', {
-  useClass: GoogleOAuthAdapter,
+container.register<IBetterAuthService>('IBetterAuthService', {
+  useClass: BetterAuthAdapter,
+});
+
+container.register<IBetterAuthClientService>('IBetterAuthClientService', {
+  useClass: BetterAuthClientAdapter,
 });
 
 container.register<AdminAccessPolicyService>('AdminAccessPolicyService', {
@@ -67,6 +73,10 @@ export class AuthServiceLocator {
 
   static getAuthenticateUser(): IAuthenticateUser {
     return container.resolve('IAuthenticateUser');
+  }
+
+  static getBetterAuthClientService(): IBetterAuthClientService {
+    return container.resolve('IBetterAuthClientService');
   }
 }
 

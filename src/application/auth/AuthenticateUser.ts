@@ -1,22 +1,26 @@
 import { inject, injectable } from 'tsyringe';
 import { User } from '@/domain/auth/entities/User';
 import type { UserRepository } from '@/domain/auth/repositories/UserRepository';
-import type { OAuthService } from './services/OAuthService';
-import type { IAuthenticateUser } from './IAuthenticateUser';
+import type { IBetterAuthService } from './services/IBetterAuthService';
+import type { IAuthenticateUser, AuthSession } from './IAuthenticateUser';
 import type { ILogger } from '../shared/ILogger';
 
 @injectable()
 export class AuthenticateUser implements IAuthenticateUser {
   constructor(
-    @inject('OAuthService') private oAuthService: OAuthService,
+    @inject('IBetterAuthService') private betterAuthService: IBetterAuthService,
     @inject('UserRepository') private userRepository: UserRepository,
     @inject('ILogger')
     private logger: ILogger
   ) {}
 
-  async execute(oAuthToken: string): Promise<User> {
+  async execute(session: AuthSession | null): Promise<User> {
     try {
-      const userData = await this.oAuthService.getUser(oAuthToken);
+      if (!session || !session.user) {
+        throw new Error('Invalid session provided');
+      }
+
+      const userData = session.user;
       const user = new User(userData.email, true);
       await this.userRepository.save(user);
       this.logger.logInfo(`User authenticated successfully: ${user.email}`);
@@ -24,7 +28,7 @@ export class AuthenticateUser implements IAuthenticateUser {
     } catch (error) {
       this.logger.logError(
         `Unexpected error during authentication: ${(error as Error).message}`,
-        { token: oAuthToken }
+        { session }
       );
       throw error;
     }

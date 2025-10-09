@@ -29,7 +29,7 @@ test.describe('Admin Page', () => {
       'Sign in to access the Admin Dashboard'
     );
     await expect(
-      page.getByRole('button', { name: 'Sign in with Google' })
+      page.getByRole('button', { name: 'Continue with Google' })
     ).toBeVisible();
   });
 

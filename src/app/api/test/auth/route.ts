@@ -1,50 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { encode } from 'next-auth/jwt';
 
 export async function POST(request: NextRequest) {
-  // Only allow in test environment - check for test header or test environment variable
-  const testHeader = request.headers.get('X-Test-Auth');
-  const isTestEnv =
-    process.env.NEXTAUTH_TEST_AUTH === 'true' && testHeader === 'true';
+  const { email, isAdmin } = await request.json();
 
-  if (!isTestEnv) {
-    return NextResponse.json({ error: 'Not allowed' }, { status: 403 });
+  if (request.headers.get('X-Test-Auth') !== 'true') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Get email from request
-  const data = await request.json();
-  const email = data.email || 'test@example.com';
-  const isAdmin = data.isAdmin !== false; // Default to admin for tests
+  try {
+    // For testing purposes, we'll create a mock session
+    // In a real scenario, this would involve Better Auth's session creation
+    const mockSession = {
+      user: {
+        id: 'test-user-id',
+        email: email,
+        name: isAdmin ? 'Test Admin' : 'Test User',
+        image: null,
+      },
+      session: {
+        id: 'test-session-id',
+        userId: 'test-user-id',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        token: 'test-session-token',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    };
 
-  // Create a test user session
-  const user = {
-    id: 'test-user-id',
-    name: isAdmin ? 'Test Admin' : 'Test User',
-    email: email,
-    image: 'https://via.placeholder.com/150',
-  };
+    // Set a test cookie to simulate authentication
+    // Better Auth uses a different cookie format
+    const response = NextResponse.json({ success: true, session: mockSession });
+    response.cookies.set('better-auth.session_token', 'test-session-token', {
+      httpOnly: true,
+      secure: false, // for testing
+      sameSite: 'lax',
+      path: '/',
+    });
 
-  // Create a session token
-  const token = await encode({
-    token: {
-      name: user.name,
-      email: user.email,
-      picture: user.image,
-      sub: user.id,
-    },
-    secret: process.env.NEXTAUTH_SECRET || 'test-secret',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  });
+    // Store test user data in a separate cookie for authorization checks
+    response.cookies.set(
+      'test-user-data',
+      JSON.stringify({
+        email: email,
+        isAdmin: isAdmin,
+      }),
+      {
+        httpOnly: true,
+        secure: false, // for testing
+        sameSite: 'lax',
+        path: '/',
+      }
+    );
 
-  // Set the session cookie
-  const cookieValue = `next-auth.session-token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}`;
-
-  // Return the response with cookie
-  return new NextResponse(JSON.stringify({ success: true, user }), {
-    status: 200,
-    headers: {
-      'Set-Cookie': cookieValue,
-      'Content-Type': 'application/json',
-    },
-  });
+    return response;
+  } catch (error) {
+    console.error('Test auth error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

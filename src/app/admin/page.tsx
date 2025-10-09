@@ -1,5 +1,5 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/infrastructure/auth/api/NextAuthHandler';
+import { headers } from 'next/headers';
+import { auth } from '@/infrastructure/auth/BetterAuthInstance';
 import { User } from '@/domain/auth/entities/User';
 import {
   AuthServiceLocator,
@@ -11,7 +11,11 @@ import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const headersList = await headers();
+
+  const session = await auth.api.getSession({
+    headers: headersList,
+  });
 
   if (!session || !session.user?.email) {
     return (
@@ -28,11 +32,11 @@ export default async function AdminPage() {
   const authorizeAdminAccess = AuthServiceLocator.getAuthorizeAdminAccess();
   const isAuthorized = authorizeAdminAccess.execute(user);
 
-  if (isAuthorized) {
-    // Connect to database and fetch website name
-    const dbConnection = DatabaseConnection.getInstance();
-    await dbConnection.connect();
+  // Connect to database first to ensure Better Auth can access it
+  const dbConnection = DatabaseConnection.getInstance();
+  await dbConnection.connect();
 
+  if (isAuthorized) {
     const getWebsiteName = SettingsServiceLocator.getWebsiteName();
     const websiteName = await getWebsiteName.execute();
 
