@@ -4,6 +4,7 @@
     "build": { "disable": true },
     "plan": { "disable": true }
   },
+  "instructions": [".opencode/rules/*/*.mdc"],
   "mcp": {
     "github": {
       "type": "remote",
@@ -17,7 +18,7 @@
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
-        "CONTEXT7_API_KEY": "CONTEXT7_API_KEY"
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       },
       "enabled": true
     },
