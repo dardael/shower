@@ -37,8 +37,6 @@ shower/
 │   │   ├── auth/
 │   │   │   ├── entities/
 │   │   │   │   └── User.ts            -> User entity
-│   │   │   ├── repositories/
-│   │   │   │   └── UserRepository.ts  -> User repository interface
 │   │   │   ├── services/
 │   │   │   │   └── AdminAccessPolicyService.ts -> Business rules for admin access
 │   │   │   └── value-objects/
@@ -57,8 +55,6 @@ shower/
 │   │   │   │   └── GoogleOAuthAdapter.ts -> Adapter for Google OAuth
 │   │   │   ├── api/
 │   │   │   │   └── NextAuthHandler.ts -> NextAuth API handler
-│   │   │   ├── repositories/
-│   │   │   │   └── InMemoryUserRepository.ts -> In-memory implementation of UserRepository
 │   │   ├── container.ts      -> Dependency injection container
 │   ├── shared/               # Shared Layer (utilities, generic types)
 │   │   ├── components/
@@ -94,6 +90,8 @@ shower/
 ```
 
 ## Commands
+
+you must use docker compose to run all commands in order to have the same environment for everyone.
 
 - **Install**: `docker compose run --rm app npm install`
 - **Build**: `docker compose run --rm app npm run build` (Next.js with Turbopack)

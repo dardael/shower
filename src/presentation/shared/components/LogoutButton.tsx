@@ -9,22 +9,13 @@ export default function LogoutButton() {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    
     try {
-      
       await authClient.signOut();
-      
-
-      // Redirect to admin page after sign out
-      
-      router.push('/admin');
-      router.refresh();
     } catch (error) {
       console.error('Sign out error:', error);
-      // Fallback: force redirect even if there's an error
-      router.push('/admin');
-      router.refresh();
     }
+    router.push('/admin');
+    router.refresh();
   };
 
   return (
