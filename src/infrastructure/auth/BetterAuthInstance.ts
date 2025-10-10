@@ -1,22 +1,5 @@
 import { betterAuth } from 'better-auth';
-import { mongodbAdapter } from 'better-auth/adapters/mongodb';
-import { DatabaseConnection } from '../shared/databaseConnection';
-
 // Initialize database connection for Better Auth
-const dbConnection = DatabaseConnection.getInstance();
-
-// Create a function to get the database adapter
-const getDatabaseAdapter = () => {
-  try {
-    const client = dbConnection.getMongoClient();
-    console.log('Better Auth - Using MongoDB adapter');
-    return mongodbAdapter(client.db());
-  } catch {
-    // If database is not connected, fallback to memory adapter
-    console.warn('MongoDB not connected, using memory adapter for Better Auth');
-    return undefined;
-  }
-};
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
@@ -37,5 +20,4 @@ export const auth = betterAuth({
     },
     cookiePrefix: 'better-auth',
   },
-  database: getDatabaseAdapter(),
 });

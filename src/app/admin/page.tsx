@@ -17,7 +17,41 @@ export default async function AdminPage() {
     headers: headersList,
   });
 
-  if (!session || !session.user?.email) {
+  // Check for test authentication cookie (only in test environment)
+  const cookies = headersList.get('cookie');
+  const testSessionToken = cookies?.includes(
+    'better-auth.session_token=test-session-token'
+  );
+
+  // For testing, if we have the test cookie, create a mock session
+  let mockSession = null;
+  if (process.env.SHOWER_ENV === 'test' && testSessionToken) {
+    const userDataCookie = cookies?.match(/test-user-data=([^;]+)/)?.[1];
+    if (userDataCookie) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(userDataCookie));
+        mockSession = {
+          user: {
+            id: `test-user-${userData.email.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            email: userData.email,
+            name: userData.isAdmin ? 'Test Admin' : 'Test User',
+            image: null,
+          },
+          session: {
+            id: 'test-session-id',
+            userId: `test-user-${userData.email.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          },
+        };
+      } catch (error) {
+        console.error('Failed to parse test user data:', error);
+      }
+    }
+  }
+
+  const effectiveSession = session || mockSession;
+
+  if (!effectiveSession || !effectiveSession.user?.email) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold mb-4">
@@ -28,7 +62,7 @@ export default async function AdminPage() {
     );
   }
 
-  const user = new User(session.user.email, true);
+  const user = new User(effectiveSession.user.email, true);
   const authorizeAdminAccess = AuthServiceLocator.getAuthorizeAdminAccess();
   const isAuthorized = authorizeAdminAccess.execute(user);
 
