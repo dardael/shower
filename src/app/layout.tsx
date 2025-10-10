@@ -3,6 +3,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,11 +40,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Initialize database connection
+  await initializeDatabase();
+
   return (
     <html lang="en">
       <body

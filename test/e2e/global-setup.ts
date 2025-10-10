@@ -7,10 +7,6 @@ import fs from 'fs';
  * This runs once before all tests
  */
 async function globalSetup() {
-  // We don't need to set NODE_ENV as Playwright already does this
-  // process.env.NODE_ENV is set to 'test' automatically
-
-  // Load test environment variables
   const envTestPath = path.join(process.cwd(), '.env.test');
   const envTestLocalPath = path.join(process.cwd(), '.env.test.local');
 

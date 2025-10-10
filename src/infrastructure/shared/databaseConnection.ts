@@ -21,7 +21,9 @@ export class DatabaseConnection {
     const uri = process.env.MONGODB_URI as string;
 
     try {
+      // Connect using Mongoose for the application
       await mongoose.connect(uri);
+
       this.isConnected = true;
       console.log('Connected to MongoDB');
     } catch (error) {
@@ -36,6 +38,7 @@ export class DatabaseConnection {
     }
 
     await mongoose.disconnect();
+
     this.isConnected = false;
     console.log('Disconnected from MongoDB');
   }

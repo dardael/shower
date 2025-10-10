@@ -1,14 +1,16 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
+import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
+
+const authClient = new BetterAuthClientAdapter();
 
 export default function LoginButton() {
   return (
     <button
-      onClick={() => signIn('google')}
+      onClick={() => authClient.signInSocial('google', '/admin')}
       className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
     >
-      Sign in with Google
+      Continue with Google
     </button>
   );
 }

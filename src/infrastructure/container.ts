@@ -1,16 +1,12 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
-import type { UserRepository } from '@/domain/auth/repositories/UserRepository';
 import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAccessPolicyService';
-import type { OAuthService } from '@/application/auth/services/OAuthService';
-import type { IAuthenticateUser } from '@/application/auth/IAuthenticateUser';
+import type { IBetterAuthClientService } from '@/application/auth/services/IBetterAuthClientService';
 import type { IAuthorizeAdminAccess } from '@/application/auth/IAuthorizeAdminAccess';
 import type { ILogger } from '@/application/shared/ILogger';
 import { AdminAccessPolicy } from '@/domain/auth/value-objects/AdminAccessPolicy';
-import { AuthenticateUser } from '@/application/auth/AuthenticateUser';
 import { AuthorizeAdminAccess } from '@/application/auth/AuthorizeAdminAccess';
-import { GoogleOAuthAdapter } from '@/infrastructure/auth/adapters/GoogleOAuthAdapter';
-import { InMemoryUserRepository } from '@/infrastructure/auth/repositories/InMemoryUserRepository';
+import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
 import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
@@ -21,12 +17,8 @@ import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 
 // Register interfaces with implementations
-container.register<UserRepository>('UserRepository', {
-  useClass: InMemoryUserRepository,
-});
-
-container.register<OAuthService>('OAuthService', {
-  useClass: GoogleOAuthAdapter,
+container.register<IBetterAuthClientService>('IBetterAuthClientService', {
+  useClass: BetterAuthClientAdapter,
 });
 
 container.register<AdminAccessPolicyService>('AdminAccessPolicyService', {
@@ -34,9 +26,6 @@ container.register<AdminAccessPolicyService>('AdminAccessPolicyService', {
 });
 
 // Register application services
-container.register<IAuthenticateUser>('IAuthenticateUser', {
-  useClass: AuthenticateUser,
-});
 container.register<IAuthorizeAdminAccess>('IAuthorizeAdminAccess', {
   useClass: AuthorizeAdminAccess,
 });
@@ -63,10 +52,6 @@ container.register<IGetWebsiteName>('IGetWebsiteName', {
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
     return container.resolve('IAuthorizeAdminAccess');
-  }
-
-  static getAuthenticateUser(): IAuthenticateUser {
-    return container.resolve('IAuthenticateUser');
   }
 }
 

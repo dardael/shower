@@ -83,7 +83,7 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     env: {
-      NODE_ENV: 'test',
+      SHOWER_ENV: 'test',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
       NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || '',
