@@ -1,6 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/presentation/shared/components/ui/button';
+import { Input } from '@/presentation/shared/components/ui/input';
+import { Label } from '@/presentation/shared/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/shared/components/ui/card';
+import {
+  Alert,
+  AlertDescription,
+} from '@/presentation/shared/components/ui/alert';
 
 interface WebsiteSettingsFormProps {
   initialName: string;
@@ -12,6 +26,7 @@ export default function WebsiteSettingsForm({
   const [name, setName] = useState(initialName);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
   const fetchWebsiteName = async () => {
     try {
       const response = await fetch('/api/settings/name');
@@ -60,45 +75,41 @@ export default function WebsiteSettingsForm({
   };
 
   return (
-    <div className="max-w-md mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-4">Website Settings</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+    <Card className="max-w-md mx-auto mt-8">
+      <CardHeader>
+        <CardTitle>Website Settings</CardTitle>
+        <CardDescription>
+          Manage your website&apos;s basic configuration
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Website Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter website name"
+              maxLength={50}
+              required
+            />
+            <p className="text-sm text-muted-foreground">
+              This name will appear in the browser tab. Max 50 characters.
+            </p>
+          </div>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? 'Updating...' : 'Update Website Name'}
+          </Button>
+        </form>
+        {message && (
+          <Alert
+            className={`mt-4 ${message.includes('successfully') ? 'border-green-200 bg-green-50 text-green-800' : 'border-red-200 bg-red-50 text-red-800'}`}
           >
-            Website Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Enter website name"
-            maxLength={50}
-            required
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            This name will appear in the browser tab. Max 50 characters.
-          </p>
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {loading ? 'Updating...' : 'Update Website Name'}
-        </button>
-      </form>
-      {message && (
-        <p
-          className={`mt-4 text-sm ${message.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}
-        >
-          {message}
-        </p>
-      )}
-    </div>
+            <AlertDescription>{message}</AlertDescription>
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
   );
 }

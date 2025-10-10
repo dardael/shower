@@ -2,6 +2,7 @@
 
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/presentation/shared/components/ui/button';
 
 const authClient = new BetterAuthClientAdapter();
 
@@ -19,11 +20,8 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
-      onClick={handleSignOut}
-      className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-    >
+    <Button variant="outline" onClick={handleSignOut}>
       Sign out
-    </button>
+    </Button>
   );
 }

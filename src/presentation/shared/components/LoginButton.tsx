@@ -1,16 +1,17 @@
 'use client';
 
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
+import { Button } from '@/presentation/shared/components/ui/button';
 
 const authClient = new BetterAuthClientAdapter();
 
 export default function LoginButton() {
   return (
-    <button
+    <Button
       onClick={() => authClient.signInSocial('google', '/admin')}
-      className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      className="w-full"
     >
       Continue with Google
-    </button>
+    </Button>
   );
 }
