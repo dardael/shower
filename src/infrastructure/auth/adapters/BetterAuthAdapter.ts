@@ -20,7 +20,7 @@ export class BetterAuthAdapter implements IBetterAuthService {
     // This method is typically called from the client side
     // Server-side implementation would be different
     throw new Error(
-      'signInSocial should be called from client side using Better Auth client'
+      'signInSocial should be called from client side using BetterAuthClientAdapter'
     );
   }
 
