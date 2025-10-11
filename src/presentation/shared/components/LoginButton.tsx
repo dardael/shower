@@ -1,16 +1,25 @@
 'use client';
 
+import { Button } from '@chakra-ui/react';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 
 const authClient = new BetterAuthClientAdapter();
 
 export default function LoginButton() {
   return (
-    <button
+    <Button
       onClick={() => authClient.signInSocial('google', '/admin')}
-      className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      colorPalette="blue"
+      px={4}
+      py={2}
+      variant="outline"
+      w="full"
+      _dark={{
+        borderColor: 'blue.400',
+        _hover: { bg: 'blue.900' },
+      }}
     >
       Continue with Google
-    </button>
+    </Button>
   );
 }

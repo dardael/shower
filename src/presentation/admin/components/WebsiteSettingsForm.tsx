@@ -1,6 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Heading,
+  Stack,
+  Field,
+  Input,
+  Button,
+  Text,
+} from '@chakra-ui/react';
 
 interface WebsiteSettingsFormProps {
   initialName: string;
@@ -12,6 +21,7 @@ export default function WebsiteSettingsForm({
   const [name, setName] = useState(initialName);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
   const fetchWebsiteName = async () => {
     try {
       const response = await fetch('/api/settings/name');
@@ -60,45 +70,84 @@ export default function WebsiteSettingsForm({
   };
 
   return (
-    <div className="max-w-md mx-auto mt-8">
-      <h2 className="text-2xl font-bold mb-4">Website Settings</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+    <Container
+      maxW="md"
+      mx="auto"
+      mt={8}
+      p={6}
+      bg={{ base: 'white', _dark: 'gray.800' }}
+      borderRadius="lg"
+      boxShadow="md"
+    >
+      <Heading
+        as="h2"
+        size="lg"
+        mb={4}
+        color={{ base: 'gray.900', _dark: 'white' }}
+      >
+        Website Settings
+      </Heading>
+      <form onSubmit={handleSubmit}>
+        <Stack gap={4}>
+          <Field.Root>
+            <Field.Label
+              htmlFor="name"
+              color={{ base: 'gray.700', _dark: 'gray.300' }}
+            >
+              Website Name
+            </Field.Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter website name"
+              maxLength={50}
+              required
+              bg={{ base: 'white', _dark: 'gray.700' }}
+              borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
+              _focus={{
+                borderColor: { base: 'blue.500', _dark: 'blue.400' },
+                boxShadow: {
+                  base: '0 0 0 1px blue.500',
+                  _dark: '0 0 0 1px blue.400',
+                },
+              }}
+              color={{ base: 'gray.900', _dark: 'white' }}
+              _placeholder={{ color: { base: 'gray.400', _dark: 'gray.500' } }}
+            />
+            <Field.HelperText color={{ base: 'gray.500', _dark: 'gray.400' }}>
+              This name will appear in the browser tab. Max 50 characters.
+            </Field.HelperText>
+          </Field.Root>
+          <Button
+            type="submit"
+            disabled={loading}
+            loading={loading}
+            colorPalette="indigo"
+            w="full"
+            _dark={{
+              bg: 'indigo.600',
+              _hover: { bg: 'indigo.500' },
+              _disabled: { bg: 'indigo.800' },
+            }}
           >
-            Website Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="Enter website name"
-            maxLength={50}
-            required
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            This name will appear in the browser tab. Max 50 characters.
-          </p>
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {loading ? 'Updating...' : 'Update Website Name'}
-        </button>
+            {loading ? 'Updating...' : 'Update Website Name'}
+          </Button>
+        </Stack>
       </form>
       {message && (
-        <p
-          className={`mt-4 text-sm ${message.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}
+        <Text
+          mt={4}
+          fontSize="sm"
+          color={
+            message.includes('successfully')
+              ? { base: 'green.600', _dark: 'green.400' }
+              : { base: 'red.600', _dark: 'red.400' }
+          }
         >
           {message}
-        </p>
+        </Text>
       )}
-    </div>
+    </Container>
   );
 }

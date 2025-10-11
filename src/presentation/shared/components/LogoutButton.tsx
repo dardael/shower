@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@chakra-ui/react';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 import { useRouter } from 'next/navigation';
 
@@ -19,11 +20,17 @@ export default function LogoutButton() {
   };
 
   return (
-    <button
+    <Button
       onClick={handleSignOut}
-      className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+      colorPalette="red"
+      px={4}
+      py={2}
+      _dark={{
+        bg: 'red.600',
+        _hover: { bg: 'red.500' },
+      }}
     >
       Sign out
-    </button>
+    </Button>
   );
 }

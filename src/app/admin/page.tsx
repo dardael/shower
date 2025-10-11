@@ -6,6 +6,7 @@ import {
   SettingsServiceLocator,
 } from '@/infrastructure/container';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
+import { VStack, Heading, Box, AbsoluteCenter } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
 import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
@@ -53,12 +54,41 @@ export default async function AdminPage() {
 
   if (!effectiveSession || !effectiveSession.user?.email) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold mb-4">
-          Sign in to access the Admin Dashboard
-        </h1>
-        <LoginButton />
-      </div>
+      <Box
+        position="relative"
+        height={'100vh'}
+        width={'100%'}
+        bg={{ base: 'gray.50', _dark: 'gray.900' }}
+      >
+        <AbsoluteCenter>
+          <Box
+            bg={{ base: 'white', _dark: 'gray.800' }}
+            padding={8}
+            borderRadius="lg"
+            boxShadow="lg"
+            width="90%"
+            maxWidth="400px"
+          >
+            <VStack gap={4}>
+              <Heading
+                as="h1"
+                size="2xl"
+                color={{ base: 'gray.900', _dark: 'white' }}
+              >
+                Connexion
+              </Heading>
+              <Heading
+                size="md"
+                color={{ base: 'gray.600', _dark: 'gray.300' }}
+                textAlign="center"
+              >
+                {"Accéder à l'administration du site"}
+              </Heading>
+              <LoginButton />
+            </VStack>
+          </Box>
+        </AbsoluteCenter>
+      </Box>
     );
   }
 

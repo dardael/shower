@@ -1,0 +1,41 @@
+---
+description: Enforce TypeScript strict mode compliance and best practices for type safety, eliminating implicit any types and ensuring robust type checking throughout the codebase.
+globs: src/**/*.{ts,tsx}
+alwaysApply: true
+---
+
+Sub rule 1: Type Safety
+- Never use `any` type; use `unknown` for truly unknown data
+- Always provide explicit return types for functions
+- Use strict null checks; handle `null` and `undefined` explicitly
+- Prefer `const` assertions for readonly data structures
+
+Sub rule 2: Interface and Type Definitions
+- Use `interface` for object shapes that can be extended
+- Use `type` for unions, intersections, and utility types
+- Define all props interfaces for React components
+- Use generic types with proper constraints
+
+Sub rule 3: Function Typing
+- Type all function parameters explicitly
+- Use arrow functions with explicit return types
+- Avoid function overloads; use union types instead
+- Use proper typing for async functions (Promise<T>)
+
+Sub rule 4: Object and Array Typing
+- Define interfaces for complex object structures
+- Use readonly arrays when data should not be mutated
+- Type array elements explicitly (e.g., `string[]` not `Array`)
+- Use tuple types for fixed-length arrays
+
+Sub rule 5: Error Handling
+- Type error objects in catch blocks
+- Create custom error classes with proper typing
+- Use Result/Either patterns for error handling
+- Never suppress TypeScript errors with `@ts-ignore` or `@ts-expect-error`
+
+Sub rule 6: Import and Export Typing
+- Use `import type` for type-only imports
+- Export types explicitly with `export type`
+- Re-export types from barrel files
+- Avoid circular dependencies in type definitions

@@ -25,9 +25,7 @@ test.describe('Admin Page', () => {
     await page.goto('/admin');
 
     // Check that we see the login page
-    await expect(page.locator('h1')).toContainText(
-      'Sign in to access the Admin Dashboard'
-    );
+    await expect(page.locator('h1')).toContainText('Connexion');
     await expect(
       page.getByRole('button', { name: 'Continue with Google' })
     ).toBeVisible();
