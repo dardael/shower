@@ -1,6 +1,6 @@
 ---
 description: Agent to write technical documentation for software components and systems.
-mode: primary
+mode: subagent
 model: zai-coding-plan/glm-4.6
 temperature: 0.4
 tools:

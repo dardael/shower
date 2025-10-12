@@ -1,6 +1,6 @@
 ---
 description: Coding agent to implement the solution in the code base from an architect plan
-mode: primary
+mode: subagent
 model: zai-coding-plan/glm-4.6
 temperature: 0.2
 tools:

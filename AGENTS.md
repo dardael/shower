@@ -93,6 +93,9 @@ shower/
 
 you must use docker compose to run all commands in order to have the same environment for everyone.
 
+**IMPORTANT**: Agents must NOT launch `docker compose up app` or `docker compose run --rm app npm run dev`. If these commands are needed, the agent must ask the user to run them manually.
+
+- **Launch server**: `docker compose up app` (USER ONLY - agents must ask user to run this)
 - **Install**: `docker compose run --rm app npm install`
 - **Build**: `docker compose run --rm app npm run build` (Next.js with Turbopack)
 - **Lint**: `docker compose run --rm app npm run lint` (ESLint with Next.js, TypeScript, Prettier)

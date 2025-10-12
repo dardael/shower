@@ -1,6 +1,6 @@
 ---
 description: Agent to write functionnal documentation from user story and code implementation
-mode: primary
+mode: subagent
 model: zai-coding-plan/glm-4.6
 temperature: 0.4
 tools:

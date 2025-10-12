@@ -45,7 +45,7 @@ description: Describe the specific role this agent plays, e.g., "You are a code 
 
 mode: primary
 
-model: github-copilot/gpt-4o for plan or brainstorming tasks / github-copilot/gpt-4.1 for writing or coding tasks,
+model: zai-coding-plan/glm-4.6
 
 temperature: 0.1 => Very focused and deterministic responses / 0.4 => Balanced responses with some creativity / 0.8 => More creative and varied responses, useful for brainstorming and exploration,
 
@@ -88,5 +88,4 @@ github: [true or false depending on if the agent needs access to github]
 
 4. Fill in the sections (Role, Goal, Rules, Steps) with content tailored to the specified phase.
 5. Ensure the definition is practical, actionable, and suitable for OpenAI.
-6. Output the definition in markdown format by creating a file in agent/ directory.
-7. If a template output file to fill is necessary, create a new file based on the template and populate it with the generated content. set it in template/ directory
+6. Output the definition in markdown format by creating a file in .opencode/agent/ directory.

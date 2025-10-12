@@ -1,30 +1,35 @@
 ---
-description: Rules for writing and maintaining unit tests with Jest, ensuring consistency, readability, and adherence to best practices.
+description: Rules for writing simple, maintainable unit tests focusing on main behaviors without over-mocking or over-testing.
 globs: test/unit/**/*.test.ts
 alwaysApply: false
 ---
 
-Sub rule 1: Test Structure
+Sub rule 1: Test Simplicity
+- Test only main behaviors and happy paths
+- Avoid testing implementation details
+- Focus on what the code does, not how it does it
+- Keep tests short and readable
+
+Sub rule 2: Test Structure
 - Name test files as `ModuleName.test.ts`
-- Group related tests using `describe` blocks 
-- Write meaningful test names
+- Group related tests using `describe` blocks
+- Use descriptive test names that explain the behavior
+- Follow Arrange-Act-Assert pattern
 
-Sub rule 2: Jest Matchers/Expectations
+Sub rule 3: Minimal Mocking
+- Mock only external dependencies (API calls, database, file system)
+- Never mock Chakra UI components or React components
+- Use real implementations when possible
+- Avoid mocking internal application logic
+
+Sub rule 4: Simple Assertions
 - Use `toBe` for primitive comparisons
-- Use `toEqual` for object/array deep equality
-- Avoid negated assertions (e.g., `not`) unless necessary
+- Use `toEqual` for object/array equality
+- Use `toBeTruthy`/`toBeFalsy` for boolean checks
+- Keep assertions focused on the expected outcome
 
-Sub rule 3: Mocks and Spies
-- Use `jest.fn()` for function mocks
-- Cleanup mocks after each test with `afterEach`
-- Use spies only when validating internal calls
-
-Sub rule 4: Test Isolation
+Sub rule 5: Test Isolation
 - No shared state between tests
-- Avoid relying on external resources
-- Use dependency injection for external dependencies
-
-Sub rule 5: Coverage
-- Cover edge cases and invalid inputs
-- Avoid excessive mocking leading to false positives
-- Ensure meaningful assertions to validate outputs
+- Use `beforeEach` only for essential setup
+- Avoid complex setup procedures
+- Keep tests independent and fast

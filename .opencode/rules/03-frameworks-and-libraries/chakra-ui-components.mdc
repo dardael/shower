@@ -11,6 +11,7 @@ Sub rule 1: Component Structure
 - Use Chakra's `Button` component for all button interactions
 - Use Chakra v3 form components with compound patterns (`Field.Root`, `Field.Label`, `Input`, `Field.ErrorText`)
 - Use `asChild` prop for styling external components like Next.js Image/Link
+  - Use {"my ' text"} when a text has a caracter to encode to avoid to write the encoded caracter
 
 Sub rule 2: Responsive Design
 - Use Chakra's responsive object syntax: `{{ base: 'sm', md: 'lg', xl: 'xl' }}`
