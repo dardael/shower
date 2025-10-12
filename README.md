@@ -29,7 +29,7 @@ This project follows **Domain-Driven Design (DDD)** and **Hexagonal Architecture
 
 Key technologies:
 
-- **Authentication**: NextAuth.js with Google OAuth
+- **Authentication**: BetterAuth with Google OAuth
 - **Dependency Injection**: Tsyringe
 - **Styling**: Tailwind CSS with Headless UI
 - **Testing**: Jest for unit tests, Playwright for integration tests
@@ -70,7 +70,7 @@ The `/admin` page is protected and requires Google authentication. Only users wi
    ADMIN_EMAIL=your-admin-email@example.com
    GOOGLE_CLIENT_ID=your-google-client-id
    GOOGLE_CLIENT_SECRET=your-google-client-secret
-   NEXTAUTH_SECRET=your-random-secret-string
+   BETTERAUTH_SECRET=your-random-secret-string
    ```
 
 3. **Access the admin page:**
@@ -160,7 +160,7 @@ Make sure to set the following environment variables in your Vercel project sett
 - `ADMIN_EMAIL`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL` (your deployment URL)
+- `BETTERAUTH_SECRET`
+- `BETTERAUTH_URL` (your deployment URL)
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

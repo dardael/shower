@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 async function getWebsiteName(): Promise<string> {
   try {
     const response = await fetch(
-      `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/settings/name`,
+      `${process.env.BETTERAUTH_URL || 'http://localhost:3000'}/api/settings/name`,
       {
         cache: 'no-store', // Always fetch fresh data for metadata
       }

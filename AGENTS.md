@@ -54,7 +54,7 @@ shower/
 │   │   │   ├── adapters/
 │   │   │   │   └── GoogleOAuthAdapter.ts -> Adapter for Google OAuth
 │   │   │   ├── api/
-│   │   │   │   └── NextAuthHandler.ts -> NextAuth API handler
+│   │   │   │   └── BetterAuthHandler.ts -> BetterAuth API handler
 │   │   ├── container.ts      -> Dependency injection container
 │   ├── shared/               # Shared Layer (utilities, generic types)
 │   │   ├── components/
