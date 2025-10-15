@@ -58,41 +58,68 @@ export default async function AdminPage() {
         position="relative"
         height="100vh"
         width="100%"
+        bg="bg.canvas"
         bgGradient={{
-          base: 'linear-gradient(135deg, blue.50 0%, purple.50 50%, indigo.50 100%)',
+          base: 'radial-gradient(circle at 20% 80%, blue.50 0%, transparent 50%), radial-gradient(circle at 80% 20%, purple.50 0%, transparent 50%), linear-gradient(135deg, gray.50 0%, white 100%)',
           _dark:
-            'linear-gradient(135deg, gray.900 0%, blue.900 50%, purple.900 100%)',
+            'radial-gradient(circle at 20% 80%, blue.900 0%, transparent 50%), radial-gradient(circle at 80% 20%, purple.900 0%, transparent 50%), linear-gradient(135deg, gray.900 0%, black 100%)',
+        }}
+        _before={{
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%)',
+          pointerEvents: 'none',
         }}
       >
         <AbsoluteCenter>
           <Box
-            bg={{ base: 'white', _dark: 'gray.800' }}
-            borderRadius="2xl"
+            bg="bg.subtle"
+            borderRadius="3xl"
+            border="1px solid"
+            borderColor="border"
             boxShadow={{
-              base: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              base: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)',
               _dark:
-                '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3)',
+                '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)',
             }}
-            padding={10}
-            width="450px"
+            padding={{ base: 6, sm: 8, md: 10 }}
+            width={{ base: '95%', sm: '90%', md: '480px' }}
             maxWidth="90%"
+            position="relative"
+            _after={{
+              content: '""',
+              position: 'absolute',
+              top: -1,
+              left: -1,
+              right: -1,
+              bottom: -1,
+              bg: 'linear-gradient(135deg, blue.500, purple.500)',
+              borderRadius: '3xl',
+              zIndex: -1,
+              opacity: 0.1,
+            }}
           >
-            <VStack gap={6}>
+            <VStack gap={{ base: 4, md: 6 }}>
               <Heading
                 as="h1"
-                size="3xl"
+                size={{ base: '2xl', md: '3xl' }}
                 fontWeight="bold"
-                color={{ base: 'gray.900', _dark: 'white' }}
+                color="fg"
                 textAlign="center"
+                letterSpacing="tight"
               >
                 Connexion
               </Heading>
               <Heading
-                size="lg"
+                size={{ base: 'md', md: 'lg' }}
                 fontWeight="medium"
-                color={{ base: 'gray.600', _dark: 'gray.300' }}
+                color="fg.muted"
                 textAlign="center"
-                lineHeight="1.5"
+                lineHeight="relaxed"
               >
                 {"Accéder à l'administration du site"}
               </Heading>

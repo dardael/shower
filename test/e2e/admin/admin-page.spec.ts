@@ -55,9 +55,11 @@ test.describe('Admin Page', () => {
 
     await signIn(page, 'non-admin@example.com', false);
     // Check that we see the not authorized page
-    await expect(page.locator('h1')).toContainText('Not Authorized');
+    await expect(page.locator('h1')).toContainText('Access Restricted');
     await expect(
-      page.getByText('You do not have permission to access this page')
+      page.getByText(
+        "You don't have the necessary permissions to access this admin area"
+      )
     ).toBeVisible();
   });
 

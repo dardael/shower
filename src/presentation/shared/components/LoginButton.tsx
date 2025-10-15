@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, HStack } from '@chakra-ui/react';
+import { Button, HStack, Box } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc';
 import { useState } from 'react';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
@@ -23,31 +23,39 @@ export default function LoginButton() {
     <Button
       onClick={handleSignIn}
       loading={isLoading}
-      loadingText="Connexion..."
+      loadingText="Connecting..."
       colorPalette="blue"
-      variant="solid"
+      variant="surface"
       size="lg"
       width="full"
-      height="56px"
-      borderRadius="lg"
+      height="52px"
+      borderRadius="xl"
       fontSize="md"
-      fontWeight="600"
+      fontWeight="semibold"
+      bg="bg.canvas"
+      borderWidth="2px"
+      borderColor="border"
+      color="fg"
       _hover={{
+        bg: 'colorPalette.subtle',
+        borderColor: 'colorPalette.solid',
         transform: 'translateY(-1px)',
-        boxShadow: '0 10px 20px -5px rgba(59, 130, 246, 0.5)',
+        color: 'fg',
       }}
       _active={{
         transform: 'translateY(0)',
       }}
       _focusVisible={{
         ring: '2px',
-        ringColor: 'blue.500',
+        ringColor: 'colorPalette.solid',
         ringOffset: '2px',
       }}
     >
       {!isLoading && (
         <HStack gap={3}>
-          <FcGoogle size={20} />
+          <Box p={1} borderRadius="md" bg="white">
+            <FcGoogle size={18} />
+          </Box>
           <span>Continue with Google</span>
         </HStack>
       )}

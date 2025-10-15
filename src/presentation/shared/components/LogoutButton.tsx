@@ -1,6 +1,7 @@
 'use client';
 
-import { Button } from '@chakra-ui/react';
+import { Button, HStack } from '@chakra-ui/react';
+import { FiLogOut } from 'react-icons/fi';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
 import { useRouter } from 'next/navigation';
 
@@ -23,14 +24,30 @@ export default function LogoutButton() {
     <Button
       onClick={handleSignOut}
       colorPalette="red"
-      px={4}
-      py={2}
+      variant="outline"
+      size="md"
+      borderRadius="lg"
+      fontWeight="medium"
+      borderWidth="2px"
+      borderColor="border"
+      color="fg"
+      _hover={{
+        bg: 'colorPalette.subtle',
+        borderColor: 'colorPalette.solid',
+        color: 'fg',
+      }}
       _dark={{
-        bg: 'red.600',
-        _hover: { bg: 'red.500' },
+        borderColor: 'border',
+        _hover: {
+          bg: 'colorPalette.subtle',
+          borderColor: 'colorPalette.solid',
+        },
       }}
     >
-      Sign out
+      <HStack gap={2}>
+        <FiLogOut size={16} />
+        <span>Sign out</span>
+      </HStack>
     </Button>
   );
 }

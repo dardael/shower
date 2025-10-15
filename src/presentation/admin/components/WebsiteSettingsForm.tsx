@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Heading,
   Stack,
   Field,
   Input,
   Button,
   Text,
+  Box,
+  VStack,
 } from '@chakra-ui/react';
 
 interface WebsiteSettingsFormProps {
@@ -70,29 +71,62 @@ export default function WebsiteSettingsForm({
   };
 
   return (
-    <Container
-      maxW="md"
-      mx="auto"
-      mt={8}
-      p={6}
-      bg={{ base: 'white', _dark: 'gray.800' }}
-      borderRadius="lg"
-      boxShadow="md"
+    <Box
+      bg="bg.subtle"
+      borderRadius="2xl"
+      border="1px solid"
+      borderColor="border"
+      p={{ base: 4, sm: 6, md: 8 }}
+      boxShadow="sm"
+      position="relative"
+      _before={{
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '4px',
+        bg: 'linear-gradient(90deg, blue.500, purple.500)',
+        borderRadius: '2xl 2xl 0 0',
+      }}
     >
-      <Heading
-        as="h2"
-        size="lg"
-        mb={4}
-        color={{ base: 'gray.900', _dark: 'white' }}
-      >
-        Website Settings
-      </Heading>
+      <VStack align="start" gap={2} mb={{ base: 4, md: 6 }}>
+        <Heading
+          as="h2"
+          size={{ base: 'lg', md: 'xl' }}
+          fontWeight="semibold"
+          color="fg"
+          display="flex"
+          alignItems="center"
+          gap={3}
+        >
+          <Box
+            w="8px"
+            h="8px"
+            borderRadius="full"
+            bg="colorPalette.solid"
+            colorPalette="purple"
+          />
+          Website Settings
+        </Heading>
+        <Text
+          fontSize={{ base: 'sm', md: 'md' }}
+          color="fg.muted"
+          lineHeight="relaxed"
+        >
+          Configure your website&apos;s basic information and appearance
+        </Text>
+      </VStack>
+
       <form onSubmit={handleSubmit}>
-        <Stack gap={4}>
+        <Stack gap={{ base: 4, md: 6 }}>
           <Field.Root>
             <Field.Label
               htmlFor="name"
-              color={{ base: 'gray.700', _dark: 'gray.300' }}
+              fontSize="sm"
+              fontWeight="semibold"
+              color="fg"
+              mb={2}
             >
               Website Name
             </Field.Label>
@@ -100,54 +134,77 @@ export default function WebsiteSettingsForm({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter website name"
+              placeholder="Enter your website name"
               maxLength={50}
               required
-              bg={{ base: 'white', _dark: 'gray.700' }}
-              borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
+              bg="bg.canvas"
+              borderColor="border"
+              borderWidth="2px"
+              borderRadius="lg"
+              fontSize={{ base: 'sm', md: 'md' }}
+              color="fg"
+              _placeholder={{ color: 'fg.muted' }}
               _focus={{
-                borderColor: { base: 'blue.500', _dark: 'blue.400' },
-                boxShadow: {
-                  base: '0 0 0 1px blue.500',
-                  _dark: '0 0 0 1px blue.400',
-                },
+                borderColor: 'colorPalette.solid',
+                colorPalette: 'blue',
+                boxShadow: '0 0 0 3px colorPalette.subtle',
               }}
-              color={{ base: 'gray.900', _dark: 'white' }}
-              _placeholder={{ color: { base: 'gray.400', _dark: 'gray.500' } }}
+              _hover={{
+                borderColor: 'border.emphasized',
+              }}
             />
-            <Field.HelperText color={{ base: 'gray.500', _dark: 'gray.400' }}>
-              This name will appear in the browser tab. Max 50 characters.
+            <Field.HelperText
+              fontSize={{ base: 'xs', md: 'sm' }}
+              color="fg.muted"
+              mt={2}
+            >
+              This name appears in browser tabs and search results. Maximum 50
+              characters.
             </Field.HelperText>
           </Field.Root>
+
           <Button
             type="submit"
             disabled={loading}
             loading={loading}
-            colorPalette="indigo"
-            w="full"
+            colorPalette="blue"
+            variant="solid"
+            size={{ base: 'md', md: 'lg' }}
+            width="full"
+            height={{ base: '44px', md: '48px' }}
+            borderRadius="lg"
+            fontSize={{ base: 'sm', md: 'md' }}
+            fontWeight="semibold"
+            mt={2}
             _dark={{
-              bg: 'indigo.600',
-              _hover: { bg: 'indigo.500' },
-              _disabled: { bg: 'indigo.800' },
+              bg: 'colorPalette.solid',
+              _hover: { bg: 'colorPalette.emphasized' },
+              _disabled: { bg: 'colorPalette.muted' },
             }}
           >
             {loading ? 'Updating...' : 'Update Website Name'}
           </Button>
         </Stack>
       </form>
+
       {message && (
         <Text
           mt={4}
           fontSize="sm"
-          color={
-            message.includes('successfully')
-              ? { base: 'green.600', _dark: 'green.400' }
-              : { base: 'red.600', _dark: 'red.400' }
+          fontWeight="medium"
+          px={3}
+          py={2}
+          borderRadius="md"
+          bg={message.includes('successfully') ? 'green.subtle' : 'red.subtle'}
+          color={message.includes('successfully') ? 'green.fg' : 'red.fg'}
+          border="1px solid"
+          borderColor={
+            message.includes('successfully') ? 'green.border' : 'red.border'
           }
         >
           {message}
         </Text>
       )}
-    </Container>
+    </Box>
   );
 }
