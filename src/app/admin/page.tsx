@@ -56,31 +56,43 @@ export default async function AdminPage() {
     return (
       <Box
         position="relative"
-        height={'100vh'}
-        width={'100%'}
-        bg={{ base: 'gray.50', _dark: 'gray.900' }}
+        height="100vh"
+        width="100%"
+        bgGradient={{
+          base: 'linear-gradient(135deg, blue.50 0%, purple.50 50%, indigo.50 100%)',
+          _dark:
+            'linear-gradient(135deg, gray.900 0%, blue.900 50%, purple.900 100%)',
+        }}
       >
         <AbsoluteCenter>
           <Box
             bg={{ base: 'white', _dark: 'gray.800' }}
-            padding={8}
-            borderRadius="lg"
-            boxShadow="lg"
-            width="90%"
-            maxWidth="400px"
+            borderRadius="2xl"
+            boxShadow={{
+              base: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+              _dark:
+                '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3)',
+            }}
+            padding={10}
+            width="450px"
+            maxWidth="90%"
           >
-            <VStack gap={4}>
+            <VStack gap={6}>
               <Heading
                 as="h1"
-                size="2xl"
+                size="3xl"
+                fontWeight="bold"
                 color={{ base: 'gray.900', _dark: 'white' }}
+                textAlign="center"
               >
                 Connexion
               </Heading>
               <Heading
-                size="md"
+                size="lg"
+                fontWeight="medium"
                 color={{ base: 'gray.600', _dark: 'gray.300' }}
                 textAlign="center"
+                lineHeight="1.5"
               >
                 {"Accéder à l'administration du site"}
               </Heading>

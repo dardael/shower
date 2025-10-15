@@ -20,4 +20,6 @@ export const auth = betterAuth({
     },
     cookiePrefix: 'better-auth',
   },
+  trustedOrigins:
+    process.env.NODE_ENV === 'development' ? ['http://localhost:3000'] : [],
 });

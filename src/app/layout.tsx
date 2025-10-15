@@ -1,21 +1,9 @@
 import 'reflect-metadata';
 import React from 'react';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
-import ChakraUIProvider from '@/infrastructure/shared/adapters/ChakraUIProvider';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
+import { Provider } from '@/presentation/shared/components/ui/provider';
 async function getWebsiteName(): Promise<string> {
   try {
     const response = await fetch(
@@ -50,11 +38,9 @@ export default async function RootLayout({
   await initializeDatabase();
 
   return (
-    <html lang="en" className="h-full">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} h-full m-0 p-0 font-sans antialiased`}
-      >
-        <ChakraUIProvider>{children}</ChakraUIProvider>
+    <html suppressHydrationWarning>
+      <body>
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
