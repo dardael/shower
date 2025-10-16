@@ -4,16 +4,39 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
+
+// Force dynamic rendering to prevent static generation during build
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 async function getWebsiteName(): Promise<string> {
+  // Only fetch during runtime, not during build
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    return 'Shower'; // Default during build
+  }
+
   try {
-    const response = await fetch(
-      `${process.env.BETTERAUTH_URL || 'http://localhost:3000'}/api/settings/name`
-    );
+    const baseUrl =
+      process.env.BETTER_AUTH_URL ||
+      (process.env.NODE_ENV === 'production'
+        ? process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000'
+        : 'http://localhost:3000');
+
+    const response = await fetch(`${baseUrl}/api/settings/name`, {
+      cache: 'no-store', // Ensure fresh data
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
     const data = await response.json();
     return data.name || 'Shower';
   } catch (error) {
     console.error('Failed to fetch website name:', error);
-    return 'Shower'; // Default
+    return 'Shower'; // Default fallback
   }
 }
 

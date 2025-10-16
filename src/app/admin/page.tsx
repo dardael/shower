@@ -6,10 +6,14 @@ import {
   SettingsServiceLocator,
 } from '@/infrastructure/container';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
-import { VStack, Heading, Box, AbsoluteCenter } from '@chakra-ui/react';
+import { VStack, Heading, Box, AbsoluteCenter, Text } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
 import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
+
+// Force dynamic rendering to prevent static generation during build
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export default async function AdminPage() {
   const headersList = await headers();
@@ -136,14 +140,58 @@ export default async function AdminPage() {
   const isAuthorized = authorizeAdminAccess.execute(user);
 
   // Connect to database first to ensure Better Auth can access it
-  const dbConnection = DatabaseConnection.getInstance();
-  await dbConnection.connect();
+  // Add error handling for build-time scenarios
+  let websiteName: string | null = null;
+  let dbError: Error | null = null;
+
+  try {
+    const dbConnection = DatabaseConnection.getInstance();
+    await dbConnection.connect();
+
+    if (isAuthorized) {
+      const getWebsiteName = SettingsServiceLocator.getWebsiteName();
+      websiteName = await getWebsiteName.execute();
+    }
+  } catch (error) {
+    console.error('Database connection error:', error);
+    dbError =
+      error instanceof Error ? error : new Error('Unknown database error');
+
+    // In development environment, show a helpful error message
+    if (process.env.NODE_ENV === 'development') {
+      return (
+        <Box
+          position="relative"
+          height="100vh"
+          width="100%"
+          bg="bg.canvas"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <VStack gap={4} maxW="500px" textAlign="center" p={8}>
+            <Heading size="lg" color="fg">
+              Database Connection Required
+            </Heading>
+            <Text color="fg.muted">
+              The admin panel requires a database connection. Please ensure:
+            </Text>
+            <VStack gap={2} align="start" color="fg.muted">
+              <Text>• MongoDB is running and accessible</Text>
+              <Text>• MONGODB_URI environment variable is set</Text>
+              <Text>• Database permissions are configured correctly</Text>
+            </VStack>
+            <Text fontSize="sm" color="fg.muted">
+              Error: {dbError.message}
+            </Text>
+          </VStack>
+        </Box>
+      );
+    }
+  }
 
   if (isAuthorized) {
-    const getWebsiteName = SettingsServiceLocator.getWebsiteName();
-    const websiteName = await getWebsiteName.execute();
-
-    return <AdminDashboard initialWebsiteName={websiteName} />;
+    return <AdminDashboard initialWebsiteName={websiteName || ''} />;
   } else {
     return <NotAuthorized />;
   }
