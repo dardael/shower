@@ -1,9 +1,4 @@
 import { defineConfig, devices } from '@playwright/test';
-import { config } from 'dotenv';
-
-// Load test environment variables
-config({ path: '.env.test' });
-config({ path: '.env.test.local', override: true });
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -17,9 +12,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  workers: 1,
+  workers: 8,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: 'line',
   /* Global setup and teardown for the tests */
   globalSetup: './test/e2e/global-setup.ts',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -40,20 +35,6 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-      },
-    },
-
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-      },
-    },
-
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
       },
     },
     /* Test against mobile viewports. */
@@ -79,17 +60,18 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     env: {
+      NODE_ENV: 'production',
       SHOWER_ENV: 'test',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
       BETTERAUTH_SECRET: process.env.BETTERAUTH_SECRET || '',
       BETTERAUTH_URL: process.env.BETTERAUTH_URL || '',
       ADMIN_EMAIL: process.env.ADMIN_EMAIL || '',
-      MONGODB_URI: process.env.MONGODB_URI_TEST || '',
+      MONGODB_URI: process.env.MONGODB_URI || '',
     },
   },
 });

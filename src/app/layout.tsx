@@ -7,10 +7,7 @@ import { Provider } from '@/presentation/shared/components/ui/provider';
 async function getWebsiteName(): Promise<string> {
   try {
     const response = await fetch(
-      `${process.env.BETTERAUTH_URL || 'http://localhost:3000'}/api/settings/name`,
-      {
-        cache: 'no-store', // Always fetch fresh data for metadata
-      }
+      `${process.env.BETTERAUTH_URL || 'http://localhost:3000'}/api/settings/name`
     );
     const data = await response.json();
     return data.name || 'Shower';

@@ -34,6 +34,25 @@ async function globalSetup() {
   ) {
     console.warn('WARNING: MONGODB_URI is not set to a test database');
   }
+
+  // Verify critical environment variables are available
+  const requiredEnvVars = [
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'BETTERAUTH_SECRET',
+    'BETTERAUTH_URL',
+    'ADMIN_EMAIL',
+    'MONGODB_URI',
+  ];
+
+  const missingVars = requiredEnvVars.filter(
+    (varName) => !process.env[varName]
+  );
+  if (missingVars.length > 0) {
+    console.warn(`⚠️ Missing environment variables: ${missingVars.join(', ')}`);
+  }
+
+  console.log('✅ Environment setup completed');
 }
 
 export default globalSetup;
