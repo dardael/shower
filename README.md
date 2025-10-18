@@ -2,14 +2,14 @@
 
 A Next.js application for creating showcase websites with admin authentication.
 
-This project uses modern technologies including Next.js 15, TypeScript, Tailwind CSS, and follows Domain-Driven Design (DDD) and Hexagonal Architecture principles.
+This project uses modern technologies including Next.js 15, TypeScript, Chakra UI, and follows Domain-Driven Design (DDD) and Hexagonal Architecture principles.
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-docker compose run --rm npm run dev
+docker compose run --rm app npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -31,7 +31,7 @@ Key technologies:
 
 - **Authentication**: BetterAuth with Google OAuth
 - **Dependency Injection**: Tsyringe
-- **Styling**: Tailwind CSS with Headless UI
+- **Styling**: Chakra UI
 - **Testing**: Jest for unit tests, Playwright for integration tests
 
 ## Project Structure
@@ -140,13 +140,13 @@ This project uses Prettier for code formatting.
 To format the code, run:
 
 ```bash
-docker compose run --rm npm run format
+docker compose run --rm app npm run format
 ```
 
 To check if the code is formatted correctly, run:
 
 ```bash
-docker compose run --rm npm run check-format
+docker compose run --rm app npm run check-format
 ```
 
 ## Deploy on Vercel
