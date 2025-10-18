@@ -11,6 +11,14 @@ import {
   Box,
   VStack,
 } from '@chakra-ui/react';
+import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import type {
+  ImageData,
+  ImageMetadata,
+  ImageManagerConfig,
+  ImageManagerLabels,
+  ValidationError,
+} from '@/presentation/shared/components/ImageManager/types';
 
 interface WebsiteSettingsFormProps {
   initialName: string;
@@ -22,6 +30,8 @@ export default function WebsiteSettingsForm({
   const [name, setName] = useState(initialName);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
+  const [iconLoading, setIconLoading] = useState(false);
 
   const fetchWebsiteName = async () => {
     try {
@@ -37,8 +47,29 @@ export default function WebsiteSettingsForm({
     }
   };
 
+  const fetchWebsiteIcon = async () => {
+    try {
+      const response = await fetch('/api/settings/icon');
+      const data = await response.json();
+      if (response.ok && data.icon) {
+        setCurrentIcon({
+          url: data.icon.url,
+          filename: data.icon.filename,
+          size: data.icon.size,
+          format: data.icon.format,
+        });
+      } else {
+        setCurrentIcon(null);
+      }
+    } catch (error) {
+      console.error('Error fetching website icon:', error);
+      setCurrentIcon(null);
+    }
+  };
+
   useEffect(() => {
     fetchWebsiteName();
+    fetchWebsiteIcon();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,6 +99,94 @@ export default function WebsiteSettingsForm({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Icon management functions
+  const handleIconUpload = async (
+    file: File,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _metadata: ImageMetadata
+  ): Promise<void> => {
+    setIconLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('icon', file);
+
+      const response = await fetch('/api/settings/icon', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCurrentIcon({
+          url: data.icon.url,
+          filename: data.icon.filename,
+          size: data.icon.size,
+          format: data.icon.format,
+        });
+        setMessage('Website icon updated successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to upload icon');
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setIconLoading(false);
+    }
+  };
+
+  const handleIconDelete = async (): Promise<void> => {
+    setIconLoading(true);
+    try {
+      const response = await fetch('/api/settings/icon', {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCurrentIcon(null);
+        setMessage('Website icon removed successfully!');
+      } else {
+        throw new Error(data.error || 'Failed to remove icon');
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setIconLoading(false);
+    }
+  };
+
+  const handleIconReplace = async (
+    file: File,
+    metadata: ImageMetadata
+  ): Promise<void> => {
+    await handleIconUpload(file, metadata);
+  };
+
+  const handleIconValidationError = (error: ValidationError): void => {
+    setMessage(error.message);
+  };
+
+  // Icon manager configuration
+  const iconConfig: ImageManagerConfig = {
+    acceptedFormats: ['ico', 'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'],
+    maxFileSize: 2 * 1024 * 1024, // 2MB
+    previewSize: { width: '64px', height: '64px' },
+    aspectRatio: '1:1',
+  };
+
+  const iconLabels: ImageManagerLabels = {
+    uploadLabel: 'Upload Website Icon',
+    uploadHint:
+      'Upload a favicon for your website (ICO, PNG, JPG, SVG, GIF, WebP)',
+    replaceButton: 'Replace Icon',
+    deleteButton: 'Remove Icon',
+    dragDropText: 'Drag and drop your icon here',
+    sizeLimitText: 'Maximum file size: 2MB',
+    formatText: 'Supported formats: ICO, PNG, JPG, SVG, GIF, WebP',
   };
 
   return (
@@ -163,6 +282,44 @@ export default function WebsiteSettingsForm({
             </Field.HelperText>
           </Field.Root>
 
+          <Field.Root>
+            <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
+              Website Icon
+            </Field.Label>
+            <Box
+              bg="bg.canvas"
+              borderColor="border"
+              borderWidth="2px"
+              borderRadius="lg"
+              p={4}
+            >
+              <ImageManager
+                currentImage={currentIcon}
+                config={iconConfig}
+                labels={iconLabels}
+                onImageUpload={handleIconUpload}
+                onImageDelete={handleIconDelete}
+                onImageReplace={handleIconReplace}
+                onValidationError={handleIconValidationError}
+                disabled={iconLoading}
+                loading={iconLoading}
+                showFileSize={true}
+                showFormatInfo={true}
+                allowDelete={true}
+                allowReplace={true}
+              />
+            </Box>
+            <Field.HelperText
+              fontSize={{ base: 'xs', md: 'sm' }}
+              color="fg.muted"
+              mt={2}
+            >
+              Upload a favicon that appears in browser tabs. Recommended size is
+              32x32 pixels for ICO format or 16x16 to 32x32 pixels for other
+              formats.
+            </Field.HelperText>
+          </Field.Root>
+
           <Button
             type="submit"
             disabled={loading}
@@ -182,7 +339,7 @@ export default function WebsiteSettingsForm({
               _disabled: { bg: 'colorPalette.muted' },
             }}
           >
-            {loading ? 'Updating...' : 'Update Website Name'}
+            {loading ? 'Updating...' : 'Update Website'}
           </Button>
         </Stack>
       </form>

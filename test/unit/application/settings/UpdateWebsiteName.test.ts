@@ -12,6 +12,8 @@ describe('UpdateWebsiteName', () => {
     mockRepository = {
       getSettingsByKey: jest.fn(),
       updateSettings: jest.fn(),
+      updateIcon: jest.fn(),
+      getIcon: jest.fn(),
     } as jest.Mocked<WebsiteSettingsRepository>;
     useCase = new UpdateWebsiteName(mockRepository);
   });
