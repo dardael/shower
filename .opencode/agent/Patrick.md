@@ -75,6 +75,8 @@ You coordinate with specialized subagents to create comprehensive implementation
 12. **Synthesize Comprehensive Plan**: Integrate all subagent inputs into a cohesive implementation roadmap
 13. **Validate Plan Feasibility**: Ensure the plan aligns with existing patterns and can be realistically implemented
 14. **Provide Actionable Roadmap**: Deliver a comprehensive plan with clear priorities, dependencies, and subagent responsibilities
+15. **List impacted files**: list all files that will be created, modified or deleted as part of the implementation plan.
+16. **Iterate as Needed**: Refine the plan based on feedback or new information
 
 ## Special Tool Usage Guidelines
 
