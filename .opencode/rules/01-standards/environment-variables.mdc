@@ -1,0 +1,42 @@
+---
+description: Defines the structure and management of environment variables across development, testing, and production environments, ensuring secure handling of sensitive data and consistent configuration.
+globs: .env*
+alwaysApply: false
+---
+
+Sub rule 1: Environment File Structure
+- Use `.env` for non-sensitive production variables
+- Use `.env.local` for sensitive production variables (passwords, API keys, secrets)
+- Use `.env.test` for non-sensitive test variables
+- Use `.env.test.local` for sensitive test variables
+- Add all sensitive variables to `.env` and `.env.test` with empty values as placeholders
+
+Sub rule 2: Production Environment Setup
+- Place non-sensitive variables in `.env`: `NEXT_PUBLIC_APP_URL=`, `NODE_ENV=production`
+- Place sensitive variables in `.env.local`: `DATABASE_URL=`, `SECRET_KEY=`, `API_TOKEN=`
+- Add empty placeholders for sensitive variables in `.env`: `DATABASE_URL=`, `SECRET_KEY=`
+- Never commit `.env.local` to version control (add to `.gitignore`)
+
+Sub rule 3: Test Environment Setup
+- Place non-sensitive test variables in `.env.test`: `NEXT_PUBLIC_APP_URL=http://localhost:3000`
+- Place sensitive test variables in `.env.test.local`: `TEST_DATABASE_URL=`, `TEST_SECRET_KEY=`
+- Add empty placeholders for sensitive variables in `.env.test`: `TEST_DATABASE_URL=`, `TEST_SECRET_KEY=`
+- Configure additional test variables in `playwright.config.ts` when needed
+
+Sub rule 4: Variable Classification
+- Sensitive variables: passwords, API keys, secret tokens, database URLs, private keys
+- Non-sensitive variables: URLs, ports, feature flags, public configuration, environment names
+- When in doubt, treat variables as sensitive and use `.local` files
+
+Sub rule 5: Security Best Practices
+- Always add `.env.local` and `.env.test.local` to `.gitignore`
+- Use empty values in committed files to document required variables
+- Use environment-specific prefixes: `TEST_` for test variables
+- Validate required environment variables on application startup
+- Use TypeScript interfaces to type environment variables
+
+Sub rule 6: Documentation and Access
+- Document environment variables only in `README.md` or `doc/technical.md`
+- Do not add comments about environment variables in code files
+- Provide clear setup instructions for new developers in documentation
+- Production deployment will use `.env.local` for all environment variables
