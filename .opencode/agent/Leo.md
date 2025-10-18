@@ -231,7 +231,7 @@ The goal is to orchestrate the entire software development lifecycle by intellig
 
 When any agent or subagent launches e2e tests, Leo must actively monitor the test execution to prevent hanging processes:
 
-1. **Output Monitoring**: Track test output in real-time to detect when no changes occur for 30+ seconds
+1. **Output Monitoring**: Track test output in real-time to detect when no changes occur for 60+ seconds
 2. **Process Termination**: Automatically stop the test process when output stagnation is detected
 3. **Resource Cleanup**: Ensure proper cleanup of test processes and associated resources
 

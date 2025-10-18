@@ -1,4 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
+import { config as dotenvConfig } from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+
+// Load test environment variables before configuration
+const envTestPath = path.join(process.cwd(), '.env.test');
+const envTestLocalPath = path.join(process.cwd(), '.env.test.local');
+
+if (fs.existsSync(envTestPath)) {
+  dotenvConfig({ path: envTestPath });
+}
+if (fs.existsSync(envTestLocalPath)) {
+  dotenvConfig({ path: envTestLocalPath, override: true });
+}
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -71,7 +85,10 @@ export default defineConfig({
       BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || '',
       BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || '',
       ADMIN_EMAIL: process.env.ADMIN_EMAIL || '',
-      MONGODB_URI: process.env.MONGODB_URI || '',
+      MONGODB_URI:
+        process.env.MONGODB_URI_TEST || process.env.MONGODB_URI || '',
+      LOG_FOLDER: process.env.LOG_FOLDER || './logs',
+      LOG_LEVEL: process.env.LOG_LEVEL || 'info',
     },
   },
 });

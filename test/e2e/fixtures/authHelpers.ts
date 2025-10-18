@@ -1,10 +1,26 @@
 import { Page } from '@playwright/test';
 
+/**
+ * Signs in a user for testing purposes
+ *
+ * @param page - Playwright page instance
+ * @param isAdmin - Whether the user should have admin privileges (default: true)
+ *
+ * Usage examples:
+ * - signIn(page) // Signs in as admin using environment email
+ * - signIn(page, false) // Signs in as non-admin user
+ */
 export async function signIn(
   page: Page,
-  email: string = 'test@example.com',
   isAdmin: boolean = true
 ): Promise<void> {
+  // Get appropriate email based on admin status
+  const email = isAdmin
+    ? process.env.ADMIN_EMAIL ||
+      process.env.TEST_EMAIL ||
+      'shower.test.playwrights@gmail.com'
+    : 'non-admin@example.com';
+
   // Use the original test auth endpoint
   const response = await page.request.post('/api/test/auth', {
     data: { email, isAdmin },

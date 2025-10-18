@@ -37,7 +37,7 @@ test.describe('Admin Page', () => {
     // Go to the admin page
     await page.goto('/admin');
 
-    await signIn(page, process.env.ADMIN_EMAIL, true);
+    await signIn(page);
 
     // Check that we see the admin dashboard
     await expect(page.locator('h1')).toContainText('Admin Dashboard');
@@ -53,7 +53,7 @@ test.describe('Admin Page', () => {
     // Go to the admin page
     await page.goto('/admin');
 
-    await signIn(page, 'non-admin@example.com', false);
+    await signIn(page, false);
     // Check that we see the not authorized page
     await expect(page.locator('h1')).toContainText('Access Restricted');
     await expect(
@@ -64,7 +64,7 @@ test.describe('Admin Page', () => {
   });
 
   test('updates website name successfully', async ({ page }) => {
-    await signIn(page, process.env.ADMIN_EMAIL, true);
+    await signIn(page);
 
     await page.waitForResponse(
       (response) =>
@@ -104,7 +104,7 @@ test.describe('Admin Page', () => {
     // Go to the admin page
     await page.goto('/admin');
 
-    await signIn(page, process.env.ADMIN_EMAIL, true);
+    await signIn(page);
 
     await page.waitForResponse(
       (response) =>
@@ -135,7 +135,7 @@ test.describe('Admin Page', () => {
     // Go to the admin page
     await page.goto('/admin');
 
-    await signIn(page, process.env.ADMIN_EMAIL, true);
+    await signIn(page);
     // Intercept the API call and mock a server error
     await page.route('/api/settings', async (route) => {
       await route.fulfill({
