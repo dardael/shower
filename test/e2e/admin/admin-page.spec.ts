@@ -82,7 +82,7 @@ test.describe('Admin Page', () => {
       const value = await websiteNameInput.inputValue();
       expect(value).toBe('Updated Website Name');
     }).toPass();
-    await page.getByRole('button', { name: 'Update Website Name' }).click();
+    await page.getByRole('button', { name: 'Update Website' }).click();
 
     // Check for success message
     await expect(
@@ -116,11 +116,11 @@ test.describe('Admin Page', () => {
     const websiteNameInput = page.getByLabel('Website Name');
     await websiteNameInput.clear({ timeout: 5000 });
     await websiteNameInput.fill('', { timeout: 5000 });
-    await page.getByRole('button', { name: 'Update Website Name' }).click();
+    await page.getByRole('button', { name: 'Update Website' }).click();
 
     // Check if HTML validation prevents submission (the button remains enabled)
     await expect(
-      page.getByRole('button', { name: 'Update Website Name' })
+      page.getByRole('button', { name: 'Update Website' })
     ).toBeEnabled();
 
     // Try with a name that's too long (51 characters)
@@ -149,7 +149,7 @@ test.describe('Admin Page', () => {
     const websiteNameInput = page.getByLabel('Website Name');
     await websiteNameInput.clear({ timeout: 5000 });
     await websiteNameInput.fill('This will fail', { timeout: 5000 });
-    await page.getByRole('button', { name: 'Update Website Name' }).click();
+    await page.getByRole('button', { name: 'Update Website' }).click();
 
     // Check for error message
     await expect(page.getByText('Server error')).toBeVisible();

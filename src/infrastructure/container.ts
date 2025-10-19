@@ -12,8 +12,12 @@ import { LogFormatterService } from '@/domain/shared/services/LogFormatterServic
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import type { IUpdateWebsiteName } from '@/application/settings/IUpdateWebsiteName';
 import type { IGetWebsiteName } from '@/application/settings/IGetWebsiteName';
+import type { IUpdateWebsiteIcon } from '@/application/settings/IUpdateWebsiteIcon';
+import type { IGetWebsiteIcon } from '@/application/settings/IGetWebsiteIcon';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
+import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
+import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 
 // Register interfaces with implementations
@@ -48,6 +52,14 @@ container.register<IGetWebsiteName>('IGetWebsiteName', {
   useClass: GetWebsiteName,
 });
 
+container.register<IUpdateWebsiteIcon>('IUpdateWebsiteIcon', {
+  useClass: UpdateWebsiteIcon,
+});
+
+container.register<IGetWebsiteIcon>('IGetWebsiteIcon', {
+  useClass: GetWebsiteIcon,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -62,6 +74,14 @@ export class SettingsServiceLocator {
 
   static getWebsiteName(): IGetWebsiteName {
     return container.resolve('IGetWebsiteName');
+  }
+
+  static getUpdateWebsiteIcon(): IUpdateWebsiteIcon {
+    return container.resolve('IUpdateWebsiteIcon');
+  }
+
+  static getWebsiteIcon(): IGetWebsiteIcon {
+    return container.resolve('IGetWebsiteIcon');
   }
 }
 

@@ -8,6 +8,8 @@ import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 const mockWebsiteSettingsRepository: jest.Mocked<WebsiteSettingsRepository> = {
   getSettingsByKey: jest.fn(),
   updateSettings: jest.fn(),
+  updateIcon: jest.fn(),
+  getIcon: jest.fn(),
 };
 
 describe('GetWebsiteName', () => {

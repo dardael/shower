@@ -1,9 +1,93 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface IIconMetadata {
+  filename: string;
+  originalName: string;
+  size: number;
+  format: string;
+  mimeType: string;
+  uploadedAt: Date;
+}
+
 export interface IWebsiteSettings extends Document {
   key: string;
   name: string;
+  icon: {
+    url: string;
+    metadata: IIconMetadata;
+  } | null;
 }
+
+const IconMetadataSchema = new Schema<IIconMetadata>(
+  {
+    filename: {
+      type: String,
+      required: true,
+    },
+    originalName: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 2 * 1024 * 1024, // 2MB max
+    },
+    format: {
+      type: String,
+      required: true,
+      enum: ['ico', 'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'],
+    },
+    mimeType: {
+      type: String,
+      required: true,
+      enum: [
+        'image/x-icon',
+        'image/vnd.microsoft.icon',
+        'image/png',
+        'image/jpeg',
+        'image/svg+xml',
+        'image/gif',
+        'image/webp',
+      ],
+    },
+    uploadedAt: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: (value: Date) => value <= new Date(),
+        message: 'Upload date cannot be in the future',
+      },
+    },
+  },
+  { _id: false }
+);
+
+const IconSchema = new Schema(
+  {
+    url: {
+      type: String,
+      required: true,
+      validate: {
+        validator: (value: string) => {
+          try {
+            new URL(value);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        message: 'Icon URL must be a valid URL',
+      },
+    },
+    metadata: {
+      type: IconMetadataSchema,
+      required: true,
+    },
+  },
+  { _id: false }
+);
 
 const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
   {
@@ -24,6 +108,10 @@ const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
         },
         message: 'Website name contains invalid characters',
       },
+    },
+    icon: {
+      type: IconSchema,
+      default: null,
     },
   },
   {
