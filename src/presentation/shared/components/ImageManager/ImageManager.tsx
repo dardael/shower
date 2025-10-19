@@ -237,7 +237,6 @@ export default function ImageManager({
       textAlign="center"
       bg={dragActive ? 'colorPalette.subtle' : 'bg.subtle'}
       cursor={disabled ? 'not-allowed' : 'pointer'}
-      transition="all 0.2s"
       _hover={
         !disabled && !dragActive
           ? { borderColor: 'border.emphasized', bg: 'bg.muted' }
