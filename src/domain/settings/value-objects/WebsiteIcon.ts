@@ -15,7 +15,7 @@ export class WebsiteIcon {
     this.validateUrl(url);
     this.validateMetadata(metadata);
     this._url = url.trim();
-    this._metadata = { ...metadata! };
+    this._metadata = { ...(metadata as IconMetadata) };
   }
 
   private validateUrl(url: string): void {
