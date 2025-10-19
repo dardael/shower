@@ -104,13 +104,13 @@ export default function WebsiteSettingsForm({
   // Icon management functions
   const handleIconUpload = async (
     file: File,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _metadata: ImageMetadata
+    metadata: ImageMetadata
   ): Promise<void> => {
     setIconLoading(true);
     try {
       const formData = new FormData();
       formData.append('icon', file);
+      formData.append('metadata', JSON.stringify(metadata));
 
       const response = await fetch('/api/settings/icon', {
         method: 'POST',
