@@ -287,14 +287,9 @@ export default function ImageManager({
         </Button>
         <VStack gap={1} fontSize="xs" color="fg.muted">
           {showFormatInfo && (
-            <Text>
-              Supported formats:{' '}
-              {config.acceptedFormats.map((f) => f.toUpperCase()).join(', ')}
-            </Text>
+            <Text>Supported formats: ICO, PNG, JPG, SVG, GIF, WebP</Text>
           )}
-          <Text>
-            Maximum file size: {(config.maxFileSize / 1024 / 1024).toFixed(1)}MB
-          </Text>
+          <Text>Maximum file size: 2MB</Text>
         </VStack>
       </VStack>
     </Box>
