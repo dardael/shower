@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { sanitizeFilename } from '@/infrastructure/shared/utils/filenameSanitizer';
 
 export async function GET(
   _request: NextRequest,
@@ -9,22 +10,17 @@ export async function GET(
   try {
     const { filename } = await props.params;
 
-    // Validate filename to prevent directory traversal
+    // Validate and sanitize filename to prevent directory traversal
     if (!filename || typeof filename !== 'string') {
       return NextResponse.json({ error: 'Invalid filename' }, { status: 400 });
     }
 
-    // Sanitize filename - only allow alphanumeric, hyphens, underscores, and dots
-    if (!/^[a-zA-Z0-9._-]+$/.test(filename)) {
-      return NextResponse.json(
-        { error: 'Invalid filename format' },
-        { status: 400 }
-      );
-    }
+    // Sanitize filename using utility function
+    const sanitizedFilename = sanitizeFilename(filename);
 
     // Construct file path
     const iconsDir = path.join(process.cwd(), 'public', 'icons');
-    const filePath = path.join(iconsDir, filename);
+    const filePath = path.join(iconsDir, sanitizedFilename);
 
     // Ensure the file is within the icons directory
     const normalizedIconsDir = path.normalize(iconsDir);
@@ -45,7 +41,7 @@ export async function GET(
     const fileBuffer = await fs.readFile(filePath);
 
     // Determine MIME type based on file extension
-    const ext = filename.split('.').pop()?.toLowerCase();
+    const ext = sanitizedFilename.split('.').pop()?.toLowerCase();
     let mimeType = 'image/x-icon'; // default
 
     switch (ext) {

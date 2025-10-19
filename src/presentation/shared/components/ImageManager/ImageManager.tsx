@@ -58,8 +58,23 @@ export default function ImageManager({
     }
   }, [currentImage]);
 
+  // Store previous preview URL for cleanup
+  const previousPreviewUrl = useRef<string | null>(null);
+
   // Cleanup object URLs on unmount and when previewUrl changes
   useEffect(() => {
+    // Cleanup previous object URL
+    if (
+      previousPreviewUrl.current &&
+      previousPreviewUrl.current.startsWith('blob:')
+    ) {
+      URL.revokeObjectURL(previousPreviewUrl.current);
+    }
+
+    // Store current preview URL for next cleanup
+    previousPreviewUrl.current = previewUrl;
+
+    // Cleanup on unmount
     return () => {
       if (previewUrl && previewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previewUrl);

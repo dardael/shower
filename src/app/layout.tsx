@@ -16,13 +16,7 @@ async function getWebsiteName(): Promise<string> {
   }
 
   try {
-    const baseUrl =
-      process.env.BETTER_AUTH_URL ||
-      (process.env.NODE_ENV === 'production'
-        ? process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000'
-        : 'http://localhost:3000');
+    const baseUrl = process.env.SHOWER_URL || 'http://localhost:3000';
 
     const response = await fetch(`${baseUrl}/api/settings/name`, {
       cache: 'no-store', // Ensure fresh data
@@ -47,13 +41,7 @@ async function getWebsiteIcon(): Promise<string | null> {
   }
 
   try {
-    const baseUrl =
-      process.env.BETTER_AUTH_URL ||
-      (process.env.NODE_ENV === 'production'
-        ? process.env.VERCEL_URL
-          ? `https://${process.env.VERCEL_URL}`
-          : 'http://localhost:3000'
-        : 'http://localhost:3000');
+    const baseUrl = process.env.SHOWER_URL || 'http://localhost:3000';
 
     const response = await fetch(`${baseUrl}/api/settings/icon`, {
       cache: 'no-store', // Ensure fresh data
