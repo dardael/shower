@@ -8,7 +8,6 @@ import {
   Button,
   Text,
   Image,
-  IconButton,
   Spinner,
   createToaster,
 } from '@chakra-ui/react';
