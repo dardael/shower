@@ -13,9 +13,12 @@ export class WebsiteIcon {
 
   constructor(url: string, metadata: IconMetadata | null | undefined) {
     this.validateUrl(url);
+    if (!metadata) {
+      throw new Error('Website icon metadata cannot be null');
+    }
     this.validateMetadata(metadata);
     this._url = url.trim();
-    this._metadata = { ...(metadata as IconMetadata) };
+    this._metadata = { ...metadata };
   }
 
   private validateUrl(url: string): void {
