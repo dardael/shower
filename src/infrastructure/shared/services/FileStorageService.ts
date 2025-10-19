@@ -13,8 +13,7 @@ export class LocalFileStorageService implements IFileStorageService {
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
 
   constructor() {
-    // Ensure icons directory exists
-    this.ensureIconsDirectory();
+    // Directory will be ensured before operations
   }
 
   private async ensureIconsDirectory(): Promise<void> {
@@ -28,9 +27,13 @@ export class LocalFileStorageService implements IFileStorageService {
   async uploadIcon(
     file: File
   ): Promise<{ url: string; metadata: IIconMetadata }> {
+    // Ensure icons directory exists
+    await this.ensureIconsDirectory();
+
     // Validate file type
     const allowedTypes = [
       'image/x-icon',
+      'image/vnd.microsoft.icon',
       'image/png',
       'image/jpeg',
       'image/svg+xml',
@@ -92,6 +95,9 @@ export class LocalFileStorageService implements IFileStorageService {
   }
 
   async deleteIcon(filename: string): Promise<void> {
+    // Ensure icons directory exists
+    await this.ensureIconsDirectory();
+
     try {
       const filePath = path.join(this.iconsDir, filename);
       await fs.unlink(filePath);
