@@ -43,17 +43,29 @@ export default function ImageManager({
   );
   const [validationError, setValidationError] =
     useState<ValidationError | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   // Sync internal state with currentImage prop changes
   useEffect(() => {
     if (currentImage) {
       setImageState('preview');
       setPreviewUrl(currentImage.url);
+      setImageError(false);
     } else {
       setImageState('empty');
       setPreviewUrl(null);
+      setImageError(false);
     }
   }, [currentImage]);
+
+  // Cleanup object URLs on unmount and when previewUrl changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toaster = createToaster({
@@ -135,6 +147,9 @@ export default function ImageManager({
         } else {
           await onImageUpload(file, metadata);
         }
+
+        // Cleanup object URL after successful upload
+        URL.revokeObjectURL(objectUrl);
 
         setImageState('preview');
         toaster.create({
@@ -273,12 +288,12 @@ export default function ImageManager({
         <VStack gap={1} fontSize="xs" color="fg.muted">
           {showFormatInfo && (
             <Text>
-              {labels.formatText}: {config.acceptedFormats.join(', ')}
+              Supported formats:{' '}
+              {config.acceptedFormats.map((f) => f.toUpperCase()).join(', ')}
             </Text>
           )}
           <Text>
-            {labels.sizeLimitText}:{' '}
-            {(config.maxFileSize / 1024 / 1024).toFixed(1)}MB
+            Maximum file size: {(config.maxFileSize / 1024 / 1024).toFixed(1)}MB
           </Text>
         </VStack>
       </VStack>
@@ -312,30 +327,38 @@ export default function ImageManager({
           </Box>
         )}
 
-        <Image
-          src={previewUrl || currentImage?.url}
-          alt="Preview"
-          width="100%"
-          height="100%"
-          objectFit="contain"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              const fallback = document.createElement('div');
-              fallback.innerHTML =
-                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-              fallback.style.color = 'var(--colors-fg-muted)';
-              fallback.style.display = 'flex';
-              fallback.style.alignItems = 'center';
-              fallback.style.justifyContent = 'center';
-              fallback.style.width = '100%';
-              fallback.style.height = '100%';
-              parent.appendChild(fallback);
-            }
-          }}
-        />
+        {!imageError ? (
+          <Image
+            src={previewUrl || currentImage?.url}
+            alt="Preview"
+            width="100%"
+            height="100%"
+            objectFit="contain"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Box
+            width="100%"
+            height="100%"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            color="fg.muted"
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </Box>
+        )}
       </Box>
 
       {/* Action buttons outside the preview area */}
