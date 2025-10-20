@@ -1,3 +1,4 @@
+import { inject, injectable } from 'tsyringe';
 import { SocialNetworkRepository } from '../../../domain/settings/repositories/SocialNetworkRepository';
 import { SocialNetwork } from '../../../domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '../../../domain/settings/value-objects/SocialNetworkType';
@@ -5,10 +6,13 @@ import { SocialNetworkTypeValueObject } from '../../../domain/settings/value-obj
 import { SocialNetworkUrl } from '../../../domain/settings/value-objects/SocialNetworkUrl';
 import { SocialNetworkLabel } from '../../../domain/settings/value-objects/SocialNetworkLabel';
 import { WebsiteSettingsModel } from '../models/WebsiteSettingsModel';
+import type { ILogger } from '../../../application/shared/ILogger';
 
+@injectable()
 export class MongooseSocialNetworkRepository
   implements SocialNetworkRepository
 {
+  constructor(@inject('ILogger') private readonly logger: ILogger) {}
   async getAllSocialNetworks(): Promise<SocialNetwork[]> {
     const settingsDoc = await WebsiteSettingsModel.findOne({
       key: 'socialNetworks',
@@ -81,9 +85,34 @@ export class MongooseSocialNetworkRepository
         doc.enabled
       );
     } catch (error) {
-      // If there's an error mapping, create a default social network
-      console.error(`Error mapping social network from database: ${error}`);
-      return SocialNetwork.createDefault(doc.type as SocialNetworkType);
+      // Log the error with full context for debugging
+      this.logger.logError('Invalid social network data found in database', {
+        type: doc.type,
+        url: doc.url,
+        label: doc.label,
+        enabled: doc.enabled,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Create a default social network but with the same type to maintain data integrity
+      // This ensures the application continues to work while highlighting data issues
+      try {
+        return SocialNetwork.createDefault(doc.type as SocialNetworkType);
+      } catch (fallbackError) {
+        // If even creating a default fails, use Instagram as ultimate fallback
+        this.logger.logError(
+          'Failed to create default social network, using Instagram fallback',
+          {
+            originalType: doc.type,
+            fallbackError:
+              fallbackError instanceof Error
+                ? fallbackError.message
+                : 'Unknown error',
+          }
+        );
+        return SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM);
+      }
     }
   }
 
