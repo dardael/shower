@@ -185,7 +185,6 @@ export default function SocialNetworksForm() {
         throw new Error(data.error || 'Failed to update social networks');
       }
     } catch (error) {
-      console.error('Save error:', error);
       toaster.create({
         title: 'Error',
         description: `Failed to update social networks: ${error instanceof Error ? error.message : 'Unknown error'}`,
