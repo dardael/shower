@@ -83,7 +83,6 @@ test.describe('Social Networks Management', () => {
   test('should enable inputs when checkbox is checked', async ({ page }) => {
     // Find the first enable checkbox (Instagram)
     const instagramCheckboxInput = page.getByTestId('checkbox-input-instagram');
-    const instagramCheckbox = page.getByTestId('checkbox-instagram');
     const firstUrlInput = page.getByLabel('URL').first();
     const firstLabelInput = page.getByLabel('Label').first();
 
