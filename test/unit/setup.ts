@@ -4,8 +4,7 @@ import React from 'react';
 
 // Polyfill structuredClone for test environment
 if (typeof structuredClone === 'undefined') {
-  global.structuredClone = (obj: unknown) =>
-    JSON.parse(JSON.stringify(obj));
+  global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
 }
 
 // Define proper types for component props
