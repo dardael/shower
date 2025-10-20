@@ -6,12 +6,12 @@ import {
   Stack,
   Field,
   Input,
-  Button,
   Text,
   Box,
   VStack,
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import SaveButton from '@/presentation/shared/components/SaveButton';
 import type {
   ImageData,
   ImageMetadata,
@@ -320,27 +320,16 @@ export default function WebsiteSettingsForm({
             </Field.HelperText>
           </Field.Root>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            loading={loading}
-            colorPalette="blue"
-            variant="solid"
-            size={{ base: 'md', md: 'lg' }}
-            width="full"
-            height={{ base: '44px', md: '48px' }}
-            borderRadius="lg"
-            fontSize={{ base: 'sm', md: 'md' }}
-            fontWeight="semibold"
-            mt={2}
-            _dark={{
-              bg: 'colorPalette.solid',
-              _hover: { bg: 'colorPalette.emphasized' },
-              _disabled: { bg: 'colorPalette.muted' },
-            }}
-          >
-            {loading ? 'Updating...' : 'Update Website'}
-          </Button>
+          <Box w="full">
+            <SaveButton
+              type="submit"
+              isLoading={loading}
+              loadingText="Updating..."
+              width="full"
+            >
+              Update Website
+            </SaveButton>
+          </Box>
         </Stack>
       </form>
 

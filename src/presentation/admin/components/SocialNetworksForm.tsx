@@ -7,13 +7,13 @@ import {
   HStack,
   Text,
   Heading,
-  Button,
   Field,
   Input,
   Checkbox,
   Spinner,
 } from '@chakra-ui/react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
+import SaveButton from '@/presentation/shared/components/SaveButton';
 import { useState, useEffect } from 'react';
 import {
   FaInstagram,
@@ -310,14 +310,15 @@ export default function SocialNetworksForm() {
             })}
           </VStack>
 
-          <Button
-            onClick={handleSubmit}
-            loading={isSaving}
-            colorPalette="blue"
-            w={{ base: 'full', md: 'auto' }}
-          >
-            Save Changes
-          </Button>
+          <Box w="full">
+            <SaveButton
+              isLoading={isSaving}
+              onClick={handleSubmit}
+              width="full"
+            >
+              Save Changes
+            </SaveButton>
+          </Box>
         </VStack>
       </Box>
     </>
