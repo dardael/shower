@@ -35,7 +35,6 @@ export async function PUT(request: NextRequest) {
       new Date().toISOString()
     );
     const body = await request.json();
-    console.log('Request body:', JSON.stringify(body, null, 2));
 
     // Validate request body
     if (!Array.isArray(body.socialNetworks)) {
