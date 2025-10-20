@@ -164,11 +164,6 @@ export default function SocialNetworksForm() {
         })),
       };
 
-      console.log(
-        'Sending data to server:',
-        JSON.stringify(requestData, null, 2)
-      );
-
       const response = await fetch('/api/settings/social-networks', {
         method: 'PUT',
         headers: {
