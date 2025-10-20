@@ -11,6 +11,7 @@ import {
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import WebsiteSettingsForm from './WebsiteSettingsForm';
+import SocialNetworksForm from './SocialNetworksForm';
 
 interface AdminDashboardProps {
   initialWebsiteName: string;
@@ -95,6 +96,7 @@ export default function AdminDashboard({
         </Box>
 
         <WebsiteSettingsForm initialName={initialWebsiteName} />
+        <SocialNetworksForm />
         <LogoutButton />
       </Stack>
     </Container>

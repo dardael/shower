@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { SocialNetworkSchema, type ISocialNetwork } from './SocialNetworkModel';
 
 export interface IIconMetadata {
   filename: string;
@@ -16,6 +17,7 @@ export interface IWebsiteSettings extends Document {
     url: string;
     metadata: IIconMetadata;
   } | null;
+  socialNetworks: ISocialNetwork[];
 }
 
 const IconMetadataSchema = new Schema<IIconMetadata>(
@@ -112,6 +114,10 @@ const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
     icon: {
       type: IconSchema,
       default: null,
+    },
+    socialNetworks: {
+      type: [SocialNetworkSchema],
+      default: [],
     },
   },
   {
