@@ -524,10 +524,9 @@ describe('ImageManager', () => {
       // Trigger the error event
       fireEvent.error(image);
 
-      // After error, the image should still be in the document but the SVG fallback should be visible
-      // The component shows an SVG when the image fails to load
-      const svg = document.querySelector('svg');
-      expect(svg).toBeInTheDocument();
+      // After error, the image should still be in the document but the fallback icon should be visible
+      // The component shows an FiImage icon when the image fails to load
+      expect(screen.getByTestId('image-icon')).toBeInTheDocument();
 
       // The image metadata should still be displayed
       expect(screen.getByText('test-image.jpg')).toBeInTheDocument();

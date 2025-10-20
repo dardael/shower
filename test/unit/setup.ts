@@ -18,52 +18,101 @@ interface InputProps {
   [key: string]: unknown;
 }
 
+// Chakra UI specific props that should be filtered out in tests
+const chakraStyleProps = [
+  'borderColor',
+  'borderRadius',
+  'borderWidth',
+  'borderStyle',
+  'textAlign',
+  'alignItems',
+  'justifyContent',
+  'display',
+  'bg',
+  'color',
+  'p',
+  'm',
+  'gap',
+  'width',
+  'height',
+  'position',
+  'inset',
+  'overflow',
+  'cursor',
+  '_hover',
+  'zIndex',
+  'fit',
+  'fontSize',
+  'fontWeight',
+  'variant',
+];
+
+// Filter out only Chakra UI style props to avoid DOM warnings, but keep event handlers
+function filterChakraProps(
+  props: Record<string, unknown>
+): Record<string, unknown> {
+  const filtered: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    // Keep event handlers and important DOM attributes
+    if (!chakraStyleProps.includes(key) && !key.startsWith('_')) {
+      filtered[key] = value;
+    }
+  }
+  return filtered;
+}
+
 // Mock Chakra UI components to avoid rendering issues in tests
 jest.mock('@chakra-ui/react', () => {
   const mockModule = {
     IconButton: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('button', props, children);
+      return React.createElement('button', filterChakraProps(props), children);
     },
     Container: ({ children, ...props }: ComponentProps) =>
-      React.createElement('div', props, children),
+      React.createElement('div', filterChakraProps(props), children),
     Heading: ({ children, ...props }: ComponentProps) =>
-      React.createElement('h1', props, children),
+      React.createElement('h1', filterChakraProps(props), children),
     Text: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('span', props, children);
+      return React.createElement('span', filterChakraProps(props), children);
     },
     Stack: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('div', props, children);
+      return React.createElement('div', filterChakraProps(props), children);
     },
     HStack: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('div', props, children);
+      return React.createElement('div', filterChakraProps(props), children);
     },
     VStack: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('div', props, children);
+      return React.createElement('div', filterChakraProps(props), children);
     },
     Box: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('div', props, children);
+      return React.createElement('div', filterChakraProps(props), children);
     },
     Button: ({ children, ...props }: ComponentProps) => {
-      return React.createElement('button', props, children);
+      return React.createElement('button', filterChakraProps(props), children);
     },
-    Input: ({ ...props }: InputProps) => React.createElement('input', props),
+    Input: ({ ...props }: InputProps) =>
+      React.createElement('input', filterChakraProps(props)),
     Field: {
       Root: ({ children, ...props }: ComponentProps) =>
-        React.createElement('div', props, children),
+        React.createElement('div', filterChakraProps(props), children),
       Label: ({ children, ...props }: ComponentProps) =>
-        React.createElement('label', props, children),
+        React.createElement('label', filterChakraProps(props), children),
       HelperText: ({ children, ...props }: ComponentProps) =>
-        React.createElement('span', props, children),
+        React.createElement('span', filterChakraProps(props), children),
     },
     AbsoluteCenter: ({ children, ...props }: ComponentProps) =>
-      React.createElement('div', props, children),
+      React.createElement('div', filterChakraProps(props), children),
     Image: ({ src, alt, onError, ...props }: ComponentProps) => {
-      return React.createElement('img', { src, alt, onError, ...props });
+      return React.createElement('img', {
+        src,
+        alt,
+        onError,
+        ...filterChakraProps(props),
+      });
     },
     Spinner: ({ ...props }: ComponentProps) =>
       React.createElement(
         'div',
-        { 'data-testid': 'spinner', ...props },
+        { 'data-testid': 'spinner', ...filterChakraProps(props) },
         'Loading...'
       ),
     createToaster: jest.fn(() => ({
