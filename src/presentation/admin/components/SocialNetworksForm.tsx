@@ -255,12 +255,15 @@ export default function SocialNetworksForm() {
                         {getDefaultLabel(socialNetwork.type)}
                       </Text>
                       <Checkbox.Root
+                        data-testid={`checkbox-${socialNetwork.type.toLowerCase()}`}
                         checked={socialNetwork.enabled}
                         onCheckedChange={(checked) =>
                           handleEnabledChange(socialNetwork.type, checked)
                         }
                       >
-                        <Checkbox.HiddenInput />
+                        <Checkbox.HiddenInput
+                          data-testid={`checkbox-input-${socialNetwork.type.toLowerCase()}`}
+                        />
                         <Checkbox.Control />
                         <Checkbox.Label>Enable</Checkbox.Label>
                       </Checkbox.Root>
