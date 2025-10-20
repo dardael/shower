@@ -3,8 +3,11 @@ import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import type { ILogger } from '@/application/shared/ILogger';
 
 export async function GET() {
+  const logger = container.resolve<ILogger>('ILogger');
+
   try {
     const getSocialNetworks =
       container.resolve<GetSocialNetworks>('IGetSocialNetworks');
@@ -20,7 +23,10 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    console.error('Error fetching social networks:', error);
+    logger.logError('Error fetching social networks', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social networks' },
       { status: 500 }
@@ -29,12 +35,14 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const logger = container.resolve<ILogger>('ILogger');
+
   try {
-    console.log(
-      'Received social networks update request at:',
-      new Date().toISOString()
-    );
     const body = await request.json();
+
+    logger.logInfo('Processing social networks update request', {
+      socialNetworksCount: body.socialNetworks?.length || 0,
+    });
 
     // Validate request body
     if (!Array.isArray(body.socialNetworks)) {
@@ -78,13 +86,16 @@ export async function PUT(request: NextRequest) {
 
     await updateSocialNetworks.execute(socialNetworkObjects);
 
+    logger.logInfo('Social networks updated successfully', {
+      count: socialNetworkObjects.length,
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating social networks:', error);
-    console.error(
-      'Error stack:',
-      error instanceof Error ? error.stack : 'No stack trace'
-    );
+    logger.logError('Error updating social networks', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       {
         success: false,
