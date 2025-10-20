@@ -46,22 +46,74 @@ export async function PUT(request: NextRequest) {
 
     // Validate request body
     if (!Array.isArray(body.socialNetworks)) {
+      logger.logWarning(
+        'Invalid request body - socialNetworks is not an array',
+        {
+          body: typeof body,
+          socialNetworks: body.socialNetworks,
+        }
+      );
       return NextResponse.json(
-        { success: false, error: 'Invalid social networks data' },
+        {
+          success: false,
+          error: 'Invalid social networks data: expected an array',
+        },
         { status: 400 }
       );
     }
 
-    // Validate each social network
-    for (const sn of body.socialNetworks) {
-      if (
-        !sn.type ||
-        typeof sn.url !== 'string' ||
-        typeof sn.label !== 'string' ||
-        typeof sn.enabled !== 'boolean'
+    // Enhanced validation for each social network
+    for (const [index, sn] of body.socialNetworks.entries()) {
+      const validationErrors: string[] = [];
+
+      // Validate type
+      if (!sn.type || typeof sn.type !== 'string') {
+        validationErrors.push('type is required and must be a string');
+      } else if (
+        !Object.values(SocialNetworkType).includes(sn.type as SocialNetworkType)
       ) {
+        validationErrors.push(
+          `type must be one of: ${Object.values(SocialNetworkType).join(', ')}`
+        );
+      }
+
+      // Validate URL
+      if (typeof sn.url !== 'string') {
+        validationErrors.push('url is required and must be a string');
+      } else if (sn.url.length > 2048) {
+        validationErrors.push('url must be less than 2048 characters');
+      }
+
+      // Validate label
+      if (typeof sn.label !== 'string') {
+        validationErrors.push('label is required and must be a string');
+      } else if (sn.label.length === 0) {
+        validationErrors.push('label cannot be empty');
+      } else if (sn.label.length > 50) {
+        validationErrors.push('label must be less than 50 characters');
+      } else if (/<|>|&|"|'/.test(sn.label)) {
+        validationErrors.push('label contains invalid characters');
+      }
+
+      // Validate enabled
+      if (typeof sn.enabled !== 'boolean') {
+        validationErrors.push('enabled is required and must be a boolean');
+      }
+
+      if (validationErrors.length > 0) {
+        logger.logWarning(
+          `Validation failed for social network at index ${index}`,
+          {
+            index,
+            socialNetwork: sn,
+            errors: validationErrors,
+          }
+        );
         return NextResponse.json(
-          { success: false, error: 'Invalid social network format' },
+          {
+            success: false,
+            error: `Invalid social network format at index ${index}: ${validationErrors.join(', ')}`,
+          },
           { status: 400 }
         );
       }
