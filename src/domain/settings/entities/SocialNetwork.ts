@@ -11,6 +11,9 @@ export class SocialNetwork {
   private _label: SocialNetworkLabel;
   private _enabled: boolean;
 
+  // Cache for default social networks to improve performance
+  private static defaultNetworksCache: SocialNetwork[] | null = null;
+
   constructor(
     type: SocialNetworkTypeValueObject,
     url: SocialNetworkUrl,
@@ -138,9 +141,14 @@ export class SocialNetwork {
   }
 
   static createAllDefaults(): SocialNetwork[] {
-    return Object.values(SocialNetworkType).map((type) =>
-      SocialNetwork.createDefault(type)
-    );
+    // Cache default social networks to avoid recreating them on every call
+    if (!SocialNetwork.defaultNetworksCache) {
+      SocialNetwork.defaultNetworksCache = Object.values(SocialNetworkType).map(
+        (type) => SocialNetwork.createDefault(type)
+      );
+    }
+    // Return a copy to prevent accidental modifications of the cached array
+    return [...SocialNetwork.defaultNetworksCache];
   }
 
   toJSON() {
