@@ -1,6 +1,10 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { IIconMetadata } from '@/infrastructure/settings/models/WebsiteSettingsModel';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export interface IFileStorageService {
   uploadIcon(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
@@ -101,9 +105,18 @@ export class LocalFileStorageService implements IFileStorageService {
     try {
       const filePath = path.join(this.iconsDir, filename);
       await fs.unlink(filePath);
-      console.log(`Deleted icon file: ${filename}`);
+      const logger = container.resolve<ILogger>('ILogger');
+      new LogMessage(logger).execute(
+        LogLevel.INFO,
+        `Deleted icon file: ${filename}`
+      );
     } catch (error) {
-      console.error(`Failed to delete icon file ${filename}:`, error);
+      const logger = container.resolve<ILogger>('ILogger');
+      new LogMessage(logger).execute(
+        LogLevel.ERROR,
+        `Failed to delete icon file ${filename}`,
+        { error }
+      );
       // Don't throw error - file might not exist
     }
   }

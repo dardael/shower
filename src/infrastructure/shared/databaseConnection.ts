@@ -1,4 +1,8 @@
 import mongoose from 'mongoose';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
@@ -25,9 +29,15 @@ export class DatabaseConnection {
       await mongoose.connect(uri);
 
       this.isConnected = true;
-      console.log('Connected to MongoDB');
+      const logger = container.resolve<ILogger>('ILogger');
+      new LogMessage(logger).execute(LogLevel.INFO, 'Connected to MongoDB');
     } catch (error) {
-      console.error('Failed to connect to MongoDB:', error);
+      const logger = container.resolve<ILogger>('ILogger');
+      new LogMessage(logger).execute(
+        LogLevel.ERROR,
+        'Failed to connect to MongoDB',
+        { error }
+      );
       throw error;
     }
   }
@@ -40,7 +50,8 @@ export class DatabaseConnection {
     await mongoose.disconnect();
 
     this.isConnected = false;
-    console.log('Disconnected from MongoDB');
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(LogLevel.INFO, 'Disconnected from MongoDB');
   }
 
   public getConnectionStatus(): boolean {

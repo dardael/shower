@@ -1,9 +1,9 @@
 import {
   SocialNetworkTypeValueObject,
   SocialNetworkType,
-} from '../value-objects/SocialNetworkType';
-import { SocialNetworkUrl } from '../value-objects/SocialNetworkUrl';
-import { SocialNetworkLabel } from '../value-objects/SocialNetworkLabel';
+} from '@/domain/settings/value-objects/SocialNetworkType';
+import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
+import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetworkLabel';
 
 export class SocialNetwork {
   private readonly _type: SocialNetworkTypeValueObject;

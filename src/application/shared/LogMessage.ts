@@ -1,5 +1,5 @@
-import { LogLevel } from '../../domain/shared/value-objects/LogLevel';
-import { ILogger } from './ILogger';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { ILogger } from '@/application/shared/ILogger';
 
 export class LogMessage {
   constructor(private readonly logger: ILogger) {}

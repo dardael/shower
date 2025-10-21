@@ -1,4 +1,4 @@
-import { LogLevel } from '../value-objects/LogLevel';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export class LogFormatterService {
   format(

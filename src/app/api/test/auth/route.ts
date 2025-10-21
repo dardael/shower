@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export async function POST(request: NextRequest) {
   const { email, isAdmin } = await request.json();
@@ -54,7 +58,10 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Test auth error:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(LogLevel.ERROR, 'Test auth error', {
+      error,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -4,6 +4,10 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -29,7 +33,12 @@ async function getWebsiteName(): Promise<string> {
     const data = await response.json();
     return data.name || 'Shower';
   } catch (error) {
-    console.error('Failed to fetch website name:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Failed to fetch website name',
+      { error }
+    );
     return 'Shower'; // Default fallback
   }
 }
@@ -54,7 +63,12 @@ async function getWebsiteIcon(): Promise<string | null> {
     const data = await response.json();
     return data.icon?.url || null;
   } catch (error) {
-    console.error('Failed to fetch website icon:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Failed to fetch website icon',
+      { error }
+    );
     return null; // Default fallback
   }
 }

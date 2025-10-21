@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { sanitizeFilename } from '@/infrastructure/shared/utils/filenameSanitizer';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export async function GET(
   _request: NextRequest,
@@ -78,7 +82,10 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error serving icon:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(LogLevel.ERROR, 'Error serving icon', {
+      error,
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

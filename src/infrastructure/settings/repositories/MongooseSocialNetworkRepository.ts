@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
-import { SocialNetworkRepository } from '../../../domain/settings/repositories/SocialNetworkRepository';
-import { SocialNetwork } from '../../../domain/settings/entities/SocialNetwork';
-import { SocialNetworkType } from '../../../domain/settings/value-objects/SocialNetworkType';
-import { SocialNetworkTypeValueObject } from '../../../domain/settings/value-objects/SocialNetworkType';
-import { SocialNetworkUrl } from '../../../domain/settings/value-objects/SocialNetworkUrl';
-import { SocialNetworkLabel } from '../../../domain/settings/value-objects/SocialNetworkLabel';
-import { WebsiteSettingsModel } from '../models/WebsiteSettingsModel';
-import type { ILogger } from '../../../application/shared/ILogger';
+import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
+import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
+import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { SocialNetworkTypeValueObject } from '@/domain/settings/value-objects/SocialNetworkType';
+import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
+import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetworkLabel';
+import { WebsiteSettingsModel } from '@/infrastructure/settings/models/WebsiteSettingsModel';
+import type { ILogger } from '@/application/shared/ILogger';
 
 @injectable()
 export class MongooseSocialNetworkRepository

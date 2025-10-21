@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import type { WebsiteSettingsRepository } from '../../domain/settings/repositories/WebsiteSettingsRepository';
-import { WebsiteName } from '../../domain/settings/value-objects/WebsiteName';
-import type { IUpdateWebsiteName } from './IUpdateWebsiteName';
+import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
+import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
+import type { IUpdateWebsiteName } from '@/application/settings/IUpdateWebsiteName';
 
 export interface UpdateWebsiteNameRequest {
   name: string;

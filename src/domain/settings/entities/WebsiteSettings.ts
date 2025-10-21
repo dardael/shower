@@ -1,6 +1,6 @@
-import { WebsiteName } from '../value-objects/WebsiteName';
-import { WebsiteIcon } from '../value-objects/WebsiteIcon';
-import { SocialNetwork } from './SocialNetwork';
+import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
+import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 
 export class WebsiteSettings {
   private readonly _key: string;

@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import type { AdminAccessPolicyService } from '../services/AdminAccessPolicyService';
+import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAccessPolicyService';
 
 @injectable()
 export class AdminAccessPolicy implements AdminAccessPolicyService {

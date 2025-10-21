@@ -1,5 +1,5 @@
-import { SocialNetwork } from '../entities/SocialNetwork';
-import { SocialNetworkType } from '../value-objects/SocialNetworkType';
+import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
+import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 
 export interface SocialNetworkRepository {
   getAllSocialNetworks(): Promise<SocialNetwork[]>;

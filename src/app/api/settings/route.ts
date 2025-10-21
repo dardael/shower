@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/infrastructure/auth/BetterAuthInstance';
 import { SettingsServiceLocator } from '@/infrastructure/container';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +43,12 @@ export async function POST(request: NextRequest) {
     await updateWebsiteName.execute({ name });
     return NextResponse.json({ message: 'Website name updated successfully' });
   } catch (error) {
-    console.error('Error updating website name:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Error updating website name',
+      { error }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

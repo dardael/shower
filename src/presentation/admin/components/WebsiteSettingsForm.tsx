@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Heading,
   Stack,
@@ -12,6 +12,9 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
+import { ClientLogger } from '@/presentation/shared/utils/clientLogger';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+
 import type {
   ImageData,
   ImageMetadata,
@@ -33,21 +36,25 @@ export default function WebsiteSettingsForm({
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
 
-  const fetchWebsiteName = async () => {
+  const logger = useMemo(() => new ClientLogger(), []);
+
+  const fetchWebsiteName = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/name');
       const data = await response.json();
       if (response.ok) {
         setName(data.name);
       } else {
-        console.error('Failed to fetch website name:', data.error);
+        logger.execute(LogLevel.ERROR, 'Failed to fetch website name', {
+          error: data.error,
+        });
       }
     } catch (error) {
-      console.error('Error fetching website name:', error);
+      logger.execute(LogLevel.ERROR, 'Error fetching website name', { error });
     }
-  };
+  }, []);
 
-  const fetchWebsiteIcon = async () => {
+  const fetchWebsiteIcon = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/icon');
       const data = await response.json();
@@ -62,15 +69,15 @@ export default function WebsiteSettingsForm({
         setCurrentIcon(null);
       }
     } catch (error) {
-      console.error('Error fetching website icon:', error);
+      logger.execute(LogLevel.ERROR, 'Error fetching website icon', { error });
       setCurrentIcon(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWebsiteName();
     fetchWebsiteIcon();
-  }, []);
+  }, [fetchWebsiteName, fetchWebsiteIcon]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

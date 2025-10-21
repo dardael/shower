@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
-import { WebsiteIcon } from '../../../../../src/domain/settings/value-objects/WebsiteIcon';
-import type { IconMetadata } from '../../../../../src/domain/settings/value-objects/WebsiteIcon';
+import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import type { IconMetadata } from '@/domain/settings/value-objects/WebsiteIcon';
 
 describe('WebsiteIcon', () => {
   const validMetadata: IconMetadata = {

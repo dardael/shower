@@ -10,6 +10,10 @@ import { VStack, Heading, Box, AbsoluteCenter, Text } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
 import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -49,7 +53,12 @@ export default async function AdminPage() {
           },
         };
       } catch (error) {
-        console.error('Failed to parse test user data:', error);
+        const logger = container.resolve<ILogger>('ILogger');
+        new LogMessage(logger).execute(
+          LogLevel.ERROR,
+          'Failed to parse test user data',
+          { error }
+        );
       }
     }
   }
@@ -153,7 +162,12 @@ export default async function AdminPage() {
       websiteName = await getWebsiteName.execute();
     }
   } catch (error) {
-    console.error('Database connection error:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Database connection error',
+      { error }
+    );
     dbError =
       error instanceof Error ? error : new Error('Unknown database error');
 

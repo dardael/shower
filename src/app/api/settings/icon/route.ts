@@ -6,6 +6,10 @@ import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
 import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
+import { container } from '@/infrastructure/container';
+import type { ILogger } from '@/application/shared/ILogger';
+import { LogMessage } from '@/application/shared/LogMessage';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 export async function GET() {
   try {
@@ -92,7 +96,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error updating website icon:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Error updating website icon',
+      { error }
+    );
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : 'Internal server error',
@@ -140,7 +149,12 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ message: 'Website icon removed successfully' });
   } catch (error) {
-    console.error('Error removing website icon:', error);
+    const logger = container.resolve<ILogger>('ILogger');
+    new LogMessage(logger).execute(
+      LogLevel.ERROR,
+      'Error removing website icon',
+      { error }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
