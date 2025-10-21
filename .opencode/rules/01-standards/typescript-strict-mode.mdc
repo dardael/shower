@@ -34,8 +34,18 @@ Sub rule 5: Error Handling
 - Use Result/Either patterns for error handling
 - Never suppress TypeScript errors with `@ts-ignore` or `@ts-expect-error`
 
-Sub rule 6: Import and Export Typing
+Sub rule 6: Code Comments
+- Write code that is self-explanatory and requires minimal comments
+- Use comments only when code is complex and cannot be made clearer through refactoring
+- Avoid comments that explain what the code does; instead, improve code readability
+- Use comments to explain why complex business logic exists, not how it works
+- Prefer meaningful variable and function names over explanatory comments
+
+Sub rule 7: Import and Export Typing
 - Use `import type` for type-only imports
 - Export types explicitly with `export type`
 - Re-export types from barrel files
 - Avoid circular dependencies in type definitions
+- Use absolute imports from `src/` for internal modules instead of relative paths (`../../` or `./`)
+  - Use `@/` prefix: `import { UserService } from '@/domain/auth/services/UserService'`
+  - Never use: `import { UserService } from '../../domain/auth/services/UserService'`
