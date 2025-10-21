@@ -12,9 +12,7 @@ import {
   Checkbox,
   Spinner,
 } from '@chakra-ui/react';
-import { toaster } from '@/presentation/shared/components/ui/toaster';
 import SaveButton from '@/presentation/shared/components/SaveButton';
-import { useState, useEffect } from 'react';
 import {
   FaInstagram,
   FaFacebook,
@@ -23,20 +21,18 @@ import {
   FaPhone,
 } from 'react-icons/fa';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-
-interface SocialNetworkFormData {
-  type: SocialNetworkType;
-  url: string;
-  label: string;
-  enabled: boolean;
-}
+import { useSocialNetworksForm } from '@/presentation/admin/hooks/useSocialNetworksForm';
 
 export default function SocialNetworksForm() {
-  const [socialNetworks, setSocialNetworks] = useState<SocialNetworkFormData[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const {
+    socialNetworks,
+    isLoading,
+    isSaving,
+    handleUrlChange,
+    handleLabelChange,
+    handleEnabledChange,
+    handleSubmit,
+  } = useSocialNetworksForm();
 
   const getIcon = (type: SocialNetworkType) => {
     const icons = {
@@ -69,132 +65,6 @@ export default function SocialNetworksForm() {
       [SocialNetworkType.PHONE]: 'tel:+1234567890',
     };
     return placeholders[type];
-  };
-
-  useEffect(() => {
-    fetchSocialNetworks();
-  }, []);
-
-  const fetchSocialNetworks = async () => {
-    try {
-      const response = await fetch('/api/settings/social-networks');
-      const data = await response.json();
-
-      if (data.success) {
-        setSocialNetworks(data.data);
-      } else {
-        throw new Error(data.error || 'Failed to fetch social networks');
-      }
-    } catch {
-      toaster.create({
-        title: 'Error',
-        description: 'Failed to load social networks',
-        type: 'error',
-        duration: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUrlChange = (type: SocialNetworkType, url: string) => {
-    setSocialNetworks((prev) =>
-      prev.map((sn) => (sn.type === type ? { ...sn, url } : sn))
-    );
-  };
-
-  const handleLabelChange = (type: SocialNetworkType, label: string) => {
-    setSocialNetworks((prev) =>
-      prev.map((sn) => (sn.type === type ? { ...sn, label } : sn))
-    );
-  };
-
-  const handleEnabledChange = (
-    type: SocialNetworkType,
-    details: { checked: string | boolean }
-  ) => {
-    const enabled =
-      typeof details.checked === 'boolean'
-        ? details.checked
-        : details.checked === 'true';
-    setSocialNetworks((prev) =>
-      prev.map((sn) => (sn.type === type ? { ...sn, enabled } : sn))
-    );
-  };
-
-  const validateForm = (): boolean => {
-    for (const sn of socialNetworks) {
-      if (sn.enabled) {
-        if (!sn.url.trim()) {
-          toaster.create({
-            title: 'Validation Error',
-            description: `${getDefaultLabel(sn.type)} URL is required when enabled`,
-            type: 'error',
-            duration: 3000,
-          });
-          return false;
-        }
-
-        if (!sn.label.trim()) {
-          toaster.create({
-            title: 'Validation Error',
-            description: `${getDefaultLabel(sn.type)} label is required when enabled`,
-            type: 'error',
-            duration: 3000,
-          });
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const requestData = {
-        socialNetworks: socialNetworks.map((sn) => ({
-          type: sn.type,
-          url: sn.url,
-          label: sn.label,
-          enabled: sn.enabled,
-        })),
-      };
-
-      const response = await fetch('/api/settings/social-networks', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toaster.create({
-          title: 'Success',
-          description: 'Social networks updated successfully',
-          type: 'success',
-          duration: 3000,
-        });
-      } else {
-        throw new Error(data.error || 'Failed to update social networks');
-      }
-    } catch (error) {
-      toaster.create({
-        title: 'Error',
-        description: `Failed to update social networks: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        type: 'error',
-        duration: 5000,
-      });
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   if (isLoading) {
