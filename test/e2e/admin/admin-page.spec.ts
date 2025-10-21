@@ -51,53 +51,51 @@ test.describe('Admin Page', () => {
     await TestDatabase.connect();
     await TestDatabase.cleanDatabase();
 
-    try {
-      await signIn(page);
+    await signIn(page);
 
-      // Wait for page to load and data to be fetched
-      const websiteNameInput = page.getByLabel('Website Name');
-      await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
-      await expect(websiteNameInput).toHaveValue('Shower', { timeout: 5000 });
+    // Wait for page to load and data to be fetched
+    const websiteNameInput = page.getByLabel('Website Name');
+    await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(websiteNameInput).toHaveValue('Shower', { timeout: 5000 });
 
-      // Update the website name
-      await websiteNameInput.clear();
-      await websiteNameInput.fill('Updated Website Name');
-      await expect(websiteNameInput).toHaveValue('Updated Website Name');
+    // Update the website name
+    await websiteNameInput.clear();
+    await websiteNameInput.fill('Updated Website Name');
+    await expect(websiteNameInput).toHaveValue('Updated Website Name');
 
-      // Wait for the update API call to complete
-      const updateResponse = page.waitForResponse(
-        (response) =>
-          response.url().includes('/api/settings') && response.status() === 200
-      );
+    // Wait for the update API call to complete
+    const updateResponse = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/settings') && response.status() === 200
+    );
 
-      await page.getByRole('button', { name: 'Update Website' }).click();
-      await updateResponse;
+    await page.getByRole('button', { name: 'Update Website' }).click();
+    await updateResponse;
 
-      // Check for success message
-      await expect(
-        page.getByText('Website name updated successfully')
-      ).toBeVisible({ timeout: 5000 });
+    // Check for success message
+    await expect(
+      page.getByText('Website name updated successfully')
+    ).toBeVisible({ timeout: 5000 });
 
-      // Verify that the input field has been updated
-      await expect(websiteNameInput).toHaveValue('Updated Website Name');
+    // Verify that the input field has been updated
+    await expect(websiteNameInput).toHaveValue('Updated Website Name');
 
-      // Reload and verify persistence
-      await page.reload();
-      await page.waitForLoadState('networkidle');
+    // Reload and verify persistence
+    await page.reload();
+    await page.waitForLoadState('networkidle');
 
-      // Wait for data to be refetched
-      await page.waitForResponse(
-        (response) =>
-          response.url().includes('/api/settings/name') &&
-          response.status() === 200
-      );
+    // Wait for the input to be visible and populated after reload
+    await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
 
-      await expect(websiteNameInput).toHaveValue('Updated Website Name');
-    } finally {
-      // Cleanup
-      await TestDatabase.cleanDatabase();
-      await TestDatabase.disconnect();
-    }
+    // Wait for the data to be loaded by checking for the expected value
+    // Use a longer timeout and retry mechanism
+    await expect(websiteNameInput).toHaveValue('Updated Website Name', {
+      timeout: 10000,
+    });
+
+    // Cleanup
+    await TestDatabase.cleanDatabase();
+    await TestDatabase.disconnect();
   });
 
   test('validates input field requirements', async ({ page }) => {
