@@ -15,18 +15,15 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: socialNetworks.map((sn) => ({
-        type: sn.type.value,
-        url: sn.url.value,
-        label: sn.label.value,
-        enabled: sn.enabled,
+      data: socialNetworks.map((socialNetwork) => ({
+        type: socialNetwork.type.value,
+        url: socialNetwork.url.value,
+        label: socialNetwork.label.value,
+        enabled: socialNetwork.enabled,
       })),
     });
   } catch (error) {
-    logger.logError('Error fetching social networks', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    logger.logError('Error fetching social networks', { error });
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social networks' },
       { status: 500 }
@@ -40,9 +37,7 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
 
-    logger.logInfo('Processing social networks update request', {
-      socialNetworksCount: body.socialNetworks?.length || 0,
-    });
+    logger.logInfo('Processing social networks update request');
 
     // Validate request body
     if (!Array.isArray(body.socialNetworks)) {
@@ -63,14 +58,16 @@ export async function PUT(request: NextRequest) {
     }
 
     // Enhanced validation for each social network
-    for (const [index, sn] of body.socialNetworks.entries()) {
+    for (const [index, socialNetwork] of body.socialNetworks.entries()) {
       const validationErrors: string[] = [];
 
       // Validate type
-      if (!sn.type || typeof sn.type !== 'string') {
+      if (!socialNetwork.type || typeof socialNetwork.type !== 'string') {
         validationErrors.push('type is required and must be a string');
       } else if (
-        !Object.values(SocialNetworkType).includes(sn.type as SocialNetworkType)
+        !Object.values(SocialNetworkType).includes(
+          socialNetwork.type as SocialNetworkType
+        )
       ) {
         validationErrors.push(
           `type must be one of: ${Object.values(SocialNetworkType).join(', ')}`
@@ -78,25 +75,25 @@ export async function PUT(request: NextRequest) {
       }
 
       // Validate URL
-      if (typeof sn.url !== 'string') {
+      if (typeof socialNetwork.url !== 'string') {
         validationErrors.push('url is required and must be a string');
-      } else if (sn.url.length > 2048) {
+      } else if (socialNetwork.url.length > 2048) {
         validationErrors.push('url must be less than 2048 characters');
       }
 
       // Validate label
-      if (typeof sn.label !== 'string') {
+      if (typeof socialNetwork.label !== 'string') {
         validationErrors.push('label is required and must be a string');
-      } else if (sn.label.length === 0) {
+      } else if (socialNetwork.label.length === 0) {
         validationErrors.push('label cannot be empty');
-      } else if (sn.label.length > 50) {
+      } else if (socialNetwork.label.length > 50) {
         validationErrors.push('label must be less than 50 characters');
-      } else if (/<|>|&|"|'/.test(sn.label)) {
+      } else if (/<|>|&|"|'/.test(socialNetwork.label)) {
         validationErrors.push('label contains invalid characters');
       }
 
       // Validate enabled
-      if (typeof sn.enabled !== 'boolean') {
+      if (typeof socialNetwork.enabled !== 'boolean') {
         validationErrors.push('enabled is required and must be a boolean');
       }
 
@@ -105,7 +102,7 @@ export async function PUT(request: NextRequest) {
           `Validation failed for social network at index ${index}`,
           {
             index,
-            socialNetwork: sn,
+            socialNetwork: socialNetwork,
             errors: validationErrors,
           }
         );
@@ -128,12 +125,12 @@ export async function PUT(request: NextRequest) {
       '@/domain/settings/entities/SocialNetwork'
     );
     const socialNetworkObjects = body.socialNetworks.map(
-      (sn: {
+      (socialNetwork: {
         type: SocialNetworkType;
         url: string;
         label: string;
         enabled: boolean;
-      }) => SocialNetwork.fromJSON(sn)
+      }) => SocialNetwork.fromJSON(socialNetwork)
     );
 
     await updateSocialNetworks.execute(socialNetworkObjects);
@@ -144,10 +141,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.logError('Error updating social networks', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    logger.logError('Error updating social networks', { error });
     return NextResponse.json(
       {
         success: false,
