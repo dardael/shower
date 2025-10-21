@@ -1,0 +1,187 @@
+---
+description: Enforce the use of the enhanced logging system for structured, performant, and maintainable logging across all application layers. This rule covers proper usage of UnifiedLogger, AsyncFileLoggerAdapter, and related logging components.
+globs: src/**/*.{ts,tsx}
+alwaysApply: true
+---
+
+Sub rule 1: Core Logging System Usage
+- Use `UnifiedLogger` as the primary logging interface for all new code
+- Import from: `import { UnifiedLogger } from '@/application/shared/UnifiedLogger'`
+- Obtain logger through dependency injection: `constructor(@inject('UnifiedLogger') private logger: UnifiedLogger)`
+- Use `EnhancedLoggerServiceLocator.getUnifiedLogger()` for manual instantiation when needed
+- Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in production code
+
+Sub rule 2: Log Level Usage
+- Use `logger.debug()` for detailed troubleshooting information in development
+- Use `logger.info()` for important business events and successful operations
+- Use `logger.warn()` for concerning situations that don't stop the application
+- Use `logger.error()` for error conditions that impact functionality
+- Use `logger.execute(LogLevel.ERROR, message, metadata)` for dynamic level selection
+
+Sub rule 3: Structured Logging with Metadata
+- Always include relevant metadata in log entries for better debugging
+- Use structured objects for metadata: `logger.info('User login', { userId, email, ip })`
+- Include correlation IDs for request tracking: `logger.info('API call', { requestId, userId })`
+- Add context information: `logger.error('Database error', { query, table, error })`
+- Use consistent field names: `userId`, `requestId`, `operation`, `duration`, `success`
+
+Sub rule 4: Specialized Logging Methods
+- Use `logger.logApiRequest(method, url, userId, metadata)` for API request logging
+- Use `logger.logApiResponse(method, url, statusCode, duration, metadata)` for API response logging
+- Use `logger.logError(error, message, metadata)` for proper error object handling
+- Use `logger.logSecurity(context)` for security events (login attempts, failures, etc.)
+- Use `logger.logUserAction(action, userId, metadata)` for user behavior tracking
+- Use `logger.logBusinessEvent(event, metadata)` for important business milestones
+
+Sub rule 5: Performance Measurement
+- Use `logger.startTimer(operation, metadata)` to begin performance measurement
+- Use `logger.endTimer(metrics, additionalMetadata)` to complete and log timing
+- Use `logger.measure(operation, asyncFn, metadata)` for automatic async operation timing
+- Performance warnings automatically trigger for operations > 1000ms
+- Include operation context: `logger.measure('database-query', () => fetchData(), { table, query })`
+
+Sub rule 6: Contextual Logging
+- Use `logger.withContext(context)` to create contextual loggers with preset metadata
+- Include request context: `const contextualLogger = logger.withContext({ requestId, userId })`
+- Use contextual loggers throughout request lifecycle for consistent correlation
+- Chain context: `logger.withContext({ module: 'auth' }).withContext({ operation: 'login' })`
+- Context automatically includes correlation IDs and request tracking
+
+Sub rule 7: Conditional and Batch Logging
+- Use `logger.logIf(condition, level, message, metadata)` for conditional logging
+- Use `logger.debugIf(message, condition, metadata)` for debug-only conditional logging
+- Use `logger.batch(entries)` for multiple log entries to improve performance
+- Batch example: `logger.batch([{ level: LogLevel.INFO, message: 'Started' }, { level: LogLevel.INFO, message: 'Completed' }])`
+- Use conditional logging to avoid performance impact in production
+
+Sub rule 8: Error Handling and Logging
+- Always log errors with proper error object handling: `logger.logError(error, 'Operation failed', { context })`
+- Include stack traces automatically through `logError` method
+- Use structured error information: `logger.error('Validation failed', { errors, field, value })`
+- Log retry attempts: `logger.warn('Retrying operation', { attempt, maxAttempts, delay })`
+- Include error context for debugging: `logger.error('Database connection failed', { host, port, database })`
+
+Sub rule 9: Client-Side Logging
+- Use `clientLogger` for browser-side logging: `import { clientLogger } from '@/presentation/shared/utils/clientLogger'`
+- Client logger automatically falls back to console when server logging unavailable
+- Use same API patterns as server-side logging for consistency
+- Include browser context: `clientLogger.info('User interaction', { event, element, timestamp })`
+- Handle client errors gracefully: `clientLogger.logError(error, 'Client operation failed')`
+
+Sub rule 10: Testing and Logging
+- Mock `UnifiedLogger` in tests using jest mocks or test doubles
+- Verify log calls in tests: `expect(mockLogger.logInfo).toHaveBeenCalledWith(expectedMessage, expectedMetadata)`
+- Test logging behavior: `expect(() => logger.logError(error)).not.toThrow()`
+- Use test-specific log levels to avoid noise in test output
+- Avoid logging in test assertions; use test framework features instead
+
+Examples:
+
+Basic logging:
+```typescript
+// Good
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+
+class UserService {
+  constructor(@inject('UnifiedLogger') private logger: UnifiedLogger) {}
+
+  async createUser(userData: CreateUserDto): Promise<User> {
+    this.logger.info('Creating user', { email: userData.email, role: userData.role });
+    
+    try {
+      const user = await this.userRepository.create(userData);
+      this.logger.info('User created successfully', { userId: user.id, email: user.email });
+      return user;
+    } catch (error) {
+      this.logger.logError(error, 'Failed to create user', { email: userData.email });
+      throw error;
+    }
+  }
+}
+
+// Bad
+console.log('Creating user');
+console.error('Failed to create user');
+```
+
+API logging:
+```typescript
+// Good
+export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  
+  try {
+    logger.logApiRequest('GET', '/api/users', request.headers.get('x-user-id'));
+    
+    const users = await userService.getUsers();
+    
+    const duration = Date.now() - startTime;
+    logger.logApiResponse('GET', '/api/users', 200, duration, { count: users.length });
+    
+    return Response.json(users);
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    logger.logApiResponse('GET', '/api/users', 500, duration);
+    logger.logError(error, 'API request failed', { method: 'GET', url: '/api/users' });
+    throw error;
+  }
+}
+```
+
+Performance measurement:
+```typescript
+// Good
+const result = await logger.measure('database-query', async () => {
+  return await userRepository.findById(userId);
+}, { table: 'users', operation: 'findById' });
+
+// Manual timing
+const timer = logger.startTimer('data-processing', { batchSize });
+try {
+  const processed = await processData(data);
+  logger.endTimer(timer, { processedCount: processed.length, success: true });
+} catch (error) {
+  logger.endTimer(timer, { success: false, error: error.message });
+  throw error;
+}
+```
+
+Contextual logging:
+```typescript
+// Good
+const contextualLogger = logger.withContext({ 
+  requestId: 'req-123', 
+  userId: 'user-456',
+  module: 'payment' 
+});
+
+contextualLogger.info('Processing payment');
+contextualLogger.info('Payment validated');
+contextualLogger.info('Payment completed');
+// All logs include requestId, userId, and module automatically
+```
+
+Security logging:
+```typescript
+// Good
+logger.logSecurity({
+  event: 'LOGIN_ATTEMPT',
+  userId: credentials.email,
+  ip: request.ip,
+  userAgent: request.headers.get('user-agent'),
+  success: false,
+  reason: 'invalid_credentials'
+});
+```
+
+Batch logging:
+```typescript
+// Good
+const logEntries = [
+  { level: LogLevel.INFO, message: 'Import started', metadata: { fileCount } },
+  { level: LogLevel.INFO, message: 'Processing records', metadata: { current, total } },
+  { level: LogLevel.INFO, message: 'Import completed', metadata: { successCount, errorCount } }
+];
+
+logger.batch(logEntries);
+```

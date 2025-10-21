@@ -34,12 +34,14 @@ Sub rule 4: Error Handling
 
 Sub rule 5: Logging Practices
 - Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in production code
-- Use the project's logging system: `LogMessage` class with `ILogger` interface
-- Import logging utilities: `import { LogMessage } from '@/application/shared/LogMessage'`
-- Use appropriate log levels: `LogLevel.DEBUG`, `LogLevel.INFO`, `LogLevel.WARNING`, `LogLevel.ERROR`
-- Example usage: `new LogMessage(logger).execute(LogLevel.INFO, 'User authenticated successfully', { userId: user.id })`
-- Include relevant metadata in log messages for better debugging and monitoring
-- Use `LogLevel.ERROR` for error conditions, `LogLevel.WARNING` for concerning situations, `LogLevel.INFO` for important events, `LogLevel.DEBUG` for detailed troubleshooting
+- Use the enhanced logging system: `UnifiedLogger` class with structured logging capabilities
+- Import logging utilities: `import { UnifiedLogger } from '@/application/shared/UnifiedLogger'`
+- Obtain logger through dependency injection: `constructor(@inject('UnifiedLogger') private logger: UnifiedLogger)`
+- Use appropriate methods: `logger.debug()`, `logger.info()`, `logger.warn()`, `logger.error()`
+- Example usage: `logger.info('User authenticated successfully', { userId: user.id, email: user.email })`
+- Include structured metadata in all log entries for better debugging and monitoring
+- Use specialized methods: `logger.logApiRequest()`, `logger.logError()`, `logger.logSecurity()`, `logger.measure()`
+- For detailed logging guidelines and examples, see the enhanced-logging-system rule
 
 Sub rule 6: TypeScript Specific Clean Code
 - Use interfaces over types for object shapes that can be extended
