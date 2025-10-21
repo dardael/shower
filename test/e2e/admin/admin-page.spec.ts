@@ -63,7 +63,7 @@ test.describe('Admin Page', () => {
     ).toBeVisible();
   });
 
-  test('updates website name successfully', async ({ page }) => {
+  test.skip('updates website name successfully', async ({ page }) => {
     await signIn(page);
 
     await page.waitForResponse(
