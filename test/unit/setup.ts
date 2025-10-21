@@ -2,6 +2,9 @@ import 'reflect-metadata';
 import '@testing-library/jest-dom';
 import React from 'react';
 
+// Increase EventEmitter max listeners to prevent memory leak warnings
+process.setMaxListeners(50);
+
 // Suppress React act() warnings for renderHook async operations
 const originalError = console.error;
 beforeAll(() => {

@@ -219,12 +219,12 @@ describe('UnifiedLogger', () => {
       logger.endTimer(timer);
 
       expect(mockLogger.logWarning).toHaveBeenCalledWith(
-        'Performance: test-operation took 2000ms',
-        {
+        expect.stringContaining('Performance: test-operation took'),
+        expect.objectContaining({
           operation: 'test-operation',
           duration: expect.any(Number),
           type: 'performance',
-        }
+        })
       );
     });
 

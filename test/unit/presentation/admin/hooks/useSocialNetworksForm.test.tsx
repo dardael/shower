@@ -4,7 +4,8 @@ import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetwork
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 
 // Mock fetch
-global.fetch = jest.fn();
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 // Mock toaster
 jest.mock('@/presentation/shared/components/ui/toaster');
@@ -12,6 +13,7 @@ jest.mock('@/presentation/shared/components/ui/toaster');
 describe('useSocialNetworksForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockFetch.mockClear();
   });
 
   it('should initialize with loading state', () => {
@@ -32,7 +34,7 @@ describe('useSocialNetworksForm', () => {
       },
     ];
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       json: jest.fn().mockResolvedValueOnce({
         success: true,
         data: mockSocialNetworks,
@@ -47,11 +49,11 @@ describe('useSocialNetworksForm', () => {
     });
 
     expect(result.current.socialNetworks).toEqual(mockSocialNetworks);
-    expect(fetch).toHaveBeenCalledWith('/api/settings/social-networks');
+    expect(mockFetch).toHaveBeenCalledWith('/api/settings/social-networks');
   });
 
   it('should handle fetch error', async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
@@ -114,7 +116,7 @@ describe('useSocialNetworksForm', () => {
       },
     ];
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       json: jest.fn().mockResolvedValueOnce({
         success: true,
         data: mockSocialNetworks,
@@ -141,7 +143,7 @@ describe('useSocialNetworksForm', () => {
       },
     ];
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       json: jest.fn().mockResolvedValueOnce({
         success: true,
         data: mockSocialNetworks,
@@ -174,7 +176,7 @@ describe('useSocialNetworksForm', () => {
       },
     ];
 
-    (fetch as jest.Mock)
+    mockFetch
       .mockResolvedValueOnce({
         json: jest.fn().mockResolvedValueOnce({
           success: true,
@@ -216,7 +218,7 @@ describe('useSocialNetworksForm', () => {
       },
     ];
 
-    (fetch as jest.Mock)
+    mockFetch
       .mockResolvedValueOnce({
         json: jest.fn().mockResolvedValueOnce({
           success: true,
