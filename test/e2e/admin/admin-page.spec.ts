@@ -46,6 +46,8 @@ test.describe('Admin Page', () => {
     ).toBeVisible();
   });
 
+  test.describe.configure({ mode: 'serial' });
+
   test('updates website name successfully', async ({ page }) => {
     // Setup for this test
     await TestDatabase.connect();
@@ -88,7 +90,6 @@ test.describe('Admin Page', () => {
     await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
 
     // Wait for the data to be loaded by checking for the expected value
-    // Use a longer timeout and retry mechanism
     await expect(websiteNameInput).toHaveValue('Updated Website Name', {
       timeout: 10000,
     });
