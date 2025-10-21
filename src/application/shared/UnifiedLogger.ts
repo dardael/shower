@@ -1,6 +1,7 @@
 import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 import type { ILogger } from '@/application/shared/ILogger';
 import { ContextualLogger, type LogContext } from './ContextualLogger';
+import { PerformanceMonitor } from './PerformanceMonitor';
 
 export interface PerformanceMetrics {
   operation: string;
@@ -17,7 +18,17 @@ export interface SecurityContext {
 }
 
 export class UnifiedLogger {
-  constructor(private readonly logger: ILogger) {}
+  private performanceMonitor?: PerformanceMonitor;
+
+  constructor(private readonly logger: ILogger) {
+    // Initialize performance monitor in production or when explicitly enabled
+    if (
+      process.env.NODE_ENV === 'production' ||
+      process.env.ENABLE_PERFORMANCE_MONITORING === 'true'
+    ) {
+      this.performanceMonitor = new PerformanceMonitor(this);
+    }
+  }
 
   // Direct logging methods - consistent with console API
   debug(message: string, metadata?: Record<string, unknown>): void {
@@ -167,6 +178,11 @@ export class UnifiedLogger {
     fn: () => Promise<T>,
     metadata?: Record<string, unknown>
   ): Promise<T> {
+    // Use performance monitor if available, otherwise fall back to simple timer
+    if (this.performanceMonitor) {
+      return this.performanceMonitor.measure(operation, fn, metadata);
+    }
+
     const timer = this.startTimer(operation, metadata);
     try {
       const result = await fn();
@@ -293,5 +309,38 @@ export class UnifiedLogger {
     if (process.env.NODE_ENV !== 'production' && condition) {
       this.debug(message, metadata);
     }
+  }
+
+  /**
+   * Get performance monitor instance
+   */
+  getPerformanceMonitor(): PerformanceMonitor | undefined {
+    return this.performanceMonitor;
+  }
+
+  /**
+   * Get performance statistics
+   */
+  getPerformanceStatistics() {
+    return (
+      this.performanceMonitor?.getStatistics() || {
+        totalMetrics: 0,
+        activeMetrics: 0,
+        totalAlerts: 0,
+        criticalAlerts: 0,
+        warningAlerts: 0,
+        recentAlerts: [],
+      }
+    );
+  }
+
+  /**
+   * Set performance threshold for an operation
+   */
+  setPerformanceThreshold(
+    operation: string,
+    threshold: { warning: number; critical: number }
+  ): void {
+    this.performanceMonitor?.setThreshold(operation, threshold);
   }
 }

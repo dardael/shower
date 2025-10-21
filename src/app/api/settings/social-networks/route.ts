@@ -10,9 +10,15 @@ export async function GET() {
   const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
 
   try {
-    const getSocialNetworks =
-      container.resolve<GetSocialNetworks>('IGetSocialNetworks');
-    const socialNetworks = await getSocialNetworks.execute();
+    const socialNetworks = await logger.measure(
+      'api.get.social-networks',
+      async () => {
+        const getSocialNetworks =
+          container.resolve<GetSocialNetworks>('IGetSocialNetworks');
+        return await getSocialNetworks.execute();
+      },
+      { endpoint: '/api/settings/social-networks', method: 'GET' }
+    );
 
     return NextResponse.json({
       success: true,
