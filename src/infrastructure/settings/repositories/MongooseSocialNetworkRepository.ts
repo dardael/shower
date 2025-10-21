@@ -56,11 +56,25 @@ export class MongooseSocialNetworkRepository
   async getSocialNetworkByType(
     type: SocialNetworkType
   ): Promise<SocialNetwork | null> {
-    const allNetworks = await this.getAllSocialNetworks();
-    return (
-      allNetworks.find((socialNetwork) => socialNetwork.type.value === type) ||
-      null
+    const settingsDocument = await WebsiteSettingsModel.findOne(
+      { key: 'socialNetworks' },
+      { socialNetworks: { $elemMatch: { type } } }
     );
+
+    if (
+      !settingsDocument ||
+      !settingsDocument.socialNetworks ||
+      settingsDocument.socialNetworks.length === 0
+    ) {
+      const defaultNetworks = this.getDefaultSocialNetworks();
+      return (
+        defaultNetworks.find(
+          (socialNetwork) => socialNetwork.type.value === type
+        ) || null
+      );
+    }
+
+    return this.mapToDomain(settingsDocument.socialNetworks[0]);
   }
 
   private getDefaultSocialNetworks(): SocialNetwork[] {

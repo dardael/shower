@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
@@ -56,45 +56,56 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     }
   };
 
-  const handleUrlChange = (type: SocialNetworkType, url: string) => {
-    setSocialNetworks((prev) =>
-      prev.map((socialNetwork) =>
-        socialNetwork.type === type ? { ...socialNetwork, url } : socialNetwork
-      )
-    );
-  };
+  const handleUrlChange = useCallback(
+    (type: SocialNetworkType, url: string) => {
+      setSocialNetworks((prev) =>
+        prev.map((socialNetwork) =>
+          socialNetwork.type === type
+            ? { ...socialNetwork, url }
+            : socialNetwork
+        )
+      );
+    },
+    []
+  );
 
-  const handleLabelChange = (type: SocialNetworkType, label: string) => {
-    setSocialNetworks((prev) =>
-      prev.map((socialNetwork) =>
-        socialNetwork.type === type
-          ? { ...socialNetwork, label }
-          : socialNetwork
-      )
-    );
-  };
+  const handleLabelChange = useCallback(
+    (type: SocialNetworkType, label: string) => {
+      setSocialNetworks((prev) =>
+        prev.map((socialNetwork) =>
+          socialNetwork.type === type
+            ? { ...socialNetwork, label }
+            : socialNetwork
+        )
+      );
+    },
+    []
+  );
 
-  const handleEnabledChange = (
-    type: SocialNetworkType,
-    details: { checked: string | boolean }
-  ) => {
-    const enabled =
-      typeof details.checked === 'boolean'
-        ? details.checked
-        : details.checked === 'true';
+  const handleEnabledChange = useCallback(
+    (type: SocialNetworkType, details: { checked: string | boolean }) => {
+      const enabled =
+        typeof details.checked === 'boolean'
+          ? details.checked
+          : details.checked === 'true';
 
-    setSocialNetworks((prev) =>
-      prev.map((socialNetwork) =>
-        socialNetwork.type === type
-          ? { ...socialNetwork, enabled }
-          : socialNetwork
-      )
-    );
-  };
+      setSocialNetworks((prev) =>
+        prev.map((socialNetwork) =>
+          socialNetwork.type === type
+            ? { ...socialNetwork, enabled }
+            : socialNetwork
+        )
+      );
+    },
+    []
+  );
 
-  const getConfig = (type: SocialNetworkType) => SOCIAL_NETWORK_CONFIG[type];
+  const getConfig = useCallback(
+    (type: SocialNetworkType) => SOCIAL_NETWORK_CONFIG[type],
+    []
+  );
 
-  const validateForm = (): boolean => {
+  const validateForm = useCallback((): boolean => {
     for (const socialNetwork of socialNetworks) {
       if (socialNetwork.enabled) {
         if (!socialNetwork.url.trim()) {
@@ -119,7 +130,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
       }
     }
     return true;
-  };
+  }, [socialNetworks, getConfig]);
 
   const handleSubmit = async () => {
     if (!validateForm()) {
