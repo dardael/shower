@@ -2,6 +2,32 @@ import 'reflect-metadata';
 import '@testing-library/jest-dom';
 import React from 'react';
 
+// Suppress React act() warnings for renderHook async operations
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args: unknown[]) => {
+    const messageString = args.map((arg) => String(arg)).join(' ');
+
+    // Suppress act() warnings that are known false positives in renderHook tests
+    if (
+      messageString.includes(
+        'An update to TestComponent inside a test was not wrapped in act'
+      ) ||
+      messageString.includes(
+        'The current testing environment is not configured to support act'
+      )
+    ) {
+      return;
+    }
+
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 // Polyfill structuredClone for test environment
 if (typeof structuredClone === 'undefined') {
   global.structuredClone = (obj: unknown) => JSON.parse(JSON.stringify(obj));
