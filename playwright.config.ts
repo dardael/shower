@@ -74,11 +74,11 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run build && npm run start',
+    command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     env: {
-      NODE_ENV: 'production',
+      NODE_ENV: 'development',
       SHOWER_ENV: 'test',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
