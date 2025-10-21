@@ -109,13 +109,14 @@ export default function SocialNetworksForm() {
     );
   };
 
-  const handleEnabledChange = (type: SocialNetworkType, checked: unknown) => {
-    // Chakra UI v3 returns { checked: boolean } or boolean directly
+  const handleEnabledChange = (
+    type: SocialNetworkType,
+    details: { checked: string | boolean }
+  ) => {
     const enabled =
-      typeof checked === 'boolean'
-        ? checked
-        : (checked as { checked: boolean })?.checked || false;
-
+      typeof details.checked === 'boolean'
+        ? details.checked
+        : details.checked === 'true';
     setSocialNetworks((prev) =>
       prev.map((sn) => (sn.type === type ? { ...sn, enabled } : sn))
     );
