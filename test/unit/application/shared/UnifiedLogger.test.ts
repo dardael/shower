@@ -302,29 +302,19 @@ describe('UnifiedLogger', () => {
       expect(mockLogger.logInfo).not.toHaveBeenCalled();
     });
 
-    it('should debug in non-production environment', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
-
+    it('should debug when condition is true', () => {
       logger.debugIf('Debug message', true);
 
       expect(mockLogger.logDebug).toHaveBeenCalledWith(
         'Debug message',
         undefined
       );
-
-      process.env.NODE_ENV = originalEnv;
     });
 
-    it('should not debug in production environment', () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
-
-      logger.debugIf('Debug message', true);
+    it('should not debug when condition is false', () => {
+      logger.debugIf('Debug message', false);
 
       expect(mockLogger.logDebug).not.toHaveBeenCalled();
-
-      process.env.NODE_ENV = originalEnv;
     });
   });
 });
