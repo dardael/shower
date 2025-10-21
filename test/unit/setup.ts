@@ -9,15 +9,20 @@ process.setMaxListeners(50);
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args: unknown[]) => {
-    const messageString = args.map((arg) => String(arg)).join(' ');
+    // Convert all args to string for checking
+    const fullMessage = args.map((arg) => String(arg)).join(' ');
 
     // Suppress act() warnings that are known false positives in renderHook tests
     if (
-      messageString.includes(
+      fullMessage.includes(
         'An update to TestComponent inside a test was not wrapped in act'
       ) ||
-      messageString.includes(
+      fullMessage.includes(
         'The current testing environment is not configured to support act'
+      ) ||
+      fullMessage.includes('wrap-tests-with-act') ||
+      fullMessage.includes(
+        'When testing, code that causes React state updates should be wrapped into act'
       )
     ) {
       return;
