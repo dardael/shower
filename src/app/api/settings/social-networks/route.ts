@@ -4,6 +4,7 @@ import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import type { ILogger } from '@/application/shared/ILogger';
+import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 
 export async function GET() {
   const logger = container.resolve<ILogger>('ILogger');
@@ -33,87 +34,30 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   const logger = container.resolve<ILogger>('ILogger');
+  const validationService = new SocialNetworkValidationService(logger);
 
   try {
     const body = await request.json();
 
     logger.logInfo('Processing social networks update request');
 
-    // Validate request body
-    if (!Array.isArray(body.socialNetworks)) {
-      logger.logWarning(
-        'Invalid request body - socialNetworks is not an array',
-        {
-          body: typeof body,
-          socialNetworks: body.socialNetworks,
-        }
-      );
+    // Validate request body using shared validation service
+    const validationResult = validationService.validateSocialNetworksArray(
+      body.socialNetworks
+    );
+
+    if (!validationResult.isValid) {
+      const errorMessage = validationResult.errors
+        .map((error) => `${error.field}: ${error.message}`)
+        .join(', ');
+
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid social networks data: expected an array',
+          error: `Validation failed: ${errorMessage}`,
         },
         { status: 400 }
       );
-    }
-
-    // Enhanced validation for each social network
-    for (const [index, socialNetwork] of body.socialNetworks.entries()) {
-      const validationErrors: string[] = [];
-
-      // Validate type
-      if (!socialNetwork.type || typeof socialNetwork.type !== 'string') {
-        validationErrors.push('type is required and must be a string');
-      } else if (
-        !Object.values(SocialNetworkType).includes(
-          socialNetwork.type as SocialNetworkType
-        )
-      ) {
-        validationErrors.push(
-          `type must be one of: ${Object.values(SocialNetworkType).join(', ')}`
-        );
-      }
-
-      // Validate URL
-      if (typeof socialNetwork.url !== 'string') {
-        validationErrors.push('url is required and must be a string');
-      } else if (socialNetwork.url.length > 2048) {
-        validationErrors.push('url must be less than 2048 characters');
-      }
-
-      // Validate label
-      if (typeof socialNetwork.label !== 'string') {
-        validationErrors.push('label is required and must be a string');
-      } else if (socialNetwork.label.length === 0) {
-        validationErrors.push('label cannot be empty');
-      } else if (socialNetwork.label.length > 50) {
-        validationErrors.push('label must be less than 50 characters');
-      } else if (/<|>|&|"|'/.test(socialNetwork.label)) {
-        validationErrors.push('label contains invalid characters');
-      }
-
-      // Validate enabled
-      if (typeof socialNetwork.enabled !== 'boolean') {
-        validationErrors.push('enabled is required and must be a boolean');
-      }
-
-      if (validationErrors.length > 0) {
-        logger.logWarning(
-          `Validation failed for social network at index ${index}`,
-          {
-            index,
-            socialNetwork: socialNetwork,
-            errors: validationErrors,
-          }
-        );
-        return NextResponse.json(
-          {
-            success: false,
-            error: `Invalid social network format at index ${index}: ${validationErrors.join(', ')}`,
-          },
-          { status: 400 }
-        );
-      }
     }
 
     const updateSocialNetworks = container.resolve<UpdateSocialNetworks>(
