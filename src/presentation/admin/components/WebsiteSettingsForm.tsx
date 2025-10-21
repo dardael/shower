@@ -42,17 +42,13 @@ export default function WebsiteSettingsForm({
     try {
       const response = await fetch('/api/settings/name');
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.name) {
         setName(data.name);
-      } else {
-        logger.execute(LogLevel.ERROR, 'Failed to fetch website name', {
-          error: data.error,
-        });
       }
     } catch (error) {
       logger.execute(LogLevel.ERROR, 'Error fetching website name', { error });
     }
-  }, []);
+  }, [logger]);
 
   const fetchWebsiteIcon = useCallback(async () => {
     try {
@@ -72,7 +68,7 @@ export default function WebsiteSettingsForm({
       logger.execute(LogLevel.ERROR, 'Error fetching website icon', { error });
       setCurrentIcon(null);
     }
-  }, []);
+  }, [logger]);
 
   useEffect(() => {
     fetchWebsiteName();

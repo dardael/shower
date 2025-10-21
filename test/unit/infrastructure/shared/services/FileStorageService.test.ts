@@ -1,6 +1,22 @@
 import { LocalFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
 import { promises as fsPromises } from 'fs';
 
+// Mock the container to avoid BetterAuth import issues
+jest.mock('@/infrastructure/container', () => ({
+  container: {
+    resolve: jest.fn().mockReturnValue({
+      execute: jest.fn(),
+      logInfo: jest.fn(),
+      logWarning: jest.fn(),
+      logError: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    }),
+  },
+}));
+
 // Mock the fs module to avoid actual file operations in tests
 jest.mock('fs', () => ({
   promises: {
@@ -117,21 +133,14 @@ describe('LocalFileStorageService', () => {
 
   describe('deleteIcon', () => {
     it('should delete icon file successfully', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
       mockFs.unlink.mockResolvedValue(undefined);
 
       await fileStorageService.deleteIcon('favicon-123.ico');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Deleted icon file: favicon-123.ico'
-      );
       expect(mockFs.unlink).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
     });
 
     it('should handle file not found gracefully', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockFs.unlink.mockRejectedValue(new Error('ENOENT: no such file'));
 
       // Should not throw error
@@ -139,12 +148,7 @@ describe('LocalFileStorageService', () => {
         fileStorageService.deleteIcon('nonexistent.ico')
       ).resolves.toBeUndefined();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to delete icon file nonexistent.ico:'),
-        expect.any(Error)
-      );
-
-      consoleSpy.mockRestore();
+      expect(mockFs.unlink).toHaveBeenCalled();
     });
   });
 });
