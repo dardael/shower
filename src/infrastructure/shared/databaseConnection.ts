@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
-import { LogMessage } from '@/application/shared/LogMessage';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
@@ -29,15 +27,22 @@ export class DatabaseConnection {
       await mongoose.connect(uri);
 
       this.isConnected = true;
-      const logger = container.resolve<ILogger>('ILogger');
-      new LogMessage(logger).execute(LogLevel.INFO, 'Connected to MongoDB');
+      try {
+        const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+        logger.info('Connected to MongoDB');
+      } catch {
+        console.log('Connected to MongoDB');
+      }
     } catch (error) {
-      const logger = container.resolve<ILogger>('ILogger');
-      new LogMessage(logger).execute(
-        LogLevel.ERROR,
-        'Failed to connect to MongoDB',
-        { error }
-      );
+      try {
+        const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+        logger.logError(
+          error instanceof Error ? error : new Error(String(error)),
+          'Failed to connect to MongoDB'
+        );
+      } catch {
+        console.error('Failed to connect to MongoDB:', error);
+      }
       throw error;
     }
   }
@@ -50,8 +55,12 @@ export class DatabaseConnection {
     await mongoose.disconnect();
 
     this.isConnected = false;
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(LogLevel.INFO, 'Disconnected from MongoDB');
+    try {
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      logger.info('Disconnected from MongoDB');
+    } catch {
+      console.log('Disconnected from MongoDB');
+    }
   }
 
   public getConnectionStatus(): boolean {

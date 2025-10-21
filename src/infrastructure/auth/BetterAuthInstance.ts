@@ -2,9 +2,7 @@ import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { MongoClient, Db } from 'mongodb';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
-import { LogMessage } from '@/application/shared/LogMessage';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 // Initialize database connection for Better Auth
 let mongoClient: MongoClient | null = null;
@@ -18,29 +16,26 @@ if (process.env.MONGODB_URI) {
 
     // Handle connection errors gracefully
     mongoClient.on('error', (error) => {
-      const logger = container.resolve<ILogger>('ILogger');
-      new LogMessage(logger).execute(
-        LogLevel.ERROR,
-        'MongoDB connection error',
-        { error }
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      logger.logError(
+        error instanceof Error ? error : new Error(String(error)),
+        'MongoDB connection error'
       );
     });
 
     // Connect asynchronously (non-blocking)
     mongoClient.connect().catch((error) => {
-      const logger = container.resolve<ILogger>('ILogger');
-      new LogMessage(logger).execute(
-        LogLevel.ERROR,
-        'Failed to connect to MongoDB',
-        { error }
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      logger.logError(
+        error instanceof Error ? error : new Error(String(error)),
+        'Failed to connect to MongoDB'
       );
     });
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
-      'Error initializing MongoDB connection',
-      { error }
+    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
+      'Error initializing MongoDB connection'
     );
   }
 }

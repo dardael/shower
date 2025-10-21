@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import {
   Box,
   Stack,
@@ -34,38 +35,43 @@ export default function SocialNetworksForm() {
     handleSubmit,
   } = useSocialNetworksForm();
 
-  const getIcon = (type: SocialNetworkType) => {
-    const icons = {
+  const iconMap = useMemo(
+    () => ({
       [SocialNetworkType.INSTAGRAM]: FaInstagram,
       [SocialNetworkType.FACEBOOK]: FaFacebook,
       [SocialNetworkType.LINKEDIN]: FaLinkedin,
       [SocialNetworkType.EMAIL]: FaEnvelope,
       [SocialNetworkType.PHONE]: FaPhone,
-    };
-    return icons[type];
-  };
+    }),
+    []
+  );
 
-  const getDefaultLabel = (type: SocialNetworkType): string => {
-    const labels = {
+  const labelMap = useMemo(
+    () => ({
       [SocialNetworkType.INSTAGRAM]: 'Instagram',
       [SocialNetworkType.FACEBOOK]: 'Facebook',
       [SocialNetworkType.LINKEDIN]: 'LinkedIn',
       [SocialNetworkType.EMAIL]: 'Email',
       [SocialNetworkType.PHONE]: 'Phone',
-    };
-    return labels[type];
-  };
+    }),
+    []
+  );
 
-  const getUrlPlaceholder = (type: SocialNetworkType): string => {
-    const placeholders = {
+  const placeholderMap = useMemo(
+    () => ({
       [SocialNetworkType.INSTAGRAM]: 'https://instagram.com/username',
       [SocialNetworkType.FACEBOOK]: 'https://facebook.com/page',
       [SocialNetworkType.LINKEDIN]: 'https://linkedin.com/in/profile',
       [SocialNetworkType.EMAIL]: 'mailto:contact@example.com',
       [SocialNetworkType.PHONE]: 'tel:+1234567890',
-    };
-    return placeholders[type];
-  };
+    }),
+    []
+  );
+
+  const getIcon = (type: SocialNetworkType) => iconMap[type];
+  const getDefaultLabel = (type: SocialNetworkType): string => labelMap[type];
+  const getUrlPlaceholder = (type: SocialNetworkType): string =>
+    placeholderMap[type];
 
   if (isLoading) {
     return (

@@ -5,9 +5,7 @@ import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
-import { LogMessage } from '@/application/shared/LogMessage';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -33,9 +31,9 @@ async function getWebsiteName(): Promise<string> {
     const data = await response.json();
     return data.name || 'Shower';
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
+    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
       'Failed to fetch website name',
       { error }
     );
@@ -63,9 +61,9 @@ async function getWebsiteIcon(): Promise<string | null> {
     const data = await response.json();
     return data.icon?.url || null;
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
+    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
       'Failed to fetch website icon',
       { error }
     );
@@ -95,8 +93,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Initialize database connection
-  await initializeDatabase();
+  // Initialize database connection - with timeout to prevent hanging
+  try {
+    await Promise.race([
+      initializeDatabase(),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Database initialization timeout')),
+          5000
+        )
+      ),
+    ]);
+  } catch (error) {
+    console.error('Database initialization failed or timed out:', error);
+    // Continue without database to allow the app to start
+  }
 
   return (
     <html suppressHydrationWarning>

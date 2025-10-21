@@ -4,11 +4,12 @@ import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAcces
 import type { IBetterAuthClientService } from '@/application/auth/services/IBetterAuthClientService';
 import type { IAuthorizeAdminAccess } from '@/application/auth/IAuthorizeAdminAccess';
 import type { ILogger } from '@/application/shared/ILogger';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
+import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import { AdminAccessPolicy } from '@/domain/auth/value-objects/AdminAccessPolicy';
 import { AuthorizeAdminAccess } from '@/application/auth/AuthorizeAdminAccess';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
-import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
-import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import type { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
 import type { IUpdateWebsiteName } from '@/application/settings/IUpdateWebsiteName';
@@ -26,7 +27,23 @@ import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetwork
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 
-// Register interfaces with implementations
+// Register simple logger to avoid circular dependencies
+container.register<ILogger>('ILogger', {
+  useFactory: () => {
+    const formatter = new LogFormatterService();
+    return new FileLoggerAdapter(formatter);
+  },
+});
+
+// Register unified logger
+container.register<UnifiedLogger>('UnifiedLogger', {
+  useFactory: () => {
+    const baseLogger = container.resolve<ILogger>('ILogger');
+    return new UnifiedLogger(baseLogger);
+  },
+});
+
+// Register auth services
 container.register<IBetterAuthClientService>('IBetterAuthClientService', {
   useClass: BetterAuthClientAdapter,
 });
@@ -38,11 +55,6 @@ container.register<AdminAccessPolicyService>('AdminAccessPolicyService', {
 // Register application services
 container.register<IAuthorizeAdminAccess>('IAuthorizeAdminAccess', {
   useClass: AuthorizeAdminAccess,
-});
-
-// Register logger
-container.register<ILogger>('ILogger', {
-  useFactory: () => new FileLoggerAdapter(new LogFormatterService()),
 });
 
 // Register settings services
@@ -108,6 +120,16 @@ export class SettingsServiceLocator {
 
   static getUpdateSocialNetworks(): IUpdateSocialNetworks {
     return container.resolve('IUpdateSocialNetworks');
+  }
+}
+
+export class LoggerServiceLocator {
+  static getUnifiedLogger(): UnifiedLogger {
+    return container.resolve('UnifiedLogger');
+  }
+
+  static getLogger(): ILogger {
+    return container.resolve('ILogger');
   }
 }
 

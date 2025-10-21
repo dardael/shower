@@ -1,18 +1,32 @@
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import type { ILogger } from '@/application/shared/ILogger';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 describe('SocialNetworkValidationService', () => {
   let validationService: SocialNetworkValidationService;
-  let mockLogger: ILogger;
+  let mockLogger: UnifiedLogger;
 
   beforeEach(() => {
     mockLogger = {
-      logInfo: jest.fn(),
-      logWarning: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
       logError: jest.fn(),
-      logDebug: jest.fn(),
-    } as unknown as ILogger;
+      logApiRequest: jest.fn(),
+      logApiResponse: jest.fn(),
+      logSecurity: jest.fn(),
+      logUserAction: jest.fn(),
+      logBusinessEvent: jest.fn(),
+      startTimer: jest.fn(),
+      endTimer: jest.fn(),
+      measure: jest.fn(),
+      withContext: jest.fn(),
+      logIf: jest.fn(),
+      debugIf: jest.fn(),
+      batch: jest.fn(),
+      execute: jest.fn(),
+    } as unknown as UnifiedLogger;
 
     validationService = new SocialNetworkValidationService(mockLogger);
   });
@@ -164,11 +178,12 @@ describe('SocialNetworkValidationService', () => {
 
       validationService.validateSocialNetworkData(invalidSocialNetwork, 2);
 
-      expect(mockLogger.logWarning).toHaveBeenCalledWith(
-        'Validation failed for social network at index 2',
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'Validation failed for social network',
         expect.objectContaining({
           index: 2,
-          socialNetwork: invalidSocialNetwork,
+          socialNetworkType: invalidSocialNetwork.type,
+          errorCount: expect.any(Number),
           errors: expect.any(Array),
         })
       );

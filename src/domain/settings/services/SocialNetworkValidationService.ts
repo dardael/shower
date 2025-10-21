@@ -1,5 +1,6 @@
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import type { ILogger } from '@/application/shared/ILogger';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { inject } from 'tsyringe';
 
 export interface SocialNetworkValidationError {
   field: string;
@@ -12,7 +13,9 @@ export interface SocialNetworkValidationResult {
 }
 
 export class SocialNetworkValidationService {
-  constructor(private readonly logger: ILogger) {}
+  constructor(
+    @inject('UnifiedLogger') private readonly logger: UnifiedLogger
+  ) {}
 
   validateSocialNetworkData(
     socialNetwork: unknown,
@@ -95,14 +98,12 @@ export class SocialNetworkValidationService {
     };
 
     if (!result.isValid) {
-      this.logger.logWarning(
-        `Validation failed for social network at index ${index}`,
-        {
-          index,
-          socialNetwork: data,
-          errors: result.errors,
-        }
-      );
+      this.logger.warn('Validation failed for social network', {
+        index,
+        socialNetworkType: data.type,
+        errorCount: result.errors.length,
+        errors: result.errors,
+      });
     }
 
     return result;

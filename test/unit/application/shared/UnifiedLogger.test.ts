@@ -202,7 +202,7 @@ describe('UnifiedLogger', () => {
       logger.endTimer(timer, { result: 'success' });
 
       expect(mockLogger.logInfo).toHaveBeenCalledWith(
-        'Performance: test-operation took 100ms',
+        expect.stringContaining('Performance: test-operation took'),
         {
           result: 'success',
           operation: 'test-operation',

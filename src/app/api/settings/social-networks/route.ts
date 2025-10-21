@@ -3,11 +3,11 @@ import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import type { ILogger } from '@/application/shared/ILogger';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 
 export async function GET() {
-  const logger = container.resolve<ILogger>('ILogger');
+  const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
 
   try {
     const getSocialNetworks =
@@ -24,7 +24,10 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    logger.logError('Error fetching social networks', { error });
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
+      'Error fetching social networks'
+    );
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social networks' },
       { status: 500 }
@@ -33,13 +36,13 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const logger = container.resolve<ILogger>('ILogger');
+  const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
   const validationService = new SocialNetworkValidationService(logger);
 
   try {
     const body = await request.json();
 
-    logger.logInfo('Processing social networks update request');
+    logger.info('Processing social networks update request');
 
     // Validate request body using shared validation service
     const validationResult = validationService.validateSocialNetworksArray(
@@ -79,13 +82,16 @@ export async function PUT(request: NextRequest) {
 
     await updateSocialNetworks.execute(socialNetworkObjects);
 
-    logger.logInfo('Social networks updated successfully', {
+    logger.info('Social networks updated successfully', {
       count: socialNetworkObjects.length,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.logError('Error updating social networks', { error });
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
+      'Error updating social networks'
+    );
     return NextResponse.json(
       {
         success: false,

@@ -1,8 +1,6 @@
 import { DatabaseConnection } from './databaseConnection';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
-import { LogMessage } from '@/application/shared/LogMessage';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 let isInitialized = false;
 
@@ -15,18 +13,26 @@ export async function initializeDatabase(): Promise<void> {
     const dbConnection = DatabaseConnection.getInstance();
     await dbConnection.connect();
     isInitialized = true;
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.INFO,
-      'Database initialized successfully'
-    );
+    // Only log if logger is available to avoid circular dependency
+    try {
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      logger.info('Database initialized successfully');
+    } catch {
+      // Logger not available, skip logging
+      console.log('Database initialized successfully');
+    }
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
-      'Failed to initialize database',
-      { error }
-    );
+    // Only log if logger is available to avoid circular dependency
+    try {
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      logger.logError(
+        error instanceof Error ? error : new Error(String(error)),
+        'Failed to initialize database'
+      );
+    } catch {
+      // Logger not available, use console
+      console.error('Failed to initialize database:', error);
+    }
     throw error;
   }
 }

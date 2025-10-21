@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 
@@ -91,16 +91,18 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     );
   };
 
-  const getDefaultLabel = (type: SocialNetworkType): string => {
-    const labels = {
+  const labelMap = useMemo(
+    () => ({
       [SocialNetworkType.INSTAGRAM]: 'Instagram',
       [SocialNetworkType.FACEBOOK]: 'Facebook',
       [SocialNetworkType.LINKEDIN]: 'LinkedIn',
       [SocialNetworkType.EMAIL]: 'Email',
       [SocialNetworkType.PHONE]: 'Phone',
-    };
-    return labels[type];
-  };
+    }),
+    []
+  );
+
+  const getDefaultLabel = (type: SocialNetworkType): string => labelMap[type];
 
   const validateForm = (): boolean => {
     for (const socialNetwork of socialNetworks) {

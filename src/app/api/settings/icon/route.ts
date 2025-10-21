@@ -7,9 +7,7 @@ import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/rep
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
 import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
-import { LogMessage } from '@/application/shared/LogMessage';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 export async function GET() {
   try {
@@ -96,9 +94,9 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
+    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
       'Error updating website icon',
       { error }
     );
@@ -149,9 +147,9 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ message: 'Website icon removed successfully' });
   } catch (error) {
-    const logger = container.resolve<ILogger>('ILogger');
-    new LogMessage(logger).execute(
-      LogLevel.ERROR,
+    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    logger.logError(
+      error instanceof Error ? error : new Error(String(error)),
       'Error removing website icon',
       { error }
     );

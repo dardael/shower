@@ -6,13 +6,15 @@ import { SocialNetworkTypeValueObject } from '@/domain/settings/value-objects/So
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetworkLabel';
 import { WebsiteSettingsModel } from '@/infrastructure/settings/models/WebsiteSettingsModel';
-import type { ILogger } from '@/application/shared/ILogger';
+import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 
 @injectable()
 export class MongooseSocialNetworkRepository
   implements SocialNetworkRepository
 {
-  constructor(@inject('ILogger') private readonly logger: ILogger) {}
+  constructor(
+    @inject('UnifiedLogger') private readonly logger: UnifiedLogger
+  ) {}
   async getAllSocialNetworks(): Promise<SocialNetwork[]> {
     const settingsDocument = await WebsiteSettingsModel.findOne({
       key: 'socialNetworks',
@@ -89,13 +91,16 @@ export class MongooseSocialNetworkRepository
       );
     } catch (error) {
       // Log the error with context for debugging
-      this.logger.logError('Invalid social network data found in database', {
-        type: doc.type,
-        url: doc.url,
-        label: doc.label,
-        enabled: doc.enabled,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      this.logger.logError(
+        error instanceof Error ? error : new Error(String(error)),
+        'Invalid social network data found in database',
+        {
+          socialNetworkType: doc.type,
+          url: doc.url,
+          label: doc.label,
+          enabled: doc.enabled,
+        }
+      );
 
       // Create a default social network with the same type to maintain data integrity
       // Use Instagram as ultimate fallback if the original type is invalid
