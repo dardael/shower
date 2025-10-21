@@ -14,31 +14,31 @@ export class MongooseSocialNetworkRepository
 {
   constructor(@inject('ILogger') private readonly logger: ILogger) {}
   async getAllSocialNetworks(): Promise<SocialNetwork[]> {
-    const settingsDoc = await WebsiteSettingsModel.findOne({
+    const settingsDocument = await WebsiteSettingsModel.findOne({
       key: 'socialNetworks',
     });
 
     if (
-      !settingsDoc ||
-      !settingsDoc.socialNetworks ||
-      settingsDoc.socialNetworks.length === 0
+      !settingsDocument ||
+      !settingsDocument.socialNetworks ||
+      settingsDocument.socialNetworks.length === 0
     ) {
       return this.getDefaultSocialNetworks();
     }
 
-    return settingsDoc.socialNetworks.map(
-      (sn: {
+    return settingsDocument.socialNetworks.map(
+      (socialNetwork: {
         type: SocialNetworkType;
         url: string;
         label: string;
         enabled: boolean;
-      }) => this.mapToDomain(sn)
+      }) => this.mapToDomain(socialNetwork)
     );
   }
 
   async updateSocialNetworks(socialNetworks: SocialNetwork[]): Promise<void> {
-    const socialNetworksData = socialNetworks.map((sn) =>
-      this.mapToDatabase(sn)
+    const socialNetworksData = socialNetworks.map((socialNetwork) =>
+      this.mapToDatabase(socialNetwork)
     );
 
     await WebsiteSettingsModel.updateOne(
@@ -55,7 +55,10 @@ export class MongooseSocialNetworkRepository
     type: SocialNetworkType
   ): Promise<SocialNetwork | null> {
     const allNetworks = await this.getAllSocialNetworks();
-    return allNetworks.find((sn) => sn.type.value === type) || null;
+    return (
+      allNetworks.find((socialNetwork) => socialNetwork.type.value === type) ||
+      null
+    );
   }
 
   private getDefaultSocialNetworks(): SocialNetwork[] {
