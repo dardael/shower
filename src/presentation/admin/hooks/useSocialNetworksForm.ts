@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
 
 export interface SocialNetworkFormData {
   type: SocialNetworkType;
@@ -91,18 +92,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     );
   };
 
-  const labelMap = useMemo(
-    () => ({
-      [SocialNetworkType.INSTAGRAM]: 'Instagram',
-      [SocialNetworkType.FACEBOOK]: 'Facebook',
-      [SocialNetworkType.LINKEDIN]: 'LinkedIn',
-      [SocialNetworkType.EMAIL]: 'Email',
-      [SocialNetworkType.PHONE]: 'Phone',
-    }),
-    []
-  );
-
-  const getDefaultLabel = (type: SocialNetworkType): string => labelMap[type];
+  const getConfig = (type: SocialNetworkType) => SOCIAL_NETWORK_CONFIG[type];
 
   const validateForm = (): boolean => {
     for (const socialNetwork of socialNetworks) {
@@ -110,7 +100,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         if (!socialNetwork.url.trim()) {
           toaster.create({
             title: 'Validation Error',
-            description: `${getDefaultLabel(socialNetwork.type)} URL is required when enabled`,
+            description: `${getConfig(socialNetwork.type).label} URL is required when enabled`,
             type: 'error',
             duration: 3000,
           });
@@ -120,7 +110,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         if (!socialNetwork.label.trim()) {
           toaster.create({
             title: 'Validation Error',
-            description: `${getDefaultLabel(socialNetwork.type)} label is required when enabled`,
+            description: `${getConfig(socialNetwork.type).label} label is required when enabled`,
             type: 'error',
             duration: 3000,
           });

@@ -1,4 +1,5 @@
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { VALIDATION_CONSTANTS } from '@/domain/settings/constants/SocialNetworkConfig';
 import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
 import { inject } from 'tsyringe';
 
@@ -54,10 +55,10 @@ export class SocialNetworkValidationService {
         field: 'url',
         message: 'url is required and must be a string',
       });
-    } else if (data.url.length > 2048) {
+    } else if (data.url.length > VALIDATION_CONSTANTS.MAX_URL_LENGTH) {
       errors.push({
         field: 'url',
-        message: 'url must be less than 2048 characters',
+        message: `url must be less than ${VALIDATION_CONSTANTS.MAX_URL_LENGTH} characters`,
       });
     }
 
@@ -72,12 +73,14 @@ export class SocialNetworkValidationService {
         field: 'label',
         message: 'label cannot be empty',
       });
-    } else if (data.label.length > 50) {
+    } else if (data.label.length > VALIDATION_CONSTANTS.MAX_LABEL_LENGTH) {
       errors.push({
         field: 'label',
-        message: 'label must be less than 50 characters',
+        message: `label must be less than ${VALIDATION_CONSTANTS.MAX_LABEL_LENGTH} characters`,
       });
-    } else if (/<|>|&|"|'/.test(data.label)) {
+    } else if (
+      VALIDATION_CONSTANTS.HTML_SPECIAL_CHARS_PATTERN.test(data.label)
+    ) {
       errors.push({
         field: 'label',
         message: 'label contains invalid characters',

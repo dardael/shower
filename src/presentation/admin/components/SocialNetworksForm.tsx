@@ -22,6 +22,7 @@ import {
   FaPhone,
 } from 'react-icons/fa';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
 import { useSocialNetworksForm } from '@/presentation/admin/hooks/useSocialNetworksForm';
 
 export default function SocialNetworksForm() {
@@ -46,32 +47,8 @@ export default function SocialNetworksForm() {
     []
   );
 
-  const labelMap = useMemo(
-    () => ({
-      [SocialNetworkType.INSTAGRAM]: 'Instagram',
-      [SocialNetworkType.FACEBOOK]: 'Facebook',
-      [SocialNetworkType.LINKEDIN]: 'LinkedIn',
-      [SocialNetworkType.EMAIL]: 'Email',
-      [SocialNetworkType.PHONE]: 'Phone',
-    }),
-    []
-  );
-
-  const placeholderMap = useMemo(
-    () => ({
-      [SocialNetworkType.INSTAGRAM]: 'https://instagram.com/username',
-      [SocialNetworkType.FACEBOOK]: 'https://facebook.com/page',
-      [SocialNetworkType.LINKEDIN]: 'https://linkedin.com/in/profile',
-      [SocialNetworkType.EMAIL]: 'mailto:contact@example.com',
-      [SocialNetworkType.PHONE]: 'tel:+1234567890',
-    }),
-    []
-  );
-
   const getIcon = (type: SocialNetworkType) => iconMap[type];
-  const getDefaultLabel = (type: SocialNetworkType): string => labelMap[type];
-  const getUrlPlaceholder = (type: SocialNetworkType): string =>
-    placeholderMap[type];
+  const getConfig = (type: SocialNetworkType) => SOCIAL_NETWORK_CONFIG[type];
 
   if (isLoading) {
     return (
@@ -123,13 +100,13 @@ export default function SocialNetworksForm() {
                     <HStack gap={3}>
                       <Icon size={20} color="fg.muted" />
                       <Text fontWeight="medium" color="fg">
-                        {getDefaultLabel(socialNetwork.type)}
+                        {getConfig(socialNetwork.type).label}
                       </Text>
                       <Checkbox.Root
                         data-testid={`checkbox-${socialNetwork.type.toLowerCase()}`}
                         checked={socialNetwork.enabled}
-                        onCheckedChange={(checked) =>
-                          handleEnabledChange(socialNetwork.type, checked)
+                        onCheckedChange={(details) =>
+                          handleEnabledChange(socialNetwork.type, details)
                         }
                       >
                         <Checkbox.HiddenInput
@@ -152,7 +129,9 @@ export default function SocialNetworksForm() {
                           onChange={(e) =>
                             handleUrlChange(socialNetwork.type, e.target.value)
                           }
-                          placeholder={getUrlPlaceholder(socialNetwork.type)}
+                          placeholder={
+                            getConfig(socialNetwork.type).placeholder
+                          }
                           disabled={!socialNetwork.enabled}
                         />
                         <Field.ErrorText />
@@ -168,7 +147,7 @@ export default function SocialNetworksForm() {
                               e.target.value
                             )
                           }
-                          placeholder={getDefaultLabel(socialNetwork.type)}
+                          placeholder={getConfig(socialNetwork.type).label}
                           disabled={!socialNetwork.enabled}
                         />
                         <Field.ErrorText />
