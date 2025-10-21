@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSocialNetworksForm } from '@/presentation/admin/hooks/useSocialNetworksForm';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
@@ -41,11 +41,11 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    // Wait for loading state to change and data to be fetched
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.isLoading).toBe(false);
     expect(result.current.socialNetworks).toEqual(mockSocialNetworks);
     expect(fetch).toHaveBeenCalledWith('/api/settings/social-networks');
   });
@@ -55,11 +55,11 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    // Wait for loading state to change
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.isLoading).toBe(false);
     expect(toaster.create).toHaveBeenCalledWith({
       title: 'Error',
       description: 'Failed to load social networks',
@@ -123,8 +123,8 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
     const isValid = result.current.validateForm();
@@ -150,8 +150,8 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
     const isValid = result.current.validateForm();
@@ -189,8 +189,8 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
     await act(async () => {
@@ -227,8 +227,8 @@ describe('useSocialNetworksForm', () => {
 
     const { result } = renderHook(() => useSocialNetworksForm());
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
     });
 
     await act(async () => {
