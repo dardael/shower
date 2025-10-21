@@ -88,34 +88,24 @@ export class MongooseSocialNetworkRepository
         doc.enabled
       );
     } catch (error) {
-      // Log the error with full context for debugging
+      // Log the error with context for debugging
       this.logger.logError('Invalid social network data found in database', {
         type: doc.type,
         url: doc.url,
         label: doc.label,
         enabled: doc.enabled,
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
       });
 
-      // Create a default social network but with the same type to maintain data integrity
-      // This ensures the application continues to work while highlighting data issues
-      try {
-        return SocialNetwork.createDefault(doc.type as SocialNetworkType);
-      } catch (fallbackError) {
-        // If even creating a default fails, use Instagram as ultimate fallback
-        this.logger.logError(
-          'Failed to create default social network, using Instagram fallback',
-          {
-            originalType: doc.type,
-            fallbackError:
-              fallbackError instanceof Error
-                ? fallbackError.message
-                : 'Unknown error',
-          }
-        );
-        return SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM);
-      }
+      // Create a default social network with the same type to maintain data integrity
+      // Use Instagram as ultimate fallback if the original type is invalid
+      const fallbackType = Object.values(SocialNetworkType).includes(
+        doc.type as SocialNetworkType
+      )
+        ? (doc.type as SocialNetworkType)
+        : SocialNetworkType.INSTAGRAM;
+
+      return SocialNetwork.createDefault(fallbackType);
     }
   }
 
