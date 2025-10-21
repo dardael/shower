@@ -1,6 +1,5 @@
 import { AsyncFileLoggerAdapter } from '@/infrastructure/shared/adapters/AsyncFileLoggerAdapter';
 import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLogFormatterService';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 // Mock the container to avoid ES module issues
 jest.mock('@/infrastructure/enhancedContainer', () => ({

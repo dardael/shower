@@ -30,7 +30,7 @@ describe('Enhanced Logging Components', () => {
         files.map((file) => fs.unlink(join(testLogFolder, file)))
       );
       await fs.rmdir(testLogFolder);
-    } catch (error) {
+    } catch {
       // Ignore cleanup errors
     }
 
