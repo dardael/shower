@@ -1,4 +1,4 @@
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLogFormatterService';
 import { AsyncFileLoggerAdapter } from '@/infrastructure/shared/adapters/AsyncFileLoggerAdapter';
@@ -8,7 +8,7 @@ import { join } from 'path';
 describe('Enhanced Logging Components', () => {
   const testLogFolder = './test-logs';
   let asyncLogger: AsyncFileLoggerAdapter;
-  let unifiedLogger: UnifiedLogger;
+  let unifiedLogger: Logger;
 
   beforeAll(async () => {
     // Set environment variable for log folder
@@ -49,12 +49,12 @@ describe('Enhanced Logging Components', () => {
       fallbackToConsole: false,
     });
 
-    unifiedLogger = new UnifiedLogger(asyncLogger);
+    unifiedLogger = new Logger(asyncLogger);
   });
 
   it('should create enhanced logging components', () => {
     expect(asyncLogger).toBeInstanceOf(AsyncFileLoggerAdapter);
-    expect(unifiedLogger).toBeInstanceOf(UnifiedLogger);
+    expect(unifiedLogger).toBeInstanceOf(Logger);
   });
 
   it('should log messages asynchronously and create log files', async () => {

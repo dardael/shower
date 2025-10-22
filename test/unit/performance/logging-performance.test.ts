@@ -4,7 +4,7 @@ import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLo
 // Mock the container to avoid ES module issues
 jest.mock('@/infrastructure/enhancedContainer', () => ({
   EnhancedLoggerServiceLocator: {
-    getUnifiedLogger: () => ({
+    getLogger: () => ({
       info: jest.fn(),
       debug: jest.fn(),
       warn: jest.fn(),

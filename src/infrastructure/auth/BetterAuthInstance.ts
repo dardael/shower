@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from 'better-auth/adapters/mongodb';
 import { MongoClient, Db } from 'mongodb';
 import { container } from '@/infrastructure/container';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 // Initialize database connection for Better Auth
 let mongoClient: MongoClient | null = null;
@@ -16,7 +16,7 @@ if (process.env.MONGODB_URI) {
 
     // Handle connection errors gracefully
     mongoClient.on('error', (error) => {
-      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      const logger = container.resolve<Logger>('Logger');
       logger.logError(
         error instanceof Error ? error : new Error(String(error)),
         'MongoDB connection error'
@@ -25,14 +25,14 @@ if (process.env.MONGODB_URI) {
 
     // Connect asynchronously (non-blocking)
     mongoClient.connect().catch((error) => {
-      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      const logger = container.resolve<Logger>('Logger');
       logger.logError(
         error instanceof Error ? error : new Error(String(error)),
         'Failed to connect to MongoDB'
       );
     });
   } catch (error) {
-    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    const logger = container.resolve<Logger>('Logger');
     logger.logError(
       error instanceof Error ? error : new Error(String(error)),
       'Error initializing MongoDB connection'

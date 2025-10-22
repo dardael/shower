@@ -6,15 +6,13 @@ import { SocialNetworkTypeValueObject } from '@/domain/settings/value-objects/So
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetworkLabel';
 import { WebsiteSettingsModel } from '@/infrastructure/settings/models/WebsiteSettingsModel';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 @injectable()
 export class MongooseSocialNetworkRepository
   implements SocialNetworkRepository
 {
-  constructor(
-    @inject('UnifiedLogger') private readonly logger: UnifiedLogger
-  ) {}
+  constructor(@inject('Logger') private readonly logger: Logger) {}
   async getAllSocialNetworks(): Promise<SocialNetwork[]> {
     const settingsDocument = await WebsiteSettingsModel.findOne({
       key: 'socialNetworks',

@@ -107,7 +107,7 @@ The application implements a comprehensive, production-grade logging system that
 
 The logging system follows a hexagonal architecture pattern with clear separation of concerns:
 
-- **Application Layer**: `UnifiedLogger` - Main interface for all logging operations
+- **Application Layer**: `Logger` - Main interface for all logging operations
 - **Domain Layer**: `EnhancedLogFormatterService` - Handles log formatting and structure
 - **Infrastructure Layer**: `AsyncFileLoggerAdapter` - Manages async file operations and performance
 
@@ -144,12 +144,12 @@ The logging system follows a hexagonal architecture pattern with clear separatio
 #### **Dependency Injection (Recommended)**
 
 ```typescript
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
 class UserService {
-  constructor(@inject('UnifiedLogger') private logger: UnifiedLogger) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
     this.logger.info('Creating user', {
@@ -176,7 +176,7 @@ class UserService {
 ```typescript
 import { EnhancedLoggerServiceLocator } from '@/infrastructure/enhancedContainer';
 
-const logger = EnhancedLoggerServiceLocator.getUnifiedLogger();
+const logger = EnhancedLoggerServiceLocator.getLogger();
 logger.info('Manual logging example', { context: 'manual' });
 ```
 
@@ -184,7 +184,7 @@ logger.info('Manual logging example', { context: 'manual' });
 
 ```typescript
 export async function GET(request: NextRequest) {
-  const logger = EnhancedLoggerServiceLocator.getUnifiedLogger();
+  const logger = EnhancedLoggerServiceLocator.getLogger();
   const startTime = Date.now();
 
   try {

@@ -1,4 +1,4 @@
-import { UnifiedLogger } from './UnifiedLogger';
+import { Logger } from './Logger';
 
 export interface PerformanceMetric {
   name: string;
@@ -27,7 +27,7 @@ export class PerformanceMonitor {
   private alerts: PerformanceAlert[] = [];
   private maxAlerts: number = 100;
 
-  constructor(private readonly logger: UnifiedLogger) {
+  constructor(private readonly logger: Logger) {
     this.setupDefaultThresholds();
   }
 

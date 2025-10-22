@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { container } from '@/infrastructure/container';
 import type { ILogger } from '@/application/shared/ILogger';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { ContextualLogger } from '@/application/shared/ContextualLogger';
 
 export interface RequestContext {
   requestId: string;
   userId?: string;
   startTime: number;
-  logger: UnifiedLogger;
+  logger: Logger;
   contextualLogger: ContextualLogger;
 }
 
@@ -23,7 +23,7 @@ export function createRequestContext(request: NextRequest): RequestContext {
   const startTime = Date.now();
 
   const baseLogger = container.resolve<ILogger>('ILogger');
-  const unifiedLogger = new UnifiedLogger(baseLogger);
+  const unifiedLogger = new Logger(baseLogger);
   const contextualLogger = unifiedLogger.withContext({
     requestId,
     userId,

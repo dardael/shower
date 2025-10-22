@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { sanitizeFilename } from '@/infrastructure/shared/utils/filenameSanitizer';
 import { container } from '@/infrastructure/container';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 export async function GET(
   _request: NextRequest,
@@ -80,7 +80,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    const logger = container.resolve<Logger>('Logger');
     logger.logError(
       error instanceof Error ? error : new Error(String(error)),
       'Error serving icon',

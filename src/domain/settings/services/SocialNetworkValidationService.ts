@@ -1,6 +1,6 @@
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { VALIDATION_CONSTANTS } from '@/domain/settings/constants/SocialNetworkConfig';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { inject } from 'tsyringe';
 
 export interface SocialNetworkValidationError {
@@ -14,9 +14,7 @@ export interface SocialNetworkValidationResult {
 }
 
 export class SocialNetworkValidationService {
-  constructor(
-    @inject('UnifiedLogger') private readonly logger: UnifiedLogger
-  ) {}
+  constructor(@inject('Logger') private readonly logger: Logger) {}
 
   validateSocialNetworkData(
     socialNetwork: unknown,

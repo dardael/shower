@@ -4,7 +4,7 @@ import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAcces
 import type { IBetterAuthClientService } from '@/application/auth/services/IBetterAuthClientService';
 import type { IAuthorizeAdminAccess } from '@/application/auth/IAuthorizeAdminAccess';
 import type { ILogger } from '@/application/shared/ILogger';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
 import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import { AdminAccessPolicy } from '@/domain/auth/value-objects/AdminAccessPolicy';
@@ -38,10 +38,10 @@ container.register<ILogger>('ILogger', {
 });
 
 // Register unified logger
-container.register<UnifiedLogger>('UnifiedLogger', {
+container.register<Logger>('Logger', {
   useFactory: () => {
     const baseLogger = container.resolve<ILogger>('ILogger');
-    return new UnifiedLogger(baseLogger);
+    return new Logger(baseLogger);
   },
 });
 
@@ -102,7 +102,7 @@ container.register<SocialNetworkValidationService>(
   'SocialNetworkValidationService',
   {
     useFactory: () => {
-      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      const logger = container.resolve<Logger>('Logger');
       return new SocialNetworkValidationService(logger);
     },
   }
@@ -142,11 +142,11 @@ export class SettingsServiceLocator {
 }
 
 export class LoggerServiceLocator {
-  static getUnifiedLogger(): UnifiedLogger {
-    return container.resolve('UnifiedLogger');
+  static getLogger(): Logger {
+    return container.resolve('Logger');
   }
 
-  static getLogger(): ILogger {
+  static getBaseLogger(): ILogger {
     return container.resolve('ILogger');
   }
 }

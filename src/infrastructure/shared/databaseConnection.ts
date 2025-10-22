@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { container } from '@/infrastructure/container';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
@@ -28,14 +28,14 @@ export class DatabaseConnection {
 
       this.isConnected = true;
       try {
-        const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+        const logger = container.resolve<Logger>('Logger');
         logger.info('Connected to MongoDB');
       } catch {
         console.log('Connected to MongoDB');
       }
     } catch (error) {
       try {
-        const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+        const logger = container.resolve<Logger>('Logger');
         logger.logError(
           error instanceof Error ? error : new Error(String(error)),
           'Failed to connect to MongoDB'
@@ -56,7 +56,7 @@ export class DatabaseConnection {
 
     this.isConnected = false;
     try {
-      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      const logger = container.resolve<Logger>('Logger');
       logger.info('Disconnected from MongoDB');
     } catch {
       console.log('Disconnected from MongoDB');

@@ -17,7 +17,7 @@ export interface SecurityContext {
   metadata?: Record<string, unknown>;
 }
 
-export class UnifiedLogger {
+export class Logger {
   private performanceMonitor?: PerformanceMonitor;
 
   constructor(private readonly logger: ILogger) {
@@ -253,18 +253,18 @@ export class UnifiedLogger {
   /**
    * Create a child logger with additional context
    */
-  child(context: LogContext): UnifiedLogger {
+  child(context: LogContext): Logger {
     const contextualLogger = new ContextualLogger(this.logger, context);
 
-    // Return a new UnifiedLogger that uses the contextual logger internally
-    return new UnifiedLogger({
-      logDebug: (message, metadata) =>
+    // Return a new Logger that uses the contextual logger internally
+    return new Logger({
+      logDebug: (message: string, metadata?: Record<string, unknown>) =>
         contextualLogger.logDebug(message, metadata),
-      logInfo: (message, metadata) =>
+      logInfo: (message: string, metadata?: Record<string, unknown>) =>
         contextualLogger.logInfo(message, metadata),
-      logWarning: (message, metadata) =>
+      logWarning: (message: string, metadata?: Record<string, unknown>) =>
         contextualLogger.logWarning(message, metadata),
-      logError: (message, metadata) =>
+      logError: (message: string, metadata?: Record<string, unknown>) =>
         contextualLogger.logError(message, metadata),
     });
   }

@@ -123,12 +123,12 @@ This application features a comprehensive, production-grade logging system that 
 #### Dependency Injection (Recommended)
 
 ```typescript
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { inject, injectable } from 'tsyringe';
 
 @injectable()
 class UserService {
-  constructor(@inject('UnifiedLogger') private logger: UnifiedLogger) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
     this.logger.info('Creating user', { email: userData.email });
@@ -151,7 +151,7 @@ class UserService {
 
 ```typescript
 export async function GET(request: NextRequest) {
-  const logger = EnhancedLoggerServiceLocator.getUnifiedLogger();
+  const logger = EnhancedLoggerServiceLocator.getLogger();
   const startTime = Date.now();
 
   try {
@@ -439,7 +439,7 @@ The enhanced logging system follows the same hexagonal architecture principles a
 
 ### Components
 
-- **`UnifiedLogger`** (Application Layer): Main interface for all logging operations
+- **`Logger`** (Application Layer): Main interface for all logging operations
 - **`EnhancedLogFormatterService`** (Domain Layer): Handles log formatting and structure
 - **`AsyncFileLoggerAdapter`** (Infrastructure Layer): Manages async file operations
 - **`LogRotationService`** (Infrastructure Layer): Automatic log management and cleanup

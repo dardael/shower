@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 export async function POST(request: NextRequest) {
   const { email, isAdmin } = await request.json();
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    const logger = container.resolve<Logger>('Logger');
     logger.logError(
       error instanceof Error ? error : new Error(String(error)),
       'Test auth error',

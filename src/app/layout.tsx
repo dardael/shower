@@ -5,7 +5,7 @@ import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
 import { container } from '@/infrastructure/container';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -31,7 +31,7 @@ async function getWebsiteName(): Promise<string> {
     const data = await response.json();
     return data.name || 'Shower';
   } catch (error) {
-    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    const logger = container.resolve<Logger>('Logger');
     logger.logError(
       error instanceof Error ? error : new Error(String(error)),
       'Failed to fetch website name',
@@ -61,7 +61,7 @@ async function getWebsiteIcon(): Promise<string | null> {
     const data = await response.json();
     return data.icon?.url || null;
   } catch (error) {
-    const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+    const logger = container.resolve<Logger>('Logger');
     logger.logError(
       error instanceof Error ? error : new Error(String(error)),
       'Failed to fetch website icon',

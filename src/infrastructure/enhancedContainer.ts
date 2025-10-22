@@ -4,7 +4,7 @@ import { AsyncFileLoggerAdapter } from '@/infrastructure/shared/adapters/AsyncFi
 import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLogFormatterService';
 import { LogRotationService } from '@/infrastructure/shared/services/LogRotationService';
 import type { ILogger } from '@/application/shared/ILogger';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 // Enhanced logger configuration
 const logConfig = {
@@ -61,22 +61,22 @@ container.register<ILogger>('ILogger', {
   },
 });
 
-// Register unified logger
-container.register<UnifiedLogger>('UnifiedLogger', {
+// Register logger
+container.register<Logger>('Logger', {
   useFactory: () => {
     const baseLogger = container.resolve<ILogger>('ILogger');
-    return new UnifiedLogger(baseLogger);
+    return new Logger(baseLogger);
   },
 });
 
 // Export enhanced service locators
 export class EnhancedLoggerServiceLocator {
-  static getLogger(): ILogger {
+  static getBaseLogger(): ILogger {
     return container.resolve<ILogger>('ILogger');
   }
 
-  static getUnifiedLogger(): UnifiedLogger {
-    return container.resolve<UnifiedLogger>('UnifiedLogger');
+  static getLogger(): Logger {
+    return container.resolve<Logger>('Logger');
   }
 }
 

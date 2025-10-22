@@ -1,9 +1,9 @@
 import { PerformanceMonitor } from '@/application/shared/PerformanceMonitor';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 describe('PerformanceMonitor', () => {
   let performanceMonitor: PerformanceMonitor;
-  let mockLogger: jest.Mocked<UnifiedLogger>;
+  let mockLogger: jest.Mocked<Logger>;
 
   beforeEach(() => {
     mockLogger = {
@@ -30,7 +30,7 @@ describe('PerformanceMonitor', () => {
       getPerformanceMonitor: jest.fn(),
       getPerformanceStatistics: jest.fn(),
       setPerformanceThreshold: jest.fn(),
-    } as unknown as jest.Mocked<UnifiedLogger>;
+    } as unknown as jest.Mocked<Logger>;
 
     performanceMonitor = new PerformanceMonitor(mockLogger);
   });

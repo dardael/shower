@@ -1,10 +1,10 @@
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 
 describe('SocialNetworkValidationService', () => {
   let validationService: SocialNetworkValidationService;
-  let mockLogger: UnifiedLogger;
+  let mockLogger: Logger;
 
   beforeEach(() => {
     mockLogger = {
@@ -26,7 +26,7 @@ describe('SocialNetworkValidationService', () => {
       debugIf: jest.fn(),
       batch: jest.fn(),
       execute: jest.fn(),
-    } as unknown as UnifiedLogger;
+    } as unknown as Logger;
 
     validationService = new SocialNetworkValidationService(mockLogger);
   });

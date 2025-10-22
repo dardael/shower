@@ -3,11 +3,11 @@ import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import { UnifiedLogger } from '@/application/shared/UnifiedLogger';
+import { Logger } from '@/application/shared/Logger';
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 
 export async function GET() {
-  const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+  const logger = container.resolve<Logger>('Logger');
 
   try {
     const socialNetworks = await logger.measure(
@@ -42,7 +42,7 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+  const logger = container.resolve<Logger>('Logger');
   const validationService = container.resolve<SocialNetworkValidationService>(
     'SocialNetworkValidationService'
   );
