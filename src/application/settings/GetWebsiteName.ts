@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
-import type { WebsiteSettingsRepository } from '../../domain/settings/repositories/WebsiteSettingsRepository';
-import type { IGetWebsiteName } from './IGetWebsiteName';
+import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
+import type { IGetWebsiteName } from '@/application/settings/IGetWebsiteName';
 
 @injectable()
 export class GetWebsiteName implements IGetWebsiteName {

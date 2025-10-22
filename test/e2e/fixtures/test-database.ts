@@ -1,20 +1,25 @@
 import mongoose from 'mongoose';
-import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
 
 /**
  * Test database utility for managing the test database in e2e tests
- * Extends the existing DatabaseConnection with test-specific functionality
+ * Simplified version to avoid TypeScript decorator issues
  */
 export class TestDatabase {
-  private static dbConnection: DatabaseConnection;
+  private static isConnected = false;
 
   /**
    * Connect to the test database
    */
   public static async connect(): Promise<void> {
-    // Use the singleton pattern from the existing DatabaseConnection
-    this.dbConnection = DatabaseConnection.getInstance();
-    await this.dbConnection.connect();
+    if (this.isConnected) {
+      return;
+    }
+
+    const MONGODB_URI =
+      process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/shower_test';
+
+    await mongoose.connect(MONGODB_URI);
+    this.isConnected = true;
 
     // Verify we're connected to the test database to prevent accidental data corruption
     const dbName = mongoose.connection.name;
@@ -32,7 +37,10 @@ export class TestDatabase {
    * Disconnect from the test database
    */
   public static async disconnect(): Promise<void> {
-    await this.dbConnection.disconnect();
+    if (this.isConnected) {
+      await mongoose.disconnect();
+      this.isConnected = false;
+    }
   }
 
   /**

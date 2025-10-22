@@ -11,6 +11,8 @@ import {
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import WebsiteSettingsForm from './WebsiteSettingsForm';
+import SocialNetworksForm from './SocialNetworksForm';
+import AdminErrorBoundary from './AdminErrorBoundary';
 
 interface AdminDashboardProps {
   initialWebsiteName: string;
@@ -94,7 +96,14 @@ export default function AdminDashboard({
           </VStack>
         </Box>
 
-        <WebsiteSettingsForm initialName={initialWebsiteName} />
+        <AdminErrorBoundary>
+          <WebsiteSettingsForm initialName={initialWebsiteName} />
+        </AdminErrorBoundary>
+
+        <AdminErrorBoundary>
+          <SocialNetworksForm />
+        </AdminErrorBoundary>
+
         <LogoutButton />
       </Stack>
     </Container>

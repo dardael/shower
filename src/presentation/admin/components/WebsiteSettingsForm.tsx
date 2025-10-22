@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Heading,
   Stack,
   Field,
   Input,
-  Button,
   Text,
   Box,
   VStack,
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import SaveButton from '@/presentation/shared/components/SaveButton';
+
 import type {
   ImageData,
   ImageMetadata,
@@ -33,21 +34,19 @@ export default function WebsiteSettingsForm({
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
 
-  const fetchWebsiteName = async () => {
+  const fetchWebsiteName = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/name');
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.name) {
         setName(data.name);
-      } else {
-        console.error('Failed to fetch website name:', data.error);
       }
     } catch (error) {
-      console.error('Error fetching website name:', error);
+      // Error will be handled by the calling component or UI
     }
-  };
+  }, []);
 
-  const fetchWebsiteIcon = async () => {
+  const fetchWebsiteIcon = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/icon');
       const data = await response.json();
@@ -62,15 +61,15 @@ export default function WebsiteSettingsForm({
         setCurrentIcon(null);
       }
     } catch (error) {
-      console.error('Error fetching website icon:', error);
+      // Error will be handled by the calling component or UI
       setCurrentIcon(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWebsiteName();
     fetchWebsiteIcon();
-  }, []);
+  }, [fetchWebsiteName, fetchWebsiteIcon]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -320,27 +319,16 @@ export default function WebsiteSettingsForm({
             </Field.HelperText>
           </Field.Root>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            loading={loading}
-            colorPalette="blue"
-            variant="solid"
-            size={{ base: 'md', md: 'lg' }}
-            width="full"
-            height={{ base: '44px', md: '48px' }}
-            borderRadius="lg"
-            fontSize={{ base: 'sm', md: 'md' }}
-            fontWeight="semibold"
-            mt={2}
-            _dark={{
-              bg: 'colorPalette.solid',
-              _hover: { bg: 'colorPalette.emphasized' },
-              _disabled: { bg: 'colorPalette.muted' },
-            }}
-          >
-            {loading ? 'Updating...' : 'Update Website'}
-          </Button>
+          <Box w="full">
+            <SaveButton
+              type="submit"
+              isLoading={loading}
+              loadingText="Updating..."
+              width="full"
+            >
+              Update Website
+            </SaveButton>
+          </Box>
         </Stack>
       </form>
 

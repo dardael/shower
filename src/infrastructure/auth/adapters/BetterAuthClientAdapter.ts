@@ -33,7 +33,6 @@ export class BetterAuthClientAdapter implements IBetterAuthClientService {
         callbackURL: callbackURL || '/admin',
       });
     } catch (error) {
-      console.error('Error signing in with social provider:', error);
       throw error;
     }
   }
@@ -43,7 +42,6 @@ export class BetterAuthClientAdapter implements IBetterAuthClientService {
       const client = this.getClient();
       await client.signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
       throw error;
     }
   }

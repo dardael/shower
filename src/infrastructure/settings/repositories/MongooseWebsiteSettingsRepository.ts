@@ -1,11 +1,11 @@
-import { WebsiteSettingsRepository } from '../../../domain/settings/repositories/WebsiteSettingsRepository';
-import { WebsiteSettings } from '../../../domain/settings/entities/WebsiteSettings';
-import { WebsiteName } from '../../../domain/settings/value-objects/WebsiteName';
-import { WebsiteIcon } from '../../../domain/settings/value-objects/WebsiteIcon';
+import { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
+import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
+import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
+import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 import {
   WebsiteSettingsModel,
   type IIconMetadata,
-} from '../models/WebsiteSettingsModel';
+} from '@/infrastructure/settings/models/WebsiteSettingsModel';
 
 export class MongooseWebsiteSettingsRepository
   implements WebsiteSettingsRepository

@@ -1,0 +1,58 @@
+---
+description: Define when to use static imports versus dynamic imports for optimal performance, code readability, and maintainability across TypeScript and JavaScript modules.
+globs: src/**/*.{ts,tsx,js,jsx}
+alwaysApply: true
+---
+
+Sub rule 1: Use Static Imports by Default
+- Import all core modules, utilities, and domain entities using static imports at the top of files
+- Use static imports for dependencies needed immediately when the module loads
+- Prefer static imports for application logic, domain objects, and frequently used utilities
+- Static imports should be the default choice unless there's a specific reason for dynamic import
+
+Sub rule 2: When to Use Dynamic Imports
+- Use dynamic imports for code splitting large libraries or components
+- Use dynamic imports for conditional loading based on runtime conditions
+- Use dynamic imports for optional dependencies that may not be available
+- Use dynamic imports to resolve circular dependency issues
+- Use dynamic imports for non-critical features that can load asynchronously
+
+Sub rule 3: Static Import Patterns
+- Place all static imports at the top of the file, grouped by category
+- Group external library imports first, then internal module imports
+- Use `import type` for type-only imports to improve tree-shaking
+- Keep import statements organized and consistent across the codebase
+- Example: `import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork'`
+
+Sub rule 4: Dynamic Import Patterns
+- Use `await import()` syntax for dynamic imports within functions
+- Only use dynamic imports when there's a clear performance or architectural benefit
+- Ensure dynamic imports are properly handled with try-catch blocks
+- Cache dynamically imported modules when appropriate to avoid repeated loading
+- Example: `const { HeavyComponent } = await import('./HeavyComponent')`
+
+Sub rule 5: Performance Considerations
+- Static imports are bundled at build time and loaded synchronously
+- Dynamic imports create separate bundles that load on-demand
+- Avoid dynamic imports for small, frequently used modules
+- Use dynamic imports for large libraries (chart libraries, editors, etc.)
+- Consider the network cost of additional requests when using dynamic imports
+
+Sub rule 6: Code Readability and Maintenance
+- Static imports make dependencies explicit and easy to discover
+- Dynamic imports can hide dependencies and make code harder to understand
+- Use descriptive variable names for dynamically imported modules
+- Document why a dynamic import is necessary when used
+- Prefer static imports for better IDE support and refactoring capabilities
+
+Sub rule 7: Domain and Application Layer Guidelines
+- Always use static imports for domain entities, value objects, and services
+- Use static imports for application services and use cases
+- Avoid dynamic imports for core business logic
+- Dynamic imports in domain/application layers should be rare and well-justified
+
+Sub rule 8: Presentation Layer Guidelines
+- Use dynamic imports for large UI components or pages
+- Use dynamic imports for route-based code splitting
+- Use static imports for shared UI components and utilities
+- Consider lazy loading for components that are not immediately visible

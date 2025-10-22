@@ -1,5 +1,5 @@
-import { WebsiteSettings } from '../entities/WebsiteSettings';
-import { WebsiteIcon } from '../value-objects/WebsiteIcon';
+import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
+import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 
 export interface WebsiteSettingsRepository {
   getSettingsByKey(key: string): Promise<WebsiteSettings>;

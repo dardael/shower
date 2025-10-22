@@ -2,7 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { User } from '@/domain/auth/entities/User';
 import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAccessPolicyService';
 import type { IAuthorizeAdminAccess } from './IAuthorizeAdminAccess';
-import type { ILogger } from '../shared/ILogger';
+import type { ILogger } from '@/application/shared/ILogger';
 
 @injectable()
 export class AuthorizeAdminAccess implements IAuthorizeAdminAccess {

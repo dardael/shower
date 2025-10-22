@@ -259,13 +259,12 @@ export default function ImageManager({
   // Upload area component
   const UploadArea = () => (
     <Box
-      borderWidth="2px"
-      borderStyle="dashed"
-      borderColor={dragActive ? 'colorPalette.solid' : 'border'}
+      border="2px dashed"
+      borderColor={dragActive ? 'border.emphasized' : 'border'}
       borderRadius="lg"
       p={8}
       textAlign="center"
-      bg={dragActive ? 'colorPalette.subtle' : 'bg.subtle'}
+      bg={dragActive ? 'bg.muted' : 'bg.subtle'}
       cursor={disabled ? 'not-allowed' : 'pointer'}
       _hover={
         !disabled && !dragActive
@@ -279,7 +278,9 @@ export default function ImageManager({
       onDrop={handleDrop}
     >
       <VStack gap={4}>
-        <FiImage size={48} color="fg.muted" />
+        <Box color="fg.muted">
+          <FiImage size={48} />
+        </Box>
         <VStack gap={2}>
           <Text fontWeight="medium" color="fg">
             {labels.dragDropText}
@@ -343,7 +344,7 @@ export default function ImageManager({
             alt="Preview"
             width="100%"
             height="100%"
-            objectFit="contain"
+            fit="contain"
             onError={() => setImageError(true)}
           />
         ) : (
@@ -355,18 +356,7 @@ export default function ImageManager({
             justifyContent="center"
             color="fg.muted"
           >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
+            <FiImage size={48} />
           </Box>
         )}
       </Box>
@@ -376,7 +366,6 @@ export default function ImageManager({
         {allowReplace && (
           <Button
             size="sm"
-            colorPalette="blue"
             variant="solid"
             disabled={disabled || loading}
             onClick={() => fileInputRef.current?.click()}
@@ -388,7 +377,6 @@ export default function ImageManager({
         {allowDelete && (
           <Button
             size="sm"
-            colorPalette="red"
             variant="solid"
             disabled={disabled || loading}
             onClick={handleDelete}
@@ -420,22 +408,21 @@ export default function ImageManager({
   // Error state component
   const ErrorState = () => (
     <Box
-      borderWidth="2px"
-      borderColor="red.border"
+      border="2px solid"
+      borderColor="border.error"
       borderRadius="lg"
       p={4}
-      bg="red.subtle"
+      bg="bg.error"
     >
       <VStack gap={2}>
-        <Text color="red.fg" fontWeight="medium">
+        <Text color="fg.error" fontWeight="medium">
           Upload Error
         </Text>
-        <Text color="red.fg" fontSize="sm">
+        <Text color="fg.error" fontSize="sm">
           {validationError?.message}
         </Text>
         <Button
           size="sm"
-          colorPalette="red"
           variant="outline"
           onClick={() => {
             setValidationError(null);
@@ -451,16 +438,16 @@ export default function ImageManager({
   // Uploading state component
   const UploadingState = () => (
     <Box
-      borderWidth="2px"
-      borderColor="blue.border"
+      border="2px solid"
+      borderColor="border.info"
       borderRadius="lg"
       p={8}
-      bg="blue.subtle"
+      bg="bg.info"
       textAlign="center"
     >
       <VStack gap={4}>
-        <Spinner size="lg" color="blue.fg" />
-        <Text color="blue.fg" fontWeight="medium">
+        <Spinner size="lg" color="fg.info" />
+        <Text color="fg.info" fontWeight="medium">
           Uploading image...
         </Text>
       </VStack>

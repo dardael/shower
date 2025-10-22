@@ -6,7 +6,7 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 /** @type {import("jest").Config} **/
 module.exports = {
   testEnvironment: 'jsdom',
-  testMatch: ['<rootDir>/test/unit/**/*.test.{ts,tsx}'],
+  testMatch: ['<rootDir>/test/**/*.test.{ts,tsx}'],
   transform: {
     ...tsJestTransformCfg,
     '^.+\\.tsx?$': [
@@ -22,4 +22,5 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/test/unit/setup.ts'],
+  transformIgnorePatterns: ['node_modules/(?!(nanostores|better-auth)/)'],
 };

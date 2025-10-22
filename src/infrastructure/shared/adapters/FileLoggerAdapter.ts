@@ -1,8 +1,8 @@
 import { appendFileSync, mkdirSync } from 'fs';
 import { resolve, join } from 'path';
-import { LogLevel } from '../../../domain/shared/value-objects/LogLevel';
-import { LogFormatterService } from '../../../domain/shared/services/LogFormatterService';
-import { ILogger } from '../../../application/shared/ILogger';
+import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
+import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
+import { ILogger } from '@/application/shared/ILogger';
 
 export class FileLoggerAdapter implements ILogger {
   private readonly logFolder: string;

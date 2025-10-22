@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
+import { container } from '@/infrastructure/container';
+import { Logger } from '@/application/shared/Logger';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -29,7 +31,8 @@ async function getWebsiteName(): Promise<string> {
     const data = await response.json();
     return data.name || 'Shower';
   } catch (error) {
-    console.error('Failed to fetch website name:', error);
+    const logger = container.resolve<Logger>('Logger');
+    logger.logError(error, 'Failed to fetch website name', { error });
     return 'Shower'; // Default fallback
   }
 }
@@ -54,7 +57,8 @@ async function getWebsiteIcon(): Promise<string | null> {
     const data = await response.json();
     return data.icon?.url || null;
   } catch (error) {
-    console.error('Failed to fetch website icon:', error);
+    const logger = container.resolve<Logger>('Logger');
+    logger.logError(error, 'Failed to fetch website icon', { error });
     return null; // Default fallback
   }
 }
@@ -81,8 +85,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Initialize database connection
-  await initializeDatabase();
+  // Initialize database connection - with timeout to prevent hanging
+  try {
+    await Promise.race([
+      initializeDatabase(),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Database initialization timeout')),
+          5000
+        )
+      ),
+    ]);
+  } catch (error) {
+    console.error('Database initialization failed or timed out:', error);
+    // Continue without database to allow the app to start
+  }
 
   return (
     <html suppressHydrationWarning>

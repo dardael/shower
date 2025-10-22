@@ -2,23 +2,6 @@ import { test, expect } from '@playwright/test';
 import { TestDatabase } from '../fixtures/test-database';
 import { signIn } from '../fixtures/authHelpers';
 
-// Skip database operations for auth tests - we'll just mock what we need
-// Setup for each test
-test.beforeEach(async ({ page }) => {
-  await TestDatabase.connect();
-  await TestDatabase.cleanDatabase();
-  page.on('console', (msg) => {
-    // Filter out messages if needed
-    if (msg.type() === 'log') {
-      console.log(`Browser console log: ${msg.text()}`);
-    }
-  });
-});
-test.afterEach(async () => {
-  await TestDatabase.cleanDatabase();
-  await TestDatabase.disconnect();
-});
-
 test.describe('Admin Page', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
     // Go to the admin page without authentication
@@ -63,95 +46,127 @@ test.describe('Admin Page', () => {
     ).toBeVisible();
   });
 
+  test.describe.configure({ mode: 'serial' });
+
   test('updates website name successfully', async ({ page }) => {
-    await signIn(page);
+    // Setup for this test
+    await TestDatabase.connect();
+    await TestDatabase.cleanDatabase();
 
-    await page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/settings/name') &&
-        response.status() === 200
-    );
-    // Update the website name
-    const websiteNameInput = page.locator('#name');
-    await expect(websiteNameInput).toHaveValue('Shower');
-    await websiteNameInput.waitFor({ state: 'visible', timeout: 5000 });
-    await websiteNameInput.clear();
-    await websiteNameInput.fill('Updated Website Name');
+    try {
+      await signIn(page);
 
-    await expect(async () => {
-      const value = await websiteNameInput.inputValue();
-      expect(value).toBe('Updated Website Name');
-    }).toPass();
-    await page.getByRole('button', { name: 'Update Website' }).click();
+      // Wait for page to load and data to be fetched
+      const websiteNameInput = page.getByLabel('Website Name');
+      await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
+      await expect(websiteNameInput).toHaveValue('Shower', { timeout: 5000 });
 
-    // Check for success message
-    await expect(
-      page.getByText('Website name updated successfully')
-    ).toBeVisible();
+      // Update the website name
+      await websiteNameInput.clear();
+      await websiteNameInput.fill('Updated Website Name');
+      await expect(websiteNameInput).toHaveValue('Updated Website Name');
 
-    // Verify that the input field has been updated
-    await expect(page.getByLabel('Website Name')).toHaveValue(
-      'Updated Website Name'
-    );
+      // Wait for the update API call to complete
+      const updateResponse = page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/settings') && response.status() === 200
+      );
 
-    await page.reload();
-    await expect(page.getByLabel('Website Name')).toHaveValue(
-      'Updated Website Name'
-    );
+      await page.getByRole('button', { name: 'Update Website' }).click();
+      await updateResponse;
+
+      // Check for success message
+      await expect(
+        page.getByText('Website name updated successfully')
+      ).toBeVisible({ timeout: 5000 });
+
+      // Verify that the input field has been updated
+      await expect(websiteNameInput).toHaveValue('Updated Website Name');
+
+      // Reload and verify persistence
+      await page.reload();
+      await page.waitForLoadState('networkidle');
+
+      // Wait for the input to be visible and populated after reload
+      await websiteNameInput.waitFor({ state: 'visible', timeout: 10000 });
+
+      // Wait for the data to be loaded by checking for the expected value
+      await expect(websiteNameInput).toHaveValue('Updated Website Name', {
+        timeout: 10000,
+      });
+    } finally {
+      // Cleanup - always run this even if test fails
+      await TestDatabase.cleanDatabase();
+      await TestDatabase.disconnect();
+    }
   });
 
   test('validates input field requirements', async ({ page }) => {
-    // Go to the admin page
-    await page.goto('/admin');
+    // Setup for this test
+    await TestDatabase.connect();
+    await TestDatabase.cleanDatabase();
 
-    await signIn(page);
+    try {
+      await signIn(page);
 
-    await page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/settings/name') &&
-        response.status() === 200
-    );
+      await page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/settings/name') &&
+          response.status() === 200
+      );
 
-    // Try to submit with empty name
-    const websiteNameInput = page.getByLabel('Website Name');
-    await websiteNameInput.clear({ timeout: 5000 });
-    await websiteNameInput.fill('', { timeout: 5000 });
-    await page.getByRole('button', { name: 'Update Website' }).click();
+      // Try to submit with empty name
+      const websiteNameInput = page.getByLabel('Website Name');
+      await websiteNameInput.clear({ timeout: 5000 });
+      await websiteNameInput.fill('', { timeout: 5000 });
+      await page.getByRole('button', { name: 'Update Website' }).click();
 
-    // Check if HTML validation prevents submission (the button remains enabled)
-    await expect(
-      page.getByRole('button', { name: 'Update Website' })
-    ).toBeEnabled();
+      // Check if HTML validation prevents submission (the button remains enabled)
+      await expect(
+        page.getByRole('button', { name: 'Update Website' })
+      ).toBeEnabled();
 
-    // Try with a name that's too long (51 characters)
-    await websiteNameInput.clear({ timeout: 5000 });
-    await websiteNameInput.fill('a'.repeat(51), { timeout: 5000 });
+      // Try with a name that's too long (51 characters)
+      await websiteNameInput.clear({ timeout: 5000 });
+      await websiteNameInput.fill('a'.repeat(51), { timeout: 5000 });
 
-    // Check that the input only accepts 50 characters (due to maxLength)
-    await expect(page.getByLabel('Website Name')).toHaveValue('a'.repeat(50));
+      // Check that the input only accepts 50 characters (due to maxLength)
+      await expect(page.getByLabel('Website Name')).toHaveValue('a'.repeat(50));
+    } finally {
+      // Cleanup
+      await TestDatabase.cleanDatabase();
+      await TestDatabase.disconnect();
+    }
   });
 
   test('handles server errors gracefully', async ({ page }) => {
-    // Go to the admin page
-    await page.goto('/admin');
+    // Setup for this test
+    await TestDatabase.connect();
+    await TestDatabase.cleanDatabase();
 
-    await signIn(page);
-    // Intercept the API call and mock a server error
-    await page.route('/api/settings', async (route) => {
-      await route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({ error: 'Server error' }),
+    try {
+      await signIn(page);
+      // Intercept the API call and mock a server error
+      await page.route('/api/settings', async (route) => {
+        await route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Server error' }),
+        });
       });
-    });
 
-    // Update the website name
-    const websiteNameInput = page.getByLabel('Website Name');
-    await websiteNameInput.clear({ timeout: 5000 });
-    await websiteNameInput.fill('This will fail', { timeout: 5000 });
-    await page.getByRole('button', { name: 'Update Website' }).click();
+      // Update the website name
+      const websiteNameInput = page.getByLabel('Website Name');
+      await websiteNameInput.clear({ timeout: 5000 });
+      await websiteNameInput.fill('This will fail', { timeout: 5000 });
+      await page.getByRole('button', { name: 'Update Website' }).click();
 
-    // Check for error message
-    await expect(page.getByText('Server error')).toBeVisible();
+      // Check for error message
+      await expect(page.getByText('Server error')).toBeVisible();
+    } finally {
+      // Cleanup
+      await TestDatabase.cleanDatabase();
+      await TestDatabase.disconnect();
+    }
   });
 });

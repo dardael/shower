@@ -24,70 +24,241 @@ Here the current tree structure to follow :
 ```
 shower/
 ├── src/
-│   ├── presentation/         # Presentation Layer
-│   │   ├── app/              # Routes defined using App Router
-│   │   │   ├── admin/        # Admin domain
-│   │   │   │   ├── page.tsx          -> Route `/admin`
-│   │   │   │   └── components/
-│   │   │   │       ├── AdminDashboard.tsx -> Admin dashboard component
-│   │   │   │       └── NotAuthorized.tsx  -> Not authorized component
-│   │   ├── layout.tsx     -> Global layout for all pages
-│   │   └── page.tsx       -> Route `/`
+│   ├── app/                  # Next.js App Router (API routes and pages)
+│   │   ├── admin/
+│   │   │   └── page.tsx              -> Route `/admin`
+│   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   │   └── [...all]/
+│   │   │   │       └── route.ts      -> BetterAuth API handler
+│   │   │   ├── icons/
+│   │   │   │   └── [filename]/
+│   │   │   │       └── route.ts      -> Icon serving endpoint
+│   │   │   ├── settings/
+│   │   │   │   ├── icon/
+│   │   │   │   │   └── route.ts      -> Website icon API
+│   │   │   │   ├── name/
+│   │   │   │   │   └── route.ts      -> Website name API
+│   │   │   │   ├── social-networks/
+│   │   │   │   │   └── route.ts      -> Social networks API
+│   │   │   │   └── route.ts          -> General settings API
+│   │   │   └── test/
+│   │   │       └── auth/
+│   │   │           └── route.ts      -> Test authentication endpoint
+│   │   ├── globals.css               -> Global styles
+│   │   ├── layout.tsx                -> Root layout component
+│   │   └── page.tsx                  -> Home page route `/`
+│   ├── presentation/         # Presentation Layer (React components)
+│   │   ├── admin/
+│   │   │   ├── components/
+│   │   │   │   ├── AdminDashboard.tsx    -> Admin dashboard component
+│   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
+│   │   │   │   ├── NotAuthorized.tsx     -> Not authorized component
+│   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
+│   │   │   │   └── WebsiteSettingsForm.tsx -> Website settings form
+│   │   │   └── hooks/
+│   │   │       └── useSocialNetworksForm.ts -> Hook for social networks form
+│   │   └── shared/
+│   │       ├── components/
+│   │       │   ├── ImageManager/
+│   │       │   │   ├── ImageManager.tsx -> Image upload/management component
+│   │       │   │   └── types.ts        -> Image manager types
+│   │       │   ├── ui/
+│   │       │   │   ├── color-mode.tsx -> Color mode provider
+│   │       │   │   ├── provider.tsx   -> UI provider wrapper
+│   │       │   │   ├── toaster.tsx    -> Toast notification component
+│   │       │   │   └── tooltip.tsx    -> Tooltip component
+│   │       │   ├── DarkModeToggle.tsx  -> Dark mode toggle button
+│   │       │   ├── ErrorBoundary.tsx   -> Global error boundary
+│   │       │   ├── LoginButton.tsx     -> Login button component
+│   │       │   ├── LogoutButton.tsx    -> Logout button component
+│   │       │   └── SaveButton.tsx      -> Save button component
+│   │       └── theme.ts                -> Chakra UI theme configuration
 │   ├── domain/               # Domain Layer (entities, business rules)
 │   │   ├── auth/
 │   │   │   ├── entities/
-│   │   │   │   └── User.ts            -> User entity
+│   │   │   │   └── User.ts             -> User entity
 │   │   │   ├── services/
 │   │   │   │   └── AdminAccessPolicyService.ts -> Business rules for admin access
 │   │   │   └── value-objects/
 │   │   │       └── AdminAccessPolicy.ts -> Value object for admin access policy
+│   │   ├── settings/
+│   │   │   ├── constants/
+│   │   │   │   └── SocialNetworkConfig.ts -> Social network configuration constants
+│   │   │   ├── entities/
+│   │   │   │   ├── SocialNetwork.ts   -> Social network entity
+│   │   │   │   └── WebsiteSettings.ts -> Website settings entity
+│   │   │   ├── repositories/
+│   │   │   │   ├── SocialNetworkRepository.ts -> Social network repository interface
+│   │   │   │   └── WebsiteSettingsRepository.ts -> Website settings repository interface
+│   │   │   ├── services/
+│   │   │   │   └── SocialNetworkValidationService.ts -> Social network validation service
+│   │   │   └── value-objects/
+│   │   │       ├── SocialNetworkLabel.ts -> Social network label value object
+│   │   │       ├── SocialNetworkType.ts -> Social network type value object
+│   │   │       ├── SocialNetworkUrl.ts -> Social network URL value object
+│   │   │       ├── WebsiteIcon.ts -> Website icon value object
+│   │   │       └── WebsiteName.ts -> Website name value object
+│   │   └── shared/
+│   │       ├── services/
+│   │       │   ├── EnhancedLogFormatterService.ts -> Enhanced log formatting service
+│   │       │   └── LogFormatterService.ts -> Log formatting service
+│   │       └── value-objects/
+│   │           └── LogLevel.ts -> Log level value object
 │   ├── application/          # Application Layer (use-cases, services)
 │   │   ├── auth/
 │   │   │   ├── services/
-│   │   │   │   └── OAuthService.ts    -> Service for OAuth integration
-│   │   │   ├── AuthenticateUser.ts    -> Use case for authenticating a user
+│   │   │   │   └── IBetterAuthClientService.ts -> BetterAuth client service interface
 │   │   │   ├── AuthorizeAdminAccess.ts -> Use case for authorizing admin access
-│   │   │   ├── IAuthenticateUser.ts   -> Interface for AuthenticateUser use case
 │   │   │   └── IAuthorizeAdminAccess.ts -> Interface for AuthorizeAdminAccess use case
+│   │   ├── settings/
+│   │   │   ├── GetSocialNetworks.ts -> Use case for getting social networks
+│   │   │   ├── GetWebsiteIcon.ts -> Use case for getting website icon
+│   │   │   ├── GetWebsiteName.ts -> Use case for getting website name
+│   │   │   ├── IGetSocialNetworks.ts -> Interface for GetSocialNetworks use case
+│   │   │   ├── IGetWebsiteIcon.ts -> Interface for GetWebsiteIcon use case
+│   │   │   ├── IGetWebsiteName.ts -> Interface for GetWebsiteName use case
+│   │   │   ├── IUpdateSocialNetworks.ts -> Interface for UpdateSocialNetworks use case
+│   │   │   ├── IUpdateWebsiteIcon.ts -> Interface for UpdateWebsiteIcon use case
+│   │   │   ├── IUpdateWebsiteName.ts -> Interface for UpdateWebsiteName use case
+│   │   │   ├── SocialNetworkFactory.ts -> Factory for creating social networks
+│   │   │   ├── UpdateSocialNetworks.ts -> Use case for updating social networks
+│   │   │   ├── UpdateWebsiteIcon.ts -> Use case for updating website icon
+│   │   │   └── UpdateWebsiteName.ts -> Use case for updating website name
+│   │   └── shared/
+│   │       ├── ContextualLogger.ts -> Contextual logging service
+│   │       ├── ILogger.ts -> Logger interface
+│   │       ├── Logger.ts -> Main logger implementation
+│   │       └── PerformanceMonitor.ts -> Performance monitoring service
 │   ├── infrastructure/       # Infrastructure Layer (adapters, database)
 │   │   ├── auth/
 │   │   │   ├── adapters/
-│   │   │   │   └── GoogleOAuthAdapter.ts -> Adapter for Google OAuth
-│   │   │   ├── api/
-│   │   │   │   └── BetterAuthHandler.ts -> BetterAuth API handler
-│   │   ├── container.ts      -> Dependency injection container
-│   ├── shared/               # Shared Layer (utilities, generic types)
-│   │   ├── components/
-│   │   │   ├── LoginButton.tsx        -> Login button component
-│   │   │   └── LogoutButton.tsx       -> Logout button component
+│   │   │   │   └── BetterAuthClientAdapter.ts -> BetterAuth client adapter
+│   │   │   └── BetterAuthInstance.ts -> BetterAuth instance configuration
+│   │   ├── settings/
+│   │   │   ├── models/
+│   │   │   │   ├── SocialNetworkModel.ts -> Mongoose social network model
+│   │   │   │   └── WebsiteSettingsModel.ts -> Mongoose website settings model
+│   │   │   └── repositories/
+│   │   │       ├── MongooseSocialNetworkRepository.ts -> Mongoose social network repository
+│   │   │       └── MongooseWebsiteSettingsRepository.ts -> Mongoose website settings repository
+│   │   ├── shared/
+│   │   │   ├── adapters/
+│   │   │   │   ├── AsyncFileLoggerAdapter.ts -> Async file logger adapter
+│   │   │   │   └── FileLoggerAdapter.ts -> File logger adapter
+│   │   │   ├── middleware/
+│   │   │   │   └── requestContext.ts -> Request context middleware
+│   │   │   ├── services/
+│   │   │   │   ├── FileStorageService.ts -> File storage service
+│   │   │   │   └── LogRotationService.ts -> Log rotation service
+│   │   │   ├── utils/
+│   │   │   │   └── filenameSanitizer.ts -> Filename sanitizer utility
+│   │   │   ├── databaseConnection.ts -> Database connection configuration
+│   │   │   └── databaseInitialization.ts -> Database initialization
+│   │   ├── container.ts -> Dependency injection container
+│   │   └── enhancedContainer.ts -> Enhanced dependency injection container
 ├── test/                     # Test Layer
-│   ├── e2e/ # end to end tests
-│   ├── unit/ # unit test following the same structure as src
-    │   ├── application/
-    │   │   ├── auth/
-    │   │   │   ├── AuthenticateUser.test.ts
-    │   │   │   ├── AuthorizeAdminAccess.test.ts
-    │   ├── domain/
-    │   │   ├── auth/
-    │   │   │   ├── value-objects/
-    │   │   │   │   ├── AdminAccessPolicy.test.ts
+│   ├── e2e/                  # End-to-end tests
+│   │   ├── admin/
+│   │   │   ├── admin-page.spec.ts -> Admin page e2e tests
+│   │   │   ├── icon-management.spec.ts -> Icon management e2e tests
+│   │   │   └── social-networks-management.spec.ts -> Social networks management e2e tests
+│   │   ├── fixtures/
+│   │   │   ├── authHelpers.ts -> Authentication test helpers
+│   │   │   └── test-database.ts -> Test database setup
+│   │   ├── global-setup.ts -> Global e2e test setup
+│   │   └── tsconfig.json -> E2E test TypeScript configuration
+│   ├── unit/                 # Unit tests (following same structure as src)
+│   │   ├── application/
+│   │   │   ├── auth/
+│   │   │   │   └── AuthorizeAdminAccess.test.ts -> Admin access authorization tests
+│   │   │   ├── settings/
+│   │   │   │   ├── GetSocialNetworks.test.ts -> Get social networks tests
+│   │   │   │   ├── GetWebsiteIcon.test.ts -> Get website icon tests
+│   │   │   │   ├── GetWebsiteName.test.ts -> Get website name tests
+│   │   │   │   ├── UpdateSocialNetworks.test.ts -> Update social networks tests
+│   │   │   │   ├── UpdateWebsiteIcon.test.ts -> Update website icon tests
+│   │   │   │   └── UpdateWebsiteName.test.ts -> Update website name tests
+│   │   │   └── shared/
+│   │   │       ├── Logger.test.ts -> Logger implementation tests
+│   │   │       ├── PerformanceMonitor.test.ts -> Performance monitor tests
+│   │   │       └── enhanced-logging-components.test.ts -> Enhanced logging tests
+│   │   ├── domain/
+│   │   │   ├── auth/
+│   │   │   │   └── value-objects/
+│   │   │   │       └── AdminAccessPolicy.test.ts -> Admin access policy tests
+│   │   │   ├── settings/
+│   │   │   │   ├── entities/
+│   │   │   │   │   ├── SocialNetwork.test.ts -> Social network entity tests
+│   │   │   │   │   └── WebsiteSettings.test.ts -> Website settings entity tests
+│   │   │   │   ├── services/
+│   │   │   │   │   └── SocialNetworkValidationService.test.ts -> Social network validation tests
+│   │   │   │   └── value-objects/
+│   │   │   │       ├── SocialNetworkLabel.test.ts -> Social network label tests
+│   │   │   │       ├── SocialNetworkType.test.ts -> Social network type tests
+│   │   │   │       ├── SocialNetworkUrl.test.ts -> Social network URL tests
+│   │   │   │       ├── WebsiteIcon.test.ts -> Website icon tests
+│   │   │   │       └── WebsiteName.test.ts -> Website name tests
+│   │   │   └── shared/
+│   │   │       ├── services/
+│   │   │       │   └── LogFormatterService.test.ts -> Log formatter service tests
+│   │   │       └── value-objects/
+│   │   │           └── LogLevel.test.ts -> Log level tests
+│   │   ├── infrastructure/
+│   │   │   ├── settings/
+│   │   │   │   └── repositories/
+│   │   │   │       └── MongooseWebsiteSettingsRepository.test.ts -> Mongoose repository tests
+│   │   │   └── shared/
+│   │   │       ├── adapters/
+│   │   │       │   └── FileLoggerAdapter.test.ts -> File logger adapter tests
+│   │   │       └── services/
+│   │   │           └── FileStorageService.test.ts -> File storage service tests
+│   │   ├── performance/
+│   │   │   └── logging-performance.test.ts -> Logging performance tests
+│   │   ├── presentation/
+│   │   │   ├── admin/
+│   │   │   │   └── hooks/
+│   │   │   │       └── useSocialNetworksForm.test.tsx -> Social networks form hook tests
+│   │   │   └── shared/
+│   │   │       └── components/
+│   │   │           ├── ImageManager/
+│   │   │           │   └── ImageManager.test.tsx -> Image manager component tests
+│   │   │           └── DarkModeToggle.test.tsx -> Dark mode toggle tests
+│   │   ├── jest-globals.d.ts -> Jest global type definitions
+│   │   ├── setup.ts -> Unit test setup
+│   │   ├── tsconfig.json -> Unit test TypeScript configuration
+│   │   └── types.d.ts -> Test type definitions
 ├── .dockerignore
+├── .env
+├── .env.test
 ├── .gitignore
+├── .husky/
+│   ├── pre-commit
+│   └── pre-push
+├── .opencode/
+│   └── rules/
+│       ├── 01-standards/
+│       ├── 03-frameworks-and-libraries/
+│       └── 07-quality-assurance/
 ├── .prettierignore
 ├── .prettierrc.js
 ├── AGENTS.md
+├── doc/
+│   ├── functionnal.md
+│   └── technical.md
 ├── Dockerfile
-├── README.md
 ├── docker-compose.yml
 ├── eslint.config.mjs
 ├── jest.config.js
 ├── middleware.ts
 ├── next.config.ts
+├── opencode.json
 ├── package-lock.json
 ├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
-```
+├── playwright.config.ts
+├── README.md
+└── tsconfig.json
+
 
 ## Commands
 
@@ -124,3 +295,4 @@ Furthermore, you must follow these specific rules:
 
 **User**: dardael
 **repo**: shower
+```

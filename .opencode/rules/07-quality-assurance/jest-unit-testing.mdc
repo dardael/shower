@@ -33,3 +33,10 @@ Sub rule 5: Test Isolation
 - Use `beforeEach` only for essential setup
 - Avoid complex setup procedures
 - Keep tests independent and fast
+
+Sub rule 6: Testing Logging
+- Mock `UnifiedLogger` in tests using jest mocks: `const mockLogger = { logInfo: jest.fn(), logError: jest.fn() }`
+- Verify log calls with proper arguments: `expect(mockLogger.logInfo).toHaveBeenCalledWith('Message', { key: 'value' })`
+- Test logging behavior without testing implementation details
+- Use test-specific log levels to avoid noise in test output
+- Avoid asserting on exact log message formats; focus on behavior and intent
