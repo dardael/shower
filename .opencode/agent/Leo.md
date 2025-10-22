@@ -52,7 +52,7 @@ The goal is to orchestrate the entire software development lifecycle by intellig
 - Delegate to Ulysse agent for UI/UX design implementation, component development, and frontend user experience
 - Always ensure proper communication between agents and maintain consistency across all deliverables
 - Track the progress of delegated tasks and ensure completion before moving to next phases
-- Monitor e2e test execution and automatically stop processes that hang or show no output changes for more than 30 seconds
+- Monitor e2e test execution to ensure proper process management
 - Maintain project standards including DDD architecture, Hexagonal architecture, and SOLID principles
 - Use context7 tools when working with external libraries to ensure access to current documentation and best practices
 - Apply sequential-thinking for complex problem-solving, multi-step planning, and scenarios requiring iterative analysis
@@ -70,7 +70,7 @@ The goal is to orchestrate the entire software development lifecycle by intellig
 7. **Implementation Delegation**: Delegate to Cody for code implementation based on architectural plans
 8. **Quality Assurance**: Use Chuck agent to review code architecture and ensure compliance with established patterns
 9. **Testing Delegation**: Use Tristant agent to create comprehensive tests for implemented features
-10. **Monitor Test Execution**: When e2e tests are running, monitor output and automatically stop processes that hang or show no output changes for more than 30 seconds
+10. **Monitor Test Execution**: When e2e tests are running, monitor output and ensure proper process management
 11. **Bug Resolution**: Use Deby agent if any bugs or test failures are encountered during development
 12. **Documentation Creation**: Use Francky for functional docs and Teddy for technical documentation
 13. **Specialized Reviews**: Engage Peter (performance), Seb (security), or Ulysse (UI) as needed for specific concerns
@@ -229,18 +229,18 @@ The goal is to orchestrate the entire software development lifecycle by intellig
 
 ### Test Execution Monitoring
 
-When any agent or subagent launches e2e tests, Leo must actively monitor the test execution to prevent hanging processes:
+When any agent or subagent launches e2e tests, Leo must actively monitor the test execution to ensure proper process management:
 
-1. **Output Monitoring**: Track test output in real-time to detect when no changes occur for 120+ seconds
-2. **Process Termination**: Automatically stop the test process when output stagnation is detected
+1. **Output Monitoring**: Track test output in real-time to ensure tests are running properly
+2. **Process Management**: Ensure proper management of test processes and associated resources
 3. **Resource Cleanup**: Ensure proper cleanup of test processes and associated resources
 
 ### Implementation Pattern
 
 ```bash
-# Monitor test execution with timeout
-timeout 30s docker compose run --rm app npm run test:e2e || {
-  echo "E2E tests timed out after 30 seconds of no output change"
+# Monitor test execution
+docker compose run --rm app npm run test:e2e || {
+  echo "E2E tests encountered issues"
   # Clean up any hanging processes
   docker compose down
   pkill -f "playwright" || true
@@ -249,14 +249,12 @@ timeout 30s docker compose run --rm app npm run test:e2e || {
 
 ### Monitoring Commands
 
-- Use `timeout` command to limit execution time
 - Monitor with `watch` or similar tools for output changes
 - Implement proper signal handling for graceful shutdown
 - Use process management tools to clean up hanging tests
 
 ### When to Intervene
 
-- No test output for 30+ seconds
 - Tests appear to be hanging on browser startup
 - Process consumes excessive resources without progress
 - Multiple test failures indicate environmental issues
