@@ -107,7 +107,6 @@ This application features a comprehensive, production-grade logging system that 
 - **Structured JSON Logging**: Production-ready format with consistent metadata
 - **Performance Monitoring**: Built-in timing and measurement tools
 - **Request Context Tracking**: Correlation IDs for end-to-end request tracing
-- **Client-Side Logging**: Browser support with graceful fallbacks
 - **Memory Efficient**: Minimal resource footprint with automatic cleanup
 
 ### Performance Characteristics
@@ -195,30 +194,6 @@ try {
 } catch (error) {
   logger.endTimer(timer, { success: false, error: error.message });
   throw error;
-}
-```
-
-#### Client-Side Logging
-
-```typescript
-import { clientLogger } from '@/presentation/shared/utils/clientLogger';
-
-export function UserProfile({ userId }: UserProfileProps) {
-  const loadUser = async () => {
-    try {
-      clientLogger.info('Loading user profile', { userId });
-      const response = await fetch(`/api/users/${userId}`);
-      const userData = await response.json();
-      clientLogger.info('User profile loaded', {
-        userId,
-        userName: userData.name,
-      });
-      return userData;
-    } catch (error) {
-      clientLogger.logError(error, 'Failed to load user profile', { userId });
-      throw error;
-    }
-  };
 }
 ```
 

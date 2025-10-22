@@ -61,14 +61,9 @@ Sub rule 8: Error Handling and Logging
 - Log retry attempts: `logger.warn('Retrying operation', { attempt, maxAttempts, delay })`
 - Include error context for debugging: `logger.error('Database connection failed', { host, port, database })`
 
-Sub rule 9: Client-Side Logging
-- Use `clientLogger` for browser-side logging: `import { clientLogger } from '@/presentation/shared/utils/clientLogger'`
-- Client logger automatically falls back to console when server logging unavailable
-- Use same API patterns as server-side logging for consistency
-- Include browser context: `clientLogger.info('User interaction', { event, element, timestamp })`
-- Handle client errors gracefully: `clientLogger.logError(error, 'Client operation failed')`
 
-Sub rule 10: Testing and Logging
+
+Sub rule 9: Testing and Logging
 - Mock `Logger` in tests using jest mocks or test doubles
 - Verify log calls in tests: `expect(mockLogger.logInfo).toHaveBeenCalledWith(expectedMessage, expectedMetadata)`
 - Test logging behavior: `expect(() => logger.logError(error)).not.toThrow()`

@@ -12,8 +12,6 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
-import { ClientLogger } from '@/presentation/shared/utils/clientLogger';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 import type {
   ImageData,
@@ -36,8 +34,6 @@ export default function WebsiteSettingsForm({
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
 
-  const logger = useMemo(() => new ClientLogger(), []);
-
   const fetchWebsiteName = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/name');
@@ -46,9 +42,9 @@ export default function WebsiteSettingsForm({
         setName(data.name);
       }
     } catch (error) {
-      logger.execute(LogLevel.ERROR, 'Error fetching website name', { error });
+      // Error will be handled by the calling component or UI
     }
-  }, [logger]);
+  }, []);
 
   const fetchWebsiteIcon = useCallback(async () => {
     try {
@@ -65,10 +61,10 @@ export default function WebsiteSettingsForm({
         setCurrentIcon(null);
       }
     } catch (error) {
-      logger.execute(LogLevel.ERROR, 'Error fetching website icon', { error });
+      // Error will be handled by the calling component or UI
       setCurrentIcon(null);
     }
-  }, [logger]);
+  }, []);
 
   useEffect(() => {
     fetchWebsiteName();

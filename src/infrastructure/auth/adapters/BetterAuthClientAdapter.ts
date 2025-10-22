@@ -3,8 +3,6 @@ import type {
   IBetterAuthClientService,
   SessionData,
 } from '@/application/auth/services/IBetterAuthClientService';
-import { ClientLogger } from '@/presentation/shared/utils/clientLogger';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 /**
  * Client-side adapter for Better Auth
@@ -35,10 +33,6 @@ export class BetterAuthClientAdapter implements IBetterAuthClientService {
         callbackURL: callbackURL || '/admin',
       });
     } catch (error) {
-      const logger = new ClientLogger();
-      logger.execute(LogLevel.ERROR, 'Error signing in with social provider', {
-        error,
-      });
       throw error;
     }
   }
@@ -48,10 +42,6 @@ export class BetterAuthClientAdapter implements IBetterAuthClientService {
       const client = this.getClient();
       await client.signOut();
     } catch (error) {
-      const logger = new ClientLogger();
-      logger.execute(LogLevel.ERROR, 'Error signing out', {
-        error,
-      });
       throw error;
     }
   }

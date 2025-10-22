@@ -260,32 +260,6 @@ contextualLogger.info('Payment completed');
 // All logs include requestId, userId, and module automatically
 ```
 
-### Client-Side Logging
-
-For browser-side logging, use the `clientLogger` utility:
-
-```typescript
-import { clientLogger } from '@/presentation/shared/utils/clientLogger';
-
-export function UserProfile({ userId }: UserProfileProps) {
-  const loadUser = async () => {
-    try {
-      clientLogger.info('Loading user profile', { userId });
-      const response = await fetch(`/api/users/${userId}`);
-      const userData = await response.json();
-      clientLogger.info('User profile loaded', {
-        userId,
-        userName: userData.name,
-      });
-      return userData;
-    } catch (error) {
-      clientLogger.logError(error, 'Failed to load user profile', { userId });
-      throw error;
-    }
-  };
-}
-```
-
 ### Environment Variables
 
 Configure the logging system with these environment variables:
