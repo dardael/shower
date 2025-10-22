@@ -17,26 +17,17 @@ if (process.env.MONGODB_URI) {
     // Handle connection errors gracefully
     mongoClient.on('error', (error) => {
       const logger = container.resolve<Logger>('Logger');
-      logger.logError(
-        error instanceof Error ? error : new Error(String(error)),
-        'MongoDB connection error'
-      );
+      logger.logError(error, 'MongoDB connection error');
     });
 
     // Connect asynchronously (non-blocking)
     mongoClient.connect().catch((error) => {
       const logger = container.resolve<Logger>('Logger');
-      logger.logError(
-        error instanceof Error ? error : new Error(String(error)),
-        'Failed to connect to MongoDB'
-      );
+      logger.logError(error, 'Failed to connect to MongoDB');
     });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error initializing MongoDB connection'
-    );
+    logger.logError(error, 'Error initializing MongoDB connection');
   }
 }
 

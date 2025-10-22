@@ -36,10 +36,7 @@ export class DatabaseConnection {
     } catch (error) {
       try {
         const logger = container.resolve<Logger>('Logger');
-        logger.logError(
-          error instanceof Error ? error : new Error(String(error)),
-          'Failed to connect to MongoDB'
-        );
+        logger.logError(error, 'Failed to connect to MongoDB');
       } catch {
         console.error('Failed to connect to MongoDB:', error);
       }

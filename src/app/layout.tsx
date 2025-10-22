@@ -32,11 +32,7 @@ async function getWebsiteName(): Promise<string> {
     return data.name || 'Shower';
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Failed to fetch website name',
-      { error }
-    );
+    logger.logError(error, 'Failed to fetch website name', { error });
     return 'Shower'; // Default fallback
   }
 }
@@ -62,11 +58,7 @@ async function getWebsiteIcon(): Promise<string | null> {
     return data.icon?.url || null;
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Failed to fetch website icon',
-      { error }
-    );
+    logger.logError(error, 'Failed to fetch website icon', { error });
     return null; // Default fallback
   }
 }

@@ -95,7 +95,7 @@ export class MongooseSocialNetworkRepository
     } catch (error) {
       // Log the error with context for debugging
       this.logger.logError(
-        error instanceof Error ? error : new Error(String(error)),
+        error,
         'Invalid social network data found in database',
         {
           socialNetworkType: doc.type,
@@ -107,7 +107,7 @@ export class MongooseSocialNetworkRepository
 
       // Re-throw the error to let the application layer handle it
       throw new Error(
-        `Invalid social network data: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Invalid social network data: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }

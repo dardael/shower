@@ -42,11 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Website name updated successfully' });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error updating website name',
-      { error }
-    );
+    logger.logError(error, 'Error updating website name', { error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

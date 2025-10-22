@@ -95,14 +95,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error updating website icon',
-      { error }
-    );
+    logger.logError(error, 'Error updating website icon', { error });
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : 'Internal server error',
+        error: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );
@@ -148,11 +144,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Website icon removed successfully' });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error removing website icon',
-      { error }
-    );
+    logger.logError(error, 'Error removing website icon', { error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

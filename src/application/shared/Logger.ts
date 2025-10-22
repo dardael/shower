@@ -30,6 +30,13 @@ export class Logger {
     }
   }
 
+  /**
+   * Normalize any value to an Error instance
+   */
+  private normalizeError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
+  }
+
   // Direct logging methods - consistent with console API
   debug(message: string, metadata?: Record<string, unknown>): void {
     this.logger.logDebug(message, metadata);
@@ -75,16 +82,17 @@ export class Logger {
    * Log errors with proper error object handling
    */
   logError(
-    error: Error,
+    error: unknown,
     message?: string,
     metadata?: Record<string, unknown>
   ): void {
-    this.error(message || error.message, {
+    const normalizedError = this.normalizeError(error);
+    this.error(message || normalizedError.message, {
       ...metadata,
       error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
+        name: normalizedError.name,
+        message: normalizedError.message,
+        stack: normalizedError.stack,
       },
       type: 'error',
     });
@@ -189,9 +197,10 @@ export class Logger {
       this.endTimer(timer, { success: true });
       return result;
     } catch (error) {
+      const normalizedError = this.normalizeError(error);
       this.endTimer(timer, {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: normalizedError.message,
       });
       throw error;
     }

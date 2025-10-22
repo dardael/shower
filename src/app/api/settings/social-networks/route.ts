@@ -31,10 +31,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error fetching social networks'
-    );
+    logger.logError(error, 'Error fetching social networks');
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social networks' },
       { status: 500 }
@@ -94,14 +91,11 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error updating social networks'
-    );
+    logger.logError(error, 'Error updating social networks');
     return NextResponse.json(
       {
         success: false,
-        error: `Failed to update social networks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: `Failed to update social networks: ${error instanceof Error ? error.message : String(error)}`,
       },
       { status: 500 }
     );

@@ -75,4 +75,131 @@ describe('Logger', () => {
       key: 'value',
     });
   });
+
+  describe('logError', () => {
+    it('should handle Error instances correctly', () => {
+      const error = new Error('Test error');
+      logger.logError(error, 'Custom message', { context: 'test' });
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('Custom message', {
+        context: 'test',
+        error: {
+          name: 'Error',
+          message: 'Test error',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should handle string errors correctly', () => {
+      logger.logError('String error', 'Custom message');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('Custom message', {
+        error: {
+          name: 'Error',
+          message: 'String error',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should handle number errors correctly', () => {
+      logger.logError(404, 'HTTP error');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('HTTP error', {
+        error: {
+          name: 'Error',
+          message: '404',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should handle object errors correctly', () => {
+      const objectError = {
+        code: 'VALIDATION_ERROR',
+        details: 'Invalid input',
+      };
+      logger.logError(objectError, 'Validation failed');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('Validation failed', {
+        error: {
+          name: 'Error',
+          message: '[object Object]',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should handle null errors correctly', () => {
+      logger.logError(null, 'Null error');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('Null error', {
+        error: {
+          name: 'Error',
+          message: 'null',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should handle undefined errors correctly', () => {
+      logger.logError(undefined, 'Undefined error');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith('Undefined error', {
+        error: {
+          name: 'Error',
+          message: 'undefined',
+          stack: expect.any(String),
+        },
+        type: 'error',
+      });
+    });
+
+    it('should use error message as default when no custom message provided', () => {
+      const error = new Error('Default error message');
+      logger.logError(error);
+
+      expect(mockLogger.logError).toHaveBeenCalledWith(
+        'Default error message',
+        {
+          error: {
+            name: 'Error',
+            message: 'Default error message',
+            stack: expect.any(String),
+          },
+          type: 'error',
+        }
+      );
+    });
+
+    it('should handle custom error types', () => {
+      class CustomError extends Error {
+        constructor(message: string) {
+          super(message);
+          this.name = 'CustomError';
+        }
+      }
+
+      const customError = new CustomError('Custom error message');
+      logger.logError(customError, 'Custom error occurred');
+
+      expect(mockLogger.logError).toHaveBeenCalledWith(
+        'Custom error occurred',
+        {
+          error: {
+            name: 'CustomError',
+            message: 'Custom error message',
+            stack: expect.any(String),
+          },
+          type: 'error',
+        }
+      );
+    });
+  });
 });

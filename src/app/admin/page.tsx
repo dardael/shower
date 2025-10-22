@@ -11,7 +11,7 @@ import LoginButton from '@/presentation/shared/components/LoginButton';
 import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
 import { container } from '@/infrastructure/container';
-import type { ILogger } from '@/application/shared/ILogger';
+
 import { Logger } from '@/application/shared/Logger';
 import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
@@ -162,8 +162,7 @@ export default async function AdminPage() {
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
     logger.execute(LogLevel.ERROR, 'Database connection error', { error });
-    dbError =
-      error instanceof Error ? error : new Error('Unknown database error');
+    dbError = error instanceof Error ? error : new Error(String(error));
 
     // In development environment, show a helpful error message
     if (process.env.NODE_ENV === 'development') {

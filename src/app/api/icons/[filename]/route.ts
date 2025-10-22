@@ -81,11 +81,7 @@ export async function GET(
     });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(
-      error instanceof Error ? error : new Error(String(error)),
-      'Error serving icon',
-      { error }
-    );
+    logger.logError(error, 'Error serving icon', { error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
