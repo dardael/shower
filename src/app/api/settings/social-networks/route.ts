@@ -5,6 +5,7 @@ import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNe
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { Logger } from '@/application/shared/Logger';
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
+import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 
 export async function GET() {
   const logger = container.resolve<Logger>('Logger');
@@ -76,9 +77,6 @@ export async function PUT(request: NextRequest) {
     );
 
     // Convert JSON to domain objects
-    const { SocialNetwork } = await import(
-      '@/domain/settings/entities/SocialNetwork'
-    );
     const socialNetworkObjects = body.socialNetworks.map(
       (socialNetwork: {
         type: SocialNetworkType;
