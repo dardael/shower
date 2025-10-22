@@ -26,6 +26,8 @@ import { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
+import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
+import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 
 // Register simple logger to avoid circular dependencies
 container.register<ILogger>('ILogger', {
@@ -89,6 +91,22 @@ container.register<IGetSocialNetworks>('IGetSocialNetworks', {
 container.register<IUpdateSocialNetworks>('IUpdateSocialNetworks', {
   useClass: UpdateSocialNetworks,
 });
+
+// Register factory services
+container.register<SocialNetworkFactory>('SocialNetworkFactory', {
+  useClass: SocialNetworkFactory,
+});
+
+// Register validation services
+container.register<SocialNetworkValidationService>(
+  'SocialNetworkValidationService',
+  {
+    useFactory: () => {
+      const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
+      return new SocialNetworkValidationService(logger);
+    },
+  }
+);
 
 // Service locator pattern for server components
 export class AuthServiceLocator {

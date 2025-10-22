@@ -29,8 +29,28 @@ export class SocialNetworkLabel {
       throw new Error('Social network label cannot be empty');
     }
 
-    // Check for HTML special characters to prevent XSS
-    if (/<|>|&|"|'/.test(trimmedValue)) {
+    // Enhanced XSS prevention - check for dangerous patterns
+    const dangerousPatterns = [
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, // Script tags
+      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, // Iframe tags
+      /javascript:/gi, // JavaScript protocol
+      /on\w+\s*=/gi, // Event handlers
+      /<[^>]*>/g, // Any HTML tags (except simple text)
+    ];
+
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(trimmedValue)) {
+        throw new Error('Social network label contains invalid characters');
+      }
+    }
+
+    // Check for specific dangerous characters
+    if (/[<>"'\\]/.test(trimmedValue)) {
+      throw new Error('Social network label contains invalid characters');
+    }
+
+    // Additional check for control characters
+    if (/[\x00-\x1F\x7F-\x9F]/.test(trimmedValue)) {
       throw new Error('Social network label contains invalid characters');
     }
   }

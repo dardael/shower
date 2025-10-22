@@ -2,10 +2,12 @@ import { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
 
 describe('GetSocialNetworks', () => {
   let getSocialNetworks: GetSocialNetworks;
   let mockRepository: jest.Mocked<SocialNetworkRepository>;
+  let mockFactory: jest.Mocked<SocialNetworkFactory>;
 
   beforeEach(() => {
     mockRepository = {
@@ -14,7 +16,14 @@ describe('GetSocialNetworks', () => {
       getSocialNetworkByType: jest.fn().mockResolvedValue(null),
     };
 
-    getSocialNetworks = new GetSocialNetworks(mockRepository);
+    mockFactory = {
+      createDefault: jest.fn(),
+      createAllDefaults: jest.fn().mockReturnValue([]),
+      create: jest.fn(),
+      clearCache: jest.fn(),
+    };
+
+    getSocialNetworks = new GetSocialNetworks(mockRepository, mockFactory);
   });
 
   it('should return social networks from repository', async () => {
@@ -43,12 +52,19 @@ describe('GetSocialNetworks', () => {
     expect(mockRepository.getAllSocialNetworks).toHaveBeenCalledTimes(1);
   });
 
-  it('should return empty array when repository returns empty', async () => {
+  it('should return defaults when repository returns empty', async () => {
+    const expectedDefaults = [
+      SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM),
+      SocialNetwork.createDefault(SocialNetworkType.FACEBOOK),
+    ];
+
     mockRepository.getAllSocialNetworks.mockResolvedValue([]);
+    mockFactory.createAllDefaults.mockReturnValue(expectedDefaults);
 
     const result = await getSocialNetworks.execute();
 
-    expect(result).toEqual([]);
+    expect(result).toEqual(expectedDefaults);
     expect(mockRepository.getAllSocialNetworks).toHaveBeenCalledTimes(1);
+    expect(mockFactory.createAllDefaults).toHaveBeenCalledTimes(1);
   });
 });

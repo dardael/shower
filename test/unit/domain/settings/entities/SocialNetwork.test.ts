@@ -29,54 +29,59 @@ describe('SocialNetwork', () => {
     });
   });
 
-  describe('setters', () => {
-    it('should update URL', () => {
+  describe('immutable methods', () => {
+    it('should update URL immutably', () => {
       const socialNetwork = SocialNetwork.createDefault(
         SocialNetworkType.INSTAGRAM
       );
       const newUrl = 'https://instagram.com/new';
 
-      socialNetwork.updateUrl(newUrl);
+      const updatedSocialNetwork = socialNetwork.updateUrl(newUrl);
 
-      expect(socialNetwork.url.value).toBe(newUrl);
+      expect(socialNetwork.url.value).toBe('');
+      expect(updatedSocialNetwork.url.value).toBe(newUrl);
     });
 
-    it('should update label', () => {
+    it('should update label immutably', () => {
       const socialNetwork = SocialNetwork.createDefault(
         SocialNetworkType.INSTAGRAM
       );
       const newLabel = 'My Instagram';
 
-      socialNetwork.updateLabel(newLabel);
+      const updatedSocialNetwork = socialNetwork.updateLabel(newLabel);
 
-      expect(socialNetwork.label.value).toBe(newLabel);
+      expect(socialNetwork.label.value).toBe('Instagram');
+      expect(updatedSocialNetwork.label.value).toBe(newLabel);
     });
 
-    it('should update enabled status', () => {
+    it('should update enabled status immutably', () => {
       const socialNetwork = SocialNetwork.createDefault(
         SocialNetworkType.INSTAGRAM
       );
 
-      socialNetwork.enabled = true;
-      expect(socialNetwork.enabled).toBe(true);
-
-      socialNetwork.enabled = false;
+      const enabledSocialNetwork = socialNetwork.withEnabled(true);
       expect(socialNetwork.enabled).toBe(false);
+      expect(enabledSocialNetwork.enabled).toBe(true);
+
+      const disabledSocialNetwork = enabledSocialNetwork.withEnabled(false);
+      expect(enabledSocialNetwork.enabled).toBe(true);
+      expect(disabledSocialNetwork.enabled).toBe(false);
     });
   });
 
   describe('enable/disable/toggle', () => {
-    it('should enable social network', () => {
+    it('should enable social network immutably', () => {
       const socialNetwork = SocialNetwork.createDefault(
         SocialNetworkType.INSTAGRAM
       );
 
-      socialNetwork.enable();
+      const enabledSocialNetwork = socialNetwork.enable();
 
-      expect(socialNetwork.enabled).toBe(true);
+      expect(socialNetwork.enabled).toBe(false);
+      expect(enabledSocialNetwork.enabled).toBe(true);
     });
 
-    it('should disable social network', () => {
+    it('should disable social network immutably', () => {
       const socialNetwork = SocialNetwork.create(
         SocialNetworkType.INSTAGRAM,
         'https://instagram.com/test',
@@ -84,21 +89,24 @@ describe('SocialNetwork', () => {
         true
       );
 
-      socialNetwork.disable();
+      const disabledSocialNetwork = socialNetwork.disable();
 
-      expect(socialNetwork.enabled).toBe(false);
+      expect(socialNetwork.enabled).toBe(true);
+      expect(disabledSocialNetwork.enabled).toBe(false);
     });
 
-    it('should toggle social network', () => {
+    it('should toggle social network immutably', () => {
       const socialNetwork = SocialNetwork.createDefault(
         SocialNetworkType.INSTAGRAM
       );
 
-      socialNetwork.toggle();
-      expect(socialNetwork.enabled).toBe(true);
-
-      socialNetwork.toggle();
+      const toggledOnce = socialNetwork.toggle();
       expect(socialNetwork.enabled).toBe(false);
+      expect(toggledOnce.enabled).toBe(true);
+
+      const toggledTwice = toggledOnce.toggle();
+      expect(toggledOnce.enabled).toBe(true);
+      expect(toggledTwice.enabled).toBe(false);
     });
   });
 

@@ -43,7 +43,9 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   const logger = container.resolve<UnifiedLogger>('UnifiedLogger');
-  const validationService = new SocialNetworkValidationService(logger);
+  const validationService = container.resolve<SocialNetworkValidationService>(
+    'SocialNetworkValidationService'
+  );
 
   try {
     const body = await request.json();

@@ -7,12 +7,9 @@ import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetwor
 
 export class SocialNetwork {
   private readonly _type: SocialNetworkTypeValueObject;
-  private _url: SocialNetworkUrl;
-  private _label: SocialNetworkLabel;
-  private _enabled: boolean;
-
-  // Cache for default social networks to improve performance
-  private static defaultNetworksCache: SocialNetwork[] | null = null;
+  private readonly _url: SocialNetworkUrl;
+  private readonly _label: SocialNetworkLabel;
+  private readonly _enabled: boolean;
 
   constructor(
     type: SocialNetworkTypeValueObject,
@@ -42,36 +39,43 @@ export class SocialNetwork {
     return this._enabled;
   }
 
-  set url(newUrl: SocialNetworkUrl) {
-    this._url = newUrl;
+  withUrl(newUrl: SocialNetworkUrl): SocialNetwork {
+    return new SocialNetwork(this._type, newUrl, this._label, this._enabled);
   }
 
-  set label(newLabel: SocialNetworkLabel) {
-    this._label = newLabel;
+  withLabel(newLabel: SocialNetworkLabel): SocialNetwork {
+    return new SocialNetwork(this._type, this._url, newLabel, this._enabled);
   }
 
-  set enabled(enabled: boolean) {
-    this._enabled = enabled;
+  withEnabled(enabled: boolean): SocialNetwork {
+    return new SocialNetwork(this._type, this._url, this._label, enabled);
   }
 
-  enable(): void {
-    this._enabled = true;
+  enable(): SocialNetwork {
+    return new SocialNetwork(this._type, this._url, this._label, true);
   }
 
-  disable(): void {
-    this._enabled = false;
+  disable(): SocialNetwork {
+    return new SocialNetwork(this._type, this._url, this._label, false);
   }
 
-  toggle(): void {
-    this._enabled = !this._enabled;
+  toggle(): SocialNetwork {
+    return new SocialNetwork(
+      this._type,
+      this._url,
+      this._label,
+      !this._enabled
+    );
   }
 
-  updateUrl(url: string): void {
-    this._url = SocialNetworkUrl.fromString(url, this._type.value);
+  updateUrl(url: string): SocialNetwork {
+    const newUrl = SocialNetworkUrl.fromString(url, this._type.value);
+    return new SocialNetwork(this._type, newUrl, this._label, this._enabled);
   }
 
-  updateLabel(label: string): void {
-    this._label = SocialNetworkLabel.fromString(label);
+  updateLabel(label: string): SocialNetwork {
+    const newLabel = SocialNetworkLabel.fromString(label);
+    return new SocialNetwork(this._type, this._url, newLabel, this._enabled);
   }
 
   isConfigured(): boolean {
@@ -141,14 +145,9 @@ export class SocialNetwork {
   }
 
   static createAllDefaults(): SocialNetwork[] {
-    // Cache default social networks to avoid recreating them on every call
-    if (!SocialNetwork.defaultNetworksCache) {
-      SocialNetwork.defaultNetworksCache = Object.values(SocialNetworkType).map(
-        (type) => SocialNetwork.createDefault(type)
-      );
-    }
-    // Return a copy to prevent accidental modifications of the cached array
-    return [...SocialNetwork.defaultNetworksCache];
+    return Object.values(SocialNetworkType).map((type) =>
+      SocialNetwork.createDefault(type)
+    );
   }
 
   toJSON() {

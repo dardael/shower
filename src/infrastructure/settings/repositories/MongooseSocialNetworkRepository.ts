@@ -25,7 +25,7 @@ export class MongooseSocialNetworkRepository
       !settingsDocument.socialNetworks ||
       settingsDocument.socialNetworks.length === 0
     ) {
-      return this.getDefaultSocialNetworks();
+      return [];
     }
 
     return settingsDocument.socialNetworks.map(
@@ -66,19 +66,10 @@ export class MongooseSocialNetworkRepository
       !settingsDocument.socialNetworks ||
       settingsDocument.socialNetworks.length === 0
     ) {
-      const defaultNetworks = this.getDefaultSocialNetworks();
-      return (
-        defaultNetworks.find(
-          (socialNetwork) => socialNetwork.type.value === type
-        ) || null
-      );
+      return null;
     }
 
     return this.mapToDomain(settingsDocument.socialNetworks[0]);
-  }
-
-  private getDefaultSocialNetworks(): SocialNetwork[] {
-    return SocialNetwork.createAllDefaults();
   }
 
   private mapToDomain(doc: {
@@ -116,15 +107,10 @@ export class MongooseSocialNetworkRepository
         }
       );
 
-      // Create a default social network with the same type to maintain data integrity
-      // Use Instagram as ultimate fallback if the original type is invalid
-      const fallbackType = Object.values(SocialNetworkType).includes(
-        doc.type as SocialNetworkType
-      )
-        ? (doc.type as SocialNetworkType)
-        : SocialNetworkType.INSTAGRAM;
-
-      return SocialNetwork.createDefault(fallbackType);
+      // Re-throw the error to let the application layer handle it
+      throw new Error(
+        `Invalid social network data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

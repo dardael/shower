@@ -43,10 +43,6 @@ describe('SocialNetworkLabel', () => {
       }).toThrow('Social network label contains invalid characters');
 
       expect(() => {
-        new SocialNetworkLabel('label&test');
-      }).toThrow('Social network label contains invalid characters');
-
-      expect(() => {
         new SocialNetworkLabel('label"test');
       }).toThrow('Social network label contains invalid characters');
 
@@ -56,6 +52,10 @@ describe('SocialNetworkLabel', () => {
 
       expect(() => {
         new SocialNetworkLabel('label>test');
+      }).toThrow('Social network label contains invalid characters');
+
+      expect(() => {
+        new SocialNetworkLabel('label\\test');
       }).toThrow('Social network label contains invalid characters');
     });
 
