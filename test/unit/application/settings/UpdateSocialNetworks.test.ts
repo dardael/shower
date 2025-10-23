@@ -2,10 +2,12 @@ import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetwork
 import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 describe('UpdateSocialNetworks', () => {
   let updateSocialNetworks: UpdateSocialNetworks;
   let mockRepository: jest.Mocked<SocialNetworkRepository>;
+  let mockNormalizationService: jest.Mocked<ISocialNetworkUrlNormalizationService>;
 
   beforeEach(() => {
     mockRepository = {
@@ -14,7 +16,15 @@ describe('UpdateSocialNetworks', () => {
       getSocialNetworkByType: jest.fn().mockResolvedValue(null),
     };
 
-    updateSocialNetworks = new UpdateSocialNetworks(mockRepository);
+    mockNormalizationService = {
+      normalizeUrl: jest.fn(),
+      requiresNormalization: jest.fn(),
+    };
+
+    updateSocialNetworks = new UpdateSocialNetworks(
+      mockRepository,
+      mockNormalizationService
+    );
   });
 
   it('should update social networks through repository', async () => {

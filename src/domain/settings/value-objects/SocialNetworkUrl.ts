@@ -1,4 +1,5 @@
 import { SocialNetworkType } from './SocialNetworkType';
+import { ISocialNetworkUrlNormalizationService } from '../services/ISocialNetworkUrlNormalizationService';
 
 export class SocialNetworkUrl {
   private readonly _value: string;
@@ -88,5 +89,14 @@ export class SocialNetworkUrl {
 
   static fromString(value: string, type: SocialNetworkType): SocialNetworkUrl {
     return new SocialNetworkUrl(value, type);
+  }
+
+  static fromStringWithNormalization(
+    value: string,
+    type: SocialNetworkType,
+    normalizationService: ISocialNetworkUrlNormalizationService
+  ): SocialNetworkUrl {
+    const normalizedUrl = normalizationService.normalizeUrl(value, type);
+    return new SocialNetworkUrl(normalizedUrl, type);
   }
 }

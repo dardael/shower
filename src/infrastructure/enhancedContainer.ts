@@ -5,6 +5,8 @@ import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLo
 import { LogRotationService } from '@/infrastructure/shared/services/LogRotationService';
 import type { ILogger } from '@/application/shared/ILogger';
 import { Logger } from '@/application/shared/Logger';
+import { SocialNetworkUrlNormalizationService } from '@/domain/settings/services/SocialNetworkUrlNormalizationService';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 // Enhanced logger configuration
 const logConfig = {
@@ -68,6 +70,17 @@ container.register<Logger>('Logger', {
     return new Logger(baseLogger);
   },
 });
+
+// Register URL normalization service
+container.register<ISocialNetworkUrlNormalizationService>(
+  'ISocialNetworkUrlNormalizationService',
+  {
+    useFactory: () => {
+      const logger = container.resolve<Logger>('Logger');
+      return new SocialNetworkUrlNormalizationService(logger);
+    },
+  }
+);
 
 // Export enhanced service locators
 export class EnhancedLoggerServiceLocator {

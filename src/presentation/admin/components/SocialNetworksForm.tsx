@@ -134,6 +134,26 @@ export default function SocialNetworksForm() {
                           }
                           disabled={!socialNetwork.enabled}
                         />
+                        <Field.HelperText>
+                          {socialNetwork.type === 'email' && (
+                            <Text fontSize="xs" color="fg.muted">
+                              Enter email address (mailto: will be added
+                              automatically)
+                            </Text>
+                          )}
+                          {socialNetwork.type === 'phone' && (
+                            <Text fontSize="xs" color="fg.muted">
+                              Enter phone number (tel: will be added
+                              automatically)
+                            </Text>
+                          )}
+                          {socialNetwork.type !== 'email' &&
+                            socialNetwork.type !== 'phone' && (
+                              <Text fontSize="xs" color="fg.muted">
+                                Full URL including https://
+                              </Text>
+                            )}
+                        </Field.HelperText>
                         <Field.ErrorText />
                       </Field.Root>
 

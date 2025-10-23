@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
