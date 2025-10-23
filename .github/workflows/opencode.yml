@@ -27,3 +27,4 @@ jobs:
           ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
         with:
           model: zai-coding-plan/glm-4.6
+
