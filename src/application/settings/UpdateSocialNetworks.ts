@@ -26,10 +26,10 @@ export class UpdateSocialNetworks implements IUpdateSocialNetworks {
         this.normalizationService
       );
 
-      return SocialNetwork.create(
-        socialNetwork.type.value,
-        normalizedUrl.value,
-        socialNetwork.label.value,
+      return new SocialNetwork(
+        socialNetwork.type,
+        normalizedUrl,
+        socialNetwork.label,
         socialNetwork.enabled
       );
     });

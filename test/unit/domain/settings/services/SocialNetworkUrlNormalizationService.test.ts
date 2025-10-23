@@ -116,6 +116,14 @@ describe('SocialNetworkUrlNormalizationService', () => {
         const result = service.normalizeUrl('   ', SocialNetworkType.PHONE);
         expect(result).toBe('');
       });
+
+      it('should handle French phone number starting with 0', () => {
+        const result = service.normalizeUrl(
+          '0646775659',
+          SocialNetworkType.PHONE
+        );
+        expect(result).toBe('tel:0646775659');
+      });
     });
 
     describe('Social network URLs', () => {
