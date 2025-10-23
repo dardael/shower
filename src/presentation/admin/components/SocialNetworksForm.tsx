@@ -137,13 +137,13 @@ export default function SocialNetworksForm() {
                         <Field.HelperText>
                           {socialNetwork.type === 'email' && (
                             <Text fontSize="xs" color="fg.muted">
-                              Enter email address (mailto: will be added
+                              Enter email address (protocol will be added
                               automatically)
                             </Text>
                           )}
                           {socialNetwork.type === 'phone' && (
                             <Text fontSize="xs" color="fg.muted">
-                              Enter phone number (tel: will be added
+                              Enter phone number (protocol will be added
                               automatically)
                             </Text>
                           )}

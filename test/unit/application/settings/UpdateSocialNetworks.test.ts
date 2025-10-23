@@ -29,17 +29,26 @@ describe('UpdateSocialNetworks', () => {
 
   it('should update social networks through repository', async () => {
     const socialNetworks = [
-      SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM),
+      SocialNetwork.create(
+        SocialNetworkType.INSTAGRAM,
+        'https://instagram.com/test',
+        'Instagram',
+        true
+      ),
       SocialNetwork.createDefault(SocialNetworkType.FACEBOOK),
     ];
 
     mockRepository.updateSocialNetworks.mockResolvedValue();
+    mockNormalizationService.normalizeUrl.mockReturnValue(
+      'https://instagram.com/test'
+    );
 
     await updateSocialNetworks.execute(socialNetworks);
 
     expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
-    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledWith(
-      socialNetworks
+    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
+      'https://instagram.com/test',
+      SocialNetworkType.INSTAGRAM
     );
   });
 
@@ -71,15 +80,56 @@ describe('UpdateSocialNetworks', () => {
 
   it('should handle single social network', async () => {
     const socialNetworks = [
-      SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM),
+      SocialNetwork.create(
+        SocialNetworkType.INSTAGRAM,
+        'https://instagram.com/test',
+        'Instagram',
+        true
+      ),
     ];
     mockRepository.updateSocialNetworks.mockResolvedValue();
+    mockNormalizationService.normalizeUrl.mockReturnValue(
+      'https://instagram.com/test'
+    );
 
     await updateSocialNetworks.execute(socialNetworks);
 
     expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
-    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledWith(
-      socialNetworks
+    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
+      'https://instagram.com/test',
+      SocialNetworkType.INSTAGRAM
     );
+  });
+
+  it('should apply normalization to email and phone URLs', async () => {
+    const emailNetwork = SocialNetwork.create(
+      SocialNetworkType.EMAIL,
+      'mailto:test@example.com',
+      'Email',
+      true
+    );
+    const phoneNetwork = SocialNetwork.create(
+      SocialNetworkType.PHONE,
+      'tel:+1234567890',
+      'Phone',
+      true
+    );
+
+    mockRepository.updateSocialNetworks.mockResolvedValue();
+    mockNormalizationService.normalizeUrl
+      .mockReturnValueOnce('mailto:test@example.com')
+      .mockReturnValueOnce('tel:+1234567890');
+
+    await updateSocialNetworks.execute([emailNetwork, phoneNetwork]);
+
+    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
+      'mailto:test@example.com',
+      SocialNetworkType.EMAIL
+    );
+    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
+      'tel:+1234567890',
+      SocialNetworkType.PHONE
+    );
+    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
   });
 });
