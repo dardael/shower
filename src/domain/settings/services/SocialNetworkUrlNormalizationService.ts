@@ -3,6 +3,8 @@ import { ISocialNetworkUrlNormalizationService } from './ISocialNetworkUrlNormal
 import { Logger } from '@/application/shared/Logger';
 import { inject } from 'tsyringe';
 
+const MIN_PHONE_DIGITS = 7;
+
 export class SocialNetworkUrlNormalizationService
   implements ISocialNetworkUrlNormalizationService
 {
@@ -67,6 +69,9 @@ export class SocialNetworkUrlNormalizationService
 
   private isValidPhone(phone: string): boolean {
     const phonePattern = /^[\d\s\-\+\(\)]+$/;
-    return phonePattern.test(phone) && phone.replace(/\D/g, '').length >= 7;
+    return (
+      phonePattern.test(phone) &&
+      phone.replace(/\D/g, '').length >= MIN_PHONE_DIGITS
+    );
   }
 }
