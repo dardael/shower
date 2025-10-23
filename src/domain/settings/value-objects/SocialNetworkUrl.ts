@@ -1,4 +1,5 @@
 import { SocialNetworkType } from './SocialNetworkType';
+import { ISocialNetworkUrlNormalizationService } from '../services/ISocialNetworkUrlNormalizationService';
 
 export class SocialNetworkUrl {
   private readonly _value: string;
@@ -17,7 +18,14 @@ export class SocialNetworkUrl {
   }
 
   get isValid(): boolean {
-    return this._value.trim() !== '';
+    // Empty URLs are valid (they represent disabled networks)
+    if (this._value.trim() === '') {
+      return true;
+    }
+
+    // For non-empty URLs, validity is determined by constructor validation
+    // If we got here without throwing an error, the URL is valid
+    return true;
   }
 
   private validateUrl(value: string, type: SocialNetworkType): void {
@@ -88,5 +96,14 @@ export class SocialNetworkUrl {
 
   static fromString(value: string, type: SocialNetworkType): SocialNetworkUrl {
     return new SocialNetworkUrl(value, type);
+  }
+
+  static fromStringWithNormalization(
+    value: string,
+    type: SocialNetworkType,
+    normalizationService: ISocialNetworkUrlNormalizationService
+  ): SocialNetworkUrl {
+    const normalizedUrl = normalizationService.normalizeUrl(value, type);
+    return new SocialNetworkUrl(normalizedUrl, type);
   }
 }

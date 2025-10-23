@@ -6,6 +6,8 @@ import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetwork
 import { Logger } from '@/application/shared/Logger';
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
+import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 export async function GET() {
   const logger = container.resolve<Logger>('Logger');
@@ -72,15 +74,33 @@ export async function PUT(request: NextRequest) {
     const updateSocialNetworks = container.resolve<UpdateSocialNetworks>(
       'IUpdateSocialNetworks'
     );
+    const normalizationService =
+      container.resolve<ISocialNetworkUrlNormalizationService>(
+        'ISocialNetworkUrlNormalizationService'
+      );
 
-    // Convert JSON to domain objects
+    // Convert JSON to domain objects with normalization
     const socialNetworkObjects = body.socialNetworks.map(
       (socialNetwork: {
         type: SocialNetworkType;
         url: string;
         label: string;
         enabled: boolean;
-      }) => SocialNetwork.fromJSON(socialNetwork)
+      }) => {
+        // Apply normalization before creating the domain object
+        const normalizedUrl = SocialNetworkUrl.fromStringWithNormalization(
+          socialNetwork.url,
+          socialNetwork.type,
+          normalizationService
+        );
+
+        return SocialNetwork.create(
+          socialNetwork.type,
+          normalizedUrl.value,
+          socialNetwork.label,
+          socialNetwork.enabled
+        );
+      }
     );
 
     await updateSocialNetworks.execute(socialNetworkObjects);
