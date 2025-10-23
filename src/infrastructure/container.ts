@@ -28,6 +28,8 @@ import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/rep
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
+import { SocialNetworkUrlNormalizationService } from '@/domain/settings/services/SocialNetworkUrlNormalizationService';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 // Register simple logger to avoid circular dependencies
 container.register<ILogger>('ILogger', {
@@ -104,6 +106,17 @@ container.register<SocialNetworkValidationService>(
     useFactory: () => {
       const logger = container.resolve<Logger>('Logger');
       return new SocialNetworkValidationService(logger);
+    },
+  }
+);
+
+// Register URL normalization service
+container.register<ISocialNetworkUrlNormalizationService>(
+  'ISocialNetworkUrlNormalizationService',
+  {
+    useFactory: () => {
+      const logger = container.resolve<Logger>('Logger');
+      return new SocialNetworkUrlNormalizationService(logger);
     },
   }
 );
