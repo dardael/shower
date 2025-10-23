@@ -1,5 +1,6 @@
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 describe('SocialNetworkUrl', () => {
   describe('constructor', () => {
@@ -8,7 +9,7 @@ describe('SocialNetworkUrl', () => {
 
       expect(url.value).toBe('');
       expect(url.isEmpty).toBe(true);
-      expect(url.isValid).toBe(false);
+      expect(url.isValid).toBe(true); // Empty URLs are valid (represent disabled networks)
     });
 
     it('should create a valid SocialNetworkUrl with HTTPS URL', () => {
@@ -127,6 +128,46 @@ describe('SocialNetworkUrl', () => {
 
       expect(url.value).toBe('https://instagram.com/test');
       expect(url.isEmpty).toBe(false);
+      expect(url.isValid).toBe(true);
+    });
+
+    it('should create URL with normalization applied', () => {
+      const mockService = {
+        normalizeUrl: jest.fn().mockReturnValue('mailto:test@example.com'),
+      } as unknown as ISocialNetworkUrlNormalizationService;
+
+      const url = SocialNetworkUrl.fromStringWithNormalization(
+        'test@example.com',
+        SocialNetworkType.EMAIL,
+        mockService
+      );
+
+      expect(mockService.normalizeUrl).toHaveBeenCalledWith(
+        'test@example.com',
+        SocialNetworkType.EMAIL
+      );
+      expect(url.value).toBe('mailto:test@example.com');
+      expect(url.isEmpty).toBe(false);
+      expect(url.isValid).toBe(true);
+    });
+
+    it('should create empty URL with normalization when input is empty', () => {
+      const mockService = {
+        normalizeUrl: jest.fn().mockReturnValue(''),
+      } as unknown as ISocialNetworkUrlNormalizationService;
+
+      const url = SocialNetworkUrl.fromStringWithNormalization(
+        '',
+        SocialNetworkType.EMAIL,
+        mockService
+      );
+
+      expect(mockService.normalizeUrl).toHaveBeenCalledWith(
+        '',
+        SocialNetworkType.EMAIL
+      );
+      expect(url.value).toBe('');
+      expect(url.isEmpty).toBe(true);
       expect(url.isValid).toBe(true);
     });
   });

@@ -18,7 +18,14 @@ export class SocialNetworkUrl {
   }
 
   get isValid(): boolean {
-    return this._value.trim() !== '';
+    // Empty URLs are valid (they represent disabled networks)
+    if (this._value.trim() === '') {
+      return true;
+    }
+
+    // For non-empty URLs, validity is determined by constructor validation
+    // If we got here without throwing an error, the URL is valid
+    return true;
   }
 
   private validateUrl(value: string, type: SocialNetworkType): void {
