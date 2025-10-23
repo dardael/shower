@@ -4,6 +4,7 @@ import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocial
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
+import { Logger } from '@/application/shared/Logger';
 
 @injectable()
 export class UpdateSocialNetworks implements IUpdateSocialNetworks {
@@ -11,29 +12,12 @@ export class UpdateSocialNetworks implements IUpdateSocialNetworks {
     @inject('SocialNetworkRepository')
     private readonly repository: SocialNetworkRepository,
     @inject('ISocialNetworkUrlNormalizationService')
-    private readonly normalizationService: ISocialNetworkUrlNormalizationService
+    private readonly normalizationService: ISocialNetworkUrlNormalizationService,
+    @inject('Logger')
+    private readonly logger: Logger
   ) {}
 
   async execute(socialNetworks: SocialNetwork[]): Promise<void> {
-    const normalizedSocialNetworks = socialNetworks.map((socialNetwork) => {
-      if (socialNetwork.url.isEmpty) {
-        return socialNetwork;
-      }
-
-      const normalizedUrl = SocialNetworkUrl.fromStringWithNormalization(
-        socialNetwork.url.value,
-        socialNetwork.type.value,
-        this.normalizationService
-      );
-
-      return new SocialNetwork(
-        socialNetwork.type,
-        normalizedUrl,
-        socialNetwork.label,
-        socialNetwork.enabled
-      );
-    });
-
-    await this.repository.updateSocialNetworks(normalizedSocialNetworks);
+    await this.repository.updateSocialNetworks(socialNetworks);
   }
 }

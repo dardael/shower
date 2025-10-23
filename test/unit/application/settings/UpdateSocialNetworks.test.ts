@@ -3,11 +3,13 @@ import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNe
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
+import { Logger } from '@/application/shared/Logger';
 
 describe('UpdateSocialNetworks', () => {
   let updateSocialNetworks: UpdateSocialNetworks;
   let mockRepository: jest.Mocked<SocialNetworkRepository>;
   let mockNormalizationService: jest.Mocked<ISocialNetworkUrlNormalizationService>;
+  let mockLogger: jest.Mocked<Logger>;
 
   beforeEach(() => {
     mockRepository = {
@@ -21,9 +23,31 @@ describe('UpdateSocialNetworks', () => {
       requiresNormalization: jest.fn(),
     };
 
+    mockLogger = {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      logApiRequest: jest.fn(),
+      logApiResponse: jest.fn(),
+      logError: jest.fn(),
+      logSecurity: jest.fn(),
+      logUserAction: jest.fn(),
+      logBusinessEvent: jest.fn(),
+      startTimer: jest.fn(),
+      endTimer: jest.fn(),
+      measure: jest.fn(),
+      withContext: jest.fn(),
+      logIf: jest.fn(),
+      debugIf: jest.fn(),
+      batch: jest.fn(),
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<Logger>;
+
     updateSocialNetworks = new UpdateSocialNetworks(
       mockRepository,
-      mockNormalizationService
+      mockNormalizationService,
+      mockLogger
     );
   });
 
@@ -32,23 +56,15 @@ describe('UpdateSocialNetworks', () => {
       SocialNetwork.create(
         SocialNetworkType.INSTAGRAM,
         'https://instagram.com/test',
-        'Instagram',
-        true
+        'Instagram'
       ),
-      SocialNetwork.createDefault(SocialNetworkType.FACEBOOK),
     ];
-
-    mockRepository.updateSocialNetworks.mockResolvedValue();
-    mockNormalizationService.normalizeUrl.mockReturnValue(
-      'https://instagram.com/test'
-    );
 
     await updateSocialNetworks.execute(socialNetworks);
 
     expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
-    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
-      'https://instagram.com/test',
-      SocialNetworkType.INSTAGRAM
+    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledWith(
+      socialNetworks
     );
   });
 
@@ -79,57 +95,38 @@ describe('UpdateSocialNetworks', () => {
   });
 
   it('should handle single social network', async () => {
-    const socialNetworks = [
-      SocialNetwork.create(
-        SocialNetworkType.INSTAGRAM,
-        'https://instagram.com/test',
-        'Instagram',
-        true
-      ),
-    ];
-    mockRepository.updateSocialNetworks.mockResolvedValue();
-    mockNormalizationService.normalizeUrl.mockReturnValue(
-      'https://instagram.com/test'
+    const socialNetwork = SocialNetwork.create(
+      SocialNetworkType.INSTAGRAM,
+      'https://instagram.com/test',
+      'Instagram'
     );
 
-    await updateSocialNetworks.execute(socialNetworks);
+    await updateSocialNetworks.execute([socialNetwork]);
 
     expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
-    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
-      'https://instagram.com/test',
-      SocialNetworkType.INSTAGRAM
-    );
+    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledWith([
+      socialNetwork,
+    ]);
   });
 
-  it('should apply normalization to email and phone URLs', async () => {
+  it('should pass social networks to repository without additional processing', async () => {
     const emailNetwork = SocialNetwork.create(
       SocialNetworkType.EMAIL,
       'mailto:test@example.com',
-      'Email',
-      true
+      'Email'
     );
     const phoneNetwork = SocialNetwork.create(
       SocialNetworkType.PHONE,
-      'tel:+1234567890',
-      'Phone',
-      true
+      'tel:0612345678',
+      'Phone'
     );
-
-    mockRepository.updateSocialNetworks.mockResolvedValue();
-    mockNormalizationService.normalizeUrl
-      .mockReturnValueOnce('mailto:test@example.com')
-      .mockReturnValueOnce('tel:+1234567890');
 
     await updateSocialNetworks.execute([emailNetwork, phoneNetwork]);
 
-    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
-      'mailto:test@example.com',
-      SocialNetworkType.EMAIL
-    );
-    expect(mockNormalizationService.normalizeUrl).toHaveBeenCalledWith(
-      'tel:+1234567890',
-      SocialNetworkType.PHONE
-    );
     expect(mockRepository.updateSocialNetworks).toHaveBeenCalledTimes(1);
+    expect(mockRepository.updateSocialNetworks).toHaveBeenCalledWith([
+      emailNetwork,
+      phoneNetwork,
+    ]);
   });
 });
