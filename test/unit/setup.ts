@@ -3,8 +3,6 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { container } from 'tsyringe';
 import { Logger } from '@/application/shared/Logger';
-import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
-import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import type { ILogger } from '@/application/shared/ILogger';
 
 // Increase EventEmitter max listeners to prevent memory leak warnings
@@ -187,20 +185,6 @@ jest.mock('@chakra-ui/react', () => {
 });
 
 // Mock next/navigation
-// Register logger for tests
-container.register<ILogger>('ILogger', {
-  useFactory: () => {
-    const formatter = new LogFormatterService();
-    return new FileLoggerAdapter(formatter);
-  },
-});
-
-container.register<Logger>('Logger', {
-  useFactory: () => {
-    const baseLogger = container.resolve<ILogger>('ILogger');
-    return new Logger(baseLogger);
-  },
-});
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -208,3 +192,29 @@ jest.mock('next/navigation', () => ({
     refresh: jest.fn(),
   }),
 }));
+
+// Register Logger for tests
+beforeAll(() => {
+  // Mock ILogger for tests
+  const mockILogger: ILogger = {
+    logDebug: jest.fn(),
+    logInfo: jest.fn(),
+    logWarning: jest.fn(),
+    logError: jest.fn(),
+  };
+
+  // Register mock ILogger
+  container.register<ILogger>('ILogger', {
+    useValue: mockILogger,
+  });
+
+  // Register Logger using the mock
+  container.register<Logger>('Logger', {
+    useFactory: () => new Logger(mockILogger),
+  });
+});
+
+// Clean up container after tests
+afterAll(() => {
+  container.clearInstances();
+});
