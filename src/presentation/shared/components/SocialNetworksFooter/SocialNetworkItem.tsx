@@ -30,8 +30,6 @@ export function SocialNetworkItem({
     (e: React.MouseEvent) => {
       if (!isValidUrl) {
         e.preventDefault();
-        // Use console for client-side logging in client components
-        console.warn('Blocked navigation to unsafe URL', { url, type });
         return;
       }
 

@@ -91,26 +91,6 @@ export default function AdminErrorBoundary({
   onError,
 }: AdminErrorBoundaryProps) {
   const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
-    // Log error to console (client-side logging)
-    console.error('Admin component error:', {
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
-      componentStack: errorInfo.componentStack,
-      errorBoundary: 'AdminErrorBoundary',
-    });
-
-    // In development, also log to console with more details
-    if (process.env.NODE_ENV === 'development') {
-      console.group('🚨 Admin Error Boundary');
-      console.error('Error:', error);
-      console.error('Error Info:', errorInfo);
-      console.error('Component Stack:', errorInfo.componentStack);
-      console.groupEnd();
-    }
-
     // Call custom error handler if provided
     if (onError) {
       onError(error, errorInfo);
