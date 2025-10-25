@@ -1,6 +1,11 @@
 import 'reflect-metadata';
 import '@testing-library/jest-dom';
 import React from 'react';
+import { container } from 'tsyringe';
+import { Logger } from '@/application/shared/Logger';
+import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
+import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
+import type { ILogger } from '@/application/shared/ILogger';
 
 // Increase EventEmitter max listeners to prevent memory leak warnings
 process.setMaxListeners(50);
@@ -182,6 +187,21 @@ jest.mock('@chakra-ui/react', () => {
 });
 
 // Mock next/navigation
+// Register logger for tests
+container.register<ILogger>('ILogger', {
+  useFactory: () => {
+    const formatter = new LogFormatterService();
+    return new FileLoggerAdapter(formatter);
+  },
+});
+
+container.register<Logger>('Logger', {
+  useFactory: () => {
+    const baseLogger = container.resolve<ILogger>('ILogger');
+    return new Logger(baseLogger);
+  },
+});
+
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),

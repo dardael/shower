@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { container } from 'tsyringe';
+import { Logger } from '@/application/shared/Logger';
 import type { PublicSocialNetwork } from './types';
 
 interface UseSocialNetworksFooterReturn {
@@ -19,6 +21,8 @@ export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
   >(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const logger = container.resolve<Logger>('Logger');
 
   useEffect(() => {
     async function fetchSocialNetworks() {
@@ -50,7 +54,7 @@ export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Unknown error occurred';
         setError(errorMessage);
-        console.error('Error fetching social networks:', errorMessage);
+        logger.error('Error fetching social networks', { error: errorMessage });
       } finally {
         setIsLoading(false);
       }

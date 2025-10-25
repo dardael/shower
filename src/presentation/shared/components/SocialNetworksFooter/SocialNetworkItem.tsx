@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { VStack, Text, Link } from '@chakra-ui/react';
+import { container } from 'tsyringe';
+import { Logger } from '@/application/shared/Logger';
 import { SocialNetworkIcon } from './SocialNetworkIcon';
 import type { SocialNetworkItemProps } from './types';
 
@@ -15,6 +17,8 @@ export function SocialNetworkItem({
   url,
   label,
 }: SocialNetworkItemProps) {
+  const logger = container.resolve<Logger>('Logger');
+
   // Validate URL on client side for security
   const isValidUrl = React.useMemo(() => {
     try {
@@ -30,14 +34,14 @@ export function SocialNetworkItem({
     (e: React.MouseEvent) => {
       if (!isValidUrl) {
         e.preventDefault();
-        console.warn(`Blocked navigation to unsafe URL: ${url}`);
+        logger.warn('Blocked navigation to unsafe URL', { url, type });
         return;
       }
 
       // Let default link behavior handle opening in new tab
       // The Link component with isExternal handles this securely
     },
-    [url, isValidUrl]
+    [url, isValidUrl, logger]
   );
 
   // Don't render if URL is invalid
