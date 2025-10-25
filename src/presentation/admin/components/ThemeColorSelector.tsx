@@ -51,7 +51,6 @@ export function ThemeColorSelector({
               onClick={() => onColorChange(color)}
               disabled={disabled}
               variant={isSelected ? 'solid' : 'outline'}
-              colorPalette={color}
               size="sm"
               width="60px"
               height="40px"
