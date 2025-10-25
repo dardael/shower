@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Heading,
   Stack,
@@ -41,7 +41,7 @@ export default function WebsiteSettingsForm({
       if (response.ok && data.name) {
         setName(data.name);
       }
-    } catch (error) {
+    } catch {
       // Error will be handled by the calling component or UI
     }
   }, []);
@@ -60,7 +60,7 @@ export default function WebsiteSettingsForm({
       } else {
         setCurrentIcon(null);
       }
-    } catch (error) {
+    } catch {
       // Error will be handled by the calling component or UI
       setCurrentIcon(null);
     }

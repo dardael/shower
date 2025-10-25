@@ -36,7 +36,7 @@ export function SocialNetworkItem({
       // Let default link behavior handle opening in new tab
       // The Link component with isExternal handles this securely
     },
-    [url, isValidUrl, type]
+    [isValidUrl]
   );
 
   // Don't render if URL is invalid
