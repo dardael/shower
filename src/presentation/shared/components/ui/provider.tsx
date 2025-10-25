@@ -3,16 +3,26 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
 import { Toaster } from './toaster';
-import { system } from '@/presentation/shared/theme';
-import { DynamicThemeProvider } from '@/presentation/shared/DynamicThemeProvider';
+import { createDynamicSystem } from '@/presentation/shared/theme';
+import {
+  DynamicThemeProvider,
+  useDynamicTheme,
+} from '@/presentation/shared/DynamicThemeProvider';
+
+function DynamicChakraProvider({ children }: { children: React.ReactNode }) {
+  const { themeColor } = useDynamicTheme();
+  const dynamicSystem = createDynamicSystem(themeColor);
+
+  return <ChakraProvider value={dynamicSystem}>{children}</ChakraProvider>;
+}
 
 export function Provider(props: ColorModeProviderProps) {
   return (
-    <ChakraProvider value={system}>
-      <DynamicThemeProvider initialThemeColor="blue">
+    <DynamicThemeProvider initialThemeColor="blue">
+      <DynamicChakraProvider>
         <ColorModeProvider {...props} />
         <Toaster />
-      </DynamicThemeProvider>
-    </ChakraProvider>
+      </DynamicChakraProvider>
+    </DynamicThemeProvider>
   );
 }

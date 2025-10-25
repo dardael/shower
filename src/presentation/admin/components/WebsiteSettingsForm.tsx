@@ -14,6 +14,7 @@ import ImageManager from '@/presentation/shared/components/ImageManager/ImageMan
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from './ThemeColorSelector';
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
+import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 
 import type {
   ImageData,
@@ -30,11 +31,9 @@ interface WebsiteSettingsFormProps {
 
 export default function WebsiteSettingsForm({
   initialName,
-  initialThemeColor = 'blue',
 }: WebsiteSettingsFormProps) {
   const [name, setName] = useState(initialName);
-  const [themeColor, setThemeColor] =
-    useState<ThemeColorToken>(initialThemeColor);
+  const { themeColor, setThemeColor } = useDynamicTheme();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
@@ -62,7 +61,7 @@ export default function WebsiteSettingsForm({
     } catch {
       // Error will be handled by calling component or UI
     }
-  }, []);
+  }, [setThemeColor]);
 
   const fetchWebsiteIcon = useCallback(async () => {
     try {
@@ -238,13 +237,7 @@ export default function WebsiteSettingsForm({
           alignItems="center"
           gap={3}
         >
-          <Box
-            w="8px"
-            h="8px"
-            borderRadius="full"
-            bg="colorPalette.solid"
-            colorPalette="purple"
-          />
+          <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
           Website Settings
         </Heading>
         <Text
