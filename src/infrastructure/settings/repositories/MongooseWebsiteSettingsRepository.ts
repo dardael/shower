@@ -28,6 +28,8 @@ export class MongooseWebsiteSettingsRepository
       ? this.mapIconToDomain(settingsDoc.icon)
       : null;
     const themeColor = ThemeColor.fromString(settingsDoc.themeColor);
+    // Initialize with empty social networks array since this method fetches general settings only
+    // Social networks are managed separately through their own repository
     return new WebsiteSettings(key, name, icon, [], themeColor);
   }
 

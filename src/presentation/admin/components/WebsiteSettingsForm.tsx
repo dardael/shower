@@ -15,6 +15,8 @@ import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from './ThemeColorSelector';
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
+import { EnhancedLoggerServiceLocator } from '@/infrastructure/enhancedContainer';
+import { Logger } from '@/application/shared/Logger';
 
 import type {
   ImageData,
@@ -26,7 +28,6 @@ import type {
 
 interface WebsiteSettingsFormProps {
   initialName: string;
-  initialThemeColor?: ThemeColorToken;
 }
 
 export default function WebsiteSettingsForm({
@@ -39,6 +40,9 @@ export default function WebsiteSettingsForm({
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
 
+  // Initialize logger for error handling
+  const logger = EnhancedLoggerServiceLocator.getLogger();
+
   const fetchWebsiteName = useCallback(async () => {
     try {
       const response = await fetch('/api/settings/name');
@@ -46,10 +50,13 @@ export default function WebsiteSettingsForm({
       if (response.ok && data.name) {
         setName(data.name);
       }
-    } catch {
-      // Error will be handled by calling component or UI
+    } catch (error) {
+      logger.logError(error, 'Failed to fetch website name', {
+        operation: 'fetchWebsiteName',
+      });
+      setMessage('Failed to load website name. Please try again later.');
     }
-  }, []);
+  }, [logger]);
 
   const fetchThemeColor = useCallback(async () => {
     try {
@@ -58,10 +65,13 @@ export default function WebsiteSettingsForm({
       if (response.ok && data.themeColor) {
         setThemeColor(data.themeColor);
       }
-    } catch {
-      // Error will be handled by calling component or UI
+    } catch (error) {
+      logger.logError(error, 'Failed to fetch theme color', {
+        operation: 'fetchThemeColor',
+      });
+      setMessage('Failed to load theme color. Please try again later.');
     }
-  }, [setThemeColor]);
+  }, [setThemeColor, logger]);
 
   const fetchWebsiteIcon = useCallback(async () => {
     try {
