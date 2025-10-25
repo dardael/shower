@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, SimpleGrid, VStack, Heading, Text } from '@chakra-ui/react';
+import { Box, VStack, Heading, Text } from '@chakra-ui/react';
 import { SocialNetworkItem } from './SocialNetworkItem';
 import type { SocialNetworksFooterProps } from './types';
 
@@ -13,7 +13,6 @@ import type { SocialNetworksFooterProps } from './types';
 export function SocialNetworksFooter({
   socialNetworks,
   title = 'Follow Us',
-  maxColumns = { base: 2, md: 4, lg: 6 },
   spacing = 6,
   maxItems,
   showTitle = false,
@@ -51,11 +50,15 @@ export function SocialNetworksFooter({
             </Text>
           </VStack>
         )}
-        <SimpleGrid
-          columns={maxColumns}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
           gap={spacing}
+          flexWrap="wrap"
+          maxW="container.lg"
+          mx="auto"
           width="full"
-          justifyItems="center"
         >
           {displayNetworks.map((socialNetwork) => (
             <SocialNetworkItem
@@ -66,7 +69,7 @@ export function SocialNetworksFooter({
               icon={socialNetwork.icon}
             />
           ))}
-        </SimpleGrid>
+        </Box>
       </VStack>
     </Box>
   );
