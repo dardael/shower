@@ -59,7 +59,7 @@ export function SocialNetworkItem({
       <VStack
         gap={3}
         textAlign="center"
-        minW={{ base: '140px', md: '180px' }}
+        minW={{ base: '180px', md: '220px' }}
         transition="none" // Explicitly disable transitions per project constraints
         _focusVisible={{
           ring: '2px',
@@ -67,7 +67,7 @@ export function SocialNetworkItem({
           ringOffset: '2px',
         }}
       >
-        <SocialNetworkIcon type={type} size={14} />
+        <SocialNetworkIcon type={type} size={28} />
         <Text fontSize="sm" fontWeight="medium" color="fg" truncate maxW="full">
           {label}
         </Text>
