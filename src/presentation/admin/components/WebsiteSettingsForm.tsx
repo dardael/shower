@@ -12,6 +12,8 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
+import { ThemeColorSelector } from './ThemeColorSelector';
+import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
 import type {
   ImageData,
@@ -23,12 +25,16 @@ import type {
 
 interface WebsiteSettingsFormProps {
   initialName: string;
+  initialThemeColor?: ThemeColorToken;
 }
 
 export default function WebsiteSettingsForm({
   initialName,
+  initialThemeColor = 'blue',
 }: WebsiteSettingsFormProps) {
   const [name, setName] = useState(initialName);
+  const [themeColor, setThemeColor] =
+    useState<ThemeColorToken>(initialThemeColor);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
@@ -42,7 +48,19 @@ export default function WebsiteSettingsForm({
         setName(data.name);
       }
     } catch {
-      // Error will be handled by the calling component or UI
+      // Error will be handled by calling component or UI
+    }
+  }, []);
+
+  const fetchThemeColor = useCallback(async () => {
+    try {
+      const response = await fetch('/api/settings');
+      const data = await response.json();
+      if (response.ok && data.themeColor) {
+        setThemeColor(data.themeColor);
+      }
+    } catch {
+      // Error will be handled by calling component or UI
     }
   }, []);
 
@@ -69,7 +87,8 @@ export default function WebsiteSettingsForm({
   useEffect(() => {
     fetchWebsiteName();
     fetchWebsiteIcon();
-  }, [fetchWebsiteName, fetchWebsiteIcon]);
+    fetchThemeColor();
+  }, [fetchWebsiteName, fetchWebsiteIcon, fetchThemeColor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,14 +101,15 @@ export default function WebsiteSettingsForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, themeColor }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Website name updated successfully!');
+        setMessage('Website settings updated successfully!');
         await fetchWebsiteName();
+        await fetchThemeColor();
       } else {
         setMessage(data.error || 'Failed to update website name');
       }
@@ -318,6 +338,12 @@ export default function WebsiteSettingsForm({
               formats.
             </Field.HelperText>
           </Field.Root>
+
+          <ThemeColorSelector
+            selectedColor={themeColor}
+            onColorChange={setThemeColor}
+            disabled={loading}
+          />
 
           <Box w="full">
             <SaveButton

@@ -18,6 +18,7 @@ export interface IWebsiteSettings extends Document {
     metadata: IIconMetadata;
   } | null;
   socialNetworks: ISocialNetwork[];
+  themeColor: string;
 }
 
 const IconMetadataSchema = new Schema<IIconMetadata>(
@@ -118,6 +119,37 @@ const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
     socialNetworks: {
       type: [SocialNetworkSchema],
       default: [],
+    },
+    themeColor: {
+      type: String,
+      required: true,
+      default: 'blue',
+      enum: [
+        'blue',
+        'red',
+        'green',
+        'purple',
+        'orange',
+        'teal',
+        'pink',
+        'cyan',
+      ],
+      validate: {
+        validator: (value: string) => {
+          return [
+            'blue',
+            'red',
+            'green',
+            'purple',
+            'orange',
+            'teal',
+            'pink',
+            'cyan',
+          ].includes(value);
+        },
+        message:
+          'Theme color must be one of: blue, red, green, purple, orange, teal, pink, cyan',
+      },
     },
   },
   {

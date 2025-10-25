@@ -2,6 +2,7 @@ import { WebsiteSettingsRepository } from '@/domain/settings/repositories/Websit
 import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
 import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import {
   WebsiteSettingsModel,
   type IIconMetadata,
@@ -15,19 +16,25 @@ export class MongooseWebsiteSettingsRepository
 
     if (!settingsDoc) {
       // Create default settings if none exist for this key
-      settingsDoc = await WebsiteSettingsModel.create({ key, name: 'Shower' });
+      settingsDoc = await WebsiteSettingsModel.create({
+        key,
+        name: 'Shower',
+        themeColor: 'blue',
+      });
     }
 
     const name = new WebsiteName(settingsDoc.name);
     const icon = settingsDoc.icon
       ? this.mapIconToDomain(settingsDoc.icon)
       : null;
-    return new WebsiteSettings(key, name, icon);
+    const themeColor = ThemeColor.fromString(settingsDoc.themeColor);
+    return new WebsiteSettings(key, name, icon, [], themeColor);
   }
 
   async updateSettings(settings: WebsiteSettings): Promise<void> {
     const updateData: Record<string, unknown> = {
       name: settings.name.value,
+      themeColor: settings.themeColor.value,
     };
 
     if (settings.icon) {
