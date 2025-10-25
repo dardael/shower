@@ -14,6 +14,7 @@ export class FileLoggerAdapter implements ILogger {
       this.logFolder = resolve(envFolder);
       mkdirSync(this.logFolder, { recursive: true });
     } catch (err) {
+      // Critical: Logger initialization failed, use console as last resort
       console.warn(
         `Invalid log folder: ${envFolder}. Using fallback './logs'. Error: ${(err as Error).message}`
       );
@@ -25,6 +26,7 @@ export class FileLoggerAdapter implements ILogger {
     try {
       this.currentLogLevel = LogLevel.fromString(envLevel);
     } catch {
+      // Critical: Logger initialization failed, use console as last resort
       console.warn(`Invalid log level: ${envLevel}. Using default 'info'.`);
       this.currentLogLevel = LogLevel.INFO;
     }

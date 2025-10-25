@@ -77,7 +77,7 @@ test.describe('Admin Page', () => {
 
       // Check for success message
       await expect(
-        page.getByText('Website name updated successfully')
+        page.getByText('Website settings updated successfully')
       ).toBeVisible({ timeout: 5000 });
 
       // Verify that the input field has been updated

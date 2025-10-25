@@ -50,10 +50,6 @@ export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Unknown error occurred';
         setError(errorMessage);
-        // Use console for client-side logging in client components
-        console.error('Error fetching social networks', {
-          error: errorMessage,
-        });
       } finally {
         setIsLoading(false);
       }

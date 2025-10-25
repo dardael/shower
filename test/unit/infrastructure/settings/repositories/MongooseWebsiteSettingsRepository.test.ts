@@ -58,6 +58,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
       expect(mockWebsiteSettingsModel.create).toHaveBeenCalledWith({
         key: 'new-key',
         name: 'Shower',
+        themeColor: 'blue',
       });
       expect(result).toBeInstanceOf(WebsiteSettings);
       expect(result.key).toBe('new-key');
@@ -89,7 +90,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'test-key' },
-        { name: 'Updated Website', icon: null },
+        { name: 'Updated Website', icon: null, themeColor: 'blue' },
         { upsert: true }
       );
     });
@@ -108,7 +109,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'new-key' },
-        { name: 'New Website', icon: null },
+        { name: 'New Website', icon: null, themeColor: 'blue' },
         { upsert: true }
       );
     });
@@ -194,6 +195,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
             url: 'https://example.com/favicon.ico',
             metadata: mockIconMetadata,
           },
+          themeColor: 'blue',
         },
         { upsert: true }
       );
@@ -214,6 +216,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
         {
           name: 'Updated Website',
           icon: null,
+          themeColor: 'blue',
         },
         { upsert: true }
       );

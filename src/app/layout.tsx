@@ -98,7 +98,12 @@ export default async function RootLayout({
       ),
     ]);
   } catch (error) {
-    console.error('Database initialization failed or timed out:', error);
+    try {
+      const logger = container.resolve<Logger>('Logger');
+      logger.logError(error, 'Database initialization failed or timed out');
+    } catch {
+      // Logger not available, continue silently
+    }
     // Continue without database to allow the app to start
   }
 

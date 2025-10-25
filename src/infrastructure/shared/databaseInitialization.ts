@@ -18,8 +18,7 @@ export async function initializeDatabase(): Promise<void> {
       const logger = container.resolve<Logger>('Logger');
       logger.info('Database initialized successfully');
     } catch {
-      // Logger not available, skip logging
-      console.log('Database initialized successfully');
+      // Logger not available, continue silently
     }
   } catch (error) {
     // Only log if logger is available to avoid circular dependency
@@ -27,8 +26,7 @@ export async function initializeDatabase(): Promise<void> {
       const logger = container.resolve<Logger>('Logger');
       logger.logError(error, 'Failed to initialize database');
     } catch {
-      // Logger not available, use console
-      console.error('Failed to initialize database:', error);
+      // Logger not available, continue silently
     }
     throw error;
   }

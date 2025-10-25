@@ -1,5 +1,6 @@
 import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 
 export class WebsiteSettings {
@@ -7,17 +8,20 @@ export class WebsiteSettings {
   private _name: WebsiteName;
   private _icon: WebsiteIcon | null;
   private _socialNetworks: SocialNetwork[];
+  private _themeColor: ThemeColor;
 
   constructor(
     key: string,
     name: WebsiteName,
     icon: WebsiteIcon | null = null,
-    socialNetworks: SocialNetwork[] = []
+    socialNetworks: SocialNetwork[] = [],
+    themeColor: ThemeColor | null = null
   ) {
     this._key = key;
     this._name = name;
     this._icon = icon;
     this._socialNetworks = socialNetworks;
+    this._themeColor = themeColor || ThemeColor.createDefault();
   }
 
   get key(): string {
@@ -36,6 +40,10 @@ export class WebsiteSettings {
     return [...this._socialNetworks];
   }
 
+  get themeColor(): ThemeColor {
+    return this._themeColor;
+  }
+
   set name(newName: WebsiteName) {
     this._name = newName;
   }
@@ -48,6 +56,10 @@ export class WebsiteSettings {
     this._socialNetworks = [...newSocialNetworks];
   }
 
+  set themeColor(newThemeColor: ThemeColor) {
+    this._themeColor = newThemeColor;
+  }
+
   updateName(newName: WebsiteName): void {
     this._name = newName;
   }
@@ -58,6 +70,10 @@ export class WebsiteSettings {
 
   updateSocialNetworks(socialNetworks: SocialNetwork[]): void {
     this._socialNetworks = [...socialNetworks];
+  }
+
+  updateThemeColor(themeColor: ThemeColor): void {
+    this._themeColor = themeColor;
   }
 
   addSocialNetwork(socialNetwork: SocialNetwork): void {
@@ -86,6 +102,10 @@ export class WebsiteSettings {
     return this._icon ? this._icon.isOptimalForFavicon() : false;
   }
 
+  hasCustomThemeColor(): boolean {
+    return !this._themeColor.equals(ThemeColor.createDefault());
+  }
+
   equals(other: WebsiteSettings | null | undefined): boolean {
     if (!other) {
       return false;
@@ -101,7 +121,8 @@ export class WebsiteSettings {
       this._socialNetworks.length === other._socialNetworks.length &&
       this._socialNetworks.every((sn, index) =>
         sn.equals(other._socialNetworks[index])
-      )
+      ) &&
+      this._themeColor.equals(other._themeColor)
     );
   }
 
@@ -121,8 +142,19 @@ export class WebsiteSettings {
     key: string,
     name: WebsiteName,
     socialNetworks: SocialNetwork[],
-    icon: WebsiteIcon | null = null
+    icon: WebsiteIcon | null = null,
+    themeColor: ThemeColor | null = null
   ): WebsiteSettings {
-    return new WebsiteSettings(key, name, icon, socialNetworks);
+    return new WebsiteSettings(key, name, icon, socialNetworks, themeColor);
+  }
+
+  static createWithThemeColor(
+    key: string,
+    name: WebsiteName,
+    themeColor: ThemeColor,
+    icon: WebsiteIcon | null = null,
+    socialNetworks: SocialNetwork[] = []
+  ): WebsiteSettings {
+    return new WebsiteSettings(key, name, icon, socialNetworks, themeColor);
   }
 }

@@ -30,15 +30,13 @@ export function SocialNetworkItem({
     (e: React.MouseEvent) => {
       if (!isValidUrl) {
         e.preventDefault();
-        // Use console for client-side logging in client components
-        console.warn('Blocked navigation to unsafe URL', { url, type });
         return;
       }
 
       // Let default link behavior handle opening in new tab
       // The Link component with isExternal handles this securely
     },
-    [url, isValidUrl, type]
+    [isValidUrl]
   );
 
   // Don't render if URL is invalid

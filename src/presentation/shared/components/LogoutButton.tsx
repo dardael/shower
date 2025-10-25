@@ -13,8 +13,8 @@ export default function LogoutButton() {
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-    } catch (error) {
-      console.error('Sign out error:', error);
+    } catch {
+      // Sign out errors are handled gracefully by redirecting
     }
     router.push('/admin');
     router.refresh();

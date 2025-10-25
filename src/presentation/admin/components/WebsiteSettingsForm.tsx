@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Heading,
   Stack,
@@ -12,6 +12,10 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
+import { ThemeColorSelector } from './ThemeColorSelector';
+import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
+import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
+import { Logger } from '@/application/shared/Logger';
 
 import type {
   ImageData,
@@ -29,6 +33,7 @@ export default function WebsiteSettingsForm({
   initialName,
 }: WebsiteSettingsFormProps) {
   const [name, setName] = useState(initialName);
+  const { themeColor, setThemeColor } = useDynamicTheme();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
@@ -41,10 +46,22 @@ export default function WebsiteSettingsForm({
       if (response.ok && data.name) {
         setName(data.name);
       }
-    } catch (error) {
-      // Error will be handled by the calling component or UI
+    } catch {
+      setMessage('Failed to load website name. Please try again later.');
     }
   }, []);
+
+  const fetchThemeColor = useCallback(async () => {
+    try {
+      const response = await fetch('/api/settings');
+      const data = await response.json();
+      if (response.ok && data.themeColor) {
+        setThemeColor(data.themeColor);
+      }
+    } catch {
+      setMessage('Failed to load theme color. Please try again later.');
+    }
+  }, [setThemeColor]);
 
   const fetchWebsiteIcon = useCallback(async () => {
     try {
@@ -60,7 +77,7 @@ export default function WebsiteSettingsForm({
       } else {
         setCurrentIcon(null);
       }
-    } catch (error) {
+    } catch {
       // Error will be handled by the calling component or UI
       setCurrentIcon(null);
     }
@@ -69,7 +86,8 @@ export default function WebsiteSettingsForm({
   useEffect(() => {
     fetchWebsiteName();
     fetchWebsiteIcon();
-  }, [fetchWebsiteName, fetchWebsiteIcon]);
+    fetchThemeColor();
+  }, [fetchWebsiteName, fetchWebsiteIcon, fetchThemeColor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,14 +100,15 @@ export default function WebsiteSettingsForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, themeColor }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Website name updated successfully!');
+        setMessage('Website settings updated successfully!');
         await fetchWebsiteName();
+        await fetchThemeColor();
       } else {
         setMessage(data.error || 'Failed to update website name');
       }
@@ -218,13 +237,7 @@ export default function WebsiteSettingsForm({
           alignItems="center"
           gap={3}
         >
-          <Box
-            w="8px"
-            h="8px"
-            borderRadius="full"
-            bg="colorPalette.solid"
-            colorPalette="purple"
-          />
+          <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
           Website Settings
         </Heading>
         <Text
@@ -318,6 +331,12 @@ export default function WebsiteSettingsForm({
               formats.
             </Field.HelperText>
           </Field.Root>
+
+          <ThemeColorSelector
+            selectedColor={themeColor}
+            onColorChange={setThemeColor}
+            disabled={loading}
+          />
 
           <Box w="full">
             <SaveButton

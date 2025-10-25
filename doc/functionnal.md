@@ -142,8 +142,98 @@ The website settings interface is organized with:
 
 ---
 
+## Theme Color Configuration
+
+### Overview
+
+The admin page includes a comprehensive theme color configuration system that allows administrators to customize the visual appearance of the application. This feature provides real-time theme updates with persistent storage, enabling consistent branding across all user interface elements.
+
+### Functionality
+
+Administrators can select from eight predefined color themes that instantly transform the entire application's visual appearance:
+
+- **Blue** (default) - Professional and trustworthy
+- **Red** - Bold and attention-grabbing
+- **Green** - Fresh and success-oriented
+- **Purple** - Creative and sophisticated
+- **Orange** - Energetic and warm
+- **Teal** - Modern and calming
+- **Pink** - Playful and friendly
+- **Cyan** - Clean and technical
+
+### Features
+
+1. **Visual Color Selector**
+   - Intuitive grid layout displaying all available color options
+   - Visual color swatches with clear labeling
+   - Selected color is highlighted for easy identification
+   - Helper text explaining the purpose of theme selection
+
+2. **Real-time Updates**
+   - Theme changes apply immediately without page refresh
+   - All UI components update instantly (buttons, forms, accents)
+   - Smooth transitions between color themes
+   - Consistent color application across entire application
+
+3. **Persistent Storage**
+   - Selected theme color is saved to database
+   - Theme preference persists after page refresh
+   - Settings survive browser sessions and restarts
+   - Automatic theme loading on page initialization
+
+4. **Global Application**
+   - Theme affects all Chakra UI components system-wide
+   - Save buttons, login buttons, and form elements use selected color
+   - Consistent color palette across admin and public pages
+   - Proper integration with dark mode functionality
+
+### User Interface
+
+#### Theme Color Selector Layout
+
+- **Color Grid**: 2x4 grid layout displaying all color options
+- **Visual Swatches**: Each color shown as a clickable circular button
+- **Selection Indicator**: Selected color has distinct visual highlighting
+- **Accessibility**: Clear labels and keyboard navigation support
+- **Responsive Design**: Adapts to different screen sizes
+
+#### Integration with Settings
+
+- **Grouped Controls**: Theme color selector grouped with other website settings
+- **Single Save Action**: Theme changes saved along with other settings
+- **Visual Feedback**: Success messages confirm theme updates
+- **Error Handling**: Clear error messages for failed updates
+
+### Workflow
+
+1. **Select Theme Color**
+   - Navigate to admin page `/admin`
+   - Locate "Theme Color" section in website settings
+   - Click on desired color swatch from the available options
+   - Observe immediate visual changes across the interface
+
+2. **Save Changes**
+   - Click "Update Website" button to persist theme selection
+   - Wait for success confirmation message
+   - Theme color is now saved and will persist across sessions
+
+3. **Verify Persistence**
+   - Refresh the page or close and reopen browser
+   - Navigate back to admin page
+   - Confirm that selected theme color is still active
+
+### Technical Benefits
+
+- **User Experience**: Personalized interface matching brand preferences
+- **Accessibility**: Proper color contrast and semantic tokens
+- **Performance**: Optimized theme system with no performance impact
+- **Consistency**: Unified color scheme across all components
+- **Flexibility**: Easy switching between different visual themes
+
+---
+
 ## Summary
 
-The admin page provides a secure and intuitive interface for managing website settings. Administrators can easily update the website name and upload a custom icon to enhance branding across the application. The icon management system ensures efficient file handling with automatic cleanup and preview functionality, while maintaining a clean and organized user experience.
+The admin page provides a secure and intuitive interface for managing website settings. Administrators can easily update the website name, upload a custom icon, and configure theme colors to enhance branding across the application. The icon management system ensures efficient file handling with automatic cleanup and preview functionality, while the theme color system provides real-time visual customization with persistent storage.
 
 The admin page remains protected through Google OAuth authentication and email-based authorization, ensuring that only authorized personnel can access and modify these critical website settings.

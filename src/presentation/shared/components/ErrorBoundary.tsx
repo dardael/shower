@@ -32,10 +32,7 @@ export class ErrorBoundary extends React.Component<
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({ error, errorInfo });
 
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
-    }
+    // In development, errors are displayed in the UI for debugging
 
     // Call custom error handler if provided
     if (this.props.onError) {
@@ -125,7 +122,7 @@ function DefaultErrorFallback({ error, reset }: DefaultErrorFallbackProps) {
           </Box>
         )}
 
-        <Button onClick={reset} colorPalette="blue" size="md">
+        <Button onClick={reset} size="md">
           Try Again
         </Button>
       </VStack>

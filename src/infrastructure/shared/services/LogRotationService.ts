@@ -241,8 +241,7 @@ export class LogRotationService {
       const logger = container.resolve<ILogger>('ILogger');
       logger.logInfo(`[LogRotation] ${message}`, metadata);
     } catch {
-      // Fallback to console if logger is not available
-      console.info(`[LogRotation] ${message}`, metadata);
+      // Logger not available, continue silently
     }
   }
 
@@ -251,8 +250,7 @@ export class LogRotationService {
       const logger = container.resolve<ILogger>('ILogger');
       logger.logError(`[LogRotation] ${message}`, metadata);
     } catch {
-      // Fallback to console if logger is not available
-      console.error(`[LogRotation] ${message}`, metadata);
+      // Logger not available, continue silently
     }
   }
 

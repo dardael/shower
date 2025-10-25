@@ -86,6 +86,7 @@ export class AsyncFileLoggerAdapter implements ILogger {
     try {
       this.currentLogLevel = LogLevel.fromString(envLevel);
     } catch {
+      // Critical: Logger initialization failed, use console as last resort
       console.warn(`Invalid log level: ${envLevel}. Using default 'info'.`);
       this.currentLogLevel = LogLevel.INFO;
     }
@@ -176,6 +177,7 @@ export class AsyncFileLoggerAdapter implements ILogger {
   }
 
   private handleFlushError(error: unknown): void {
+    // Critical: Logger flush failed, use console as last resort
     console.error('Logger flush error:', error);
 
     // Fallback to console if file logging fails repeatedly
@@ -195,6 +197,7 @@ export class AsyncFileLoggerAdapter implements ILogger {
   }
 
   private handleCriticalError(message: string, error: Error): void {
+    // Critical: Logger system failure, use console as last resort
     console.error(`[CRITICAL] ${message}:`, error);
     // In production, you might want to send this to an error monitoring service
   }
