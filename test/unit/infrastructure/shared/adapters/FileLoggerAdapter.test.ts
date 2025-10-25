@@ -25,9 +25,7 @@ describe('FileLoggerAdapter', () => {
     formatter = new LogFormatterService();
   });
 
-  // TODO: Fix this test - it's failing due to test setup changes but is unrelated to social networks footer
-  // Skipping temporarily to unblock PR
-  it.skip('should log info message when level is allowed', () => {
+  it('should log info message when level is allowed', () => {
     process.env.LOG_LEVEL = 'info';
     process.env.LOG_FOLDER = './logs';
     adapter = new FileLoggerAdapter(formatter);
