@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NextResponse } from 'next/server';
 import { SettingsServiceLocator } from '@/infrastructure/container';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';

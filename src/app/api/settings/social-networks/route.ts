@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';

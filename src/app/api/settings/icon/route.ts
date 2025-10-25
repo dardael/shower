@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/infrastructure/auth/BetterAuthInstance';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';

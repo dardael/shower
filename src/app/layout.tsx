@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { initializeDatabase } from '@/infrastructure/shared/databaseInitialization';
 import { Provider } from '@/presentation/shared/components/ui/provider';
+import { SocialNetworksFooterContainer } from '@/presentation/shared/components/SocialNetworksFooter';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 
@@ -104,7 +105,10 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <SocialNetworksFooterContainer />
+        </Provider>
       </body>
     </html>
   );

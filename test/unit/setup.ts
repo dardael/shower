@@ -57,6 +57,7 @@ const chakraStyleProps = [
   'borderRadius',
   'borderWidth',
   'borderStyle',
+  'borderTopWidth',
   'textAlign',
   'alignItems',
   'justifyContent',
@@ -65,6 +66,8 @@ const chakraStyleProps = [
   'color',
   'p',
   'm',
+  'py',
+  'px',
   'gap',
   'width',
   'height',
@@ -73,11 +76,22 @@ const chakraStyleProps = [
   'overflow',
   'cursor',
   '_hover',
+  '_focusVisible',
   'zIndex',
   'fit',
   'fontSize',
   'fontWeight',
   'variant',
+  'size',
+  'minW',
+  'maxW',
+  'textDecoration',
+  'transition',
+  'ring',
+  'ringColor',
+  'ringOffset',
+  'truncate',
+  'justifyItems',
 ];
 
 // Filter out only Chakra UI style props to avoid DOM warnings, but keep event handlers
@@ -116,11 +130,17 @@ jest.mock('@chakra-ui/react', () => {
     VStack: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },
+    SimpleGrid: ({ children, ...props }: ComponentProps) => {
+      return React.createElement('div', filterChakraProps(props), children);
+    },
     Box: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },
     Button: ({ children, ...props }: ComponentProps) => {
       return React.createElement('button', filterChakraProps(props), children);
+    },
+    Link: ({ children, ...props }: ComponentProps) => {
+      return React.createElement('a', filterChakraProps(props), children);
     },
     Input: ({ ...props }: InputProps) =>
       React.createElement('input', filterChakraProps(props)),
@@ -145,7 +165,12 @@ jest.mock('@chakra-ui/react', () => {
     Spinner: ({ ...props }: ComponentProps) =>
       React.createElement(
         'div',
-        { 'data-testid': 'spinner', ...filterChakraProps(props) },
+        {
+          'data-testid': 'spinner',
+          role: 'status',
+          'aria-label': 'Loading...',
+          ...filterChakraProps(props),
+        },
         'Loading...'
       ),
     createToaster: jest.fn(() => ({

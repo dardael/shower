@@ -18,12 +18,14 @@ import type { IUpdateWebsiteIcon } from '@/application/settings/IUpdateWebsiteIc
 import type { IGetWebsiteIcon } from '@/application/settings/IGetWebsiteIcon';
 import type { IGetSocialNetworks } from '@/application/settings/IGetSocialNetworks';
 import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocialNetworks';
+import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
 import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
 import { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
+import { GetConfiguredSocialNetworks } from '@/application/settings/GetConfiguredSocialNetworks';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -94,6 +96,13 @@ container.register<IUpdateSocialNetworks>('IUpdateSocialNetworks', {
   useClass: UpdateSocialNetworks,
 });
 
+container.register<IGetConfiguredSocialNetworks>(
+  'IGetConfiguredSocialNetworks',
+  {
+    useClass: GetConfiguredSocialNetworks,
+  }
+);
+
 // Register factory services
 container.register<SocialNetworkFactory>('SocialNetworkFactory', {
   useClass: SocialNetworkFactory,
@@ -151,6 +160,10 @@ export class SettingsServiceLocator {
 
   static getUpdateSocialNetworks(): IUpdateSocialNetworks {
     return container.resolve('IUpdateSocialNetworks');
+  }
+
+  static getConfiguredSocialNetworks(): IGetConfiguredSocialNetworks {
+    return container.resolve('IGetConfiguredSocialNetworks');
   }
 }
 
