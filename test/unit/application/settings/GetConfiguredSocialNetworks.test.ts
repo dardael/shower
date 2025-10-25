@@ -27,6 +27,7 @@ describe('GetConfiguredSocialNetworks', () => {
       logSecurity: jest.fn(),
       logUserAction: jest.fn(),
       logBusinessEvent: jest.fn(),
+      logSystemEvent: jest.fn(),
       startTimer: jest.fn(),
       endTimer: jest.fn(),
       measure: jest.fn(),
@@ -35,8 +36,11 @@ describe('GetConfiguredSocialNetworks', () => {
       batch: jest.fn(),
       withContext: jest.fn().mockReturnThis(),
       execute: jest.fn(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+      child: jest.fn(),
+      getPerformanceMonitor: jest.fn(),
+      getPerformanceStatistics: jest.fn(),
+      setPerformanceThreshold: jest.fn(),
+    } as unknown as jest.Mocked<Logger>;
 
     getConfiguredSocialNetworks = new GetConfiguredSocialNetworks(
       mockRepository,
