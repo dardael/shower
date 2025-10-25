@@ -58,18 +58,9 @@ export function SocialNetworkItem({
     >
       <VStack
         gap={2}
-        p={4}
-        bg="bg.canvas"
-        borderRadius="lg"
-        borderWidth="1px"
-        borderColor="border"
-        minW={{ base: '80px', md: '100px' }}
         textAlign="center"
+        minW={{ base: '80px', md: '100px' }}
         transition="none" // Explicitly disable transitions per project constraints
-        _hover={{
-          bg: 'bg.muted',
-          borderColor: 'border.emphasized',
-        }}
         _focusVisible={{
           ring: '2px',
           ringColor: 'colorPalette.solid',
