@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateRequest } from '@/infrastructure/auth/ApiAuthentication';
 import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
@@ -49,6 +49,11 @@ export async function PUT(request: NextRequest) {
   );
 
   try {
+    // Check authentication
+    const authResult = await authenticateRequest(request);
+    if (authResult) {
+      return authResult;
+    }
     const body = await request.json();
 
     logger.info('Processing social networks update request');

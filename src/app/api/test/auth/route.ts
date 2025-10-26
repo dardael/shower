@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
