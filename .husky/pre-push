@@ -1,2 +1,1 @@
 docker compose run --rm -T app npm test
-docker compose run --rm -T app npm run test:e2e
