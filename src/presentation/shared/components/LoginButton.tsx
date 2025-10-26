@@ -24,7 +24,6 @@ export default function LoginButton() {
       onClick={handleSignIn}
       loading={isLoading}
       loadingText="Connecting..."
-      colorPalette="blue"
       variant="surface"
       size="lg"
       width="full"

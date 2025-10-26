@@ -75,7 +75,6 @@ export default function AdminDashboard({
                 h="12px"
                 borderRadius="full"
                 bg="colorPalette.solid"
-                colorPalette="blue"
               />
               <Text
                 fontSize={{ base: 'md', md: 'lg' }}

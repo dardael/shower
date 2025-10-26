@@ -1,4 +1,17 @@
 import 'reflect-metadata';
+
+// Safeguard to ensure reflect-metadata is properly initialized across all module contexts
+// This addresses potential timing issues in Next.js API route module loading
+if (typeof Reflect.hasMetadata !== 'function') {
+  try {
+    // Attempt dynamic import if metadata system isn't properly initialized
+    void import('reflect-metadata');
+  } catch {
+    // Fallback - continue without metadata if import fails
+    // This should not happen in normal circumstances
+  }
+}
+
 import { container } from 'tsyringe';
 import type { AdminAccessPolicyService } from '@/domain/auth/services/AdminAccessPolicyService';
 import type { IBetterAuthClientService } from '@/application/auth/services/IBetterAuthClientService';
@@ -19,6 +32,8 @@ import type { IGetWebsiteIcon } from '@/application/settings/IGetWebsiteIcon';
 import type { IGetSocialNetworks } from '@/application/settings/IGetSocialNetworks';
 import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocialNetworks';
 import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
+import type { IGetThemeColor } from '@/application/settings/IGetThemeColor';
+import type { IUpdateThemeColor } from '@/application/settings/IUpdateThemeColor';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -26,6 +41,8 @@ import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
 import { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
 import { GetConfiguredSocialNetworks } from '@/application/settings/GetConfiguredSocialNetworks';
+import { GetThemeColor } from '@/application/settings/GetThemeColor';
+import { UpdateThemeColor } from '@/application/settings/UpdateThemeColor';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -103,6 +120,14 @@ container.register<IGetConfiguredSocialNetworks>(
   }
 );
 
+container.register<IGetThemeColor>('IGetThemeColor', {
+  useClass: GetThemeColor,
+});
+
+container.register<IUpdateThemeColor>('IUpdateThemeColor', {
+  useClass: UpdateThemeColor,
+});
+
 // Register factory services
 container.register<SocialNetworkFactory>('SocialNetworkFactory', {
   useClass: SocialNetworkFactory,
@@ -164,6 +189,14 @@ export class SettingsServiceLocator {
 
   static getConfiguredSocialNetworks(): IGetConfiguredSocialNetworks {
     return container.resolve('IGetConfiguredSocialNetworks');
+  }
+
+  static getGetThemeColor(): IGetThemeColor {
+    return container.resolve('IGetThemeColor');
+  }
+
+  static getUpdateThemeColor(): IUpdateThemeColor {
+    return container.resolve('IUpdateThemeColor');
   }
 }
 

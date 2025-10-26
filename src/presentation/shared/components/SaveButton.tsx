@@ -27,7 +27,6 @@ export default function SaveButton({
       disabled={disabled || isLoading}
       loading={isLoading}
       loadingText={loadingText}
-      colorPalette="blue"
       variant="solid"
       size={{ base: 'md', md: 'lg' }}
       width={width}

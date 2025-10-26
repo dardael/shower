@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { SocialNetworkSchema, type ISocialNetwork } from './SocialNetworkModel';
+import { THEME_COLOR_PALETTE } from '@/domain/settings/constants/ThemeColorPalette';
 
 export interface IIconMetadata {
   filename: string;
@@ -18,6 +19,7 @@ export interface IWebsiteSettings extends Document {
     metadata: IIconMetadata;
   } | null;
   socialNetworks: ISocialNetwork[];
+  themeColor: string;
 }
 
 const IconMetadataSchema = new Schema<IIconMetadata>(
@@ -118,6 +120,20 @@ const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
     socialNetworks: {
       type: [SocialNetworkSchema],
       default: [],
+    },
+    themeColor: {
+      type: String,
+      required: true,
+      default: 'blue',
+      enum: THEME_COLOR_PALETTE,
+      validate: {
+        validator: (value: string) => {
+          return THEME_COLOR_PALETTE.includes(
+            value as (typeof THEME_COLOR_PALETTE)[number]
+          );
+        },
+        message: `Theme color must be one of: ${THEME_COLOR_PALETTE.join(', ')}`,
+      },
     },
   },
   {

@@ -12,6 +12,8 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
+import { ThemeColorSelector } from './ThemeColorSelector';
+import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 
 import type {
   ImageData,
@@ -29,47 +31,56 @@ export default function WebsiteSettingsForm({
   initialName,
 }: WebsiteSettingsFormProps) {
   const [name, setName] = useState(initialName);
+  const { themeColor, setThemeColor } = useDynamicTheme();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
 
-  const fetchWebsiteName = useCallback(async () => {
+  const fetchWebsiteSettings = useCallback(async () => {
     try {
-      const response = await fetch('/api/settings/name');
-      const data = await response.json();
-      if (response.ok && data.name) {
-        setName(data.name);
-      }
-    } catch {
-      // Error will be handled by the calling component or UI
-    }
-  }, []);
+      // Fetch all settings in parallel for better performance
+      const [settingsResponse, iconResponse] = await Promise.all([
+        fetch('/api/settings'),
+        fetch('/api/settings/icon'),
+      ]);
 
-  const fetchWebsiteIcon = useCallback(async () => {
-    try {
-      const response = await fetch('/api/settings/icon');
-      const data = await response.json();
-      if (response.ok && data.icon) {
-        setCurrentIcon({
-          url: data.icon.url,
-          filename: data.icon.filename,
-          size: data.icon.size,
-          format: data.icon.format,
-        });
+      // Handle website settings (name and theme color)
+      if (settingsResponse.ok) {
+        const settingsData = await settingsResponse.json();
+        if (settingsData.name) {
+          setName(settingsData.name);
+        }
+        if (settingsData.themeColor) {
+          setThemeColor(settingsData.themeColor);
+        }
+      }
+
+      // Handle icon data
+      if (iconResponse.ok) {
+        const iconData = await iconResponse.json();
+        if (iconData.icon) {
+          setCurrentIcon({
+            url: iconData.icon.url,
+            filename: iconData.icon.filename,
+            size: iconData.icon.size,
+            format: iconData.icon.format,
+          });
+        } else {
+          setCurrentIcon(null);
+        }
       } else {
         setCurrentIcon(null);
       }
     } catch {
-      // Error will be handled by the calling component or UI
+      setMessage('Failed to load website settings. Please try again later.');
       setCurrentIcon(null);
     }
-  }, []);
+  }, [setThemeColor]);
 
   useEffect(() => {
-    fetchWebsiteName();
-    fetchWebsiteIcon();
-  }, [fetchWebsiteName, fetchWebsiteIcon]);
+    fetchWebsiteSettings();
+  }, [fetchWebsiteSettings]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,14 +93,14 @@ export default function WebsiteSettingsForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, themeColor }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Website name updated successfully!');
-        await fetchWebsiteName();
+        setMessage('Website settings updated successfully!');
+        await fetchWebsiteSettings();
       } else {
         setMessage(data.error || 'Failed to update website name');
       }
@@ -218,13 +229,7 @@ export default function WebsiteSettingsForm({
           alignItems="center"
           gap={3}
         >
-          <Box
-            w="8px"
-            h="8px"
-            borderRadius="full"
-            bg="colorPalette.solid"
-            colorPalette="purple"
-          />
+          <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
           Website Settings
         </Heading>
         <Text
@@ -318,6 +323,12 @@ export default function WebsiteSettingsForm({
               formats.
             </Field.HelperText>
           </Field.Root>
+
+          <ThemeColorSelector
+            selectedColor={themeColor}
+            onColorChange={setThemeColor}
+            disabled={loading}
+          />
 
           <Box w="full">
             <SaveButton

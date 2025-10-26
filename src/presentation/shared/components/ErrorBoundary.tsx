@@ -122,7 +122,7 @@ function DefaultErrorFallback({ error, reset }: DefaultErrorFallbackProps) {
           </Box>
         )}
 
-        <Button onClick={reset} colorPalette="blue" size="md">
+        <Button onClick={reset} size="md">
           Try Again
         </Button>
       </VStack>

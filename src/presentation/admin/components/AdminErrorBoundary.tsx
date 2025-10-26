@@ -64,7 +64,7 @@ function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
         )}
 
         <VStack gap={3} w="full" maxW="sm">
-          <Button onClick={reset} colorPalette="blue" size="md" w="full">
+          <Button onClick={reset} size="md" w="full">
             Try Again
           </Button>
           <Button

@@ -1,7 +1,7 @@
 import {
   SOCIAL_NETWORK_CONFIG,
   SocialNetworkType,
-} from '../constants/SocialNetworkConfig';
+} from '@/domain/settings/constants/SocialNetworkConfig';
 
 // Re-export for backward compatibility
 export { SocialNetworkType };
