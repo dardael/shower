@@ -3,6 +3,11 @@
   "instructions": [".opencode/rules/*/*.mdc"],
   "model": "zai-coding-plan/glm-4.6",
   "mcp": {
+    "browsermcp": {
+      "type": "local",
+      "enabled": true,
+      "command": ["npx", "@browsermcp/mcp@latest"]
+    },
     "github": {
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
