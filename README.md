@@ -100,6 +100,8 @@ The `/admin` page is protected and requires Google authentication. Only users wi
 
 This application features a comprehensive, production-grade logging system that provides structured, performant, and maintainable logging across all application layers.
 
+**⚠️ Important**: This logging system is designed for **single-instance deployments only**. Rate limiting and log storage are handled in-memory and on local filesystem.
+
 ### Key Features
 
 - **Async Buffered Logging**: Prevents event loop blocking with configurable buffers
@@ -224,7 +226,45 @@ LOG_DELETE_COMPRESSED_OLDER_THAN=90  # Delete compressed files older than (days)
 
 # Development settings
 LOG_STACK_TRACE=false                # Include stack traces in development
+
+# Rate limiting configuration (for /api/logs endpoint)
+RATE_LIMIT_WINDOW_MS=60000          # Rate limit time window in milliseconds (1 minute)
+RATE_LIMIT_MAX_REQUESTS=100          # Max requests per window per IP
 ```
+
+## Deployment Considerations
+
+### Single Instance Limitation
+
+**⚠️ Important**: This logging system is designed for **single-instance deployments only**.
+
+#### What this means:
+
+- **Rate limiting** is handled in-memory and resets on server restart
+- **Log storage** is on local filesystem of each instance
+- **No shared state** between multiple server instances
+- **Not suitable** for multi-instance or distributed deployments
+
+#### Suitable for:
+
+- Development environments
+- Single-server production deployments
+- Small to medium applications with single instance
+- Applications where simple logging is sufficient
+
+#### Not suitable for:
+
+- Multi-instance production deployments
+- Distributed systems with load balancing
+- High-availability applications requiring shared logging
+- Applications needing centralized log aggregation
+
+#### Alternatives for multi-instance deployments:
+
+- Implement centralized logging services (ELK stack, Splunk, etc.)
+- Use external log aggregation services
+- Implement distributed tracing systems
+- Consider cloud provider logging solutions
 
 ## Testing
 

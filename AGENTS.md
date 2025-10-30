@@ -7,7 +7,7 @@ This project aims to create a robust, scalable, and maintainable web application
 - It's designed to allow the user to create it's showcase website in a simple and efficient way.
 - The is an admin screen protected by authentication, and a public screen to display the showcase.
 - The user can create it's pages, add sections to the pages, and customize the sections with different components.
-- The user can also manage the website settings, such as the theme, the navigation, and the footer.
+- The user can also manage the website settings, such as the theme color, navigation, and footer.
 
 ## Nextjs
 
@@ -55,6 +55,7 @@ shower/
 │   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
 │   │   │   │   ├── NotAuthorized.tsx     -> Not authorized component
 │   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
+│   │   │   │   ├── ThemeColorSelector.tsx -> Theme color selector component
 │   │   │   │   └── WebsiteSettingsForm.tsx -> Website settings form
 │   │   │   └── hooks/
 │   │   │       └── useSocialNetworksForm.ts -> Hook for social networks form
@@ -74,6 +75,7 @@ shower/
 │   │       │   ├── LogoutButton.tsx    -> Logout button component
 │   │       │   └── SaveButton.tsx      -> Save button component
 │   │       └── theme.ts                -> Chakra UI theme configuration
+│   │   └── DynamicThemeProvider.tsx -> Dynamic theme provider component
 │   ├── domain/               # Domain Layer (entities, business rules)
 │   │   ├── auth/
 │   │   │   ├── entities/
@@ -84,7 +86,8 @@ shower/
 │   │   │       └── AdminAccessPolicy.ts -> Value object for admin access policy
 │   │   ├── settings/
 │   │   │   ├── constants/
-│   │   │   │   └── SocialNetworkConfig.ts -> Social network configuration constants
+│   │   │   │   ├── SocialNetworkConfig.ts -> Social network configuration constants
+│   │   │   │   └── ThemeColorPalette.ts -> Theme color palette constants
 │   │   │   ├── entities/
 │   │   │   │   ├── SocialNetwork.ts   -> Social network entity
 │   │   │   │   └── WebsiteSettings.ts -> Website settings entity
@@ -97,6 +100,7 @@ shower/
 │   │   │       ├── SocialNetworkLabel.ts -> Social network label value object
 │   │   │       ├── SocialNetworkType.ts -> Social network type value object
 │   │   │       ├── SocialNetworkUrl.ts -> Social network URL value object
+│   │   │       ├── ThemeColor.ts -> Theme color value object
 │   │   │       ├── WebsiteIcon.ts -> Website icon value object
 │   │   │       └── WebsiteName.ts -> Website name value object
 │   │   └── shared/
@@ -113,16 +117,20 @@ shower/
 │   │   │   └── IAuthorizeAdminAccess.ts -> Interface for AuthorizeAdminAccess use case
 │   │   ├── settings/
 │   │   │   ├── GetSocialNetworks.ts -> Use case for getting social networks
+│   │   │   ├── GetThemeColor.ts -> Use case for getting theme color
 │   │   │   ├── GetWebsiteIcon.ts -> Use case for getting website icon
 │   │   │   ├── GetWebsiteName.ts -> Use case for getting website name
 │   │   │   ├── IGetSocialNetworks.ts -> Interface for GetSocialNetworks use case
+│   │   │   ├── IGetThemeColor.ts -> Interface for GetThemeColor use case
 │   │   │   ├── IGetWebsiteIcon.ts -> Interface for GetWebsiteIcon use case
 │   │   │   ├── IGetWebsiteName.ts -> Interface for GetWebsiteName use case
 │   │   │   ├── IUpdateSocialNetworks.ts -> Interface for UpdateSocialNetworks use case
+│   │   │   ├── IUpdateThemeColor.ts -> Interface for UpdateThemeColor use case
 │   │   │   ├── IUpdateWebsiteIcon.ts -> Interface for UpdateWebsiteIcon use case
 │   │   │   ├── IUpdateWebsiteName.ts -> Interface for UpdateWebsiteName use case
 │   │   │   ├── SocialNetworkFactory.ts -> Factory for creating social networks
 │   │   │   ├── UpdateSocialNetworks.ts -> Use case for updating social networks
+│   │   │   ├── UpdateThemeColor.ts -> Use case for updating theme color
 │   │   │   ├── UpdateWebsiteIcon.ts -> Use case for updating website icon
 │   │   │   └── UpdateWebsiteName.ts -> Use case for updating website name
 │   │   └── shared/
@@ -162,7 +170,8 @@ shower/
 │   │   ├── admin/
 │   │   │   ├── admin-page.spec.ts -> Admin page e2e tests
 │   │   │   ├── icon-management.spec.ts -> Icon management e2e tests
-│   │   │   └── social-networks-management.spec.ts -> Social networks management e2e tests
+│   │   │   ├── social-networks-management.spec.ts -> Social networks management e2e tests
+│   │   │   └── theme-color-management.spec.ts -> Theme color management e2e tests
 │   │   ├── fixtures/
 │   │   │   ├── authHelpers.ts -> Authentication test helpers
 │   │   │   └── test-database.ts -> Test database setup
@@ -174,9 +183,11 @@ shower/
 │   │   │   │   └── AuthorizeAdminAccess.test.ts -> Admin access authorization tests
 │   │   │   ├── settings/
 │   │   │   │   ├── GetSocialNetworks.test.ts -> Get social networks tests
+│   │   │   │   ├── GetThemeColor.test.ts -> Get theme color tests
 │   │   │   │   ├── GetWebsiteIcon.test.ts -> Get website icon tests
 │   │   │   │   ├── GetWebsiteName.test.ts -> Get website name tests
 │   │   │   │   ├── UpdateSocialNetworks.test.ts -> Update social networks tests
+│   │   │   │   ├── UpdateThemeColor.test.ts -> Update theme color tests
 │   │   │   │   ├── UpdateWebsiteIcon.test.ts -> Update website icon tests
 │   │   │   │   └── UpdateWebsiteName.test.ts -> Update website name tests
 │   │   │   └── shared/
@@ -197,6 +208,7 @@ shower/
 │   │   │   │       ├── SocialNetworkLabel.test.ts -> Social network label tests
 │   │   │   │       ├── SocialNetworkType.test.ts -> Social network type tests
 │   │   │   │       ├── SocialNetworkUrl.test.ts -> Social network URL tests
+│   │   │   │       ├── ThemeColor.test.ts -> Theme color value object tests
 │   │   │   │       ├── WebsiteIcon.test.ts -> Website icon tests
 │   │   │   │       └── WebsiteName.test.ts -> Website name tests
 │   │   │   └── shared/
@@ -223,7 +235,8 @@ shower/
 │   │   │       └── components/
 │   │   │           ├── ImageManager/
 │   │   │           │   └── ImageManager.test.tsx -> Image manager component tests
-│   │   │           └── DarkModeToggle.test.tsx -> Dark mode toggle tests
+│   │   │           ├── DarkModeToggle.test.tsx -> Dark mode toggle tests
+│   │   │           └── ThemeColorSelector.test.tsx -> Theme color selector component tests
 │   │   ├── jest-globals.d.ts -> Jest global type definitions
 │   │   ├── setup.ts -> Unit test setup
 │   │   ├── tsconfig.json -> Unit test TypeScript configuration

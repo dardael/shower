@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import '@testing-library/jest-dom';
 import React from 'react';
+import { container } from 'tsyringe';
+import { Logger } from '@/application/shared/Logger';
+import type { ILogger } from '@/application/shared/ILogger';
 
 // Increase EventEmitter max listeners to prevent memory leak warnings
 process.setMaxListeners(50);
@@ -182,9 +185,67 @@ jest.mock('@chakra-ui/react', () => {
 });
 
 // Mock next/navigation
+
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
     refresh: jest.fn(),
   }),
 }));
+
+// Mock problematic ES modules that cause Jest issues
+jest.mock(
+  '@noble/ciphers/chacha',
+  () => ({
+    createCipher: jest.fn(),
+    createPRG: jest.fn(),
+    rotl: jest.fn(),
+  }),
+  { virtual: true }
+);
+
+// Mock better-auth to prevent ES module issues
+jest.mock(
+  'better-auth',
+  () => ({
+    betterAuth: jest.fn(() => ({
+      handler: jest.fn(),
+      $Infer: {},
+    })),
+  }),
+  { virtual: true }
+);
+
+jest.mock(
+  'better-auth/adapters/mongodb',
+  () => ({
+    mongodbAdapter: jest.fn(() => ({})),
+  }),
+  { virtual: true }
+);
+
+// Register Logger for tests
+beforeAll(() => {
+  // Mock ILogger for tests
+  const mockILogger: ILogger = {
+    logDebug: jest.fn(),
+    logInfo: jest.fn(),
+    logWarning: jest.fn(),
+    logError: jest.fn(),
+  };
+
+  // Register mock ILogger
+  container.register<ILogger>('ILogger', {
+    useValue: mockILogger,
+  });
+
+  // Register Logger using the mock
+  container.register<Logger>('Logger', {
+    useFactory: () => new Logger(mockILogger),
+  });
+});
+
+// Clean up container after tests
+afterAll(() => {
+  container.clearInstances();
+});

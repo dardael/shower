@@ -3,7 +3,6 @@ import type { SocialNetworkRepository } from '@/domain/settings/repositories/Soc
 import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocialNetworks';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
-import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import { Logger } from '@/application/shared/Logger';
 
 @injectable()

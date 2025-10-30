@@ -34,7 +34,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # logging
-logs/
+/logs/
 test-log/
 test-logs/
 *.log

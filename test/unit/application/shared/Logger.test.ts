@@ -79,7 +79,7 @@ describe('Logger', () => {
   describe('logError', () => {
     it('should handle Error instances correctly', () => {
       const error = new Error('Test error');
-      logger.logError(error, 'Custom message', { context: 'test' });
+      logger.logErrorWithObject(error, 'Custom message', { context: 'test' });
 
       expect(mockLogger.logError).toHaveBeenCalledWith('Custom message', {
         context: 'test',
@@ -93,7 +93,7 @@ describe('Logger', () => {
     });
 
     it('should handle string errors correctly', () => {
-      logger.logError('String error', 'Custom message');
+      logger.logErrorWithObject('String error', 'Custom message');
 
       expect(mockLogger.logError).toHaveBeenCalledWith('Custom message', {
         error: {
@@ -106,7 +106,7 @@ describe('Logger', () => {
     });
 
     it('should handle number errors correctly', () => {
-      logger.logError(404, 'HTTP error');
+      logger.logErrorWithObject(404, 'HTTP error');
 
       expect(mockLogger.logError).toHaveBeenCalledWith('HTTP error', {
         error: {
@@ -123,7 +123,7 @@ describe('Logger', () => {
         code: 'VALIDATION_ERROR',
         details: 'Invalid input',
       };
-      logger.logError(objectError, 'Validation failed');
+      logger.logErrorWithObject(objectError, 'Validation failed');
 
       expect(mockLogger.logError).toHaveBeenCalledWith('Validation failed', {
         error: {
@@ -136,7 +136,7 @@ describe('Logger', () => {
     });
 
     it('should handle null errors correctly', () => {
-      logger.logError(null, 'Null error');
+      logger.logErrorWithObject(null, 'Null error');
 
       expect(mockLogger.logError).toHaveBeenCalledWith('Null error', {
         error: {
@@ -149,7 +149,7 @@ describe('Logger', () => {
     });
 
     it('should handle undefined errors correctly', () => {
-      logger.logError(undefined, 'Undefined error');
+      logger.logErrorWithObject(undefined, 'Undefined error');
 
       expect(mockLogger.logError).toHaveBeenCalledWith('Undefined error', {
         error: {
@@ -163,7 +163,7 @@ describe('Logger', () => {
 
     it('should use error message as default when no custom message provided', () => {
       const error = new Error('Default error message');
-      logger.logError(error);
+      logger.logErrorWithObject(error);
 
       expect(mockLogger.logError).toHaveBeenCalledWith(
         'Default error message',
@@ -187,7 +187,7 @@ describe('Logger', () => {
       }
 
       const customError = new CustomError('Custom error message');
-      logger.logError(customError, 'Custom error occurred');
+      logger.logErrorWithObject(customError, 'Custom error occurred');
 
       expect(mockLogger.logError).toHaveBeenCalledWith(
         'Custom error occurred',

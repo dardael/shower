@@ -22,5 +22,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/test/unit/setup.ts'],
-  transformIgnorePatterns: ['node_modules/(?!(nanostores|better-auth)/)'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(better-auth|@better-auth|@noble|@noble/ciphers|nanostores)/)',
+  ],
 };

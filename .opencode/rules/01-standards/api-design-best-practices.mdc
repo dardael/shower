@@ -1,0 +1,75 @@
+---
+description: Establish comprehensive API design standards ensuring consistency, performance, backward compatibility, and security across all REST API endpoints in Next.js applications.
+globs: src/app/api/**/*.ts
+alwaysApply: true
+---
+
+Sub rule 1: API Structure and Organization
+- Use RESTful conventions: GET for retrieval, POST for creation, PUT for updates, DELETE for removal
+- Organize endpoints by resource hierarchy: `/api/settings`, `/api/settings/theme-color`, `/api/settings/icon`
+- Use descriptive endpoint names that clearly indicate the resource and operation
+- Group related endpoints under common resource paths for logical organization
+- Maintain consistent URL patterns across all API routes
+
+Sub rule 2: Request and Response Formats
+- Use consistent JSON request/response format across all endpoints
+- Include success messages in responses for POST/PUT operations: `{ "message": "Operation successful" }`
+- Use standard error format: `{ "error": "Error description" }`
+- Include relevant data in responses: `{ "data": {}, "message": "Success" }`
+- Use HTTP status codes appropriately: 200 for success, 400 for client errors, 401 for auth, 500 for server errors
+
+Sub rule 3: Backward Compatibility
+- Never make breaking changes to existing API endpoints
+- Add new optional fields to responses instead of changing existing structure
+- Use conditional object spreading for optional fields: `{ ...(optionalField && { optionalField }) }`
+- Maintain existing parameter names and types when extending functionality
+- Ensure existing API consumers continue to work without modifications
+
+Sub rule 4: Performance Optimization
+- Use static imports instead of dynamic imports for security and performance
+- Implement parallel data fetching with Promise.all for multiple related operations
+- Use appropriate caching strategies: `cache: 'no-store'` for fresh data, default for cacheable data
+- Minimize API calls by consolidating related data in single endpoints when appropriate
+- Implement proper database connection management and query optimization
+
+Sub rule 5: Error Handling and Validation
+- Validate all input parameters with proper error messages
+- Return specific error messages for validation failures: `"Invalid theme color provided"`
+- Use try-catch blocks with comprehensive error logging
+- Implement proper error boundaries and graceful degradation
+- Log errors with sufficient context for debugging and monitoring
+
+Sub rule 6: Authentication and Security
+- Apply authentication middleware consistently across protected endpoints
+- Use the `withApi` wrapper for standardized authentication and logging
+- Implement proper authorization checks for admin-only operations
+- Never expose sensitive information in error messages
+- Use environment variables for configuration, never hardcoded secrets
+
+Sub rule 7: API Documentation
+- Document all endpoints with request/response examples
+- Include HTTP status codes and their meanings
+- Provide clear parameter descriptions and validation rules
+- Include authentication requirements and rate limiting information
+- Document backward compatibility considerations and optional fields
+
+Sub rule 8: Logging and Monitoring
+- Use structured logging with the enhanced logging system
+- Log API requests with method, URL, and user context: `logger.logApiRequest()`
+- Log API responses with status code and duration: `logger.logApiResponse()`
+- Include correlation IDs for request tracking
+- Monitor performance metrics and error rates
+
+Sub rule 9: Testing and Quality Assurance
+- Write comprehensive unit tests for all API endpoints
+- Test both success and error scenarios
+- Mock external dependencies while testing business logic
+- Use consistent test data and fixtures
+- Validate response schemas and status codes
+
+Sub rule 10: Type Safety and Validation
+- Use TypeScript interfaces for all request/response types
+- Define explicit types for API parameters and return values
+- Use proper type guards for runtime validation
+- Export types for client-side usage
+- Maintain type consistency between frontend and backend

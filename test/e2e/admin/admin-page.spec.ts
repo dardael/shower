@@ -77,7 +77,7 @@ test.describe('Admin Page', () => {
 
       // Check for success message
       await expect(
-        page.getByText('Website name updated successfully')
+        page.getByText('Website settings updated successfully')
       ).toBeVisible({ timeout: 5000 });
 
       // Verify that the input field has been updated
@@ -109,10 +109,10 @@ test.describe('Admin Page', () => {
     try {
       await signIn(page);
 
+      // Wait for settings to be loaded
       await page.waitForResponse(
         (response) =>
-          response.url().includes('/api/settings/name') &&
-          response.status() === 200
+          response.url().includes('/api/settings') && response.status() === 200
       );
 
       // Try to submit with empty name

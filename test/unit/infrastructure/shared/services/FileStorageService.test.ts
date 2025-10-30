@@ -9,6 +9,7 @@ jest.mock('@/infrastructure/container', () => ({
       logInfo: jest.fn(),
       logWarning: jest.fn(),
       logError: jest.fn(),
+      logErrorWithObject: jest.fn(),
       debug: jest.fn(),
       info: jest.fn(),
       warn: jest.fn(),

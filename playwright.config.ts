@@ -77,6 +77,7 @@ export default defineConfig({
     command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
+    timeout: 300 * 1000, // Increase timeout to 300 seconds (5 minutes)
     env: {
       NODE_ENV: 'production',
       SHOWER_ENV: 'test',

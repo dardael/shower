@@ -94,7 +94,7 @@ export class MongooseSocialNetworkRepository
       );
     } catch (error) {
       // Log the error with context for debugging
-      this.logger.logError(
+      this.logger.logErrorWithObject(
         error,
         'Invalid social network data found in database',
         {

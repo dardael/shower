@@ -23,12 +23,18 @@ test.describe('Icon Management', () => {
   test('displays icon upload section when authenticated', async ({ page }) => {
     await signIn(page);
 
-    // Wait for the page to load
-    await page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/settings/name') &&
-        response.status() === 200
-    );
+    // Wait for the page to load - wait for both settings and icon endpoints
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/settings') && response.status() === 200
+      ),
+      page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/settings/icon') &&
+          response.status() === 200
+      ),
+    ]);
 
     // Wait a bit for the icon section to load
     await page.waitForTimeout(2000);

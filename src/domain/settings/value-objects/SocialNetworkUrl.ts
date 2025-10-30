@@ -1,5 +1,5 @@
-import { SocialNetworkType } from './SocialNetworkType';
-import { ISocialNetworkUrlNormalizationService } from '../services/ISocialNetworkUrlNormalizationService';
+import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
 export class SocialNetworkUrl {
   private readonly _value: string;

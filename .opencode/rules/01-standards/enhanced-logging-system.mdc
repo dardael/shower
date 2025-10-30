@@ -1,78 +1,123 @@
 ---
-description: Enforce the use of the enhanced logging system for structured, performant, and maintainable logging across all application layers. This rule covers proper usage of Logger, AsyncFileLoggerAdapter, and related logging components.
+description: Enforce the use of enhanced logging system for structured, performant, and maintainable logging across all application layers. This rule covers server-side Logger/AsyncFileLoggerAdapter and client-side RemoteLoggerAdapter with React integration. IMPORTANT: This is a single-instance logging system designed for simplicity - we do not want to change it for now.
 globs: src/**/*.{ts,tsx}
 alwaysApply: true
 ---
 
-Sub rule 1: Core Logging System Usage
-- Use `Logger` as the primary logging interface for all new code
+Sub rule 1: Server-Side Logging System Usage
+- Use `Logger` as the primary logging interface for server-side code
 - Import from: `import { Logger } from '@/application/shared/Logger'`
 - Obtain logger through dependency injection: `constructor(@inject('Logger') private logger: Logger)`
 - Use `EnhancedLoggerServiceLocator.getLogger()` for manual instantiation when needed
-- Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in production code
+- Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in server-side code
 
-Sub rule 2: Log Level Usage
+Sub rule 2: Client-Side Logging System Usage
+- Use `useLogger` hook for logging in React components
+- Import from: `import { useLogger } from '@/presentation/shared/hooks/useLogger'`
+- Call the hook in components: `const logger = useLogger()`
+- Client logs automatically batch and send to server via RemoteLoggerAdapter to `/api/logs` endpoint
+- Client logs are written to files using the same logging system as server-side logs
+- Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in client-side code
+- RemoteLoggerAdapter handles batching, retries, and ensures unified file-based logging
+- All client-side logs end up in the same log files as server-side logs
+
+Sub rule 3: Log Level Usage
 - Use `logger.debug()` for detailed troubleshooting information in development
 - Use `logger.info()` for important business events and successful operations
 - Use `logger.warn()` for concerning situations that don't stop the application
 - Use `logger.error()` for error conditions that impact functionality
 - Use `logger.execute(LogLevel.ERROR, message, metadata)` for dynamic level selection
+- Apply same log levels consistently across server and client-side logging
 
-Sub rule 3: Structured Logging with Metadata
+Sub rule 4: Structured Logging with Metadata
 - Always include relevant metadata in log entries for better debugging
 - Use structured objects for metadata: `logger.info('User login', { userId, email, ip })`
 - Include correlation IDs for request tracking: `logger.info('API call', { requestId, userId })`
 - Add context information: `logger.error('Database error', { query, table, error })`
 - Use consistent field names: `userId`, `requestId`, `operation`, `duration`, `success`
+- Client-side logs automatically include browser context: `userAgent`, `url`, `timestamp`
+- Server-side logs automatically include server context: `method`, `url`, `ip`, `userAgent`
+- Both client and server logs are written to the same file-based logging system via `/api/logs` endpoint
 
-Sub rule 4: Specialized Logging Methods
-- Use `logger.logApiRequest(method, url, userId, metadata)` for API request logging
-- Use `logger.logApiResponse(method, url, statusCode, duration, metadata)` for API response logging
-- Use `logger.logError(error, message, metadata)` for proper error object handling
-- Use `logger.logSecurity(context)` for security events (login attempts, failures, etc.)
-- Use `logger.logUserAction(action, userId, metadata)` for user behavior tracking
-- Use `logger.logBusinessEvent(event, metadata)` for important business milestones
+Sub rule 5: Specialized Logging Methods
+- Use `logger.logApiRequest(method, url, userId, metadata)` for API request logging (server-side)
+- Use `logger.logApiResponse(method, url, statusCode, duration, metadata)` for API response logging (server-side)
+- Use `logger.logError(error, message, metadata)` for proper error object handling (both sides)
+- Use `logger.logSecurity(context)` for security events (both sides: login attempts, failures, etc.)
+- Use `logger.logUserAction(action, userId, metadata)` for user behavior tracking (both sides)
+- Use `logger.logBusinessEvent(event, metadata)` for important business milestones (both sides)
+- Client-side specialized methods automatically route to server via RemoteLoggerAdapter
+- All client-side specialized methods write to the same file-based logging system as server-side logs
+- No console methods are used - all logging goes through unified file-based system
 
-Sub rule 5: Performance Measurement
+Sub rule 6: Performance Measurement
 - Use `logger.startTimer(operation, metadata)` to begin performance measurement
 - Use `logger.endTimer(metrics, additionalMetadata)` to complete and log timing
 - Use `logger.measure(operation, asyncFn, metadata)` for automatic async operation timing
 - Performance warnings automatically trigger for operations > 1000ms
 - Include operation context: `logger.measure('database-query', () => fetchData(), { table, query })`
+- Client-side performance measurement includes network latency to server for logging
+- Server-side performance measurement includes database and processing times
 
-Sub rule 6: Contextual Logging
-- Use `logger.withContext(context)` to create contextual loggers with preset metadata
+Sub rule 7: Contextual Logging
+- Use `logger.withContext(context)` to create contextual loggers with preset metadata (server-side)
 - Include request context: `const contextualLogger = logger.withContext({ requestId, userId })`
 - Use contextual loggers throughout request lifecycle for consistent correlation
 - Chain context: `logger.withContext({ module: 'auth' }).withContext({ operation: 'login' })`
 - Context automatically includes correlation IDs and request tracking
+- Client-side context automatically includes browser session information
+- Server-side context automatically includes request/response cycle information
 
-Sub rule 7: Conditional and Batch Logging
+Sub rule 8: Conditional and Batch Logging
 - Use `logger.logIf(condition, level, message, metadata)` for conditional logging
 - Use `logger.debugIf(message, condition, metadata)` for debug-only conditional logging
-- Use `logger.batch(entries)` for multiple log entries to improve performance
-- Batch example: `logger.batch([{ level: LogLevel.INFO, message: 'Started' }, { level: LogLevel.INFO, message: 'Completed' }])`
+- Use `logger.batch(entries)` for multiple log entries to improve performance (server-side)
+- Client-side batching is automatic via RemoteLoggerAdapter (5 seconds or 10 entries)
+- Server-side batch example: `logger.batch([{ level: LogLevel.INFO, message: 'Started' }, { level: LogLevel.INFO, message: 'Completed' }])`
 - Use conditional logging to avoid performance impact in production
+- Client-side logs queue when offline and flush when connection restored
 
-Sub rule 8: Error Handling and Logging
+Sub rule 9: Error Handling and Logging
 - Always log errors with proper error object handling: `logger.logError(error, 'Operation failed', { context })`
 - Include stack traces automatically through `logError` method
 - Use structured error information: `logger.error('Validation failed', { errors, field, value })`
 - Log retry attempts: `logger.warn('Retrying operation', { attempt, maxAttempts, delay })`
 - Include error context for debugging: `logger.error('Database connection failed', { host, port, database })`
+- Client-side errors include browser context and automatically route to server
+- Server-side errors include full request context and server environment
+- RemoteLoggerAdapter handles network errors with exponential backoff retry
 
 
 
-Sub rule 9: Testing and Logging
-- Mock `Logger` in tests using jest mocks or test doubles
+Sub rule 10: React Component Logging Integration
+- Wrap components with `LoggerProvider` to enable logging throughout component tree
+- Import provider: `import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext'`
+- Use `useLogger` hook in functional components: `const logger = useLogger()`
+- Provider automatically sets up RemoteLoggerAdapter for client-side logging
+- Ensure `LoggerProvider` is at root of component tree or high enough for all logging components
+
+Sub rule 11: Single-Instance System Limitation
+- This logging system is designed for **single-instance deployments only**
+- Rate limiting uses in-memory storage and resets on server restart
+- Log files are stored locally on each server instance
+- No shared state between multiple server instances
+- Do not implement Redis, Database, or distributed rate limiting
+- Do not add external logging service dependencies
+- Keep the logging system simple and focused on single-instance use cases
+- For multi-instance needs, use external centralized logging services instead
+
+Sub rule 12: Testing and Logging
+- Mock `Logger` in server-side tests using jest mocks or test doubles
+- Mock `useLogger` hook in client-side component tests: `jest.mock('@/presentation/shared/hooks/useLogger')`
 - Verify log calls in tests: `expect(mockLogger.logInfo).toHaveBeenCalledWith(expectedMessage, expectedMetadata)`
 - Test logging behavior: `expect(() => logger.logError(error)).not.toThrow()`
 - Use test-specific log levels to avoid noise in test output
 - Avoid logging in test assertions; use test framework features instead
+- For component tests, wrap with `LoggerProvider` or mock the `useLogger` hook
 
 Examples:
 
-Basic logging:
+Server-side logging:
 ```typescript
 // Good
 import { Logger } from '@/application/shared/Logger';
@@ -99,10 +144,45 @@ console.log('Creating user');
 console.error('Failed to create user');
 ```
 
-API logging:
+Client-side logging:
 ```typescript
 // Good
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function UserComponent({ userId }: { userId: string }) {
+  const logger = useLogger();
+
+  const handleDelete = async () => {
+    logger.info('User attempting to delete account', { userId });
+    
+    try {
+      await deleteUserAccount(userId);
+      logger.info('Account deleted successfully', { userId });
+    } catch (error) {
+      logger.logError(error, 'Failed to delete account', { userId });
+    }
+  };
+
+  return <button onClick={handleDelete}>Delete Account</button>;
+}
+
+// Bad
+function UserComponent({ userId }: { userId: string }) {
+  const handleDelete = async () => {
+    console.log('User attempting to delete account', userId);
+    // ...
+    console.error('Failed to delete account', userId);
+  };
+}
+```
+
+Server-side API logging:
+```typescript
+// Good
+import { Logger } from '@/application/shared/Logger';
+
 export async function GET(request: NextRequest) {
+  const logger = new Logger(); // or via DI
   const startTime = Date.now();
   
   try {
@@ -123,7 +203,37 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-Performance measurement:
+Client-side API call logging:
+```typescript
+// Good
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function UserList() {
+  const logger = useLogger();
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    logger.info('Fetching users from API');
+    
+    try {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+      logger.info('Users fetched successfully', { count: data.length });
+    } catch (error) {
+      logger.logError(error, 'Failed to fetch users');
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  return <div>{/* ... */}</div>;
+}
+```
+
+Server-side performance measurement:
 ```typescript
 // Good
 const result = await logger.measure('database-query', async () => {
@@ -141,7 +251,35 @@ try {
 }
 ```
 
-Contextual logging:
+Client-side performance measurement:
+```typescript
+// Good
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function DataProcessor({ data }: { data: any[] }) {
+  const logger = useLogger();
+
+  const processData = async () => {
+    logger.info('Starting client-side data processing');
+    
+    const result = await logger.measure('client-data-processing', async () => {
+      // Simulate heavy client-side processing
+      return data.map(item => ({
+        ...item,
+        processed: true,
+        timestamp: Date.now()
+      }));
+    }, { itemCount: data.length });
+
+    logger.info('Data processing completed', { processedCount: result.length });
+    return result;
+  };
+
+  return <button onClick={processData}>Process Data</button>;
+}
+```
+
+Server-side contextual logging:
 ```typescript
 // Good
 const contextualLogger = logger.withContext({ 
@@ -156,7 +294,36 @@ contextualLogger.info('Payment completed');
 // All logs include requestId, userId, and module automatically
 ```
 
-Security logging:
+Client-side contextual logging:
+```typescript
+// Good
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function PaymentProcessor({ paymentId }: { paymentId: string }) {
+  const logger = useLogger();
+
+  const processPayment = async () => {
+    // Client-side context automatically includes browser info
+    logger.info('Starting payment processing', { paymentId });
+    
+    // Add additional context
+    const paymentLogger = logger.withContext({ 
+      paymentId,
+      flow: 'checkout',
+      step: 'validation'
+    });
+
+    paymentLogger.info('Validating payment details');
+    paymentLogger.info('Payment method verified');
+    paymentLogger.info('Payment processing completed');
+    // All logs include paymentId, flow, step, plus automatic browser context
+  };
+
+  return <button onClick={processPayment}>Process Payment</button>;
+}
+```
+
+Server-side security logging:
 ```typescript
 // Good
 logger.logSecurity({
@@ -169,7 +336,46 @@ logger.logSecurity({
 });
 ```
 
-Batch logging:
+Client-side security logging:
+```typescript
+// Good
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function LoginForm() {
+  const logger = useLogger();
+
+  const handleSubmit = async (credentials: LoginCredentials) => {
+    logger.logSecurity({
+      event: 'LOGIN_ATTEMPT',
+      userId: credentials.email,
+      // Browser context (url, userAgent, timestamp) automatically added
+      success: false,
+      reason: 'user_initiated'
+    });
+
+    try {
+      await login(credentials);
+      logger.logSecurity({
+        event: 'LOGIN_SUCCESS',
+        userId: credentials.email,
+        success: true
+      });
+    } catch (error) {
+      logger.logSecurity({
+        event: 'LOGIN_FAILED',
+        userId: credentials.email,
+        success: false,
+        reason: 'invalid_credentials',
+        error: error.message
+      });
+    }
+  };
+
+  return <form onSubmit={handleSubmit}>{/* ... */}</form>;
+}
+```
+
+Server-side batch logging:
 ```typescript
 // Good
 const logEntries = [
@@ -179,4 +385,54 @@ const logEntries = [
 ];
 
 logger.batch(logEntries);
+```
+
+React Provider Setup:
+```typescript
+// Good - App root or layout component
+import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <LoggerProvider>
+          <UIProvider>
+            {children}
+          </UIProvider>
+        </LoggerProvider>
+      </body>
+    </html>
+  );
+}
+
+// Bad - Missing provider
+export default function SomeComponent() {
+  const logger = useLogger(); // Error: useLogger must be used within LoggerProvider
+  // ...
+}
+```
+
+Client-side automatic batching (handled by RemoteLoggerAdapter):
+```typescript
+// Good - Logs automatically batched and sent to server
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+
+function DataImporter() {
+  const logger = useLogger();
+
+  const importData = async (data: any[]) => {
+    // These logs will be batched automatically (5s or 10 entries)
+    logger.info('Import started', { fileCount: data.length });
+    
+    data.forEach((item, index) => {
+      logger.info('Processing record', { index, id: item.id });
+    });
+    
+    logger.info('Import completed', { totalRecords: data.length });
+    // All logs batched and sent to /api/logs endpoint
+  };
+
+  return <button onClick={() => importData(mockData)}>Import Data</button>;
+}
 ```

@@ -21,12 +21,14 @@ describe('GetConfiguredSocialNetworks', () => {
       debug: jest.fn(),
       warn: jest.fn(),
       error: jest.fn(),
+      logErrorWithObject: jest.fn(),
       logApiRequest: jest.fn(),
       logApiResponse: jest.fn(),
       logError: jest.fn(),
       logSecurity: jest.fn(),
       logUserAction: jest.fn(),
       logBusinessEvent: jest.fn(),
+      logSystemEvent: jest.fn(),
       startTimer: jest.fn(),
       endTimer: jest.fn(),
       measure: jest.fn(),
@@ -35,8 +37,11 @@ describe('GetConfiguredSocialNetworks', () => {
       batch: jest.fn(),
       withContext: jest.fn().mockReturnThis(),
       execute: jest.fn(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+      child: jest.fn(),
+      getPerformanceMonitor: jest.fn(),
+      getPerformanceStatistics: jest.fn(),
+      setPerformanceThreshold: jest.fn(),
+    } as unknown as jest.Mocked<Logger>;
 
     getConfiguredSocialNetworks = new GetConfiguredSocialNetworks(
       mockRepository,
@@ -113,7 +118,7 @@ describe('GetConfiguredSocialNetworks', () => {
     await expect(getConfiguredSocialNetworks.execute()).rejects.toThrow(
       'Database connection failed'
     );
-    expect(mockLogger.logError).toHaveBeenCalledWith(
+    expect(mockLogger.logErrorWithObject).toHaveBeenCalledWith(
       error,
       'Failed to get configured social networks',
       { operation: 'GetConfiguredSocialNetworks.execute' }

@@ -134,7 +134,7 @@ describe('Enhanced Logging Components', () => {
 
   it('should handle error logging with proper formatting', async () => {
     const error = new Error('Test component error');
-    unifiedLogger.logError(error, 'Custom error message', {
+    unifiedLogger.logErrorWithObject(error, 'Custom error message', {
       context: 'component-test',
     });
 

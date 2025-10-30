@@ -40,9 +40,13 @@ export class GetConfiguredSocialNetworks
 
       return configuredNetworks;
     } catch (error) {
-      this.logger.logError(error, 'Failed to get configured social networks', {
-        operation: 'GetConfiguredSocialNetworks.execute',
-      });
+      this.logger.logErrorWithObject(
+        error,
+        'Failed to get configured social networks',
+        {
+          operation: 'GetConfiguredSocialNetworks.execute',
+        }
+      );
       throw error;
     }
   }

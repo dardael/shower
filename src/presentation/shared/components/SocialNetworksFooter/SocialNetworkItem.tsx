@@ -30,14 +30,13 @@ export function SocialNetworkItem({
     (e: React.MouseEvent) => {
       if (!isValidUrl) {
         e.preventDefault();
-        console.warn(`Blocked navigation to unsafe URL: ${url}`);
         return;
       }
 
       // Let default link behavior handle opening in new tab
       // The Link component with isExternal handles this securely
     },
-    [url, isValidUrl]
+    [isValidUrl]
   );
 
   // Don't render if URL is invalid
@@ -57,26 +56,17 @@ export function SocialNetworkItem({
       data-testid={`social-network-item-${type}`}
     >
       <VStack
-        gap={2}
-        p={4}
-        bg="bg.canvas"
-        borderRadius="lg"
-        borderWidth="1px"
-        borderColor="border"
-        minW={{ base: '80px', md: '100px' }}
+        gap={3}
         textAlign="center"
+        minW={{ base: '180px', md: '220px' }}
         transition="none" // Explicitly disable transitions per project constraints
-        _hover={{
-          bg: 'bg.muted',
-          borderColor: 'border.emphasized',
-        }}
         _focusVisible={{
           ring: '2px',
           ringColor: 'colorPalette.solid',
           ringOffset: '2px',
         }}
       >
-        <SocialNetworkIcon type={type} size={6} />
+        <SocialNetworkIcon type={type} size={28} />
         <Text fontSize="sm" fontWeight="medium" color="fg" truncate maxW="full">
           {label}
         </Text>

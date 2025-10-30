@@ -1,0 +1,71 @@
+---
+description: Establish comprehensive documentation standards for functional documentation, technical documentation, README.md, and AGENTS.md to ensure clear separation of concerns, developer onboarding, and maintainable project documentation.
+globs: doc/**/*.{md}, README.md, AGENTS.md
+alwaysApply: true
+---
+
+Sub rule 1: Functional Documentation (doc/functionnal.md)
+- Write all functional documentation in `doc/functionnal.md`
+- Use non-technical language accessible to non-developers
+- Focus on user behavior, workflows, and business requirements
+- Include step-by-step instructions for user interactions
+- Document the "why" behind features, not just the "what"
+- Use clear headings and bullet points for readability
+- Include screenshots or diagrams when helpful (but not file links)
+- Update when user-facing features change
+
+Sub rule 2: Technical Documentation (doc/technical.md)
+- Write all technical documentation in `doc/technical.md`
+- Include implementation details, architecture decisions, and code examples
+- Provide code snippets as examples, not file copies
+- Never include explicit file paths or links to existing files
+- Document API endpoints, environment variables, and configuration
+- Include troubleshooting guides and common issues
+- Update when technical implementation changes
+- Use code blocks with proper syntax highlighting
+
+Sub rule 3: README.md Content Standards
+- Include all developer setup information in README.md
+- Document environment variables with examples and descriptions
+- List all Docker and npm commands with clear descriptions
+- Include architecture overview and project structure
+- Add authentication setup instructions
+- Provide testing guidelines and commands
+- Include deployment instructions and considerations
+- Update when project setup or commands change
+
+Sub rule 4: AGENTS.md Content Standards
+- Maintain current codebase file structure in AGENTS.md
+- Update file structure whenever files are created, renamed, updated, or deleted
+- Include all directories and important files with brief descriptions
+- Use tree format for clear visualization of project structure
+- Update when architectural changes occur
+- Include agent-specific guidelines and constraints
+- Ensure structure reflects actual codebase state
+
+Sub rule 5: Documentation Updates
+- Update functional documentation when user workflows change
+- Update technical documentation when implementation changes
+- Update README.md when setup process or commands change
+- Update AGENTS.md when file structure changes
+- Review documentation during feature development
+- Ensure consistency across all documentation files
+- Keep documentation in sync with codebase changes
+
+Sub rule 6: Content Quality Standards
+- Use clear, concise language in all documentation
+- Maintain consistent formatting and structure
+- Use proper markdown syntax and headings
+- Include examples that are current and functional
+- Avoid jargon in functional documentation
+- Be comprehensive but avoid unnecessary detail
+- Use active voice and present tense
+
+Sub rule 7: Code Example Guidelines
+- Provide minimal, focused code examples
+- Ensure examples are self-contained and runnable
+- Use realistic but simplified scenarios
+- Include error handling in examples when relevant
+- Use proper TypeScript syntax and typing
+- Keep examples under 20 lines when possible
+- Focus on demonstrating specific concepts

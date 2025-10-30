@@ -107,7 +107,10 @@ export class LocalFileStorageService implements IFileStorageService {
       logger.info(`Deleted icon file: ${filename}`);
     } catch (error) {
       const logger = container.resolve<Logger>('Logger');
-      logger.logError(error, `Failed to delete icon file ${filename}`);
+      logger.logErrorWithObject(
+        error,
+        `Failed to delete icon file ${filename}`
+      );
       // Don't throw error - file might not exist
     }
   }

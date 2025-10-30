@@ -81,7 +81,18 @@ export class Logger {
   /**
    * Log errors with proper error object handling
    */
-  logError(
+  logError(message: string, metadata?: Record<string, unknown>): void {
+    this.error(message, {
+      ...metadata,
+      type: 'error',
+    });
+  }
+
+  /**
+   * Log errors with proper error object handling (enhanced version)
+   * This method provides additional error object processing
+   */
+  logErrorWithObject(
     error: unknown,
     message?: string,
     metadata?: Record<string, unknown>

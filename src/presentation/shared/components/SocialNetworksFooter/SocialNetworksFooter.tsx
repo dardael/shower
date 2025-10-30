@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Heading, SimpleGrid, VStack, Text } from '@chakra-ui/react';
+import { Box, VStack, Heading, Text } from '@chakra-ui/react';
 import { SocialNetworkItem } from './SocialNetworkItem';
 import type { SocialNetworksFooterProps } from './types';
 
@@ -13,10 +13,9 @@ import type { SocialNetworksFooterProps } from './types';
 export function SocialNetworksFooter({
   socialNetworks,
   title = 'Follow Us',
-  maxColumns = { base: 2, md: 4, lg: 6 },
   spacing = 6,
-  showTitle = true,
   maxItems,
+  showTitle = false,
 }: SocialNetworksFooterProps) {
   // Don't render if no social networks are configured
   if (!socialNetworks || socialNetworks.length === 0) {
@@ -41,23 +40,25 @@ export function SocialNetworksFooter({
       aria-label="Social networks footer"
     >
       <VStack gap={spacing} maxW="container.xl" mx="auto">
-        {showTitle && (
-          <>
-            <Heading as="h2" size="md" color="fg" textAlign="center" mb={2}>
+        {(showTitle || title !== 'Follow Us') && (
+          <VStack gap={2} textAlign="center">
+            <Heading size="lg" color="fg">
               {title}
             </Heading>
-
-            <Text color="fg.muted" textAlign="center" fontSize="sm" mb={4}>
+            <Text color="fg.muted" fontSize="md">
               Connect with us on your favorite platforms
             </Text>
-          </>
+          </VStack>
         )}
-
-        <SimpleGrid
-          columns={maxColumns}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
           gap={spacing}
+          maxW="container.lg"
+          mx="auto"
           width="full"
-          justifyItems="center"
+          style={{ flexWrap: 'wrap' }}
         >
           {displayNetworks.map((socialNetwork) => (
             <SocialNetworkItem
@@ -68,7 +69,7 @@ export function SocialNetworksFooter({
               icon={socialNetwork.icon}
             />
           ))}
-        </SimpleGrid>
+        </Box>
       </VStack>
     </Box>
   );
