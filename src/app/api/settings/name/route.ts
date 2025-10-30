@@ -1,14 +1,9 @@
-import 'reflect-metadata';
 import { NextResponse } from 'next/server';
 import { SettingsServiceLocator } from '@/infrastructure/container';
-import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
+import { withApi } from '@/infrastructure/shared/apiWrapper';
 
-export async function GET() {
+export const GET = withApi(async () => {
   try {
-    // Connect to database
-    const dbConnection = DatabaseConnection.getInstance();
-    await dbConnection.connect();
-
     // Get website name through application layer
     const getWebsiteName = SettingsServiceLocator.getWebsiteName();
     const name = await getWebsiteName.execute();
@@ -16,4 +11,4 @@ export async function GET() {
   } catch {
     return NextResponse.json({ name: 'Shower' }, { status: 200 }); // Return default on error
   }
-}
+});

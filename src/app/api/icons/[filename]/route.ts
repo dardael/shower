@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -82,7 +81,7 @@ export async function GET(
     });
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(error, 'Error serving icon', { error });
+    logger.logErrorWithObject(error, 'Error serving icon', { error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

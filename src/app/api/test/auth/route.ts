@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
@@ -58,7 +57,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logError(error, 'Test auth error', { error });
+    logger.logErrorWithObject(error, 'Test auth error', { error });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

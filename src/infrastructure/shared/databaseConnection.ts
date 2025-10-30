@@ -31,14 +31,14 @@ export class DatabaseConnection {
         const logger = container.resolve<Logger>('Logger');
         logger.info('Connected to MongoDB');
       } catch {
-        console.log('Connected to MongoDB');
+        // Logger not available, continue silently
       }
     } catch (error) {
       try {
         const logger = container.resolve<Logger>('Logger');
-        logger.logError(error, 'Failed to connect to MongoDB');
+        logger.logErrorWithObject(error, 'Failed to connect to MongoDB');
       } catch {
-        console.error('Failed to connect to MongoDB:', error);
+        // Logger not available, continue silently
       }
       throw error;
     }
@@ -56,7 +56,7 @@ export class DatabaseConnection {
       const logger = container.resolve<Logger>('Logger');
       logger.info('Disconnected from MongoDB');
     } catch {
-      console.log('Disconnected from MongoDB');
+      // Logger not available, continue silently
     }
   }
 

@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateRequest } from '@/infrastructure/auth/ApiAuthentication';
 import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
@@ -34,7 +34,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    logger.logError(error, 'Error fetching social networks');
+    logger.logErrorWithObject(error, 'Error fetching social networks');
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social networks' },
       { status: 500 }
@@ -49,6 +49,11 @@ export async function PUT(request: NextRequest) {
   );
 
   try {
+    // Check authentication
+    const authResult = await authenticateRequest(request);
+    if (authResult) {
+      return authResult;
+    }
     const body = await request.json();
 
     logger.info('Processing social networks update request');
@@ -112,7 +117,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.logError(error, 'Error updating social networks');
+    logger.logErrorWithObject(error, 'Error updating social networks');
     return NextResponse.json(
       {
         success: false,

@@ -1,8 +1,8 @@
-import 'reflect-metadata';
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
 import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
 import { Logger } from '@/application/shared/Logger';
+import { getClientIP } from '@/infrastructure/shared/utils/clientIP';
 
 /**
  * Public API endpoint for social networks
@@ -13,9 +13,7 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
   const logger = container.resolve<Logger>('Logger');
 
-  const clientIP = request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown';
+  const clientIP = getClientIP(request);
 
   logger.logApiRequest('GET', '/api/public/social-networks', undefined, {
     userAgent: request.headers.get('user-agent'),
@@ -55,7 +53,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const duration = Date.now() - startTime;
     
-    logger.logError(error, 'Failed to fetch social networks', {
+    logger.logErrorWithObject(error, 'Failed to fetch social networks', {
       endpoint: '/api/public/social-networks',
       duration,
     });
