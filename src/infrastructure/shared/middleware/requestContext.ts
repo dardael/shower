@@ -92,11 +92,15 @@ export function requestMiddleware(
         return response;
       } catch (error) {
         const duration = Date.now() - startTime;
-        context.logger.logError(error as Error, 'Unhandled request error', {
-          method: request.method,
-          url: new URL(request.url).pathname,
-          duration,
-        });
+        context.logger.logErrorWithObject(
+          error as Error,
+          'Unhandled request error',
+          {
+            method: request.method,
+            url: new URL(request.url).pathname,
+            duration,
+          }
+        );
 
         throw error;
       }
