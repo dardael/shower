@@ -2,6 +2,7 @@ import { WebsiteSettingsRepository } from '@/domain/settings/repositories/Websit
 import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
 import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import {
   WebsiteSettingsModel,
   type IIconMetadata,
@@ -11,23 +12,35 @@ export class MongooseWebsiteSettingsRepository
   implements WebsiteSettingsRepository
 {
   async getSettingsByKey(key: string): Promise<WebsiteSettings> {
+    if (!key) {
+      key = 'website';
+    }
+
     let settingsDoc = await WebsiteSettingsModel.findOne({ key });
 
     if (!settingsDoc) {
       // Create default settings if none exist for this key
-      settingsDoc = await WebsiteSettingsModel.create({ key, name: 'Shower' });
+      settingsDoc = await WebsiteSettingsModel.create({
+        key,
+        name: 'Shower',
+        themeColor: 'blue',
+      });
     }
 
-    const name = new WebsiteName(settingsDoc.name);
+    const name = new WebsiteName(settingsDoc.name || 'Shower');
     const icon = settingsDoc.icon
       ? this.mapIconToDomain(settingsDoc.icon)
       : null;
-    return new WebsiteSettings(key, name, icon);
+    const themeColor = ThemeColor.fromString(settingsDoc.themeColor || null);
+    // Initialize with empty social networks array since this method fetches general settings only
+    // Social networks are managed separately through their own repository
+    return new WebsiteSettings(key, name, icon, [], themeColor);
   }
 
   async updateSettings(settings: WebsiteSettings): Promise<void> {
     const updateData: Record<string, unknown> = {
-      name: settings.name.value,
+      name: settings.name?.value || 'Shower',
+      themeColor: settings.themeColor?.value || 'blue',
     };
 
     if (settings.icon) {
@@ -37,7 +50,7 @@ export class MongooseWebsiteSettingsRepository
     }
 
     await WebsiteSettingsModel.updateOne(
-      { key: settings.key },
+      { key: settings.key || 'website' },
       updateData,
       { upsert: true } // Create if doesn't exist
     );
@@ -48,10 +61,18 @@ export class MongooseWebsiteSettingsRepository
       ? { icon: this.mapIconToDatabase(icon) }
       : { icon: null };
 
-    await WebsiteSettingsModel.updateOne({ key }, updateData, { upsert: true });
+    await WebsiteSettingsModel.updateOne(
+      { key: key || 'website' },
+      updateData,
+      { upsert: true }
+    );
   }
 
   async getIcon(key: string): Promise<WebsiteIcon | null> {
+    if (!key) {
+      return null;
+    }
+
     const settingsDoc = await WebsiteSettingsModel.findOne({ key });
 
     if (!settingsDoc || !settingsDoc.icon) {
