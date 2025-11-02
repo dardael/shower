@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { SocialNetworksFooterContainer } from '@/presentation/shared/components/SocialNetworksFooter/SocialNetworksFooterContainer';
 
+// Mock usePathname
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn(() => '/'),
+}));
+
 // Mock the hook
 jest.mock(
   '@/presentation/shared/components/SocialNetworksFooter/useSocialNetworksFooter',
@@ -25,9 +30,10 @@ describe('SocialNetworksFooterContainer', () => {
 
     render(<SocialNetworksFooterContainer />);
 
-    // Check for loading spinner
-    const spinner = screen.getByRole('status', { name: /loading/i });
+    // Check for loading spinner using data-testid
+    const spinner = screen.getByTestId('social-networks-footer');
     expect(spinner).toBeInTheDocument();
+    expect(spinner).toHaveAttribute('aria-label', 'Social networks footer');
   });
 
   it('should not render on error', () => {
@@ -67,7 +73,7 @@ describe('SocialNetworksFooterContainer', () => {
     expect(footer).toHaveAttribute('aria-label', 'Social networks footer');
   });
 
-  it('should not render when no social networks', () => {
+  it('should render placeholder when no social networks', () => {
     (useSocialNetworksFooter as jest.Mock).mockReturnValue({
       socialNetworks: [],
       isLoading: false,
@@ -76,7 +82,11 @@ describe('SocialNetworksFooterContainer', () => {
 
     render(<SocialNetworksFooterContainer />);
 
-    // Component should return null when no social networks
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+    // Component should render placeholder when no social networks
+    const footer = screen.getByRole('contentinfo');
+    expect(footer).toBeInTheDocument();
+    expect(
+      screen.getByText('No social networks configured yet')
+    ).toBeInTheDocument();
   });
 });

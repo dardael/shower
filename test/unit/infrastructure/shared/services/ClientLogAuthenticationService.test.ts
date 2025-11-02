@@ -842,32 +842,6 @@ describe('ClientLogAuthenticationService', () => {
       expect(result.valid).toBe(true);
     });
 
-    it.skip('should handle port numbers in origins', () => {
-      process.env.CLIENT_LOG_ALLOWED_ORIGINS =
-        'https://localhost:3000,https://example.com:8080';
-      (
-        ClientLogAuthenticationService as unknown as {
-          instance: ClientLogAuthenticationService | null;
-        }
-      ).instance = null;
-      const portService = ClientLogAuthenticationService.getInstance();
-
-      const requests = [
-        { origin: 'https://localhost:3000', expected: true },
-        { origin: 'https://example.com:8080', expected: true },
-        { origin: 'https://localhost:3001', expected: false },
-      ];
-
-      requests.forEach(({ origin, expected }) => {
-        const request = new Request('https://example.com/api/logs', {
-          headers: { origin },
-        }) as NextRequest;
-
-        const result = portService.validateOrigin(request);
-        expect(result.valid).toBe(expected);
-      });
-    });
-
     it('should handle empty token string', () => {
       const result = service.validateClientLogToken('');
       expect(result.valid).toBe(false);

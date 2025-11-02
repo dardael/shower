@@ -4,6 +4,11 @@ import { useSocialNetworksFooter } from '@/presentation/shared/components/Social
 // Mock fetch
 global.fetch = jest.fn();
 
+// Mock usePathname
+jest.mock('next/navigation', () => ({
+  usePathname: jest.fn(() => '/'),
+}));
+
 describe('useSocialNetworksFooter', () => {
   beforeEach(() => {
     jest.clearAllMocks();

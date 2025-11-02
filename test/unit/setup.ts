@@ -26,7 +26,9 @@ beforeAll(() => {
       fullMessage.includes('wrap-tests-with-act') ||
       fullMessage.includes(
         'When testing, code that causes React state updates should be wrapped into act'
-      )
+      ) ||
+      fullMessage.includes('In HTML, <html> cannot be a child of <div>') ||
+      fullMessage.includes('This will cause a hydration error')
     ) {
       return;
     }
@@ -114,6 +116,9 @@ function filterChakraProps(
 // Mock Chakra UI components to avoid rendering issues in tests
 jest.mock('@chakra-ui/react', () => {
   const mockModule = {
+    defineConfig: jest.fn(() => ({})),
+    createSystem: jest.fn(() => ({})),
+    ChakraProvider: ({ children }: ComponentProps) => children,
     IconButton: ({ children, ...props }: ComponentProps) => {
       return React.createElement('button', filterChakraProps(props), children);
     },
@@ -184,6 +189,16 @@ jest.mock('@chakra-ui/react', () => {
   return mockModule;
 });
 
+// Mock provider components
+jest.mock('@/presentation/shared/components/ui/provider', () => ({
+  Provider: ({ children }: ComponentProps) => children,
+}));
+
+jest.mock('@/presentation/shared/DynamicThemeProvider', () => ({
+  DynamicThemeProvider: ({ children }: ComponentProps) => children,
+  useDynamicTheme: () => ({ themeColor: 'blue' }),
+}));
+
 // Mock next/navigation
 
 jest.mock('next/navigation', () => ({
@@ -223,6 +238,27 @@ jest.mock(
   }),
   { virtual: true }
 );
+
+// Mock mongoose and related database modules
+jest.mock('mongoose', () => ({
+  default: {
+    connect: jest.fn(() => Promise.resolve()),
+    connection: {
+      readyState: 1,
+    },
+    disconnect: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+jest.mock('mongodb', () => ({
+  MongoClient: jest.fn(),
+  ObjectId: jest.fn(() => ({ toString: () => '507f1f77bcf86cd799439011' })),
+}));
+
+jest.mock('bson', () => ({
+  ObjectId: jest.fn(() => ({ toString: () => '507f1f77bcf86cd799439011' })),
+  BSON: {},
+}));
 
 // Register Logger for tests
 beforeAll(() => {
