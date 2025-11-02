@@ -10,8 +10,9 @@ interface UseSocialNetworksFooterReturn {
 }
 
 /**
- * Hook for fetching social networks data for the footer
+ * Hook for fetching social networks data for footer
  * Handles loading states and error management
+ * Note: Admin route detection is handled by container component
  */
 export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
   const [socialNetworks, setSocialNetworks] = useState<
@@ -26,12 +27,18 @@ export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
         setIsLoading(true);
         setError(null);
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
         const response = await fetch('/api/public/social-networks', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           throw new Error(
@@ -47,8 +54,16 @@ export function useSocialNetworksFooter(): UseSocialNetworksFooterReturn {
 
         setSocialNetworks(data.data || []);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Unknown error occurred';
+        let errorMessage = 'Unknown error occurred';
+
+        if (err instanceof Error) {
+          if (err.name === 'AbortError') {
+            errorMessage = 'Request timeout - please try again';
+          } else {
+            errorMessage = err.message;
+          }
+        }
+
         setError(errorMessage);
       } finally {
         setIsLoading(false);

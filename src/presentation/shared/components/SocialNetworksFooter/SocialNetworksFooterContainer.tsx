@@ -1,49 +1,50 @@
 'use client';
 
 import React from 'react';
-import { Box, Spinner } from '@chakra-ui/react';
+
+import { usePathname } from 'next/navigation';
 import { SocialNetworksFooter } from './SocialNetworksFooter';
 import { useSocialNetworksFooter } from './useSocialNetworksFooter';
 import type { SocialNetworksFooterProps } from './types';
 
 /**
  * SocialNetworksFooterContainer component
- * Handles data fetching and state management for the social networks footer
+ * Handles data fetching and state management for social networks footer
+ * Optimized for conditional rendering based on route
  * Renders loading states and error handling
  */
 export function SocialNetworksFooterContainer(
   props: Omit<SocialNetworksFooterProps, 'socialNetworks'>
 ) {
+  const pathname = usePathname();
+  const isAdmin = pathname.startsWith('/admin');
+
+  // Always call hook to satisfy React rules of hooks
   const { socialNetworks, isLoading, error } = useSocialNetworksFooter();
+
+  // Early return for admin routes - don't render anything
+  if (isAdmin) {
+    return null;
+  }
 
   // Don't render anything while loading or if there's an error
   if (isLoading) {
     return (
-      <Box
-        as="footer"
-        bg="bg.subtle"
-        borderTopWidth="1px"
-        borderColor="border"
-        py={{ base: 8, md: 12 }}
-        px={{ base: 4, md: 8 }}
-        width="full"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Spinner size="md" color="colorPalette.solid" />
-      </Box>
+      <SocialNetworksFooter
+        socialNetworks={socialNetworks ?? undefined}
+        {...props}
+      />
     );
   }
 
-  // Don't render on error - the footer is not critical functionality
+  // Don't render on error - footer is not critical functionality
   if (error) {
     return null;
   }
 
   return (
     <SocialNetworksFooter
-      socialNetworks={socialNetworks || undefined}
+      socialNetworks={socialNetworks ?? undefined}
       {...props}
     />
   );
