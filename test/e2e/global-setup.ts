@@ -12,18 +12,14 @@ async function globalSetup() {
 
   if (fs.existsSync(envTestPath)) {
     dotenvConfig({ path: envTestPath });
-    console.log('✅ Loaded .env.test environment variables');
   } else {
-    console.warn('⚠️ .env.test file not found, using default values');
+    // .env.test file not found, using default values
   }
 
   if (fs.existsSync(envTestLocalPath)) {
     dotenvConfig({ path: envTestLocalPath, override: true });
-    console.log('✅ Loaded .env.test.local environment variables');
   } else {
-    console.warn(
-      '⚠️ .env.test.local file not found, sensitive test variables may be missing'
-    );
+    // .env.test.local file not found, sensitive test variables may be missing
   }
 
   process.env.MONGODB_URI =
@@ -32,7 +28,7 @@ async function globalSetup() {
     !process.env.MONGODB_URI ||
     !process.env.MONGODB_URI.includes('shower_test')
   ) {
-    console.warn('WARNING: MONGODB_URI is not set to a test database');
+    // WARNING: MONGODB_URI is not set to a test database
   }
 
   // Verify critical environment variables are available
@@ -49,10 +45,8 @@ async function globalSetup() {
     (varName) => !process.env[varName]
   );
   if (missingVars.length > 0) {
-    console.warn(`⚠️ Missing environment variables: ${missingVars.join(', ')}`);
+    // Missing environment variables: ${missingVars.join(', ')}
   }
-
-  console.log('✅ Environment setup completed');
 }
 
 export default globalSetup;

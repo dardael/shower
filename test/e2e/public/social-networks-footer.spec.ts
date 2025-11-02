@@ -6,9 +6,12 @@ test.describe('Social Networks Footer', () => {
   });
 
   test('should not render footer when no social networks are configured', async ({ page }) => {
-    // Check if footer exists
+    // Check if footer shows empty state message
     const footer = page.locator('footer[aria-label="Social networks footer"]');
-    await expect(footer).not.toBeVisible();
+    await expect(footer).toBeVisible();
+    
+    // Check for empty state message
+    await expect(page.getByText('No social networks configured yet')).toBeVisible();
   });
 
   test('should render footer when social networks are configured', async ({ page }) => {
@@ -18,27 +21,20 @@ test.describe('Social Networks Footer', () => {
     // Go to home page
     await page.goto('/');
     
-    // Check if footer is visible (assuming test data is seeded)
+    // Check if footer is visible
     const footer = page.locator('footer[aria-label="Social networks footer"]');
+    await expect(footer).toBeVisible();
     
-    // Only assert if footer should be visible based on test data
-    // If test database has social networks configured, footer should be visible
-    const footerExists = await footer.isVisible();
+    // Check for social network items if they exist
+    const socialNetworkItems = page.locator('[data-testid^="social-network-item-"]');
+    const itemCount = await socialNetworkItems.count();
     
-    if (footerExists) {
-      await expect(footer).toBeVisible();
-      
-      // Check for social network items if they exist
-      const socialNetworkItems = page.locator('[data-testid^="social-network-item-"]');
-      const itemCount = await socialNetworkItems.count();
-      
-      if (itemCount > 0) {
-        // Verify at least one social network item is present
-        await expect(socialNetworkItems.first()).toBeVisible();
-      }
+    if (itemCount > 0) {
+      // Verify at least one social network item is present
+      await expect(socialNetworkItems.first()).toBeVisible();
     } else {
-      // If no social networks in test data, footer should not be visible
-      await expect(footer).not.toBeVisible();
+      // If no social networks configured, should show empty state message
+      await expect(page.getByText('No social networks configured yet')).toBeVisible();
     }
   });
 
@@ -128,9 +124,12 @@ test.describe('Social Networks Footer', () => {
   test('should handle empty state gracefully', async ({ page }) => {
     await page.goto('/');
     
-    // When no social networks are configured, footer should not render
+    // When no social networks are configured, footer should show empty state
     const footer = page.locator('footer[aria-label="Social networks footer"]');
-    await expect(footer).not.toBeVisible();
+    await expect(footer).toBeVisible();
+    
+    // Should show empty state message
+    await expect(page.getByText('No social networks configured yet')).toBeVisible();
     
     // Page should still function normally
     await expect(page.locator('body')).toBeVisible();

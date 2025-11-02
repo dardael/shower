@@ -28,7 +28,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'line',
+  reporter: 'list',
   /* Global setup and teardown for the tests */
   globalSetup: './test/e2e/global-setup.ts',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -41,6 +41,9 @@ export default defineConfig({
 
     /* Capture screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Force headless mode in Docker environments */
+    headless: process.env.CI === 'true' || process.env.SHOWER_ENV === 'test',
   },
 
   /* Configure projects for major browsers */
@@ -49,6 +52,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
       },
     },
     /* Test against mobile viewports. */
@@ -74,7 +78,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run build && npm run start',
+    command: 'npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     timeout: 300 * 1000, // Increase timeout to 300 seconds (5 minutes)
