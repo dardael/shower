@@ -4,35 +4,61 @@ globs: test/e2e/**/*.ts
 alwaysApply: false
 ---
 
-Sub rule 1:
+Sub rule 1: Test File Organization
 - Place e2e tests in `test/e2e/` directory.
 - Name test files with `.spec.ts` extension.
+- Organize tests by feature or page functionality.
 
-Sub rule 2:
+Sub rule 2: Test Structure and Naming
 - Use Playwright fixtures for shared context setup.
 - Group related tests using `describe` blocks.
 - Name test cases to clearly describe the scenario.
+- Follow Arrange-Act-Assert pattern within test cases.
 
-Sub rule 3:
-- Use `beforeEach`/`afterEach` for setup and teardown.
+Sub rule 3: Setup and Teardown
+- Use `beforeEach`/`afterEach` for test-specific setup and teardown.
 - Leverage `test.use` for scoped configuration.
+- Use global setup/teardown for shared test infrastructure.
 
-Sub rule 4:
-- Prefer page model for complex flows.
+Sub rule 4: Application Pre-execution Requirements
+- Start MongoDB service first: `docker compose up mongodb -d`
+- Build the Next.js application before running e2e tests: `docker compose run --rm app npm run build`
+- Ensure MongoDB is fully running before test execution begins.
+- Use proper wait strategies to avoid timeouts in opencode environment.
+- Verify database connection before test suite execution.
+
+Sub rule 5: Page Object Models and Helpers
+- Prefer page object model for complex flows.
 - Create reusable helper functions for repetitive actions.
+- Encapsulate page-specific logic in dedicated page classes.
+- Use meaningful method names that describe user actions.
 
-Sub rule 5:
+Sub rule 6: Element Selection Strategies
 - Use `data-testid` attributes for element selectors.
 - Avoid selectors that rely on text, classes, or DOM structure.
+- Prefer stable selectors that won't break with UI changes.
+- Use role-based selectors when appropriate for accessibility.
 
-Sub rule 6:
+Sub rule 7: Test Execution and Configuration
 - Run tests in headless mode for CI pipelines.
 - Enable video/screenshots only for failing tests.
+- Configure appropriate timeouts for network and element waits.
+- Use parallel execution for faster test suites when appropriate.
 
-Sub rule 7:
+Sub rule 8: Mocking and Network Handling
 - Mock external network requests if required.
 - Avoid mocking internal API calls; use actual endpoints for internal APIs.
+- Use route handling for network interception when needed.
+- Test both online and offline scenarios when relevant.
 
-Sub rule 8:
+Sub rule 9: Assertions and Validation
 - Use `expect` for assertions on UI and state.
 - Prefer `toBeVisible`, `toHaveText`, `toHaveAttribute`, etc., for clarity.
+- Include meaningful assertion messages for debugging.
+- Validate both positive and negative scenarios.
+
+Sub rule 10: Test Environment Management
+- Clean up test data and state after each test.
+- Use isolated test databases or environments.
+- Ensure tests are independent and can run in any order.
+- Handle browser context cleanup properly.

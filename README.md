@@ -238,28 +238,28 @@ RATE_LIMIT_MAX_REQUESTS=100          # Max requests per window per IP
 
 **⚠️ Important**: This logging system is designed for **single-instance deployments only**.
 
-#### What this means:
+#### What this means
 
 - **Rate limiting** is handled in-memory and resets on server restart
 - **Log storage** is on local filesystem of each instance
 - **No shared state** between multiple server instances
 - **Not suitable** for multi-instance or distributed deployments
 
-#### Suitable for:
+#### Suitable for
 
 - Development environments
 - Single-server production deployments
 - Small to medium applications with single instance
 - Applications where simple logging is sufficient
 
-#### Not suitable for:
+#### Not suitable for
 
 - Multi-instance production deployments
 - Distributed systems with load balancing
 - High-availability applications requiring shared logging
 - Applications needing centralized log aggregation
 
-#### Alternatives for multi-instance deployments:
+#### Alternatives for multi-instance deployments
 
 - Implement centralized logging services (ELK stack, Splunk, etc.)
 - Use external log aggregation services
@@ -296,13 +296,29 @@ The logging system includes comprehensive performance tests that run automatical
 
 Run end-to-end tests with Playwright:
 
+**Important**: Before running e2e tests, you must start MongoDB and build the application:
+
 ```bash
-docker compose run --rm app npm run test:e2e
+# Start MongoDB service
+docker compose up mongodb -d
+
+# Build the Next.js application
+docker compose run --rm app npm run build
+
+# Run e2e tests
+docker compose run --rm -T app npm run test:e2e
 ```
 
 Run with UI mode for debugging:
 
 ```bash
+# Start MongoDB service
+docker compose up mongodb -d
+
+# Build the Next.js application
+docker compose run --rm app npm run build
+
+# Run e2e tests with UI
 docker compose run --rm app npm run test:e2e:ui
 ```
 
@@ -315,16 +331,17 @@ This project uses Husky for git hooks:
 
 ## Commands Summary
 
-| Command                                        | Description                                |
-| ---------------------------------------------- | ------------------------------------------ |
-| `docker compose run --rm app npm install`      | Install npm dependencies                   |
-| `docker compose up app`                        | Start development server                   |
-| `docker compose run --rm app npm run build`    | Build for production                       |
-| `docker compose run --rm app npm run start`    | Start production server                    |
-| `docker compose run --rm app npm run lint`     | Run ESLint                                 |
-| `docker compose run --rm app npm run format`   | Format code with Prettier                  |
-| `docker compose run --rm app npm test`         | Run all unit tests (including performance) |
-| `docker compose run --rm app npm run test:e2e` | Run integration tests                      |
+| Command                                           | Description                                |
+| ------------------------------------------------- | ------------------------------------------ |
+| `docker compose run --rm app npm install`         | Install npm dependencies                   |
+| `docker compose up app`                           | Start development server                   |
+| `docker compose up mongodb -d`                    | Start MongoDB service (required for e2e)   |
+| `docker compose run --rm app npm run build`       | Build for production (required for e2e)    |
+| `docker compose run --rm app npm run start`       | Start production server                    |
+| `docker compose run --rm app npm run lint`        | Run ESLint                                 |
+| `docker compose run --rm app npm run format`      | Format code with Prettier                  |
+| `docker compose run --rm app npm test`            | Run all unit tests (including performance) |
+| `docker compose run --rm -T app npm run test:e2e` | Run integration tests (requires setup)     |
 
 ## Monitoring and Observability
 
