@@ -2,6 +2,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSocialNetworksForm } from '@/presentation/admin/hooks/useSocialNetworksForm';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
+import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext';
 
 // Mock fetch
 const mockFetch = jest.fn();
@@ -10,14 +11,43 @@ global.fetch = mockFetch;
 // Mock toaster
 jest.mock('@/presentation/shared/components/ui/toaster');
 
+// Mock logger object
+const mockLogger = {
+  info: jest.fn(),
+  logError: jest.fn(),
+  logErrorWithObject: jest.fn(),
+  logApiRequest: jest.fn(),
+  logApiResponse: jest.fn(),
+  logSecurity: jest.fn(),
+  logUserAction: jest.fn(),
+  logBusinessEvent: jest.fn(),
+  startTimer: jest.fn(),
+  endTimer: jest.fn(),
+  measure: jest.fn(),
+  withContext: jest.fn().mockReturnThis(),
+  execute: jest.fn(),
+  batch: jest.fn(),
+  logIf: jest.fn(),
+  debugIf: jest.fn(),
+};
+
+// Mock useLogger
+jest.mock('@/presentation/shared/hooks/useLogger', () => ({
+  useLogger: () => mockLogger,
+}));
+
 describe('useSocialNetworksForm', () => {
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <LoggerProvider logger={mockLogger as any}>{children}</LoggerProvider>
+  );
   beforeEach(() => {
     jest.clearAllMocks();
     mockFetch.mockClear();
   });
 
   it('should initialize with loading state', () => {
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.isSaving).toBe(false);
@@ -35,13 +65,14 @@ describe('useSocialNetworksForm', () => {
     ];
 
     mockFetch.mockResolvedValueOnce({
-      json: jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
         success: true,
         data: mockSocialNetworks,
       }),
     });
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     // Wait for loading state to change and data to be fetched
     await waitFor(() => {
@@ -55,7 +86,7 @@ describe('useSocialNetworksForm', () => {
   it('should handle fetch error', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     // Wait for loading state to change
     await waitFor(() => {
@@ -71,7 +102,7 @@ describe('useSocialNetworksForm', () => {
   });
 
   it('should handle URL change', () => {
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     act(() => {
       result.current.handleUrlChange(SocialNetworkType.INSTAGRAM, 'new-url');
@@ -82,7 +113,7 @@ describe('useSocialNetworksForm', () => {
   });
 
   it('should handle label change', () => {
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     act(() => {
       result.current.handleLabelChange(
@@ -95,7 +126,7 @@ describe('useSocialNetworksForm', () => {
   });
 
   it('should handle enabled change', () => {
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     act(() => {
       result.current.handleEnabledChange(SocialNetworkType.INSTAGRAM, {
@@ -123,7 +154,7 @@ describe('useSocialNetworksForm', () => {
       }),
     });
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -150,7 +181,7 @@ describe('useSocialNetworksForm', () => {
       }),
     });
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -189,7 +220,7 @@ describe('useSocialNetworksForm', () => {
         }),
       });
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -227,7 +258,7 @@ describe('useSocialNetworksForm', () => {
       })
       .mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(() => useSocialNetworksForm());
+    const { result } = renderHook(() => useSocialNetworksForm(), { wrapper });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -242,7 +273,7 @@ describe('useSocialNetworksForm', () => {
       title: 'Error',
       description: 'Failed to update social networks: Network error',
       type: 'error',
-      duration: 5000,
+      duration: 3000,
     });
   });
 });

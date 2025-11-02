@@ -6,31 +6,45 @@ import {
 } from '@/presentation/shared/contexts/LoggerContext';
 import { Logger } from '@/application/shared/Logger';
 import type { ILogger } from '@/application/shared/ILogger';
-import { RemoteLoggerAdapter } from '@/infrastructure/shared/adapters/RemoteLoggerAdapter';
 
-// Mock RemoteLoggerAdapter
-jest.mock('@/infrastructure/shared/adapters/RemoteLoggerAdapter', () => ({
-  RemoteLoggerAdapter: {
-    getInstance: jest.fn(() => ({
+// Mock console methods to prevent test output pollution
+const consoleSpies = {
+  error: jest.spyOn(console, 'error').mockImplementation(),
+  warn: jest.spyOn(console, 'warn').mockImplementation(),
+  info: jest.spyOn(console, 'info').mockImplementation(),
+  debug: jest.spyOn(console, 'debug').mockImplementation(),
+};
+
+describe('LoggerContext', () => {
+  let mockLogger: Logger;
+  let mockAdapter: ILogger;
+
+  beforeEach(() => {
+    mockAdapter = {
       logDebug: jest.fn(),
       logInfo: jest.fn(),
       logWarning: jest.fn(),
       logError: jest.fn(),
-    })),
-  },
-}));
-
-describe('LoggerContext', () => {
-  beforeEach(() => {
+    };
+    mockLogger = new Logger(mockAdapter);
     jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    // Restore console methods after all tests
+    Object.values(consoleSpies).forEach((spy) => spy.mockRestore());
   });
 
   describe('LoggerProvider', () => {
     it('should provide logger context to children', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
       const TestComponent = () => {
         const logger = useLogger();
+        // Test that we get the exact same Logger instance
         expect(logger).toBe(mockLogger);
+        expect(typeof logger.debug).toBe('function');
+        expect(typeof logger.info).toBe('function');
+        expect(typeof logger.warn).toBe('function');
+        expect(typeof logger.error).toBe('function');
         return <div>Test</div>;
       };
 
@@ -59,8 +73,6 @@ describe('LoggerContext', () => {
 
   describe('useLogger Hook', () => {
     it('should return logger instance from context', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
-
       const { result } = renderHook(() => useLogger(), {
         wrapper: ({ children }) => (
           <LoggerProvider logger={mockLogger}>{children}</LoggerProvider>
@@ -71,8 +83,6 @@ describe('LoggerContext', () => {
     });
 
     it('should return same logger instance on re-renders', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
-
       const { result, rerender } = renderHook(() => useLogger(), {
         wrapper: ({ children }) => (
           <LoggerProvider logger={mockLogger}>{children}</LoggerProvider>
@@ -87,8 +97,13 @@ describe('LoggerContext', () => {
     });
 
     it('should work with nested providers', () => {
-      const mockLogger1 = new Logger(RemoteLoggerAdapter.getInstance());
-      const mockLogger2 = new Logger(RemoteLoggerAdapter.getInstance());
+      const mockAdapter2 = {
+        logDebug: jest.fn(),
+        logInfo: jest.fn(),
+        logWarning: jest.fn(),
+        logError: jest.fn(),
+      };
+      const mockLogger2 = new Logger(mockAdapter2);
 
       const TestComponent = () => {
         const logger = useLogger();
@@ -100,7 +115,7 @@ describe('LoggerContext', () => {
       };
 
       const { getByTestId } = render(
-        <LoggerProvider logger={mockLogger1}>
+        <LoggerProvider logger={mockLogger}>
           <LoggerProvider logger={mockLogger2}>
             <TestComponent />
           </LoggerProvider>
@@ -113,10 +128,6 @@ describe('LoggerContext', () => {
 
   describe('Integration Tests', () => {
     it('should allow logging through useLogger hook', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
-      const mockInfo = jest.fn();
-      mockLogger.info = mockInfo;
-
       const TestComponent = () => {
         const logger = useLogger();
 
@@ -133,21 +144,12 @@ describe('LoggerContext', () => {
         </LoggerProvider>
       );
 
-      expect(mockInfo).toHaveBeenCalledWith('Test message', { key: 'value' });
+      expect(mockAdapter.logInfo).toHaveBeenCalledWith('Test message', {
+        key: 'value',
+      });
     });
 
     it('should handle different log levels', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
-      const mockDebug = jest.fn();
-      const mockInfo = jest.fn();
-      const mockWarn = jest.fn();
-      const mockError = jest.fn();
-
-      mockLogger.debug = mockDebug;
-      mockLogger.info = mockInfo;
-      mockLogger.warn = mockWarn;
-      mockLogger.error = mockError;
-
       const TestComponent = () => {
         const logger = useLogger();
 
@@ -167,17 +169,25 @@ describe('LoggerContext', () => {
         </LoggerProvider>
       );
 
-      expect(mockDebug).toHaveBeenCalledWith('Debug message');
-      expect(mockInfo).toHaveBeenCalledWith('Info message');
-      expect(mockWarn).toHaveBeenCalledWith('Warning message');
-      expect(mockError).toHaveBeenCalledWith('Error message');
+      expect(mockAdapter.logDebug).toHaveBeenCalledWith(
+        'Debug message',
+        undefined
+      );
+      expect(mockAdapter.logInfo).toHaveBeenCalledWith(
+        'Info message',
+        undefined
+      );
+      expect(mockAdapter.logWarning).toHaveBeenCalledWith(
+        'Warning message',
+        undefined
+      );
+      expect(mockAdapter.logError).toHaveBeenCalledWith(
+        'Error message',
+        undefined
+      );
     });
 
     it('should work with async operations', async () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
-      const mockInfo = jest.fn();
-      mockLogger.info = mockInfo;
-
       const TestComponent = () => {
         const logger = useLogger();
         const [data, setData] = React.useState<string>('');
@@ -212,16 +222,21 @@ describe('LoggerContext', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      expect(mockInfo).toHaveBeenCalledWith('Starting fetch');
-      expect(mockInfo).toHaveBeenCalledWith('Fetch completed');
+      expect(mockAdapter.logInfo).toHaveBeenCalledWith(
+        'Starting fetch',
+        undefined
+      );
+      expect(mockAdapter.logInfo).toHaveBeenCalledWith(
+        'Fetch completed',
+        undefined
+      );
     });
   });
 
   describe('Error Handling', () => {
     it('should handle logger errors gracefully', () => {
-      const mockLogger = new Logger(RemoteLoggerAdapter.getInstance());
       const errorMessage = 'Logger error';
-      mockLogger.info = jest.fn(() => {
+      mockAdapter.logInfo = jest.fn(() => {
         throw new Error(errorMessage);
       });
 
@@ -249,7 +264,7 @@ describe('LoggerContext', () => {
       );
 
       // Verify that mock was called and threw an error
-      expect(mockLogger.info).toHaveBeenCalled();
+      expect(mockAdapter.logInfo).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
   });
@@ -257,7 +272,7 @@ describe('LoggerContext', () => {
   describe('Memory Leak Prevention', () => {
     it('should cleanup RemoteLoggerAdapter on unmount', () => {
       const mockCleanup = jest.fn();
-      const mockAdapter = {
+      const mockAdapterWithCleanup = {
         logDebug: jest.fn(),
         logInfo: jest.fn(),
         logWarning: jest.fn(),
@@ -265,13 +280,13 @@ describe('LoggerContext', () => {
         cleanup: mockCleanup,
       };
 
-      // Set the constructor name to simulate RemoteLoggerAdapter
-      Object.defineProperty(mockAdapter, 'constructor', {
+      // Set constructor name to simulate RemoteLoggerAdapter
+      Object.defineProperty(mockAdapterWithCleanup, 'constructor', {
         value: { name: 'RemoteLoggerAdapter' },
         writable: true,
       });
 
-      const testLogger = new Logger(mockAdapter as unknown as ILogger);
+      const testLogger = new Logger(mockAdapterWithCleanup);
 
       const TestComponent = () => {
         useLogger();
@@ -293,7 +308,7 @@ describe('LoggerContext', () => {
 
     it('should not cleanup non-RemoteLoggerAdapter instances', () => {
       const mockCleanup = jest.fn();
-      const mockAdapter = {
+      const mockAdapterWithoutCleanup = {
         logDebug: jest.fn(),
         logInfo: jest.fn(),
         logWarning: jest.fn(),
@@ -302,7 +317,7 @@ describe('LoggerContext', () => {
       };
 
       // Create a logger with a non-RemoteLoggerAdapter
-      const testLogger = new Logger(mockAdapter as unknown as ILogger);
+      const testLogger = new Logger(mockAdapterWithoutCleanup);
 
       const TestComponent = () => {
         useLogger();
@@ -324,7 +339,7 @@ describe('LoggerContext', () => {
 
     it('should handle multiple mount/unmount cycles', () => {
       const mockCleanup = jest.fn();
-      const mockAdapter = {
+      const mockAdapterWithCleanup = {
         logDebug: jest.fn(),
         logInfo: jest.fn(),
         logWarning: jest.fn(),
@@ -332,13 +347,13 @@ describe('LoggerContext', () => {
         cleanup: mockCleanup,
       };
 
-      // Set the constructor name to simulate RemoteLoggerAdapter
-      Object.defineProperty(mockAdapter, 'constructor', {
+      // Set constructor name to simulate RemoteLoggerAdapter
+      Object.defineProperty(mockAdapterWithCleanup, 'constructor', {
         value: { name: 'RemoteLoggerAdapter' },
         writable: true,
       });
 
-      const testLogger = new Logger(mockAdapter as unknown as ILogger);
+      const testLogger = new Logger(mockAdapterWithCleanup);
 
       const TestComponent = () => {
         useLogger();

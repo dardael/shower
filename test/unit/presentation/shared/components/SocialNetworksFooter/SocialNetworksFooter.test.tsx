@@ -25,22 +25,34 @@ describe('SocialNetworksFooter', () => {
     socialNetworks: undefined,
   };
 
-  it('should not render when no social networks are provided', () => {
+  it('should render placeholder when no social networks are provided', () => {
     render(<SocialNetworksFooter {...defaultProps} />);
 
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+    const footer = screen.getByRole('contentinfo');
+    expect(footer).toBeInTheDocument();
+    expect(
+      screen.getByText('No social networks configured yet')
+    ).toBeInTheDocument();
   });
 
-  it('should not render when social networks array is empty', () => {
+  it('should render placeholder when social networks array is empty', () => {
     render(<SocialNetworksFooter socialNetworks={[]} />);
 
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+    const footer = screen.getByRole('contentinfo');
+    expect(footer).toBeInTheDocument();
+    expect(
+      screen.getByText('No social networks configured yet')
+    ).toBeInTheDocument();
   });
 
-  it('should not render when social networks is undefined', () => {
+  it('should render placeholder when social networks is undefined', () => {
     render(<SocialNetworksFooter socialNetworks={undefined} />);
 
-    expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
+    const footer = screen.getByRole('contentinfo');
+    expect(footer).toBeInTheDocument();
+    expect(
+      screen.getByText('No social networks configured yet')
+    ).toBeInTheDocument();
   });
 
   it('should render footer with social networks', () => {
