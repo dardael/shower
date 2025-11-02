@@ -136,7 +136,7 @@ test.describe('Social Networks Management', () => {
 
     // Should show validation error
     await expect(
-      page.getByText('Instagram URL is required when enabled')
+      page.getByText('Instagram URL is required when enabled').first()
     ).toBeVisible();
   });
 
@@ -158,7 +158,7 @@ test.describe('Social Networks Management', () => {
 
     // Should show success message
     await expect(
-      page.getByText('Social networks updated successfully')
+      page.getByText('Social networks updated successfully').first()
     ).toBeVisible();
 
     // Verify the values are still there after save
@@ -192,7 +192,7 @@ test.describe('Social Networks Management', () => {
 
     // Should show success message
     await expect(
-      page.getByText('Social networks updated successfully')
+      page.getByText('Social networks updated successfully').first()
     ).toBeVisible();
 
     // Verify both networks are enabled and saved
@@ -227,7 +227,7 @@ test.describe('Social Networks Management', () => {
 
     // Should show success message
     await expect(
-      page.getByText('Social networks updated successfully')
+      page.getByText('Social networks updated successfully').first()
     ).toBeVisible();
 
     // Verify values
@@ -256,7 +256,7 @@ test.describe('Social Networks Management', () => {
 
     // Wait for success message
     await expect(
-      page.getByText('Social networks updated successfully')
+      page.getByText('Social networks updated successfully').first()
     ).toBeVisible({ timeout: 10000 });
 
     // Loading state should be gone and button should be back to normal

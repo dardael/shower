@@ -57,7 +57,9 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.logErrorWithObject(error, 'Test auth error', { error });
+    logger.logErrorWithObject(error, 'Test auth error', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

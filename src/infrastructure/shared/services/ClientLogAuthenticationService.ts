@@ -234,13 +234,6 @@ export class ClientLogAuthenticationService {
   }
 
   /**
-   * Generate a secure secret key if not provided
-   */
-  private generateSecretKey(): string {
-    return crypto.randomBytes(32).toString('hex');
-  }
-
-  /**
    * Parse allowed origins from environment variable
    */
   private parseAllowedOrigins(): string[] {
@@ -256,6 +249,13 @@ export class ClientLogAuthenticationService {
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean);
+  }
+
+  /**
+   * Generate a secure secret key if not provided
+   */
+  private generateSecretKey(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   /**

@@ -3,15 +3,9 @@ import { TestDatabase } from '../fixtures/test-database';
 import { signIn } from '../fixtures/authHelpers';
 
 // Setup for each test
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async () => {
   await TestDatabase.connect();
   await TestDatabase.cleanDatabase();
-  page.on('console', (msg) => {
-    // Filter out messages if needed
-    if (msg.type() === 'log') {
-      console.log(`Browser console log: ${msg.text()}`);
-    }
-  });
 });
 
 test.afterEach(async () => {
