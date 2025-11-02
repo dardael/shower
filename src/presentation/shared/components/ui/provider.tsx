@@ -157,8 +157,9 @@ function ProviderWithLogger(props: ColorModeProviderProps) {
           // Check for potential memory leaks
           const queueSize = adapter.getQueueSize();
           if (queueSize && queueSize > 100) {
-            console.warn(
-              `RemoteLogger: Large queue size detected (${queueSize}), potential memory leak`
+            logger.warn(
+              `RemoteLogger: Large queue size detected (${queueSize}), potential memory leak`,
+              { queueSize, threshold: 100 }
             );
           }
         }

@@ -17,9 +17,28 @@ export function SocialNetworksFooter({
   maxItems,
   showTitle = false,
 }: SocialNetworksFooterProps) {
-  // Don't render if no social networks are configured
+  // Always render footer element, but show minimal content when no social networks
   if (!socialNetworks || socialNetworks.length === 0) {
-    return null;
+    return (
+      <Box
+        as="footer"
+        data-testid="social-networks-footer"
+        bg="bg.subtle"
+        borderTopWidth="1px"
+        borderColor="border"
+        py={{ base: 4, md: 6 }}
+        px={{ base: 4, md: 8 }}
+        width="full"
+        role="contentinfo"
+        aria-label="Social networks footer"
+      >
+        <VStack gap={2} maxW="container.xl" mx="auto" textAlign="center">
+          <Text color="fg.muted" fontSize="sm">
+            No social networks configured yet
+          </Text>
+        </VStack>
+      </Box>
+    );
   }
 
   // Limit items if maxItems is specified
@@ -30,6 +49,7 @@ export function SocialNetworksFooter({
   return (
     <Box
       as="footer"
+      data-testid="social-networks-footer"
       bg="bg.subtle"
       borderTopWidth="1px"
       borderColor="border"

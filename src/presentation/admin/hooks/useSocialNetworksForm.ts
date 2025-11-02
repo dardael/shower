@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
 
@@ -33,28 +34,67 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const logger = useLogger();
 
-  const fetchSocialNetworks = async () => {
+  // Track toast messages to prevent duplicates with proper cleanup
+  const toastMessagesRef = useRef<Set<string>>(new Set());
+  const toastTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+
+  // Cleanup function for toast deduplication
+  const clearToastMessage = useCallback((message: string) => {
+    toastMessagesRef.current.delete(message);
+    const timeouts = toastTimeoutsRef.current;
+    const timeout = timeouts.get(message);
+    if (timeout) {
+      clearTimeout(timeout);
+      timeouts.delete(message);
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    const timeouts = toastTimeoutsRef.current;
+    return () => {
+      // Clear all pending timeouts when component unmounts
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
+    };
+  }, []);
+
+  const fetchSocialNetworks = useCallback(async () => {
+    logger.info('Fetching social networks');
     try {
       const response = await fetch('/api/settings/social-networks');
       const data = await response.json();
 
       if (data.success) {
         setSocialNetworks(data.data);
+        logger.info('Social networks fetched successfully', {
+          count: data.data.length,
+        });
       } else {
         throw new Error(data.error || 'Failed to fetch social networks');
       }
-    } catch {
-      toaster.create({
-        title: 'Error',
-        description: 'Failed to load social networks',
-        type: 'error',
-        duration: 3000,
-      });
+    } catch (error) {
+      logger.logErrorWithObject(error, 'Failed to fetch social networks');
+      const message = 'Failed to load social networks';
+      if (!toastMessagesRef.current.has(message)) {
+        toaster.create({
+          title: 'Error',
+          description: message,
+          type: 'error',
+          duration: 3000,
+        });
+        toastMessagesRef.current.add(message);
+        const timeout = setTimeout(() => {
+          clearToastMessage(message);
+        }, 3000);
+        toastTimeoutsRef.current.set(message, timeout);
+      }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clearToastMessage, logger]);
 
   const handleUrlChange = useCallback(
     (type: SocialNetworkType, url: string) => {
@@ -109,28 +149,46 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     for (const socialNetwork of socialNetworks) {
       if (socialNetwork.enabled) {
         if (!socialNetwork.url.trim()) {
-          toaster.create({
-            title: 'Validation Error',
-            description: `${getConfig(socialNetwork.type).label} URL is required when enabled`,
-            type: 'error',
-            duration: 3000,
-          });
+          const config = getConfig(socialNetwork.type);
+          const message = `${config.label} URL is required when enabled`;
+          if (!toastMessagesRef.current.has(message)) {
+            toaster.create({
+              title: 'Validation Error',
+              description: message,
+              type: 'error',
+              duration: 3000,
+            });
+            toastMessagesRef.current.add(message);
+            const timeout = setTimeout(() => {
+              clearToastMessage(message);
+            }, 3000);
+            toastTimeoutsRef.current.set(message, timeout);
+          }
           return false;
         }
 
         if (!socialNetwork.label.trim()) {
-          toaster.create({
-            title: 'Validation Error',
-            description: `${getConfig(socialNetwork.type).label} label is required when enabled`,
-            type: 'error',
-            duration: 3000,
-          });
+          const config = getConfig(socialNetwork.type);
+          const message = `${config.label} label is required when enabled`;
+          if (!toastMessagesRef.current.has(message)) {
+            toaster.create({
+              title: 'Validation Error',
+              description: message,
+              type: 'error',
+              duration: 3000,
+            });
+            toastMessagesRef.current.add(message);
+            const timeout = setTimeout(() => {
+              clearToastMessage(message);
+            }, 3000);
+            toastTimeoutsRef.current.set(message, timeout);
+          }
           return false;
         }
       }
     }
     return true;
-  }, [socialNetworks, getConfig]);
+  }, [socialNetworks, getConfig, clearToastMessage]);
 
   const handleSubmit = async () => {
     if (!validateForm()) {
@@ -138,6 +196,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     }
 
     setIsSaving(true);
+    logger.info('Updating social networks', { count: socialNetworks.length });
     try {
       const requestData = {
         socialNetworks: socialNetworks.map((socialNetwork) => ({
@@ -159,22 +218,42 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
       const data = await response.json();
 
       if (data.success) {
-        toaster.create({
-          title: 'Success',
-          description: 'Social networks updated successfully',
-          type: 'success',
-          duration: 3000,
-        });
+        logger.info('Social networks updated successfully');
+        const message = 'Social networks updated successfully';
+        if (!toastMessagesRef.current.has(message)) {
+          toaster.create({
+            title: 'Success',
+            description: message,
+            type: 'success',
+            duration: 3000,
+          });
+          toastMessagesRef.current.add(message);
+          const timeout = setTimeout(() => {
+            clearToastMessage(message);
+          }, 3000);
+          toastTimeoutsRef.current.set(message, timeout);
+        }
       } else {
         throw new Error(data.error || 'Failed to update social networks');
       }
     } catch (error) {
-      toaster.create({
-        title: 'Error',
-        description: `Failed to update social networks: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        type: 'error',
-        duration: 5000,
-      });
+      logger.logErrorWithObject(error, 'Failed to update social networks');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      const message = `Failed to update social networks: ${errorMessage}`;
+      if (!toastMessagesRef.current.has(message)) {
+        toaster.create({
+          title: 'Error',
+          description: message,
+          type: 'error',
+          duration: 3000,
+        });
+        toastMessagesRef.current.add(message);
+        const timeout = setTimeout(() => {
+          clearToastMessage(message);
+        }, 3000);
+        toastTimeoutsRef.current.set(message, timeout);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -182,7 +261,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
 
   useEffect(() => {
     fetchSocialNetworks();
-  }, []);
+  }, [fetchSocialNetworks]);
 
   return {
     socialNetworks,
