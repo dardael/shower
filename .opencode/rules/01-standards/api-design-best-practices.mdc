@@ -8,7 +8,6 @@ Sub rule 1: API Structure and Organization
 - Use RESTful conventions: GET for retrieval, POST for creation, PUT for updates, DELETE for removal
 - Organize endpoints by resource hierarchy: `/api/settings`, `/api/settings/theme-color`, `/api/settings/icon`
 - Use descriptive endpoint names that clearly indicate the resource and operation
-- Group related endpoints under common resource paths for logical organization
 - Maintain consistent URL patterns across all API routes
 
 Sub rule 2: Request and Response Formats
@@ -17,13 +16,6 @@ Sub rule 2: Request and Response Formats
 - Use standard error format: `{ "error": "Error description" }`
 - Include relevant data in responses: `{ "data": {}, "message": "Success" }`
 - Use HTTP status codes appropriately: 200 for success, 400 for client errors, 401 for auth, 500 for server errors
-
-Sub rule 3: Backward Compatibility
-- Never make breaking changes to existing API endpoints
-- Add new optional fields to responses instead of changing existing structure
-- Use conditional object spreading for optional fields: `{ ...(optionalField && { optionalField }) }`
-- Maintain existing parameter names and types when extending functionality
-- Ensure existing API consumers continue to work without modifications
 
 Sub rule 4: Performance Optimization
 - Use static imports instead of dynamic imports for security and performance
@@ -46,19 +38,11 @@ Sub rule 6: Authentication and Security
 - Never expose sensitive information in error messages
 - Use environment variables for configuration, never hardcoded secrets
 
-Sub rule 7: API Documentation
-- Document all endpoints with request/response examples
-- Include HTTP status codes and their meanings
-- Provide clear parameter descriptions and validation rules
-- Include authentication requirements and rate limiting information
-- Document backward compatibility considerations and optional fields
-
 Sub rule 8: Logging and Monitoring
 - Use structured logging with the enhanced logging system
 - Log API requests with method, URL, and user context: `logger.logApiRequest()`
 - Log API responses with status code and duration: `logger.logApiResponse()`
 - Include correlation IDs for request tracking
-- Monitor performance metrics and error rates
 
 Sub rule 9: Testing and Quality Assurance
 - Write comprehensive unit tests for all API endpoints

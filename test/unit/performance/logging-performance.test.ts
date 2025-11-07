@@ -1,21 +1,6 @@
 import { AsyncFileLoggerAdapter } from '@/infrastructure/shared/adapters/AsyncFileLoggerAdapter';
 import { EnhancedLogFormatterService } from '@/domain/shared/services/EnhancedLogFormatterService';
 
-// Mock the container to avoid ES module issues
-jest.mock('@/infrastructure/enhancedContainer', () => ({
-  EnhancedLoggerServiceLocator: {
-    getLogger: () => ({
-      info: jest.fn(),
-      debug: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      logApiRequest: jest.fn(),
-      logApiResponse: jest.fn(),
-      measure: jest.fn(),
-    }),
-  },
-}));
-
 describe('Logging Performance Tests', () => {
   let logger: AsyncFileLoggerAdapter;
   let formatter: EnhancedLogFormatterService;

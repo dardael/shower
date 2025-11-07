@@ -8,10 +8,8 @@ Sub rule 1: Import React Icons
 - Import icons from `react-icons` library instead of using inline SVG
 - Use specific icon imports: `import { FcGoogle } from 'react-icons/fc'`
 - Use icon sets: `fa` (Font Awesome), `fi` (Feather), `hi` (Heroicons), `io` (Ionicons), `bs` (Bootstrap), `fc` (Flat Color), etc.
-- Import multiple icons: `import { FcGoogle, FcGithub, FcLock } from 'react-icons/fc'`
 
 Sub rule 2: Icon Implementation
-- Replace inline `<svg>` elements with React Icon components
 - Use icon components directly: `<FcGoogle size={20} />`
 - Apply size using `size` prop instead of width/height attributes
 - Use `color` prop for icon coloring when needed
@@ -23,14 +21,7 @@ Sub rule 3: Styling and Sizing
 - Use Chakra spacing utilities for icon spacing: `gap={2}`, `gap={3}`
 - Apply color through Chakra theme: `color="fg.muted"` or via icon `color` prop
 
-Sub rule 4: Common Icon Replacements
-- Replace Google SVG with: `<FcGoogle size={20} />`
-- Replace GitHub SVG with: `<AiFillGithub size={20} />` or `<FaGithub size={20} />`
-- Replace login/auth icons with: `<FiLogIn size={20} />`, `<FiUser size={20} />`
-- Replace logout icons with: `<FiLogOut size={20} />`
-- Replace settings icons with: `<FiSettings size={20} />` or `<IoSettingsOutline size={20} />`
-
-Sub rule 5: Performance Considerations
+Sub rule 4: Performance Considerations
 - React Icons are tree-shakable, only import used icons
 - Icons are optimized SVG components bundled with the library
 - Avoid creating custom icon components unless absolutely necessary

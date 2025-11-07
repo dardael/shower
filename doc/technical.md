@@ -171,15 +171,6 @@ class UserService {
 }
 ```
 
-#### **Manual Instantiation**
-
-```typescript
-import { EnhancedLoggerServiceLocator } from '@/infrastructure/enhancedContainer';
-
-const logger = EnhancedLoggerServiceLocator.getLogger();
-logger.info('Manual logging example', { context: 'manual' });
-```
-
 #### **API Request/Response Logging**
 
 ```typescript

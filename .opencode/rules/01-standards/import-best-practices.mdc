@@ -18,24 +18,19 @@ Sub rule 2: When to Use Dynamic Imports
 - Use dynamic imports for non-critical features that can load asynchronously
 
 Sub rule 3: Static Import Patterns
-- Place all static imports at the top of the file, grouped by category
 - Group external library imports first, then internal module imports
 - Use `import type` for type-only imports to improve tree-shaking
-- Keep import statements organized and consistent across the codebase
 - Example: `import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork'`
 
 Sub rule 4: Dynamic Import Patterns
 - Use `await import()` syntax for dynamic imports within functions
 - Only use dynamic imports when there's a clear performance or architectural benefit
-- Ensure dynamic imports are properly handled with try-catch blocks
 - Cache dynamically imported modules when appropriate to avoid repeated loading
 - Example: `const { HeavyComponent } = await import('./HeavyComponent')`
 
 Sub rule 5: Performance Considerations
 - Static imports are bundled at build time and loaded synchronously
 - Dynamic imports create separate bundles that load on-demand
-- Avoid dynamic imports for small, frequently used modules
-- Use dynamic imports for large libraries (chart libraries, editors, etc.)
 - Consider the network cost of additional requests when using dynamic imports
 
 Sub rule 6: Code Readability and Maintenance
@@ -43,16 +38,3 @@ Sub rule 6: Code Readability and Maintenance
 - Dynamic imports can hide dependencies and make code harder to understand
 - Use descriptive variable names for dynamically imported modules
 - Document why a dynamic import is necessary when used
-- Prefer static imports for better IDE support and refactoring capabilities
-
-Sub rule 7: Domain and Application Layer Guidelines
-- Always use static imports for domain entities, value objects, and services
-- Use static imports for application services and use cases
-- Avoid dynamic imports for core business logic
-- Dynamic imports in domain/application layers should be rare and well-justified
-
-Sub rule 8: Presentation Layer Guidelines
-- Use dynamic imports for large UI components or pages
-- Use dynamic imports for route-based code splitting
-- Use static imports for shared UI components and utilities
-- Consider lazy loading for components that are not immediately visible

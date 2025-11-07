@@ -6,14 +6,12 @@ alwaysApply: false
 
 Sub rule 1: Design Integration Workflow
 - Create/validate designs before implementation begins.
-- Review designs with stakeholders (product owners, designers, developers).
 
 Sub rule 2: Design Implementation Guidelines
 - Implement domain-driven design in the `src/domain` layer for entities, value-objects, and services.
 - Implement use cases derived from designs in the `src/application` layer to encapsulate business logic.
 - Translate designs into React components in the `src/presentation` layer.
 - Place reusable components under `src/presentation/shared/components`.
-- Use TailwindCSS for styling in components, and generate classes directly from designs.
 - Add infrastructure-specific implementations in the `src/infrastructure` layer to isolate external dependencies from core logic.
 - Maintain consistent naming conventions from design specs to code (classes, interfaces, and components).
 

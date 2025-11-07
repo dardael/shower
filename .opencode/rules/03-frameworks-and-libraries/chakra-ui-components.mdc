@@ -8,7 +8,6 @@ Sub rule 1: Component Structure
 - Import Chakra UI components from `@chakra-ui/react`
 - Use Chakra UI layout components (`Box`, `Stack`, `Flex`, `Grid`) instead of custom divs
 - Prefer semantic Chakra components (`Container`, `Heading`, `Text`) over HTML elements
-- Use Chakra's `Button` component for all button interactions
 - Use Chakra v3 form components with compound patterns (`Field.Root`, `Field.Label`, `Input`, `Field.ErrorText`)
 - Use `asChild` prop for styling external components like Next.js Image/Link
   - Use {"my ' text"} when a text has a caracter to encode to avoid to write the encoded caracter
@@ -46,8 +45,6 @@ Sub rule 5: Conditional Styling and States
 Sub rule 6: Accessibility
 - Use Chakra's built-in accessibility features and ARIA support
 - Apply proper `aria` labels when using custom components
-- Use `_highContrast`, `_lessContrast` for accessibility preferences
-- Use `_motionSafe` for reduced motion preferences
 - Ensure keyboard navigation works with Chakra components
 - Use focus ring customization: `focusRingWidth="2px"`, `focusRingStyle="dashed"`
 
@@ -55,7 +52,6 @@ Sub rule 7: Component Composition
 - Wrap components in `Box` or `Stack` for layout structure
 - Use `VStack` for vertical layouts, `HStack` for horizontal
 - Use `chakra()` factory to style external components
-- Create reusable component recipes with `defineRecipe`
 - Use `layerStyle` and `textStyle` for consistent styling patterns
 
 Sub rule 8: Form Component Patterns (Chakra UI v3)

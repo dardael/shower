@@ -11,7 +11,6 @@ This project aims to create a robust, scalable, and maintainable web application
 
 ## Nextjs
 
-- **React components** Use Next js server components as much as possible, only use client components when necessary (e.g. for interactivity).
 - **App Router** Use the app directory structure and follow the conventions for routing, layouts, and metadata.
 - **Data fetching** Use Next.js API routes and avoid server actions.
 
@@ -52,14 +51,7 @@ shower/
 │   ├── presentation/         # Presentation Layer (React components)
 │   │   ├── admin/
 │   │   │   ├── components/
-│   │   │   │   ├── AdminDashboard.tsx    -> Admin dashboard component
-│   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
-│   │   │   │   ├── NotAuthorized.tsx     -> Not authorized component
-│   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
-│   │   │   │   ├── ThemeColorSelector.tsx -> Theme color selector component
-│   │   │   │   └── WebsiteSettingsForm.tsx -> Website settings form
 │   │   │   └── hooks/
-│   │   │       └── useSocialNetworksForm.ts -> Hook for social networks form
 │   │   └── shared/
 │   │       ├── components/
 │   │       │   ├── ImageManager/
@@ -80,30 +72,14 @@ shower/
 │   ├── domain/               # Domain Layer (entities, business rules)
 │   │   ├── auth/
 │   │   │   ├── entities/
-│   │   │   │   └── User.ts             -> User entity
 │   │   │   ├── services/
-│   │   │   │   └── AdminAccessPolicyService.ts -> Business rules for admin access
 │   │   │   └── value-objects/
-│   │   │       └── AdminAccessPolicy.ts -> Value object for admin access policy
 │   │   ├── settings/
 │   │   │   ├── constants/
-│   │   │   │   ├── SocialNetworkConfig.ts -> Social network configuration constants
-│   │   │   │   └── ThemeColorPalette.ts -> Theme color palette constants
 │   │   │   ├── entities/
-│   │   │   │   ├── SocialNetwork.ts   -> Social network entity
-│   │   │   │   └── WebsiteSettings.ts -> Website settings entity
 │   │   │   ├── repositories/
-│   │   │   │   ├── SocialNetworkRepository.ts -> Social network repository interface
-│   │   │   │   └── WebsiteSettingsRepository.ts -> Website settings repository interface
 │   │   │   ├── services/
-│   │   │   │   └── SocialNetworkValidationService.ts -> Social network validation service
 │   │   │   └── value-objects/
-│   │   │       ├── SocialNetworkLabel.ts -> Social network label value object
-│   │   │       ├── SocialNetworkType.ts -> Social network type value object
-│   │   │       ├── SocialNetworkUrl.ts -> Social network URL value object
-│   │   │       ├── ThemeColor.ts -> Theme color value object
-│   │   │       ├── WebsiteIcon.ts -> Website icon value object
-│   │   │       └── WebsiteName.ts -> Website name value object
 │   │   └── shared/
 │   │       ├── services/
 │   │       │   ├── EnhancedLogFormatterService.ts -> Enhanced log formatting service
@@ -113,27 +89,7 @@ shower/
 │   ├── application/          # Application Layer (use-cases, services)
 │   │   ├── auth/
 │   │   │   ├── services/
-│   │   │   │   └── IBetterAuthClientService.ts -> BetterAuth client service interface
-│   │   │   ├── AuthorizeAdminAccess.ts -> Use case for authorizing admin access
-│   │   │   └── IAuthorizeAdminAccess.ts -> Interface for AuthorizeAdminAccess use case
 │   │   ├── settings/
-│   │   │   ├── GetSocialNetworks.ts -> Use case for getting social networks
-│   │   │   ├── GetThemeColor.ts -> Use case for getting theme color
-│   │   │   ├── GetWebsiteIcon.ts -> Use case for getting website icon
-│   │   │   ├── GetWebsiteName.ts -> Use case for getting website name
-│   │   │   ├── IGetSocialNetworks.ts -> Interface for GetSocialNetworks use case
-│   │   │   ├── IGetThemeColor.ts -> Interface for GetThemeColor use case
-│   │   │   ├── IGetWebsiteIcon.ts -> Interface for GetWebsiteIcon use case
-│   │   │   ├── IGetWebsiteName.ts -> Interface for GetWebsiteName use case
-│   │   │   ├── IUpdateSocialNetworks.ts -> Interface for UpdateSocialNetworks use case
-│   │   │   ├── IUpdateThemeColor.ts -> Interface for UpdateThemeColor use case
-│   │   │   ├── IUpdateWebsiteIcon.ts -> Interface for UpdateWebsiteIcon use case
-│   │   │   ├── IUpdateWebsiteName.ts -> Interface for UpdateWebsiteName use case
-│   │   │   ├── SocialNetworkFactory.ts -> Factory for creating social networks
-│   │   │   ├── UpdateSocialNetworks.ts -> Use case for updating social networks
-│   │   │   ├── UpdateThemeColor.ts -> Use case for updating theme color
-│   │   │   ├── UpdateWebsiteIcon.ts -> Use case for updating website icon
-│   │   │   └── UpdateWebsiteName.ts -> Use case for updating website name
 │   │   └── shared/
 │   │       ├── ContextualLogger.ts -> Contextual logging service
 │   │       ├── ILogger.ts -> Logger interface
@@ -142,18 +98,11 @@ shower/
 │   ├── infrastructure/       # Infrastructure Layer (adapters, database)
 │   │   ├── auth/
 │   │   │   ├── adapters/
-│   │   │   │   └── BetterAuthClientAdapter.ts -> BetterAuth client adapter
-│   │   │   └── BetterAuthInstance.ts -> BetterAuth instance configuration
 │   │   ├── settings/
 │   │   │   ├── models/
-│   │   │   │   ├── SocialNetworkModel.ts -> Mongoose social network model
-│   │   │   │   └── WebsiteSettingsModel.ts -> Mongoose website settings model
 │   │   │   └── repositories/
-│   │   │       ├── MongooseSocialNetworkRepository.ts -> Mongoose social network repository
-│   │   │       └── MongooseWebsiteSettingsRepository.ts -> Mongoose website settings repository
 │   │   ├── shared/
 │   │   │   ├── adapters/
-│   │   │   │   ├── AsyncFileLoggerAdapter.ts -> Async file logger adapter
 │   │   │   │   └── FileLoggerAdapter.ts -> File logger adapter
 │   │   │   ├── middleware/
 │   │   │   │   └── requestContext.ts -> Request context middleware
@@ -166,15 +115,9 @@ shower/
 │   │   │   ├── databaseInitialization.ts -> Database initialization
 │   │   │   └── layoutUtils.ts -> Layout utilities for database initialization and route detection
 │   │   ├── container.ts -> Dependency injection container
-│   │   └── enhancedContainer.ts -> Enhanced dependency injection container
 ├── test/                     # Test Layer
 │   ├── e2e/                  # End-to-end tests
 │   │   ├── admin/
-│   │   │   ├── admin-page.spec.ts -> Admin page e2e tests
-│   │   │   ├── footer-visibility.spec.ts -> Footer visibility e2e tests
-│   │   │   ├── icon-management.spec.ts -> Icon management e2e tests
-│   │   │   ├── social-networks-management.spec.ts -> Social networks management e2e tests
-│   │   │   └── theme-color-management.spec.ts -> Theme color management e2e tests
 │   │   ├── fixtures/
 │   │   │   ├── authHelpers.ts -> Authentication test helpers
 │   │   │   └── test-database.ts -> Test database setup
@@ -183,69 +126,34 @@ shower/
 │   ├── unit/                 # Unit tests (following same structure as src)
 │   │   ├── application/
 │   │   │   ├── auth/
-│   │   │   │   └── AuthorizeAdminAccess.test.ts -> Admin access authorization tests
 │   │   │   ├── settings/
-│   │   │   │   ├── GetSocialNetworks.test.ts -> Get social networks tests
-│   │   │   │   ├── GetThemeColor.test.ts -> Get theme color tests
-│   │   │   │   ├── GetWebsiteIcon.test.ts -> Get website icon tests
-│   │   │   │   ├── GetWebsiteName.test.ts -> Get website name tests
-│   │   │   │   ├── UpdateSocialNetworks.test.ts -> Update social networks tests
-│   │   │   │   ├── UpdateThemeColor.test.ts -> Update theme color tests
-│   │   │   │   ├── UpdateWebsiteIcon.test.ts -> Update website icon tests
-│   │   │   │   └── UpdateWebsiteName.test.ts -> Update website name tests
 │   │   │   └── shared/
-│   │   │       ├── Logger.test.ts -> Logger implementation tests
-│   │   │       ├── PerformanceMonitor.test.ts -> Performance monitor tests
-│   │   │       └── enhanced-logging-components.test.ts -> Enhanced logging tests
 │   │   ├── domain/
 │   │   │   ├── auth/
 │   │   │   │   └── value-objects/
-│   │   │   │       └── AdminAccessPolicy.test.ts -> Admin access policy tests
 │   │   │   ├── settings/
 │   │   │   │   ├── entities/
-│   │   │   │   │   ├── SocialNetwork.test.ts -> Social network entity tests
-│   │   │   │   │   └── WebsiteSettings.test.ts -> Website settings entity tests
 │   │   │   │   ├── services/
-│   │   │   │   │   └── SocialNetworkValidationService.test.ts -> Social network validation tests
 │   │   │   │   └── value-objects/
-│   │   │   │       ├── SocialNetworkLabel.test.ts -> Social network label tests
-│   │   │   │       ├── SocialNetworkType.test.ts -> Social network type tests
-│   │   │   │       ├── SocialNetworkUrl.test.ts -> Social network URL tests
-│   │   │   │       ├── ThemeColor.test.ts -> Theme color value object tests
-│   │   │   │       ├── WebsiteIcon.test.ts -> Website icon tests
-│   │   │   │       └── WebsiteName.test.ts -> Website name tests
 │   │   │   └── shared/
 │   │   │       ├── services/
-│   │   │       │   └── LogFormatterService.test.ts -> Log formatter service tests
 │   │   │       └── value-objects/
-│   │   │           └── LogLevel.test.ts -> Log level tests
 │   │   ├── infrastructure/
 │   │   │   ├── settings/
 │   │   │   │   └── repositories/
-│   │   │   │       └── MongooseWebsiteSettingsRepository.test.ts -> Mongoose repository tests
 │   │   │   └── shared/
 │   │   │       ├── adapters/
-│   │   │       │   └── FileLoggerAdapter.test.ts -> File logger adapter tests
 │   │   │       └── services/
-│   │   │           └── FileStorageService.test.ts -> File storage service tests
 │   │   ├── performance/
-│   │   │   └── logging-performance.test.ts -> Logging performance tests
 │   │   ├── app/
-│   │   │   ├── layout.test.tsx -> Root layout tests
 │   │   │   └── admin/
-│   │   │       └── layout.test.tsx -> Admin layout tests
 │   │   ├── presentation/
 │   │   │   ├── admin/
 │   │   │   │   ├── components/
-│   │   │   │   │   └── layout.test.tsx -> Admin layout component tests
 │   │   │   │   └── hooks/
-│   │   │   │       └── useSocialNetworksForm.test.tsx -> Social networks form hook tests
 │   │   │   └── shared/
 │   │   │       └── components/
 │   │   │           ├── ImageManager/
-│   │   │           │   └── ImageManager.test.tsx -> Image manager component tests
-│   │   │           ├── DarkModeToggle.test.tsx -> Dark mode toggle tests
-│   │   │           └── ThemeColorSelector.test.tsx -> Theme color selector component tests
 │   │   ├── jest-globals.d.ts -> Jest global type definitions
 │   │   ├── setup.ts -> Unit test setup
 │   │   ├── tsconfig.json -> Unit test TypeScript configuration
@@ -307,21 +215,6 @@ Before running e2e tests, you must complete these steps in order:
 3. **Run e2e tests**: `docker compose run --rm -T app npm run test:e2e`
 
 This ensures MongoDB is available for database operations and the application is properly built before Playwright tests execute, preventing timeouts in the opencode environment.
-
-## Code Style
-
-You must follow clean code principles and best practices.
-Furthermore, you must follow these specific rules:
-
-- **Imports**: Use `import type` for type-only imports; group by external/internal with blank lines
-- **Imports**: Use absolute imports from `src/` for internal modules
-- **Formatting**: Prettier config (semicolons, single quotes, 4-space indent, 80 char width, ES5 trailing commas)
-- **Types**: Strict TypeScript enabled; use explicit types for function parameters and return values
-- **Naming**: PascalCase for components/React elements, camelCase for variables/functions, UPPER_SNAKE for constants. do not use abbreviations.
-- **Error Handling**: Use try/catch for async operations; throw descriptive Error objects
-- **Components**: Functional components with TypeScript interfaces; use React.FC sparingly
-- **Styling**: Use Chakra UI for component styling and theming. Leverage Chakra's built-in responsive design system and accessibility features. Ensure responsive design with base/sm/md/lg/xl breakpoints for layouts.
-- **File Structure**: Next.js App Router; components in dedicated directories when reused
 
 ## Github
 

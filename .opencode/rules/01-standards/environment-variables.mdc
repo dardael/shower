@@ -36,7 +36,7 @@ Sub rule 5: Security Best Practices
 - Use TypeScript interfaces to type environment variables
 
 Sub rule 6: Documentation and Access
-- Document environment variables only in `README.md` or `doc/technical.md`
+- Document environment variables only in `README.md` and `doc/technical.md`
 - Do not add comments about environment variables in code files
 - Provide clear setup instructions for new developers in documentation
 - Production deployment will use `.env.local` for all environment variables

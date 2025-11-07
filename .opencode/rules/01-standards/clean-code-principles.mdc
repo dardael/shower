@@ -21,7 +21,6 @@ Sub rule 2: Small and Focused Functions
 Sub rule 3: Code Organization and Structure
 - Group related code together
 - Keep files focused on a single responsibility
-- Use barrel exports (`index.ts`) for clean imports
 - Organize imports: external libraries first, then internal modules
 - Avoid deep nesting (more than 3 levels)
 
@@ -61,11 +60,10 @@ Sub rule 7: Next.js Specific Clean Code
 - Use proper error boundaries for React components
 
 Sub rule 8: Comments and Documentation
-- Write self-documenting code that needs minimal comments
+- Write self-documenting code that needs no or minimal comments
 - Use comments only to explain why, not what
 - Update comments when code changes
 - Avoid commented-out code; remove it instead
-- Use JSDoc for complex functions with clear parameter and return descriptions
 
 Sub rule 9: Code Duplication (DRY)
 - Extract common logic into reusable functions
@@ -79,7 +77,6 @@ Sub rule 10: Readability and Formatting
 - Use meaningful whitespace to improve readability
 - Keep lines under 80 characters when possible
 - Use descriptive variable names even in short scopes
-- Write code as if the next developer is a violent psychopath
 
 Sub rule 11: Testing and Clean Code
 - Write tests that are easy to understand
