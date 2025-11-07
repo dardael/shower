@@ -4,6 +4,10 @@ agent: build
 model: zai-coding-plan/glm-4.6
 ---
 
+# Input
+
+$ARGUMENTS
+
 # Goal
 
 Implement a feature based on a detailed plan derived from a user story.
@@ -42,10 +46,10 @@ Implement a feature based on a detailed plan derived from a user story.
 - Ensure to follow coding standards and best practices.
 - Write unit tests for the new functionality where applicable.
 - Write end to end tests for the new functionality where applicable.
-- Document in @doc/functionnal.md the new functionality where applicable.
-- Document in @doc/technical.md the technical aspects of the implementation where applicable.
-- Update @README.md if necessary
-- Update codebase structure in @AGENTS.md
+- Document in doc/functionnal.md the new functionality where applicable.
+- Document in doc/technical.md the technical aspects of the implementation where applicable.
+- Update README.md if necessary
+- Update codebase structure in AGENTS.md
 
 ## Step 4: Test the implementation
 
