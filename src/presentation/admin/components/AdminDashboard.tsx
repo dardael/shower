@@ -10,17 +10,13 @@ import {
 } from '@chakra-ui/react';
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
-import WebsiteSettingsForm from './WebsiteSettingsForm';
-import SocialNetworksForm from './SocialNetworksForm';
 import AdminErrorBoundary from './AdminErrorBoundary';
 
 interface AdminDashboardProps {
-  initialWebsiteName: string;
+  children: React.ReactNode;
 }
 
-export default function AdminDashboard({
-  initialWebsiteName,
-}: AdminDashboardProps) {
+export default function AdminDashboard({ children }: AdminDashboardProps) {
   return (
     <Container
       maxW="container.xl"
@@ -95,13 +91,7 @@ export default function AdminDashboard({
           </VStack>
         </Box>
 
-        <AdminErrorBoundary>
-          <WebsiteSettingsForm initialName={initialWebsiteName} />
-        </AdminErrorBoundary>
-
-        <AdminErrorBoundary>
-          <SocialNetworksForm />
-        </AdminErrorBoundary>
+        <AdminErrorBoundary>{children}</AdminErrorBoundary>
 
         <LogoutButton />
       </Stack>

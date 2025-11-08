@@ -1,14 +1,11 @@
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { auth } from '@/infrastructure/auth/BetterAuthInstance';
 import { User } from '@/domain/auth/entities/User';
-import {
-  AuthServiceLocator,
-  SettingsServiceLocator,
-} from '@/infrastructure/container';
+import { AuthServiceLocator } from '@/infrastructure/container';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
 import { VStack, Heading, Box, AbsoluteCenter, Text } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
-import AdminDashboard from '@/presentation/admin/components/AdminDashboard';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
 import { container } from '@/infrastructure/container';
 
@@ -148,17 +145,11 @@ export default async function AdminPage() {
 
   // Connect to database first to ensure Better Auth can access it
   // Add error handling for build-time scenarios
-  let websiteName: string | null = null;
   let dbError: Error | null = null;
 
   try {
     const dbConnection = DatabaseConnection.getInstance();
     await dbConnection.connect();
-
-    if (isAuthorized) {
-      const getWebsiteName = SettingsServiceLocator.getWebsiteName();
-      websiteName = await getWebsiteName.execute();
-    }
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
     logger.execute(LogLevel.ERROR, 'Database connection error', { error });
@@ -198,7 +189,8 @@ export default async function AdminPage() {
   }
 
   if (isAuthorized) {
-    return <AdminDashboard initialWebsiteName={websiteName || ''} />;
+    // Redirect to website-settings as the first section
+    redirect('/admin/website-settings');
   } else {
     return <NotAuthorized />;
   }

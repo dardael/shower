@@ -5,6 +5,7 @@ import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
+import { useFormState } from './useFormState';
 
 export interface SocialNetworkFormData {
   type: SocialNetworkType;
@@ -26,6 +27,9 @@ export interface UseSocialNetworksFormReturn {
   ) => void;
   handleSubmit: () => Promise<void>;
   validateForm: () => boolean;
+  isDirty: boolean;
+  hasUnsavedChanges: boolean;
+  confirmNavigation: (targetUrl: string) => Promise<boolean>;
 }
 
 export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
@@ -35,6 +39,22 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const logger = useLogger();
+
+  // Form state management for unsaved changes detection
+  const {
+    isDirty,
+    hasUnsavedChanges,
+    updateFieldValue,
+    markAsClean,
+    confirmNavigation,
+  } = useFormState({
+    initialValues: { socialNetworks: [] },
+    onBeforeUnload: (hasChanges) => {
+      if (hasChanges) {
+        logger.info('User has unsaved social networks changes');
+      }
+    },
+  });
 
   // Track toast messages to prevent duplicates with proper cleanup
   const toastMessagesRef = useRef<Set<string>>(new Set());
@@ -69,6 +89,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
 
       if (data.success) {
         setSocialNetworks(data.data);
+        updateFieldValue('socialNetworks', data.data);
         logger.info('Social networks fetched successfully', {
           count: data.data.length,
         });
@@ -94,32 +115,30 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [clearToastMessage, logger]);
+  }, [clearToastMessage, logger, updateFieldValue]);
 
   const handleUrlChange = useCallback(
     (type: SocialNetworkType, url: string) => {
-      setSocialNetworks((prev) =>
-        prev.map((socialNetwork) =>
-          socialNetwork.type === type
-            ? { ...socialNetwork, url }
-            : socialNetwork
-        )
+      const updatedNetworks = socialNetworks.map((socialNetwork) =>
+        socialNetwork.type === type ? { ...socialNetwork, url } : socialNetwork
       );
+      setSocialNetworks(updatedNetworks);
+      updateFieldValue('socialNetworks', updatedNetworks);
     },
-    []
+    [socialNetworks, updateFieldValue]
   );
 
   const handleLabelChange = useCallback(
     (type: SocialNetworkType, label: string) => {
-      setSocialNetworks((prev) =>
-        prev.map((socialNetwork) =>
-          socialNetwork.type === type
-            ? { ...socialNetwork, label }
-            : socialNetwork
-        )
+      const updatedNetworks = socialNetworks.map((socialNetwork) =>
+        socialNetwork.type === type
+          ? { ...socialNetwork, label }
+          : socialNetwork
       );
+      setSocialNetworks(updatedNetworks);
+      updateFieldValue('socialNetworks', updatedNetworks);
     },
-    []
+    [socialNetworks, updateFieldValue]
   );
 
   const handleEnabledChange = useCallback(
@@ -129,15 +148,15 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
           ? details.checked
           : details.checked === 'true';
 
-      setSocialNetworks((prev) =>
-        prev.map((socialNetwork) =>
-          socialNetwork.type === type
-            ? { ...socialNetwork, enabled }
-            : socialNetwork
-        )
+      const updatedNetworks = socialNetworks.map((socialNetwork) =>
+        socialNetwork.type === type
+          ? { ...socialNetwork, enabled }
+          : socialNetwork
       );
+      setSocialNetworks(updatedNetworks);
+      updateFieldValue('socialNetworks', updatedNetworks);
     },
-    []
+    [socialNetworks, updateFieldValue]
   );
 
   const getConfig = useCallback(
@@ -219,6 +238,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
 
       if (data.success) {
         logger.info('Social networks updated successfully');
+        markAsClean();
         const message = 'Social networks updated successfully';
         if (!toastMessagesRef.current.has(message)) {
           toaster.create({
@@ -273,5 +293,8 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     handleEnabledChange,
     handleSubmit,
     validateForm,
+    isDirty,
+    hasUnsavedChanges,
+    confirmNavigation,
   };
 }

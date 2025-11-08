@@ -14,6 +14,13 @@ Implement a feature based on a detailed plan derived from a user story.
 
 # Rules
 
+- You're only source of truth is the provided plan at @TASKS.md:
+  - Follow it strictly. step by step.
+  - When you begin a step, write "Starting step {step number}: {step title}" in the Current Task section in TASKS.md file.
+  - When a step is completed, mark it as done in @TASKS.md.
+  - When a step failed, stop and ask for help.
+  - When compacting the session due to to big context, The file TASKS.md is the only file you should keep in context and you must follow it, read the current task from it and continue.
+  - for step 4 to 7, before doing anything, create corresponding tasks for the current step in TASKS.md. Then do them one by one.
 - Respect YAGNI principle: "You Ain't Gonna Need It".
 - Do not create more functionality beyond the plan provided and the user story.
 - Do not go to step 3 more than 3 times. if after 3 iterations the confidence level is still below 90%, stop and ask for help.
@@ -41,15 +48,9 @@ Implement a feature based on a detailed plan derived from a user story.
 
 ## Step 3: Implement the tasks
 
-- go through each task in the plan one by one.
+- Go through each task in the plan one by one.
 - Write code to implement the functionality described in each task.
 - Ensure to follow coding standards and best practices.
-- Write unit tests for the new functionality where applicable.
-- Write end to end tests for the new functionality where applicable.
-- Document in doc/functionnal.md the new functionality where applicable.
-- Document in doc/technical.md the technical aspects of the implementation where applicable.
-- Update README.md if necessary
-- Update codebase structure in AGENTS.md
 
 ## Step 4: Test the implementation
 

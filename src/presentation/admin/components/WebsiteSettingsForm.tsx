@@ -14,6 +14,8 @@ import ImageManager from '@/presentation/shared/components/ImageManager/ImageMan
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from './ThemeColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
+import { useFormState } from '../hooks/useFormState';
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
 
 import type {
   ImageData,
@@ -30,12 +32,24 @@ interface WebsiteSettingsFormProps {
 export default function WebsiteSettingsForm({
   initialName,
 }: WebsiteSettingsFormProps) {
+  const logger = useLogger();
   const [name, setName] = useState(initialName);
   const { themeColor, setThemeColor } = useDynamicTheme();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [iconLoading, setIconLoading] = useState(false);
+
+  // Form state management for unsaved changes detection
+  const { updateFieldValue, markAsClean } = useFormState({
+    initialValues: {
+      websiteName: initialName || '',
+      themeColor: themeColor || '#3182ce',
+    },
+    onBeforeUnload: (hasChanges) => {
+      logger.debug('Form before unload check', { hasChanges });
+    },
+  });
 
   const fetchWebsiteSettings = useCallback(async () => {
     try {
@@ -50,9 +64,11 @@ export default function WebsiteSettingsForm({
         const settingsData = await settingsResponse.json();
         if (settingsData.name) {
           setName(settingsData.name);
+          updateFieldValue('name', settingsData.name);
         }
         if (settingsData.themeColor) {
           setThemeColor(settingsData.themeColor);
+          updateFieldValue('themeColor', settingsData.themeColor);
         }
       }
 
@@ -60,23 +76,27 @@ export default function WebsiteSettingsForm({
       if (iconResponse.ok) {
         const iconData = await iconResponse.json();
         if (iconData.icon) {
-          setCurrentIcon({
+          const iconDataFormatted = {
             url: iconData.icon.url,
             filename: iconData.icon.filename,
             size: iconData.icon.size,
             format: iconData.icon.format,
-          });
+          };
+          setCurrentIcon(iconDataFormatted);
+          updateFieldValue('icon', iconDataFormatted);
         } else {
           setCurrentIcon(null);
+          updateFieldValue('icon', null);
         }
       } else {
         setCurrentIcon(null);
+        updateFieldValue('icon', null);
       }
     } catch {
       setMessage('Failed to load website settings. Please try again later.');
       setCurrentIcon(null);
     }
-  }, [setThemeColor]);
+  }, [setThemeColor, updateFieldValue]);
 
   useEffect(() => {
     fetchWebsiteSettings();
@@ -100,6 +120,7 @@ export default function WebsiteSettingsForm({
 
       if (response.ok) {
         setMessage('Website settings updated successfully!');
+        markAsClean();
         await fetchWebsiteSettings();
       } else {
         setMessage(data.error || 'Failed to update website name');
@@ -130,12 +151,14 @@ export default function WebsiteSettingsForm({
       const data = await response.json();
 
       if (response.ok) {
-        setCurrentIcon({
+        const iconDataFormatted = {
           url: data.icon.url,
           filename: data.icon.filename,
           size: data.icon.size,
           format: data.icon.format,
-        });
+        };
+        setCurrentIcon(iconDataFormatted);
+        updateFieldValue('icon', iconDataFormatted);
         setMessage('Website icon updated successfully!');
       } else {
         throw new Error(data.error || 'Failed to upload icon');
@@ -158,6 +181,7 @@ export default function WebsiteSettingsForm({
 
       if (response.ok) {
         setCurrentIcon(null);
+        updateFieldValue('icon', null);
         setMessage('Website icon removed successfully!');
       } else {
         throw new Error(data.error || 'Failed to remove icon');
@@ -256,7 +280,10 @@ export default function WebsiteSettingsForm({
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                updateFieldValue('name', e.target.value);
+              }}
               placeholder="Enter your website name"
               maxLength={50}
               required
@@ -326,7 +353,10 @@ export default function WebsiteSettingsForm({
 
           <ThemeColorSelector
             selectedColor={themeColor}
-            onColorChange={setThemeColor}
+            onColorChange={(color) => {
+              setThemeColor(color);
+              updateFieldValue('themeColor', color);
+            }}
             disabled={loading}
           />
 
