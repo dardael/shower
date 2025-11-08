@@ -26,71 +26,24 @@ Create a detailed plan to implement the user story. This plan will be used as a 
 
 # Steps
 
-## Step 1: Begin Understanding
-
-- Print all steps in short numbered list so the user know what we are doing.
-
-## Step 2: Plan Validation
+## Step 1: Plan Validation
 
 - Based on rules and documentation, ask the user to clarify the intentions.
 - Challenge him, detect inconsistencies and ambiguities.
 - Challenge technical choices, how will it be implemented?
 
-## Step 3: Confirmation by the developer
+## Step 2: Fill the "Instruction Template"
 
-- Print MAJOR tasks in groups.
-- ULTRA SHORT bullet points.
-- Ask user (the developer ) to confirm each group of tasks.
-
-## Step 4: Fill the "Instruction Template"
-
-- Fill "Instruction Template".
+- Fill "Instruction Template" found here: .opencode/template/planFeature.md.
 - Write straight to the point, no emojis, no style except titles, use bullet points.
 - Replace placeholders (`{variables}`) with actual user inputs.
 - Define flow of the feature, from start to end of what AI Editor should do.
-- Split tasks in logical groups by feature goals
-- Split each tasks in subtasks (frontend, backend, unit tests, e2e tests, documentation in AGENTS.md, doc/technical.md, doc/functionnal.md, etc).
-- Split each subtask in steps to be really detailled.
+- One task must be the smallest possible thing that can be done alone. (i a want to avoid tasks using And like "create component covering expand/collapse AND menu items interactions")
+- Each task must be identifiable by step number and task number.
+- Each task must begin by "[]". it will be marked as done by AI Editor by replacing it with "[x]".
+- You must only fill steps 1, 2, 3 and 5. If a step is not relevant, empty it.
 
-Instructions Template:
-
-```markdown
-# Instruction: {title}
-
-> Please follow this plan using proper rules.
-
-## Goal
-
-{goal}
-
-## Current task
-
-{must stay empty}
-
-## Grouped tasks
-
-### {Group 1}
-
-> {goal}
-
-- []{task1, with logical bridge to task2}
-  - []{subTask1 if needed}
-    - []{step 1}
-    - []{step 2}
-      -...
-  - []{subtask2 if needed}
-- []{task is needed}  
-  ...
-
-### {Group 2}
-
-> {goal}
-
-- []{task1}
-  ...
-```
-
-## Step 5: Final Review
+## Step 3: Final Review
 
 - Do a full review (list inconsistencies, ambiguities, missing details).
 - Evaluate confidence to implement, 0 = no confidence, 100 = 100% sure everything is correct.
@@ -101,15 +54,14 @@ Instructions Template:
   - **Completeness** → Are all key details covered?
   - **Correctness** → Are dependencies, versions, and steps accurate?
   - **Clarity** → Is the instruction unambiguous?
-- **Propose improvements in bullet points.**
+- **Propose improvements in number points.**
 - **User Confirmation:**
   - Ask: **"Would you like to integrate these suggestions? (YES/NO)"** and wait for response.
   - If **NO** → Keep as is.
   - If **YES** → Apply the changes.
 
-## Step 6: Deliver the plan
+## Step 4: Deliver the plan (Only after user response YES or NO)
 
 After the user has validated the plan :
 
-- If the file TASKS.md already exist, @general must delete it and create a new one.
-- Give it to @general to write the final plan in a TASKS.md file at the root of the project.
+- Give it to @general to write the final plan in a TASKS.md file at the root of the project. replace the current content if any.
