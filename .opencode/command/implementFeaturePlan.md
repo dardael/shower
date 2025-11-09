@@ -1,24 +1,19 @@
 ---
 description: Implement a plan
-agent: build
+agent: Core
 model: zai-coding-plan/glm-4.6
 ---
+
+# INPUT
+
+The plan can be found in the TASKS.md file.
 
 # Goal
 
 Implement a feature based on a detailed plan derived from a user story.
 
-# [IMPORTANT] Context
-
-When it is asked to summarize and to provide a detailed but concise summary of the conversation. give again the @TASKS.md file content as it is the only source of truth about what has to be done.
-
 # Rules
 
-- You're only source of truth is the provided plan at @TASKS.md:
-  - Follow it strictly. step by step.
-  - When you begin a task, write "Starting step {step number}: {task number}" in the Current Task section in TASKS.md file.
-  - When a task is completed, mark it as done in @TASKS.md.
-  - When a task failed, stop and ask for help.
 - Respect YAGNI principle: "You Ain't Gonna Need It".
 - Do not create more functionality beyond the plan provided and the user story.
 
