@@ -1,14 +1,10 @@
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { auth } from '@/infrastructure/auth/BetterAuthInstance';
-import { User } from '@/domain/auth/entities/User';
-import { AuthServiceLocator } from '@/infrastructure/container';
+import { AdminPageAuthenticatorator } from '@/infrastructure/auth/AdminPageAuthenticatorator';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
 import { VStack, Heading, Box, AbsoluteCenter, Text } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
 import { container } from '@/infrastructure/container';
-
 import { Logger } from '@/application/shared/Logger';
 import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
@@ -17,48 +13,8 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export default async function AdminPage() {
-  const headersList = await headers();
-
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
-
-  // Check for test authentication cookie (only in test environment)
-  const cookies = headersList.get('cookie');
-  const testSessionToken = cookies?.includes(
-    'better-auth.session_token=test-session-token'
-  );
-
-  // For testing, if we have the test cookie, create a mock session
-  let mockSession = null;
-  if (process.env.SHOWER_ENV === 'test' && testSessionToken) {
-    const userDataCookie = cookies?.match(/test-user-data=([^;]+)/)?.[1];
-    if (userDataCookie) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(userDataCookie));
-        mockSession = {
-          user: {
-            id: `test-user-${userData.email.replace(/[^a-zA-Z0-9]/g, '-')}`,
-            email: userData.email,
-            name: userData.isAdmin ? 'Test Admin' : 'Test User',
-            image: null,
-          },
-          session: {
-            id: 'test-session-id',
-            userId: `test-user-${userData.email.replace(/[^a-zA-Z0-9]/g, '-')}`,
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          },
-        };
-      } catch (error) {
-        const logger = container.resolve<Logger>('Logger');
-        logger.execute(LogLevel.ERROR, 'Failed to parse test user data', {
-          error,
-        });
-      }
-    }
-  }
-
-  const effectiveSession = session || mockSession;
+  const authenticator = new AdminPageAuthenticatorator();
+  const effectiveSession = await authenticator.getSession();
 
   if (!effectiveSession || !effectiveSession.user?.email) {
     return (
@@ -139,9 +95,9 @@ export default async function AdminPage() {
     );
   }
 
-  const user = new User(effectiveSession.user.email, true);
-  const authorizeAdminAccess = AuthServiceLocator.getAuthorizeAdminAccess();
-  const isAuthorized = authorizeAdminAccess.execute(user);
+  const isAuthorized = effectiveSession
+    ? await authenticator.isAuthorized(effectiveSession)
+    : false;
 
   // Connect to database first to ensure Better Auth can access it
   // Add error handling for build-time scenarios
@@ -189,7 +145,7 @@ export default async function AdminPage() {
   }
 
   if (isAuthorized) {
-    // Redirect to website-settings as the first section
+    // Redirect to first available section
     redirect('/admin/website-settings');
   } else {
     return <NotAuthorized />;
