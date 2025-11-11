@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { SocialNetworkSchema, type ISocialNetwork } from './SocialNetworkModel';
 import { THEME_COLOR_PALETTE } from '@/domain/settings/constants/ThemeColorPalette';
 
 export interface IIconMetadata {
@@ -18,7 +17,6 @@ export interface IWebsiteSettings extends Document {
     url: string;
     metadata: IIconMetadata;
   } | null;
-  socialNetworks: ISocialNetwork[];
   themeColor: string;
 }
 
@@ -117,10 +115,7 @@ const WebsiteSettingsSchema = new Schema<IWebsiteSettings>(
       type: IconSchema,
       default: null,
     },
-    socialNetworks: {
-      type: [SocialNetworkSchema],
-      default: [],
-    },
+
     themeColor: {
       type: String,
       required: true,

@@ -2,53 +2,19 @@ import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetwork
 import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
-import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
-import { Logger } from '@/application/shared/Logger';
 
 describe('UpdateSocialNetworks', () => {
   let updateSocialNetworks: UpdateSocialNetworks;
   let mockRepository: jest.Mocked<SocialNetworkRepository>;
-  let mockNormalizationService: jest.Mocked<ISocialNetworkUrlNormalizationService>;
-  let mockLogger: jest.Mocked<Logger>;
 
   beforeEach(() => {
     mockRepository = {
-      getAllSocialNetworks: jest.fn().mockResolvedValue([]),
-      updateSocialNetworks: jest.fn().mockResolvedValue(undefined),
-      getSocialNetworkByType: jest.fn().mockResolvedValue(null),
-    };
+      getAllSocialNetworks: jest.fn(),
+      updateSocialNetworks: jest.fn(),
+      getSocialNetworkByType: jest.fn(),
+    } as jest.Mocked<SocialNetworkRepository>;
 
-    mockNormalizationService = {
-      normalizeUrl: jest.fn(),
-      requiresNormalization: jest.fn(),
-    };
-
-    mockLogger = {
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      logApiRequest: jest.fn(),
-      logApiResponse: jest.fn(),
-      logError: jest.fn(),
-      logSecurity: jest.fn(),
-      logUserAction: jest.fn(),
-      logBusinessEvent: jest.fn(),
-      startTimer: jest.fn(),
-      endTimer: jest.fn(),
-      measure: jest.fn(),
-      withContext: jest.fn(),
-      logIf: jest.fn(),
-      debugIf: jest.fn(),
-      batch: jest.fn(),
-      execute: jest.fn(),
-    } as unknown as jest.Mocked<Logger>;
-
-    updateSocialNetworks = new UpdateSocialNetworks(
-      mockRepository,
-      mockNormalizationService,
-      mockLogger
-    );
+    updateSocialNetworks = new UpdateSocialNetworks(mockRepository);
   });
 
   it('should update social networks through repository', async () => {

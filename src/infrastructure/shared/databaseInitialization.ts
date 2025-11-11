@@ -2,6 +2,10 @@ import { DatabaseConnection } from './databaseConnection';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 
+// Import models to ensure they are registered with Mongoose
+import '@/infrastructure/settings/models/WebsiteSettingsModel';
+import '@/infrastructure/settings/models/SocialNetworkModel';
+
 let isInitialized = false;
 
 export async function initializeDatabase(): Promise<void> {

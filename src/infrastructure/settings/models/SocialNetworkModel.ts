@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface ISocialNetwork {
+export interface ISocialNetwork extends Document {
   type: string;
   url: string;
   label: string;
@@ -69,5 +69,12 @@ export const SocialNetworkSchema = new Schema<ISocialNetwork>(
       default: false,
     },
   },
-  { _id: false }
+  {
+    collection: 'socialNetworks',
+    timestamps: false, // No timestamps for social networks
+  }
 );
+
+export const SocialNetworkModel =
+  mongoose.models.SocialNetwork ||
+  mongoose.model<ISocialNetwork>('SocialNetwork', SocialNetworkSchema);
