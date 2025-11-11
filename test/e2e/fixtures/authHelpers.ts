@@ -22,7 +22,9 @@ export async function signIn(
     : 'non-admin@example.com';
 
   // Use the original test auth endpoint
-  const response = await page.request.post('/api/test/auth', {
+  // Use environment variable or fallback to localhost for Docker compatibility
+  const baseUrl = process.env.SHOWER_URL || 'http://localhost:3000';
+  const response = await page.request.post(`${baseUrl}/api/test/auth`, {
     data: { email, isAdmin },
     headers: {
       'X-Test-Auth': 'true',
@@ -62,5 +64,5 @@ export async function signIn(
     }
   }
 
-  await page.goto('/admin');
+  await page.goto(`/admin`);
 }
