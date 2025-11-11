@@ -58,6 +58,11 @@ export class SocialNetworkValidationService {
         field: 'url',
         message: `url must be less than ${VALIDATION_CONSTANTS.MAX_URL_LENGTH} characters`,
       });
+    } else if (data.enabled && data.url.trim() === '') {
+      errors.push({
+        field: 'url',
+        message: 'url is required when network is enabled',
+      });
     }
 
     // Validate label
