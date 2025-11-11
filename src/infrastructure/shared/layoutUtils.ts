@@ -1,6 +1,4 @@
 import { initializeDatabase } from './databaseInitialization';
-import { container } from '@/infrastructure/container';
-import { Logger } from '@/application/shared/Logger';
 
 // Database initialization timeout configuration
 const DATABASE_INIT_TIMEOUT = parseInt(
@@ -23,17 +21,7 @@ export async function initializeDatabaseForLayout(): Promise<void> {
         )
       ),
     ]);
-  } catch (error) {
-    try {
-      const logger = container.resolve<Logger>('Logger');
-      logger.logErrorWithObject(
-        error,
-        'Database initialization failed or timed out in layout',
-        { timeout: DATABASE_INIT_TIMEOUT }
-      );
-    } catch {
-      // Logger not available, continue silently
-    }
+  } catch {
     // Continue without database to allow app to start
   }
 }
@@ -62,9 +50,7 @@ export async function fetchWebsiteName(suffix?: string): Promise<string> {
     const data = await response.json();
     const baseName = data.name || 'Shower';
     return suffix ? `${baseName}${suffix}` : baseName;
-  } catch (error) {
-    const logger = container.resolve<Logger>('Logger');
-    logger.logErrorWithObject(error, 'Failed to fetch website name');
+  } catch {
     return suffix ? `Shower${suffix}` : 'Shower'; // Default fallback
   }
 }
@@ -92,9 +78,7 @@ export async function fetchWebsiteIcon(): Promise<string | null> {
 
     const data = await response.json();
     return data.icon?.url || null;
-  } catch (error) {
-    const logger = container.resolve<Logger>('Logger');
-    logger.logErrorWithObject(error, 'Failed to fetch website icon');
+  } catch {
     return null; // Default fallback
   }
 }

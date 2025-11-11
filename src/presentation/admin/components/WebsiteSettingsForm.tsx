@@ -16,14 +16,10 @@ import { ThemeColorSelector } from './ThemeColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useFormState } from '../hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
+import { useIconManagement } from '../hooks/useIconManagement';
+import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
-import type {
-  ImageData,
-  ImageMetadata,
-  ImageManagerConfig,
-  ImageManagerLabels,
-  ValidationError,
-} from '@/presentation/shared/components/ImageManager/types';
+import type { ImageData } from '@/presentation/shared/components/ImageManager/types';
 
 interface WebsiteSettingsFormProps {
   initialName: string;
@@ -38,15 +34,19 @@ export default function WebsiteSettingsForm({
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
-  const [iconLoading, setIconLoading] = useState(false);
 
   // Form state management for unsaved changes detection
-  const { updateFieldValue, markAsClean } = useFormState({
+  const {
+    updateFieldValue,
+    updateInitialValues,
+    markAsClean,
+    markAsInitialized,
+  } = useFormState({
     initialValues: {
       websiteName: initialName || '',
       themeColor: themeColor || '#3182ce',
     },
-    onBeforeUnload: (hasChanges) => {
+    onBeforeUnload: (hasChanges: boolean) => {
       logger.debug('Form before unload check', { hasChanges });
     },
   });
@@ -59,16 +59,18 @@ export default function WebsiteSettingsForm({
         fetch('/api/settings/icon'),
       ]);
 
+      const newValues: Record<string, unknown> = {};
+
       // Handle website settings (name and theme color)
       if (settingsResponse.ok) {
         const settingsData = await settingsResponse.json();
         if (settingsData.name) {
           setName(settingsData.name);
-          updateFieldValue('name', settingsData.name);
+          newValues.name = settingsData.name;
         }
         if (settingsData.themeColor) {
           setThemeColor(settingsData.themeColor);
-          updateFieldValue('themeColor', settingsData.themeColor);
+          newValues.themeColor = settingsData.themeColor;
         }
       }
 
@@ -83,20 +85,27 @@ export default function WebsiteSettingsForm({
             format: iconData.icon.format,
           };
           setCurrentIcon(iconDataFormatted);
-          updateFieldValue('icon', iconDataFormatted);
+          newValues.icon = iconDataFormatted;
         } else {
           setCurrentIcon(null);
-          updateFieldValue('icon', null);
+          newValues.icon = null;
         }
       } else {
         setCurrentIcon(null);
-        updateFieldValue('icon', null);
+        newValues.icon = null;
       }
+
+      // Update all values at once and mark as initialized
+      updateInitialValues({
+        websiteName: (newValues.name as string) || '',
+        themeColor: (newValues.themeColor as ThemeColorToken) || 'blue',
+      });
+      markAsInitialized();
     } catch {
       setMessage('Failed to load website settings. Please try again later.');
       setCurrentIcon(null);
     }
-  }, [setThemeColor, updateFieldValue]);
+  }, [setThemeColor, updateInitialValues, markAsInitialized]);
 
   useEffect(() => {
     fetchWebsiteSettings();
@@ -132,96 +141,22 @@ export default function WebsiteSettingsForm({
     }
   };
 
-  // Icon management functions
-  const handleIconUpload = async (
-    file: File,
-    metadata: ImageMetadata
-  ): Promise<void> => {
-    setIconLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('icon', file);
-      formData.append('metadata', JSON.stringify(metadata));
-
-      const response = await fetch('/api/settings/icon', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        const iconDataFormatted = {
-          url: data.icon.url,
-          filename: data.icon.filename,
-          size: data.icon.size,
-          format: data.icon.format,
-        };
-        setCurrentIcon(iconDataFormatted);
-        updateFieldValue('icon', iconDataFormatted);
-        setMessage('Website icon updated successfully!');
-      } else {
-        throw new Error(data.error || 'Failed to upload icon');
-      }
-    } catch (error) {
-      throw error;
-    } finally {
-      setIconLoading(false);
-    }
-  };
-
-  const handleIconDelete = async (): Promise<void> => {
-    setIconLoading(true);
-    try {
-      const response = await fetch('/api/settings/icon', {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setCurrentIcon(null);
-        updateFieldValue('icon', null);
-        setMessage('Website icon removed successfully!');
-      } else {
-        throw new Error(data.error || 'Failed to remove icon');
-      }
-    } catch (error) {
-      throw error;
-    } finally {
-      setIconLoading(false);
-    }
-  };
-
-  const handleIconReplace = async (
-    file: File,
-    metadata: ImageMetadata
-  ): Promise<void> => {
-    await handleIconUpload(file, metadata);
-  };
-
-  const handleIconValidationError = (error: ValidationError): void => {
-    setMessage(error.message);
-  };
-
-  // Icon manager configuration
-  const iconConfig: ImageManagerConfig = {
-    acceptedFormats: ['ico', 'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'],
-    maxFileSize: 2 * 1024 * 1024, // 2MB
-    previewSize: { width: '64px', height: '64px' },
-    aspectRatio: '1:1',
-  };
-
-  const iconLabels: ImageManagerLabels = {
-    uploadLabel: 'Upload Website Icon',
-    uploadHint:
-      'Upload a favicon for your website (ICO, PNG, JPG, SVG, GIF, WebP)',
-    replaceButton: 'Replace Icon',
-    deleteButton: 'Remove Icon',
-    dragDropText: 'Drag and drop your icon here',
-    sizeLimitText: 'Maximum file size: 2MB',
-    formatText: 'Supported formats: ICO, PNG, JPG, SVG, GIF, WebP',
-  };
+  // Icon management using custom hook
+  const {
+    iconLoading: iconManagementLoading,
+    handleIconUpload,
+    handleIconDelete,
+    handleIconReplace,
+    handleIconValidationError,
+    iconConfig,
+    iconLabels,
+  } = useIconManagement({
+    onIconChange: (iconData) => {
+      setCurrentIcon(iconData);
+      updateFieldValue('icon', iconData);
+    },
+    onMessage: setMessage,
+  });
 
   return (
     <Box
@@ -239,7 +174,7 @@ export default function WebsiteSettingsForm({
         left: 0,
         right: 0,
         height: '4px',
-        bg: 'linear-gradient(90deg, blue.500, purple.500)',
+        bg: 'linear-gradient(90deg, colorPalette.solid, colorPalette.muted)',
         borderRadius: '2xl 2xl 0 0',
       }}
     >
@@ -296,7 +231,6 @@ export default function WebsiteSettingsForm({
               _placeholder={{ color: 'fg.muted' }}
               _focus={{
                 borderColor: 'colorPalette.solid',
-                colorPalette: 'blue',
                 boxShadow: '0 0 0 3px colorPalette.subtle',
               }}
               _hover={{
@@ -332,8 +266,8 @@ export default function WebsiteSettingsForm({
                 onImageDelete={handleIconDelete}
                 onImageReplace={handleIconReplace}
                 onValidationError={handleIconValidationError}
-                disabled={iconLoading}
-                loading={iconLoading}
+                disabled={iconManagementLoading}
+                loading={iconManagementLoading}
                 showFileSize={true}
                 showFormatInfo={true}
                 allowDelete={true}
@@ -381,11 +315,13 @@ export default function WebsiteSettingsForm({
           px={3}
           py={2}
           borderRadius="md"
-          bg={message.includes('successfully') ? 'green.subtle' : 'red.subtle'}
-          color={message.includes('successfully') ? 'green.fg' : 'red.fg'}
+          bg={
+            message.includes('successfully') ? 'success.subtle' : 'error.subtle'
+          }
+          color={message.includes('successfully') ? 'success.fg' : 'error.fg'}
           border="1px solid"
           borderColor={
-            message.includes('successfully') ? 'green.border' : 'red.border'
+            message.includes('successfully') ? 'success.border' : 'error.border'
           }
         >
           {message}

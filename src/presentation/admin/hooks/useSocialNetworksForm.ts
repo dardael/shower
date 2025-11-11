@@ -29,7 +29,7 @@ export interface UseSocialNetworksFormReturn {
   validateForm: () => boolean;
   isDirty: boolean;
   hasUnsavedChanges: boolean;
-  confirmNavigation: (targetUrl: string) => Promise<boolean>;
+  confirmNavigation: () => boolean;
 }
 
 export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
@@ -45,14 +45,16 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     isDirty,
     hasUnsavedChanges,
     updateFieldValue,
+    updateInitialValues,
     markAsClean,
+    markAsInitialized,
     confirmNavigation,
   } = useFormState({
-    initialValues: { socialNetworks: [] },
-    onBeforeUnload: (hasChanges) => {
-      if (hasChanges) {
-        logger.info('User has unsaved social networks changes');
-      }
+    initialValues: {
+      socialNetworks: [],
+    },
+    onBeforeUnload: (hasChanges: boolean) => {
+      logger.debug('Form before unload check', { hasChanges });
     },
   });
 
@@ -89,7 +91,11 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
 
       if (data.success) {
         setSocialNetworks(data.data);
-        updateFieldValue('socialNetworks', data.data);
+
+        // Update initial values and mark as initialized
+        updateInitialValues({ socialNetworks: data.data });
+        markAsInitialized();
+
         logger.info('Social networks fetched successfully', {
           count: data.data.length,
         });
@@ -115,7 +121,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [clearToastMessage, logger, updateFieldValue]);
+  }, [clearToastMessage, logger, updateInitialValues, markAsInitialized]);
 
   const handleUrlChange = useCallback(
     (type: SocialNetworkType, url: string) => {
