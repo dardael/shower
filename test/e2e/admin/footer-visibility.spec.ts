@@ -60,9 +60,9 @@ test.describe('Footer Visibility', () => {
     const footer = page.locator('footer');
     await expect(footer).not.toBeVisible();
 
-    // Verify we're on admin dashboard
+    // Verify we're on admin page (redirected to website-settings)
     await expect(
-      page.getByRole('heading', { name: 'Admin Dashboard' })
+      page.getByRole('heading', { name: 'Website Settings' })
     ).toBeVisible();
   });
 

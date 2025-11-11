@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { signIn } from '../fixtures/authHelpers';
 import { TestDatabase } from '../fixtures/test-database';
+import { TIMEOUTS } from '../constants/timeouts';
 
 test.describe('Social Networks Management', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,8 +12,13 @@ test.describe('Social Networks Management', () => {
     // Authenticate as admin before running tests
     await signIn(page, true);
 
-    // Wait for admin dashboard to load
-    await page.waitForSelector('h1', { timeout: 10000 });
+    // Navigate to social networks page
+    await page.goto('/admin/social-networks');
+
+    // Wait for page to load
+    await page.waitForSelector('[data-testid="main-content"]', {
+      timeout: TIMEOUTS.LONG,
+    });
   });
 
   test.afterEach(async () => {
@@ -257,7 +263,7 @@ test.describe('Social Networks Management', () => {
     // Wait for success message
     await expect(
       page.getByText('Social networks updated successfully').first()
-    ).toBeVisible({ timeout: 10000 });
+    ).toBeVisible({ timeout: TIMEOUTS.LONG });
 
     // Loading state should be gone and button should be back to normal
     await expect(saveButton).toBeVisible();
