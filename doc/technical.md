@@ -525,6 +525,202 @@ When upgrading from the previous singleton pattern, run the migration script `sc
 
 ---
 
+## Social Networks Storage
+
+Social networks are stored in a dedicated MongoDB collection using Mongoose, separate from website settings. This allows for better scalability, performance, and maintainability of social media data.
+
+### Collection Structure
+
+Social networks are stored in `socialnetworks` collection with the following schema:
+
+#### **SocialNetwork Schema** (`src/infrastructure/settings/models/SocialNetworkModel.ts`)
+
+```typescript
+{
+  type: {
+    type: String,
+    required: true,
+    enum: ['instagram', 'facebook', 'linkedin', 'email', 'phone'],
+    unique: true
+  },
+  url: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /^https?:\/\/.+/.test(v);
+      },
+      message: 'URL must be a valid HTTP/HTTPS URL'
+    }
+  },
+  label: {
+    type: String,
+    required: true,
+    maxlength: 50
+  },
+  enabled: {
+    type: Boolean,
+    default: true
+  }
+}
+```
+
+### Field Descriptions
+
+- **`type`**: Social network platform identifier (required, unique)
+  - Supported platforms: `instagram`, `facebook`, `linkedin`, `email`, `phone`
+  - Enforces one entry per social network platform
+- **`url`**: Complete URL to the social media profile (required)
+  - Must be a valid HTTP/HTTPS URL
+  - Automatically validated using regex pattern
+- **`label`**: Display label for the social network (required)
+  - Maximum 50 characters
+  - Used for accessibility and user interface display
+- **`enabled`**: Whether the social network is active (optional, default: true)
+  - Controls visibility in public-facing components
+  - Allows temporary disabling without deleting data
+
+### Repository Implementation
+
+#### **MongooseSocialNetworkRepository** (`src/infrastructure/settings/repositories/MongooseSocialNetworkRepository.ts`)
+
+The repository provides CRUD operations with the following methods:
+
+- **`getAllSocialNetworks()`**: Retrieves all social networks from the collection
+- **`updateSocialNetworks(socialNetworks)`**: Bulk update operation using `deleteMany` + `insertMany` for atomic replacement
+- **`getSocialNetworkByType(type)`**: Retrieves a specific social network by its type field
+
+### API Endpoints
+
+#### **Admin Endpoints**
+
+- **GET `/api/settings/social-networks`**: Retrieve all social networks (admin access required)
+- **PUT `/api/settings/social-networks`**: Update social networks (admin access required)
+
+#### **Public Endpoints**
+
+- **GET `/api/public/social-networks`**: Retrieve only enabled social networks for public display
+
+### Data Migration
+
+#### **From Embedded Array to Dedicated Collection**
+
+Previous implementation stored social networks as an embedded array within website settings. The migration process:
+
+1. **Data Extraction**: Extract existing social networks from `websiteSettings.socialNetworks` array
+2. **Collection Creation**: Create new documents in `socialnetworks` collection
+3. **Schema Cleanup**: Remove `socialNetworks` field from website settings documents
+4. **Validation**: Ensure all social networks have required fields and valid URLs
+
+#### **Migration Benefits**
+
+- **Performance**: Separate collection allows for optimized queries and indexing
+- **Scalability**: Independent scaling of social network data
+- **Maintainability**: Clear separation of concerns between settings and social networks
+- **Query Optimization**: Dedicated indexes on `type` and `enabled` fields
+- **Future Extensibility**: Easy addition of new social network platforms
+
+### Indexing Strategy
+
+```javascript
+// Performance indexes for social networks collection
+db.socialnetworks.createIndex({ type: 1 }, { unique: true });
+db.socialnetworks.createIndex({ enabled: 1 });
+db.socialnetworks.createIndex({ type: 1, enabled: 1 });
+```
+
+### Validation Rules
+
+#### **URL Validation**
+
+- Must start with `http://` or `https://`
+- Additional validation can be added for platform-specific patterns
+- Invalid URLs are rejected at both schema and API level
+
+#### **Type Validation**
+
+- Only predefined social network types are allowed
+- Case-sensitive matching with enum values
+- Prevents typos and ensures consistency
+
+#### **Label Validation**
+
+- Maximum 50 characters to maintain UI consistency
+- Required field to ensure accessibility compliance
+- Trimmed automatically to prevent whitespace issues
+
+### Error Handling
+
+#### **Database Errors**
+
+- **Duplicate Key**: When trying to create multiple entries of same type
+- **Validation Error**: When URL format or other constraints are violated
+- **Connection Error**: Graceful degradation with proper logging
+
+#### **API Error Responses**
+
+```json
+{
+  "error": "Social network with type 'instagram' already exists"
+}
+```
+
+```json
+{
+  "error": "Invalid URL format for social network"
+}
+```
+
+### Performance Considerations
+
+#### **Query Optimization**
+
+- Public API queries only enabled social networks (`{ enabled: true }`)
+- Admin queries use lean() for better performance
+- Bulk operations minimize database round trips
+
+#### **Caching Strategy**
+
+- Social network data changes infrequently, suitable for caching
+- Cache invalidation on any update operation
+- Consider Redis caching for high-traffic scenarios
+
+### Security Considerations
+
+#### **Access Control**
+
+- Admin endpoints require authentication and authorization
+- Public endpoints only return enabled social networks
+- Rate limiting applied to prevent abuse
+
+#### **Data Validation**
+
+- Server-side validation prevents malicious data injection
+- URL validation prevents XSS through malicious links
+- Input sanitization for all user-provided data
+
+### Testing Strategy
+
+#### **Unit Tests**
+
+- Repository method testing with mocked database
+- Validation rule testing for all constraints
+- Error handling for edge cases
+
+#### **Integration Tests**
+
+- API endpoint testing with real database
+- End-to-end workflow testing
+- Performance testing for bulk operations
+
+#### **E2E Tests**
+
+- Complete admin interface testing
+- Public-facing component verification
+- Cross-browser compatibility testing
+
+---
+
 ## Theme Color System - Technical Implementation
 
 ### Architecture Overview
