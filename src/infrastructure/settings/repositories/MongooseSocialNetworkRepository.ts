@@ -5,28 +5,26 @@ import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetwork
 import { SocialNetworkTypeValueObject } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import { SocialNetworkLabel } from '@/domain/settings/value-objects/SocialNetworkLabel';
-import { WebsiteSettingsModel } from '@/infrastructure/settings/models/WebsiteSettingsModel';
+import { SocialNetworkModel } from '@/infrastructure/settings/models/SocialNetworkModel';
 import { Logger } from '@/application/shared/Logger';
+
+// Ensure model is registered
+import '@/infrastructure/settings/models/SocialNetworkModel';
 
 @injectable()
 export class MongooseSocialNetworkRepository
   implements SocialNetworkRepository
 {
   constructor(@inject('Logger') private readonly logger: Logger) {}
-  async getAllSocialNetworks(): Promise<SocialNetwork[]> {
-    const settingsDocument = await WebsiteSettingsModel.findOne({
-      key: 'socialNetworks',
-    });
 
-    if (
-      !settingsDocument ||
-      !settingsDocument.socialNetworks ||
-      settingsDocument.socialNetworks.length === 0
-    ) {
+  async getAllSocialNetworks(): Promise<SocialNetwork[]> {
+    const socialNetworksDocuments = await SocialNetworkModel.find();
+
+    if (!socialNetworksDocuments || socialNetworksDocuments.length === 0) {
       return [];
     }
 
-    return settingsDocument.socialNetworks.map(
+    return socialNetworksDocuments.map(
       (socialNetwork: {
         type: SocialNetworkType;
         url: string;
@@ -37,37 +35,28 @@ export class MongooseSocialNetworkRepository
   }
 
   async updateSocialNetworks(socialNetworks: SocialNetwork[]): Promise<void> {
-    const socialNetworksData = socialNetworks.map((socialNetwork) =>
-      this.mapToDatabase(socialNetwork)
-    );
+    // Clear existing social networks
+    await SocialNetworkModel.deleteMany({});
 
-    await WebsiteSettingsModel.updateOne(
-      { key: 'socialNetworks' },
-      {
-        $set: { socialNetworks: socialNetworksData },
-        $setOnInsert: { key: 'socialNetworks' },
-      },
-      { upsert: true }
-    );
+    // Insert new social networks
+    if (socialNetworks.length > 0) {
+      const socialNetworksData = socialNetworks.map((socialNetwork) =>
+        this.mapToDatabase(socialNetwork)
+      );
+      await SocialNetworkModel.insertMany(socialNetworksData);
+    }
   }
 
   async getSocialNetworkByType(
     type: SocialNetworkType
   ): Promise<SocialNetwork | null> {
-    const settingsDocument = await WebsiteSettingsModel.findOne(
-      { key: 'socialNetworks' },
-      { socialNetworks: { $elemMatch: { type } } }
-    );
+    const socialNetworkDocument = await SocialNetworkModel.findOne({ type });
 
-    if (
-      !settingsDocument ||
-      !settingsDocument.socialNetworks ||
-      settingsDocument.socialNetworks.length === 0
-    ) {
+    if (!socialNetworkDocument) {
       return null;
     }
 
-    return this.mapToDomain(settingsDocument.socialNetworks[0]);
+    return this.mapToDomain(socialNetworkDocument);
   }
 
   private mapToDomain(doc: {

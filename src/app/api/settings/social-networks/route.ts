@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest } from '@/infrastructure/auth/ApiAuthentication';
 import { container } from '@/infrastructure/container';
 import type { GetSocialNetworks } from '@/application/settings/GetSocialNetworks';
 import type { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetworks';
@@ -9,8 +8,9 @@ import { SocialNetworkValidationService } from '@/domain/settings/services/Socia
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
+import { withApi } from '@/infrastructure/shared/apiWrapper';
 
-export async function GET() {
+export const GET = withApi(async () => {
   const logger = container.resolve<Logger>('Logger');
 
   try {
@@ -19,19 +19,22 @@ export async function GET() {
       async () => {
         const getSocialNetworks =
           container.resolve<GetSocialNetworks>('IGetSocialNetworks');
-        return await getSocialNetworks.execute();
+        const result = await getSocialNetworks.execute();
+        return result;
       },
       { endpoint: '/api/settings/social-networks', method: 'GET' }
     );
 
+    const responseData = socialNetworks.map((socialNetwork) => ({
+      type: socialNetwork.type.value,
+      url: socialNetwork.url.value,
+      label: socialNetwork.label.value,
+      enabled: socialNetwork.enabled,
+    }));
+
     return NextResponse.json({
       success: true,
-      data: socialNetworks.map((socialNetwork) => ({
-        type: socialNetwork.type.value,
-        url: socialNetwork.url.value,
-        label: socialNetwork.label.value,
-        enabled: socialNetwork.enabled,
-      })),
+      data: responseData,
     });
   } catch (error) {
     logger.logErrorWithObject(error, 'Error fetching social networks');
@@ -40,20 +43,15 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request: NextRequest) {
+export const PUT = withApi(async (request: NextRequest) => {
   const logger = container.resolve<Logger>('Logger');
   const validationService = container.resolve<SocialNetworkValidationService>(
     'SocialNetworkValidationService'
   );
 
   try {
-    // Check authentication
-    const authResult = await authenticateRequest(request);
-    if (authResult) {
-      return authResult;
-    }
     const body = await request.json();
 
     logger.info('Processing social networks update request');
@@ -67,6 +65,11 @@ export async function PUT(request: NextRequest) {
       const errorMessage = validationResult.errors
         .map((error) => `${error.field}: ${error.message}`)
         .join(', ');
+
+      logger.warn('Social networks validation failed', {
+        errors: validationResult.errors,
+        errorMessage,
+      });
 
       return NextResponse.json(
         {
@@ -93,7 +96,7 @@ export async function PUT(request: NextRequest) {
         label: string;
         enabled: boolean;
       }) => {
-        // Apply normalization before creating the domain object
+        // Apply normalization before creating domain object
         const normalizedUrl = SocialNetworkUrl.fromStringWithNormalization(
           socialNetwork.url,
           socialNetwork.type,
@@ -126,4 +129,4 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
