@@ -1,7 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { TestDatabase } from '../fixtures/test-database';
 
 test.describe('Social Networks Footer', () => {
+  test.beforeAll(async () => {
+    await TestDatabase.connect();
+  });
+
+  test.afterAll(async () => {
+    await TestDatabase.disconnect();
+  });
+
   test.beforeEach(async ({ page }) => {
+    await TestDatabase.cleanDatabase();
     await page.goto('/');
   });
 

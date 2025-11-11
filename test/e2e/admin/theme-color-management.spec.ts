@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { signIn } from '../fixtures/authHelpers';
+import { TIMEOUTS } from '../constants/timeouts';
 
 test.describe('Theme Color Management', () => {
   test('should display theme color selector in website settings', async ({
@@ -9,7 +10,7 @@ test.describe('Theme Color Management', () => {
 
     // Wait for page to load and find theme color section
     await expect(page.getByTestId('theme-color-label')).toBeVisible({
-      timeout: 10000,
+      timeout: TIMEOUTS.LONG,
     });
 
     // Check that color buttons are present
@@ -22,7 +23,7 @@ test.describe('Theme Color Management', () => {
 
     // Find selected color button (should have data-selected="true")
     const selectedButton = page.locator('button[data-selected="true"]');
-    await expect(selectedButton).toBeVisible({ timeout: 10000 });
+    await expect(selectedButton).toBeVisible({ timeout: TIMEOUTS.LONG });
   });
 
   test('should change theme color when clicking different color', async ({
@@ -32,7 +33,7 @@ test.describe('Theme Color Management', () => {
 
     // Wait for theme color section to be visible
     await expect(page.getByTestId('theme-color-label')).toBeVisible({
-      timeout: 10000,
+      timeout: TIMEOUTS.LONG,
     });
 
     // Find and click on a different color (e.g., red)
@@ -51,6 +52,6 @@ test.describe('Theme Color Management', () => {
     // Check for helper text
     await expect(
       page.getByText('Select a color to customize your website theme')
-    ).toBeVisible({ timeout: 10000 });
+    ).toBeVisible({ timeout: TIMEOUTS.LONG });
   });
 });
