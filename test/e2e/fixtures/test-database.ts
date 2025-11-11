@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 
+// Import models to ensure they are registered with Mongoose
+import '@/infrastructure/settings/models/WebsiteSettingsModel';
+import '@/infrastructure/settings/models/SocialNetworkModel';
+
 /**
  * Test database utility for managing the test database in e2e tests
  * Simplified version to avoid TypeScript decorator issues
