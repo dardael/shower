@@ -151,13 +151,30 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   if (isMobile) {
     return (
       <>
-        {/* Backdrop */}
+        {/* Sidebar as overlay */}
+        {isOpen && (
+          <Box
+            position="fixed"
+            top={0}
+            left={0}
+            h="100vh"
+            w="280px"
+            style={{ zIndex: 1001 }}
+            data-testid="mobile-sidebar"
+            role="navigation"
+            aria-label="Admin navigation menu"
+          >
+            {sidebarContent}
+          </Box>
+        )}
+
+        {/* Backdrop - positioned after sidebar so it can capture clicks outside sidebar */}
         {isOpen && (
           <Box
             position="fixed"
             inset={0}
             bg="blackAlpha.600"
-            zIndex="hide"
+            style={{ zIndex: 1000 }}
             onClick={() => {
               logger.info('Sidebar close requested', {
                 trigger: 'backdrop_click',
@@ -168,24 +185,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             data-testid="sidebar-backdrop"
             aria-hidden="true"
             tabIndex={-1}
+            _hover={{ cursor: 'pointer' }}
           />
-        )}
-
-        {/* Sidebar as overlay */}
-        {isOpen && (
-          <Box
-            position="fixed"
-            top={0}
-            left={0}
-            h="100vh"
-            w="280px"
-            zIndex="modal"
-            data-testid="mobile-sidebar"
-            role="navigation"
-            aria-label="Admin navigation menu"
-          >
-            {sidebarContent}
-          </Box>
         )}
       </>
     );
