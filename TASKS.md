@@ -1,68 +1,105 @@
-# Instruction: Admin Dashboard Code Quality Improvements
+# Admin Dashboard Code Quality Improvement Plan
 
-## Goal
+## Overview
 
-Fix critical and major code quality issues in the Admin Dashboard implementation, including duplicate error boundaries, authentication logic duplication, overly complex localStorage handling, and debug logging in production code.
+Fix critical code quality issues in Admin Dashboard implementation while maintaining all existing functionality and following project standards.
 
-## Current task
+## Prerequisites
 
-Starting Step 4: Test the implementation
+- Ensure all existing tests pass before starting
+- Create backup of current working implementation
+- Scan all admin component files to identify exact import violations before fixing
 
-## Steps
+## Step 1: Identify and Fix Import Pattern Violations
 
-### Step 1: Address Code Review Issues
+[*] 1.1 Scan all admin component files for relative imports using grep/search tools
+[*] 1.2 Document all found relative import violations with file paths and line numbers
 
-- [x] Task 1: Fix code duplication in AdminSidebar focus trap implementation by extracting CSS selector to constant
-- [x] Task 2: Add proper environment variable typing and validation for SHOWER_ENV in AdminPageAuthenticatorator
-- [x] Task 3: Improve localStorage JSON parsing error handling in AdminLayout for better error recovery
-- [x] Task 4: Simplify focus trap logic in AdminSidebar or consider using a library for better maintainability
-- [x] Task 5: Extract test session creation logic from AdminPageAuthenticatorator to separate method for better separation of concerns
-- [x] Task 6: Standardize comment style throughout AdminLayout component
-- [x] Task 7: Clean up unused variable handling in AdminPageAuthenticatorator test
-- [x] Task 8: Extract magic timeout numbers to constants in e2e tests
-- [x] Task 9: Remove redundant style properties in AdminSidebar styling
+Found relative import violations:
 
-### Step 2: Back End implementation
+- /home/renaud/dev/shower/src/presentation/admin/components/WebsiteSettingsForm.tsx:17 - `from '../hooks/useFormState'`
+- /home/renaud/dev/shower/src/presentation/admin/components/WebsiteSettingsForm.tsx:19 - `from '../hooks/useIconManagement'`
+- /home/renaud/dev/shower/src/presentation/admin/hooks/useSocialNetworksForm.ts:8 - `from './useFormState'`
+- /home/renaud/dev/shower/src/presentation/admin/components/WebsiteSettingsForm.tsx:15 - `from './ThemeColorSelector'`
+- /home/renaud/dev/shower/src/presentation/admin/components/AdminLayout.tsx:11 - `from './AdminSidebar'`
+- /home/renaud/dev/shower/src/presentation/admin/components/AdminLayout.tsx:12 - `from './AdminErrorBoundary'`
+- /home/renaud/dev/shower/src/presentation/admin/components/AdminSidebar.tsx:14 - `from './AdminMenuItem'`
+- /home/renaud/dev/shower/src/presentation/admin/components/AdminDashboard.tsx:13 - `from './AdminErrorBoundary'`
+  [*] 1.3 Replace relative imports with absolute imports using `@/` prefix
+  [*] 1.4 Update import statements in all identified files
+  [*] 1.5 Verify import consistency across all admin components
+  [*] 1.6 Run TypeScript compilation to ensure no import errors
 
-### Step 3: Write Test
+## Step 2: Integrate Logging in AdminSidebar
 
-- [x] Task 1: Write unit tests for the new shared authentication utility function
-- [x] Task 2: Update existing component tests to reflect the simplified localStorage handling
-- [x] Task 3: Add tests to ensure error boundaries work correctly with single boundary implementation
+[*] 2.1 Add logging for sidebar toggle interactions
+[*] 2.2 Add logging for menu item clicks
+[*] 2.3 Add logging for mobile menu open/close actions
+[*] 2.4 Use structured logging with appropriate metadata
+[*] 2.5 Test logging functionality in development environment
 
-### Step 4: Test the implementation
+## Step 3: Simplify Focus Trap Implementation
 
-- [x] Task 1: Check typescript strict types. if it goes wrong, fix the issues.
-- [x] Task 2: Check eslint. if it goes wrong, fix the issues.
-- [x] Task 3: Check prettier. if it goes wrong, fix the issues.
-- [x] Task 4: Check that unit tests pass. if it goes wrong, fix the issues.
-- [x] Task 5: Check that end to end tests pass. if it goes wrong, fix the issues.
-- [x] Task 6: Perform manual testing to ensure the feature works as expected using browsermcp mcp. if it goes wrong, fix the issues.
+[*] 3.1 Review current FocusTrap class implementation
+[*] 3.2 Replace magic numbers (100ms timeouts) with named constants
+[*] 3.3 Simplify focus trap activation/deactivation logic
+[*] 3.4 Update focus trap usage in AdminSidebar component
+[*] 3.5 Test keyboard navigation and focus management
 
-### Step 5: Documentation
+## Step 4: Standardize Styling Approaches
 
-### Step 6: Commit
+[*] 4.1 Identify and remove inline styles in AdminSidebar
+[*] 4.2 Convert all styling to Chakra UI props
+[*] 4.3 Ensure consistent use of semantic Chakra components
+[*] 4.4 Verify responsive design patterns are consistent
+[*] 4.5 Test styling across different screen sizes
 
-- [] Task 1: Look at current code changes made in the working directory.
-- [] Task 2: Identify logical groupings of changes that can be committed together.
-- [] Task 3: Make git commits for each logical grouping of changes.
-- [] Task 4: The commit messages should be clear and descriptive of the changes made.
+## Step 5: Simplify localStorage Parsing with Migration
 
-### Step 7: Review
+[*] 5.1 Add fallback mechanism for localStorage format migration
+[*] 5.2 Standardize localStorage data format to boolean only for new writes
+[*] 5.3 Remove complex JSON parsing and multiple format handling
+[*] 5.4 Simplify error handling to basic boolean fallback
+[*] 5.5 Test sidebar state persistence across browser sessions
+[*] 5.6 Test migration from old format to new format
 
-- [ ] Task 1: Review the implementation to ensure all tasks in the plan have been completed.
-- [ ] Task 2: Ensure the code is clean and adheres to project standards.
-- [ ] Task 3: Check for dead code or unnecessary comments.
-- [ ] Task 4: Check for duplicated code.
-- [ ] Task 5: Check that the feature is fully implemented and functional.
-- [ ] Task 6: Make a summary of the problems you have seen in your review. group them by the following categories: Critical, Major, Minor and NITPICK. In each category, one bullet point per problem, with a short description of the problem and file and line where it is located. at the end of the summary, Give a confidence level (from 0% to 100%)
-- [ ] Task 7: If the confidence level is below 90%, create an implementation plan to address the issues found during the review. The plan should include tasks to fix each problem identified, along with any necessary testing or validation steps. Replace Step 1 in @TASKS.md by those new tasks.
-- [ ] Task 8: If the confidence level is 90% or above, write "Implementation completed successfully with high confidence." at the end of the summary.
-- [ ] Task 9: Write the review summary in @LAST_REVIEW_SUMMARY.md. If the file already exists, replace the existing content by the new summary.
+## Step 6: Complete Test Coverage
 
-### Step 8: Push changes (only if confidence level is 90% or above)
+[*] 6.1 Implement backdrop click functionality in AdminLayout
+[*] 6.2 Remove TODO comments from test files
+[*] 6.3 Update e2e test to include backdrop click test
+[*] 6.4 Verify all admin navigation tests pass
+[*] 6.5 Add regression tests for new functionality
 
-- [] Task 1: Push the feature branch to the remote repository.
-- [] Task 2: Create a pull request to merge the feature branch into the main branch. The description of the pull request must include the summary of the feature address and implementation summary.
-- [] Task 3: Add a comment on the pull request with the last review summary.
-- [] Task 4: Write "the feature branch has been pushed and a pull request has been created here: {link to the pull request}" at the end of the summary.
+## Step 7: Fix Component Naming
+
+[*] 7.1 Remove unused AdminDashboard component (not used anywhere in codebase)
+[*] 7.2 Update all import references (none found - component was unused)
+[*] 7.3 Component file removed as it was not needed
+[*] 7.4 Component removal verified - no references found in codebase
+[*] 7.5 Update documentation to reflect component removal
+
+## Step 8: Validation and Testing
+
+[*] 8.1 Run full test suite (unit + e2e) to ensure no regressions
+[*] 8.2 Perform manual testing of admin dashboard functionality
+[*] 8.3 Verify accessibility features still work correctly
+[*] 8.4 Check responsive design on mobile and desktop
+[*] 8.5 Validate logging output and error handling
+[*] 8.6 Verify no console output in test results
+
+## Step 9: Code Quality Verification
+
+[*] 9.1 Run linting and type checking commands
+[*] 9.2 Verify all import patterns follow project standards
+[*] 9.3 Check for any remaining code duplication
+[*] 9.4 Ensure all console methods are properly mocked in tests
+[*] 9.5 Validate adherence to SOLID principles and DDD architecture
+
+## Step 10: Documentation Updates
+
+[*] 10.1 Update any relevant documentation if component names changed
+[*] 10.2 Document any new logging patterns or conventions
+[*] 10.3 Update AGENTS.md if file structure changed
+[*] 10.4 Verify README.md still reflects current functionality
+[*] 10.5 Commit changes with descriptive commit message

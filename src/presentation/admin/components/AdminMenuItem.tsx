@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { VStack, Text, Link } from '@chakra-ui/react';
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
 
 export interface AdminMenuItemProps {
   href: string;
@@ -17,12 +18,14 @@ export function AdminMenuItem({
   description,
   onClick,
 }: AdminMenuItemProps) {
+  const logger = useLogger();
   const router = useRouter();
   const pathname = usePathname();
   const isActive =
     pathname === href || (href.endsWith('/') && pathname === href.slice(0, -1));
 
   const handleClick = () => {
+    logger.info('Menu item clicked', { href, label, isActive });
     router.push(href);
     onClick?.();
   };

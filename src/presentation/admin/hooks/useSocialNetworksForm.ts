@@ -5,7 +5,7 @@ import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
 import { SOCIAL_NETWORK_CONFIG } from '@/domain/settings/constants/SocialNetworkConfig';
-import { useFormState } from './useFormState';
+import { useFormState } from '@/presentation/admin/hooks/useFormState';
 
 export interface SocialNetworkFormData {
   type: SocialNetworkType;
