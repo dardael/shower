@@ -23,7 +23,7 @@ function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
       p={{ base: 6, md: 8 }}
       border="1px solid"
       borderColor={borderColor}
-      minH="400px"
+      minHeight="400px"
     >
       <VStack align="center" gap={6} maxW="md" textAlign="center" mx="auto">
         <Heading
