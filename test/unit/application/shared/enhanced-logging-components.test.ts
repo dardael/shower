@@ -35,7 +35,10 @@ describe('Enhanced Logging Components', () => {
     }
 
     // Clean up environment variable
-    delete process.env.LOG_FOLDER;
+    if (process.env.LOG_FOLDER !== undefined) {
+      const env = process.env as { [key: string]: string | undefined };
+      delete env.LOG_FOLDER;
+    }
   });
 
   beforeEach(() => {

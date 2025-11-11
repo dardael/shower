@@ -91,6 +91,39 @@ Next.js version: 15.5.4 (Turbopack)
 - The `BetterAuthHandler.ts` file contains the configuration for BetterAuth.
 - The `GoogleProvider` is configured with `prompt: 'consent'` to ensure that users explicitly reauthenticate after signing out.
 
+### Admin Page Authentication Utility
+
+#### **AdminPageAuthenticatorator** (`src/infrastructure/auth/AdminPageAuthenticatorator.ts`)
+
+A utility class that provides centralized authentication management for admin pages with comprehensive session handling and test environment support.
+
+**Key Features:**
+
+- **Session Management**: Automatic session validation and cleanup
+- **Test Environment Support**: Special handling for test environments with mock sessions
+- **Error Handling**: Graceful degradation for authentication failures
+- **Security**: Proper session validation and admin access control
+- **Performance**: Optimized session checking with caching
+
+**Usage Pattern:**
+
+```typescript
+import { AdminPageAuthenticatorator } from '@/infrastructure/auth/AdminPageAuthenticatorator';
+
+// In admin page components
+const authenticator = new AdminPageAuthenticatorator();
+const isAuthenticated = await authenticator.isAuthenticated();
+const session = await authenticator.getSession();
+```
+
+**Architecture Benefits:**
+
+- **Single Responsibility**: Focused solely on admin page authentication
+- **Testability**: Built-in support for test environments
+- **Maintainability**: Centralized authentication logic
+- **Security**: Consistent session validation across admin pages
+- **Performance**: Efficient session management with proper cleanup
+
 ### Security Best Practices
 
 - Use a strong, random `BETTERAUTH_SECRET` to secure session tokens.
@@ -875,13 +908,15 @@ The `/api/settings` GET endpoint now optionally includes `themeColor`:
 // Before (still works)
 const response = await fetch('/api/settings');
 const data = await response.json();
-console.log(data.name); // "My Website"
+logger.info('Website name retrieved', { name: data.name });
 
 // After (with theme color)
 const response = await fetch('/api/settings');
 const data = await response.json();
-console.log(data.name); // "My Website"
-console.log(data.themeColor); // "blue" (optional)
+logger.info('Website settings retrieved', {
+  name: data.name,
+  themeColor: data.themeColor,
+});
 ```
 
 #### Recommended Updates
@@ -904,7 +939,7 @@ if (data.themeColor) {
 // For theme-specific operations
 const themeResponse = await fetch('/api/settings/theme-color');
 const themeData = await themeResponse.json();
-console.log(themeData.themeColor);
+logger.info('Theme color retrieved', { themeColor: themeData.themeColor });
 ```
 
 ### For Frontend Applications
@@ -1017,15 +1052,22 @@ async function migrateThemeColor() {
         key: 'themeColor',
         themeColor: 'blue',
       });
-      console.log('Theme color setting created with default value: blue');
+      // Note: In production, use proper logging system
+      const logger = EnhancedLoggerServiceLocator.getLogger();
+      logger.info('Theme color setting created with default value', {
+        themeColor: 'blue',
+      });
     } else {
-      console.log('Theme color setting already exists');
+      const logger = EnhancedLoggerServiceLocator.getLogger();
+      logger.info('Theme color setting already exists');
     }
 
     await mongoose.disconnect();
-    console.log('Migration completed successfully');
+    const logger = EnhancedLoggerServiceLocator.getLogger();
+    logger.info('Migration completed successfully');
   } catch (error) {
-    console.error('Migration failed:', error);
+    const logger = EnhancedLoggerServiceLocator.getLogger();
+    logger.logError(error, 'Migration failed');
     process.exit(1);
   }
 }
@@ -1162,6 +1204,312 @@ Check browser storage for theme persistence:
 localStorage.getItem('theme-color');
 localStorage.getItem('chakra-ui-color-mode');
 ```
+
+---
+
+## Admin Dashboard with Collapsible Menu Navigation - Technical Implementation
+
+### Architecture Overview
+
+The admin dashboard navigation system follows the project's hexagonal architecture pattern with a focus on responsive design, state management, and user experience optimization.
+
+### Component Architecture
+
+#### **AdminLayout** (`src/presentation/admin/components/AdminLayout.tsx`)
+
+- **State Management**: React Context for sidebar state with localStorage persistence
+- **Error Handling**: Graceful fallback for private browsing mode
+- **Responsive Design**: Mobile overlay behavior with desktop persistent sidebar
+- **Accessibility**: Proper ARIA attributes and keyboard navigation support
+
+```typescript
+interface AdminLayoutContextType {
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  closeSidebar: () => void;
+  isMobile: boolean;
+}
+
+// Context provider with localStorage persistence
+export function AdminLayoutProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    // localStorage persistence with error handling
+    try {
+      const stored = localStorage.getItem('admin-sidebar-open');
+      return stored !== null ? JSON.parse(stored) : true;
+    } catch {
+      return true; // Default fallback
+    }
+  });
+}
+```
+
+#### **AdminSidebar** (`src/presentation/admin/components/AdminSidebar.tsx`)
+
+- **Responsive Behavior**: Overlay on mobile, persistent on desktop
+- **Z-Index Management**: Proper layering using Chakra UI z-index tokens
+- **Navigation Structure**: Hierarchical menu with active state highlighting
+- **Mobile Optimization**: Touch-friendly interactions and backdrop handling
+
+```typescript
+// Responsive sidebar implementation
+const sidebarStyles = {
+  position: 'fixed',
+  left: 0,
+  top: 0,
+  h: '100vh',
+  w: { base: '280px', lg: '280px' },
+  transform: {
+    base: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+    lg: 'translateX(0)',
+  },
+  zIndex: 'modal', // Chakra UI z-index token
+};
+```
+
+#### **AdminMenuItem** (`src/presentation/admin/components/AdminMenuItem.tsx`)
+
+- **Active State Detection**: Automatic pathname comparison for highlighting
+- **Navigation Integration**: Next.js Link with proper routing
+- **Visual Feedback**: Hover states, active indicators, and transitions
+- **Accessibility**: Semantic HTML and ARIA attributes
+
+```typescript
+// Active state detection
+const isActive = pathname === href ||
+  (href !== '/admin' && pathname.startsWith(href));
+
+return (
+  <Link href={href} data-active={isActive}>
+    <Flex
+      align="center"
+      gap={3}
+      px={4}
+      py={3}
+      bg={isActive ? "colorPalette.solid" : "transparent"}
+      color={isActive ? "colorPalette.contrast" : "fg.muted"}
+      _hover={{ bg: isActive ? "colorPalette.solid" : "bg.subtle" }}
+    >
+      {icon && <Icon as={icon} boxSize={5} />}
+      <Text fontWeight="medium">{label}</Text>
+    </Flex>
+  </Link>
+);
+```
+
+### Routing Structure
+
+#### **New Admin Routes**
+
+The admin dashboard now supports nested routing with dedicated sections:
+
+```
+/admin                    # Redirects to first available section
+├── /admin/website-settings  # Website configuration and theme
+├── /admin/social-networks   # Social media management
+└── /admin/[future-sections] # Extensible for future features
+```
+
+#### **Route Implementation**
+
+```typescript
+// /admin/page.tsx - Main admin redirect
+export default function AdminPage() {
+  return redirect('/admin/website-settings');
+}
+
+// /admin/website-settings/page.tsx - Website settings section
+export default function WebsiteSettingsPage() {
+  return (
+    <AdminLayout>
+      <WebsiteSettingsForm />
+    </AdminLayout>
+  );
+}
+
+// /admin/social-networks/page.tsx - Social networks section
+export default function SocialNetworksPage() {
+  return (
+    <AdminLayout>
+      <SocialNetworksForm />
+    </AdminLayout>
+  );
+}
+```
+
+### State Management
+
+#### **localStorage Persistence**
+
+- **Error Handling**: Graceful degradation in private browsing mode
+- **Type Safety**: TypeScript interfaces for state structure
+- **Performance**: Debounced updates to prevent excessive writes
+- **Cleanup**: Proper component lifecycle management
+
+```typescript
+// Persistent state with error handling
+useEffect(() => {
+  try {
+    localStorage.setItem('admin-sidebar-open', JSON.stringify(isSidebarOpen));
+  } catch (error) {
+    // Silently handle private browsing mode
+    logger.warn('Failed to save sidebar state to localStorage', { error });
+  }
+}, [isSidebarOpen]);
+```
+
+#### **Responsive Breakpoints**
+
+- **Mobile** (`base`): Sidebar as overlay with backdrop
+- **Desktop** (`lg`): Persistent sidebar with reduced content width
+- **Transitions**: Smooth breakpoint handling with proper state synchronization
+
+### Responsive Design Implementation
+
+#### **Mobile Behavior**
+
+- **Overlay Mode**: Sidebar slides over content with backdrop
+- **Touch Gestures**: Swipe-friendly interactions
+- **Backdrop Click**: Close sidebar when clicking outside
+- **Auto-close**: Sidebar closes after navigation on mobile
+
+#### **Desktop Behavior**
+
+- **Persistent Sidebar**: Always visible with fixed positioning
+- **Content Adjustment**: Main content margin accounts for sidebar width
+- **Keyboard Navigation**: Full keyboard accessibility support
+- **Hover States**: Enhanced visual feedback for mouse interactions
+
+### Accessibility Features
+
+#### **ARIA Implementation**
+
+```typescript
+// Semantic HTML with ARIA attributes
+<nav role="navigation" aria-label="Admin navigation">
+  <button
+    onClick={toggleSidebar}
+    aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+    aria-expanded={isSidebarOpen}
+  >
+    <HamburgerIcon />
+  </button>
+
+  <div
+    aria-hidden={!isSidebarOpen}
+    style={{ display: isSidebarOpen ? 'block' : 'none' }}
+  >
+    {/* Navigation menu */}
+  </div>
+</nav>
+```
+
+#### **Keyboard Navigation**
+
+- **Tab Order**: Logical navigation through menu items
+- **Focus Management**: Proper focus handling for overlay
+- **Escape Key**: Close sidebar with Escape key on mobile
+- **Screen Reader**: Comprehensive labels and descriptions
+
+### Performance Optimizations
+
+#### **React Optimizations**
+
+- **useCallback**: Memoized event handlers to prevent re-renders
+- **useMemo**: Cached computed values for expensive operations
+- **Context Splitting**: Separate contexts for different concerns
+- **Lazy Loading**: Components loaded only when needed
+
+#### **CSS Performance**
+
+- **Transform Animations**: Hardware-accelerated transforms
+- **Will-change**: Optimized rendering for animated elements
+- **Minimal Reflows**: Efficient layout calculations
+- **Chakra Tokens**: Consistent design system usage
+
+### Testing Strategy
+
+#### **Unit Tests**
+
+- **AdminLayout**: Context provider functionality and state management
+- **AdminSidebar**: Toggle behavior and responsive breakpoints
+- **AdminMenuItem**: Active state detection and navigation
+- **Error Handling**: localStorage failures and edge cases
+
+#### **Integration Tests**
+
+- **Navigation Flow**: Complete user journeys between sections
+- **State Persistence**: Sidebar state across page reloads
+- **Responsive Behavior**: Mobile and desktop interactions
+- **Accessibility**: Screen reader and keyboard navigation
+
+#### **E2E Tests**
+
+- **Full Workflows**: Complete admin dashboard interactions
+- **Mobile Testing**: Touch interactions and responsive behavior
+- **Cross-browser**: Consistent behavior across browsers
+- **Performance**: Load times and interaction responsiveness
+
+### Browser Compatibility
+
+#### **Supported Browsers**
+
+- **Chrome**: Latest 2 versions
+- **Firefox**: Latest 2 versions
+- **Safari**: Latest 2 versions
+- **Edge**: Latest 2 versions
+
+#### **Feature Detection**
+
+```typescript
+// Progressive enhancement for older browsers
+const supportsLocalStorage = () => {
+  try {
+    const test = '__test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+};
+```
+
+### Future Extensibility
+
+#### **Modular Architecture**
+
+- **Plugin System**: Easy addition of new admin sections
+- **Component Reuse**: Shared components for consistent UI
+- **Route Configuration**: Declarative route definitions
+- **Theme Integration**: Consistent with existing theme system
+
+#### **Scalability Considerations**
+
+- **Code Splitting**: Section-based bundle optimization
+- **Lazy Loading**: On-demand component loading
+- **Caching Strategy**: Optimized API response caching
+- **Performance Monitoring**: Built-in performance metrics
+
+### Migration Path
+
+#### **From Single-Page Admin**
+
+1. **Route Migration**: Move existing admin functionality to dedicated routes
+2. **Component Integration**: Wrap existing forms in AdminLayout
+3. **Navigation Update**: Implement new sidebar navigation
+4. **Testing**: Verify all existing functionality works
+
+#### **Backward Compatibility**
+
+- **API Compatibility**: All existing endpoints continue to work
+- **Data Migration**: No database changes required
+- **Feature Flags**: Gradual rollout capability
+- **Rollback Plan**: Quick reversion to previous implementation
 
 ---
 

@@ -9,6 +9,8 @@ This project aims to create a robust, scalable, and maintainable web application
 - The user can create it's pages, add sections to the pages, and customize the sections with different components.
 - The user can also manage the website settings, such as the theme color, navigation, and footer.
 
+Since this project is in creation, no need to handle backward compatibility.
+
 ## Nextjs
 
 - **App Router** Use the app directory structure and follow the conventions for routing, layouts, and metadata.
@@ -26,7 +28,11 @@ shower/
 │   ├── app/                  # Next.js App Router (API routes and pages)
 │   │   ├── admin/
 │   │   │   ├── layout.tsx             -> Admin layout component
-│   │   │   └── page.tsx              -> Route `/admin`
+│   │   │   ├── page.tsx              -> Route `/admin` (redirects to first section)
+│   │   │   ├── social-networks/
+│   │   │   │   └── page.tsx          -> Route `/admin/social-networks`
+│   │   │   └── website-settings/
+│   │   │       └── page.tsx          -> Route `/admin/website-settings`
 │   │   ├── api/
 │   │   │   ├── auth/
 │   │   │   │   └── [...all]/
@@ -51,6 +57,15 @@ shower/
 │   ├── presentation/         # Presentation Layer (React components)
 │   │   ├── admin/
 │   │   │   ├── components/
+│   │   │   │   ├── AdminLayout.tsx -> Admin layout wrapper with sidebar state management
+│   │   │   │   ├── AdminSidebar.tsx -> Collapsible sidebar navigation component
+│   │   │   │   ├── AdminMenuItem.tsx -> Individual navigation menu item component
+│   │   │   │   ├── AdminDashboard.tsx -> Main admin dashboard component
+│   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
+│   │   │   │   ├── NotAuthorized.tsx -> Unauthorized access component
+│   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
+│   │   │   │   ├── ThemeColorSelector.tsx -> Theme color selection component
+│   │   │   │   └── WebsiteSettingsForm.tsx -> Website settings management form
 │   │   │   └── hooks/
 │   │   └── shared/
 │   │       ├── components/
