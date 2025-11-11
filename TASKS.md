@@ -1,157 +1,68 @@
-# Instruction: Implement Collapsible Admin Menu Navigation
-
-> Please follow this plan using proper rules.
+# Instruction: Admin Dashboard Code Quality Improvements
 
 ## Goal
 
-Create a collapsible sidebar navigation system for the admin dashboard that allows administrators to navigate between different sections using URL-based routing, with mobile responsiveness and form state preservation.
+Fix critical and major code quality issues in the Admin Dashboard implementation, including duplicate error boundaries, authentication logic duplication, overly complex localStorage handling, and debug logging in production code.
 
 ## Current task
 
-Starting step 7: Integrate WebsiteSettingsForm into new structure
+Starting Step 4: Test the implementation
 
-## Grouped tasks
+## Steps
 
-### Group 1: Routing and Navigation Structure
+### Step 1: Address Code Review Issues
 
-> Create URL-based routing system for admin sections with proper authentication and navigation state management
+- [x] Task 1: Fix code duplication in AdminSidebar focus trap implementation by extracting CSS selector to constant
+- [x] Task 2: Add proper environment variable typing and validation for SHOWER_ENV in AdminPageAuthenticatorator
+- [x] Task 3: Improve localStorage JSON parsing error handling in AdminLayout for better error recovery
+- [x] Task 4: Simplify focus trap logic in AdminSidebar or consider using a library for better maintainability
+- [x] Task 5: Extract test session creation logic from AdminPageAuthenticatorator to separate method for better separation of concerns
+- [x] Task 6: Standardize comment style throughout AdminLayout component
+- [x] Task 7: Clean up unused variable handling in AdminPageAuthenticatorator test
+- [x] Task 8: Extract magic timeout numbers to constants in e2e tests
+- [x] Task 9: Remove redundant style properties in AdminSidebar styling
 
-- [x]Create new admin route structure using Next.js App Router
-  - [x]Create `/admin/website-settings` route with page component
-  - [x]Create `/admin/social-networks` route with page component
-  - [x]Create `/admin/layout.tsx` to handle admin-specific layout
-  - [x]Update existing `/admin/page.tsx` to redirect to first section
-  - [x]Add route protection middleware for all admin routes
+### Step 2: Back End implementation
 
-- [x]Implement navigation state management
-  - [x]Create useAdminNavigation hook for active section tracking
-  - [x]Add URL synchronization for active section state
-  - [x]Implement navigation helper functions
-  - [x]Add TypeScript interfaces for navigation types
+### Step 3: Write Test
 
-- [x]Set up route protection and authentication
-  - [x]Update authentication middleware for new routes
-  - [x]Add admin access verification to all admin routes
-  - [x]Implement proper redirect logic for unauthorized access
-  - [x]Add loading states during authentication checks
+- [x] Task 1: Write unit tests for the new shared authentication utility function
+- [x] Task 2: Update existing component tests to reflect the simplified localStorage handling
+- [x] Task 3: Add tests to ensure error boundaries work correctly with single boundary implementation
 
-### Group 2: Sidebar Component Development
+### Step 4: Test the implementation
 
-> Create responsive collapsible sidebar with hamburger menu for mobile and localStorage persistence
+- [x] Task 1: Check typescript strict types. if it goes wrong, fix the issues.
+- [x] Task 2: Check eslint. if it goes wrong, fix the issues.
+- [x] Task 3: Check prettier. if it goes wrong, fix the issues.
+- [x] Task 4: Check that unit tests pass. if it goes wrong, fix the issues.
+- [x] Task 5: Check that end to end tests pass. if it goes wrong, fix the issues.
+- [x] Task 6: Perform manual testing to ensure the feature works as expected using browsermcp mcp. if it goes wrong, fix the issues.
 
-- [x]Create AdminSidebar component
-  - [x]Implement collapsible sidebar with toggle functionality
-  - [x]Add responsive design with mobile hamburger menu
-  - [x]Implement localStorage persistence for sidebar state
-  - [x]Add smooth transitions and proper animations
-  - [x]Use Chakra UI v3 components for consistent styling
+### Step 5: Documentation
 
-- [x]Create AdminMenuItem component
-  - [x]Implement individual menu item with active state highlighting
-  - [x]Add proper icons using react-icons library
-  - [x]Implement hover and focus states for accessibility
-  - [x]Add data-testid attributes for testing
-  - [x]Support nested menu items for future extensibility
+### Step 6: Commit
 
-- [x]Implement mobile navigation
-  - [x]Create hamburger menu button for mobile devices
-  - [x]Add overlay backdrop for mobile menu
-  - [x]Implement swipe gestures for mobile interaction
-  - [x]Add proper focus management for mobile navigation
+- [] Task 1: Look at current code changes made in the working directory.
+- [] Task 2: Identify logical groupings of changes that can be committed together.
+- [] Task 3: Make git commits for each logical grouping of changes.
+- [] Task 4: The commit messages should be clear and descriptive of the changes made.
 
-### Group 3: Content Area and Layout
+### Step 7: Review
 
-> Refactor admin dashboard to use dynamic routing with proper content area and section switching
+- [ ] Task 1: Review the implementation to ensure all tasks in the plan have been completed.
+- [ ] Task 2: Ensure the code is clean and adheres to project standards.
+- [ ] Task 3: Check for dead code or unnecessary comments.
+- [ ] Task 4: Check for duplicated code.
+- [ ] Task 5: Check that the feature is fully implemented and functional.
+- [ ] Task 6: Make a summary of the problems you have seen in your review. group them by the following categories: Critical, Major, Minor and NITPICK. In each category, one bullet point per problem, with a short description of the problem and file and line where it is located. at the end of the summary, Give a confidence level (from 0% to 100%)
+- [ ] Task 7: If the confidence level is below 90%, create an implementation plan to address the issues found during the review. The plan should include tasks to fix each problem identified, along with any necessary testing or validation steps. Replace Step 1 in @TASKS.md by those new tasks.
+- [ ] Task 8: If the confidence level is 90% or above, write "Implementation completed successfully with high confidence." at the end of the summary.
+- [ ] Task 9: Write the review summary in @LAST_REVIEW_SUMMARY.md. If the file already exists, replace the existing content by the new summary.
 
-- [x]Refactor AdminDashboard component
-  - [x]Remove existing form components from main dashboard
-  - [x]Create content area that displays active section
-  - [x]Implement proper layout structure with sidebar and content
-  - [x]Add responsive breakpoints for mobile and desktop
-  - [x]Maintain existing styling consistency
+### Step 8: Push changes (only if confidence level is 90% or above)
 
-- [x]Create AdminLayout component
-  - [x]Implement layout wrapper with sidebar and content areas
-  - [x]Add proper spacing and responsive design
-  - [x]Implement loading states for section transitions
-  - [x]Add error boundaries for section loading failures
-
-- [x]Implement section switching logic
-  - [x]Add smooth transitions between sections
-  - [x]Implement proper focus management during section changes
-  - [x]Add loading indicators during section switches
-  - [x]Handle browser back/forward navigation properly
-
-### Group 4: Form Integration and State Management
-
-> Integrate existing forms into new routing structure with state preservation and user prompts
-
-- []Integrate WebsiteSettingsForm into new structure
-  - []Move form to `/admin/website-settings` route
-  - []Implement form state preservation across navigation
-  - []Add user prompts for unsaved changes
-  - []Maintain all existing functionality and API calls
-
-- []Integrate SocialNetworksForm into new structure
-  - []Move form to `/admin/social-networks` route
-  - []Implement form state preservation across navigation
-  - []Add user prompts for unsaved changes
-  - []Maintain all existing functionality and API calls
-
-- []Implement form state management
-  - []Create useFormState hook for form change tracking
-  - []Add unsaved changes detection logic
-  - []Implement user confirmation dialogs
-  - []Add proper cleanup and reset functionality
-
-### Group 5: Testing Implementation
-
-> Create comprehensive unit and e2e tests for navigation functionality and mobile responsiveness
-
-- []Create unit tests for new components
-  - []Test AdminSidebar component functionality
-  - []Test AdminMenuItem component behavior
-  - []Test useAdminNavigation hook
-  - []Test form state preservation logic
-  - []Test localStorage persistence functionality
-
-- []Create e2e tests for navigation
-  - []Test sidebar collapse/expand functionality
-  - []Test mobile hamburger menu behavior
-  - []Test section switching with URL changes
-  - []Test form state preservation prompts
-  - []Test browser back/forward navigation
-
-- []Test accessibility and responsiveness
-  - []Test keyboard navigation patterns
-  - []Test focus management during section changes
-  - []Test mobile responsive design
-  - []Test screen reader compatibility
-
-### Group 6: Documentation and Updates
-
-> Update project documentation and file structure to reflect new navigation system
-
-- []Update AGENTS.md file structure
-  - []Add new component files to directory structure
-  - []Update admin component listings
-  - []Add new hook files to structure
-  - []Update test file listings
-
-- []Update technical documentation
-  - []Document new routing architecture
-  - []Add navigation system technical details
-  - []Document mobile responsiveness implementation
-  - []Add form state preservation technical notes
-
-- []Update functional documentation
-  - []Document new navigation user experience
-  - []Add mobile navigation instructions
-  - []Document form state preservation behavior
-  - []Add accessibility features documentation
-
-- []Update existing tests and configurations
-  - []Update existing e2e tests for new routes
-  - []Modify authentication tests for new structure
-  - []Update test fixtures and helpers
-  - []Add new test data and scenarios
+- [] Task 1: Push the feature branch to the remote repository.
+- [] Task 2: Create a pull request to merge the feature branch into the main branch. The description of the pull request must include the summary of the feature address and implementation summary.
+- [] Task 3: Add a comment on the pull request with the last review summary.
+- [] Task 4: Write "the feature branch has been pushed and a pull request has been created here: {link to the pull request}" at the end of the summary.

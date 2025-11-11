@@ -17,9 +17,9 @@ Have a well coded, working feature based on the tasks listed in the tasks.md fil
 
 ## Rules
 
-You're only source of truth is the provided plan at @TASKS.md:
+Your only source of truth is the provided plan at @TASKS.md:
 
-1. Follow it strictly. step by step.
+1. Follow it strictly. step by step and tasks by tasks.
 2. When you begin a task, write "Starting step {step number}: {task number}" in the Current Task section in TASKS.md file.
-3. When a task is completed, mark it as done using " [x] " syntax.
+3. When a task is completed, mark it as done using "[x]" syntax.
 4. When a task failed, stop and ask for help.
