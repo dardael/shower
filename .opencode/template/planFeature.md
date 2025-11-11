@@ -4,6 +4,10 @@
 
 {goal}
 
+## Related github issues
+
+{link to the github issues related to this feature}
+
 ## Current task
 
 {must stay empty}
@@ -50,7 +54,7 @@
 - [] Task 3: Make git commits for each logical grouping of changes.
 - [] Task 4: The commit messages should be clear and descriptive of the changes made.
 
-### Step 7: Review
+### Step 7: Review the current files modified/created/deleted in the working directory
 
 - [] Task 1: Review the implementation to ensure all tasks in the plan have been completed.
 - [] Task 2: Ensure the code is clean and adheres to project standards.
