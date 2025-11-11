@@ -7,6 +7,7 @@ import {
   fetchWebsiteIcon,
 } from '@/infrastructure/shared/layoutUtils';
 import { Provider } from '@/presentation/shared/components/ui/provider';
+import { Toaster } from '@/presentation/shared/components/ui/toaster';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,10 @@ export default async function AdminLayout({
   return (
     <html suppressHydrationWarning>
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          {children}
+          <Toaster />
+        </Provider>
       </body>
     </html>
   );

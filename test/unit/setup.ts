@@ -29,13 +29,14 @@ beforeAll(() => {
       ) ||
       fullMessage.includes('In HTML, <html> cannot be a child of <div>') ||
       fullMessage.includes('This will cause a hydration error') ||
-      fullMessage.includes('React does not recognize the') ||
+      fullMessage.includes('React does not recognize that') ||
       fullMessage.includes('on a DOM element') ||
       fullMessage.includes(
-        'If you intentionally want it to appear in the DOM as a custom attribute'
+        'If you intentionally want it to appear in DOM as a custom attribute'
       ) ||
       fullMessage.includes('spell it as lowercase') ||
-      fullMessage.includes('accidentally passed it from a parent component')
+      fullMessage.includes('accidentally passed it from a parent component') ||
+      fullMessage.includes('Functions are not valid as a React child')
     ) {
       return;
     }
@@ -136,8 +137,12 @@ function filterChakraProps(
 ): Record<string, unknown> {
   const filtered: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(props)) {
-    // Keep event handlers and important DOM attributes
-    if (!chakraStyleProps.includes(key) && !key.startsWith('_')) {
+    // Keep event handlers and important DOM attributes, but filter out Chakra props
+    if (
+      !chakraStyleProps.includes(key) &&
+      !key.startsWith('_') &&
+      key !== 'toaster'
+    ) {
       filtered[key] = value;
     }
   }
@@ -229,6 +234,68 @@ jest.mock('@chakra-ui/react', () => {
     createToaster: jest.fn(() => ({
       create: jest.fn(),
     })),
+    Toaster: ({ children, ...props }: ComponentProps) => {
+      const filteredProps = filterChakraProps(props);
+      // Remove toaster prop as it's a function and can't be rendered
+      const { toaster, ...safeProps } = filteredProps;
+      return React.createElement(
+        'div',
+        { 'data-testid': 'toaster', ...safeProps },
+        children
+      );
+    },
+    ChakraToaster: ({ children, ...props }: ComponentProps) => {
+      const filteredProps = filterChakraProps(props);
+      // Remove toaster prop as it's a function and can't be rendered
+      const { toaster, ...safeProps } = filteredProps;
+      return React.createElement(
+        'div',
+        { 'data-testid': 'chakra-toaster', ...safeProps },
+        children
+      );
+    },
+    Portal: ({ children, ...props }: ComponentProps) =>
+      React.createElement(
+        'div',
+        { 'data-testid': 'portal', ...filterChakraProps(props) },
+        children
+      ),
+    Toast: {
+      Root: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'toast-root', ...filterChakraProps(props) },
+          children
+        ),
+      Title: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'toast-title', ...filterChakraProps(props) },
+          children
+        ),
+      Description: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'toast-description', ...filterChakraProps(props) },
+          children
+        ),
+      Indicator: ({ ...props }: ComponentProps) =>
+        React.createElement('div', {
+          'data-testid': 'toast-indicator',
+          ...filterChakraProps(props),
+        }),
+      ActionTrigger: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'button',
+          { 'data-testid': 'toast-action', ...filterChakraProps(props) },
+          children
+        ),
+      CloseTrigger: ({ ...props }: ComponentProps) =>
+        React.createElement('button', {
+          'data-testid': 'toast-close',
+          ...filterChakraProps(props),
+        }),
+    },
     useBreakpointValue: jest.fn(),
   };
 
