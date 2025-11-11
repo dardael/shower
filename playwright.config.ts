@@ -49,7 +49,27 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'admin-auth-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/admin-*.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'admin-settings-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/*-management.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'public-tests',
+      testDir: './test/e2e/public',
+      testMatch: '**/*.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         headless: true, // Force headless mode for Docker environment
