@@ -60,7 +60,6 @@ shower/
 │   │   │   │   ├── AdminLayout.tsx -> Admin layout wrapper with sidebar state management
 │   │   │   │   ├── AdminSidebar.tsx -> Collapsible sidebar navigation component
 │   │   │   │   ├── AdminMenuItem.tsx -> Individual navigation menu item component
-│   │   │   │   ├── AdminDashboard.tsx -> Main admin dashboard component
 │   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
 │   │   │   │   ├── NotAuthorized.tsx -> Unauthorized access component
 │   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form

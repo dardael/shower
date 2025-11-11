@@ -11,8 +11,9 @@ import {
   type IconButtonProps,
 } from '@chakra-ui/react';
 import { FiMenu, FiX } from 'react-icons/fi';
-import { AdminMenuItem } from './AdminMenuItem';
+import { AdminMenuItem } from '@/presentation/admin/components/AdminMenuItem';
 import { FocusTrap } from '@/presentation/shared/utils/focusTrap';
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
 
 export interface AdminSidebarProps {
   isOpen: boolean;
@@ -33,10 +34,15 @@ const menuItems = [
 ];
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
+  const logger = useLogger();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   const handleClose = () => {
     if (isMobile) {
+      logger.info('Sidebar close requested', {
+        trigger: 'manual_close',
+        isMobile,
+      });
       onClose();
     }
   };
@@ -44,6 +50,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen && isMobile) {
+        logger.info('Sidebar close requested', {
+          trigger: 'escape_key',
+          isMobile,
+        });
         onClose();
       }
     };
@@ -55,7 +65,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, isMobile, onClose]);
+  }, [isOpen, isMobile, onClose, logger]);
 
   useEffect(() => {
     if (!isOpen || !isMobile) return;
@@ -65,12 +75,16 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       onEscape: undefined, // Escape is handled by the separate effect above
     });
 
+    // Activate focus trap
     focusTrap.activate();
+    logger.debug('Focus trap activated for mobile sidebar');
 
     return () => {
+      // Clean up focus trap
       focusTrap.deactivate();
+      logger.debug('Focus trap deactivated for mobile sidebar');
     };
-  }, [isOpen, isMobile]);
+  }, [isOpen, isMobile, logger]);
 
   const sidebarContent = (
     <VStack
@@ -143,8 +157,14 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             position="fixed"
             inset={0}
             bg="blackAlpha.600"
-            zIndex="overlay"
-            onClick={handleClose}
+            zIndex="hide"
+            onClick={() => {
+              logger.info('Sidebar close requested', {
+                trigger: 'backdrop_click',
+                isMobile,
+              });
+              handleClose();
+            }}
             data-testid="sidebar-backdrop"
             aria-hidden="true"
             tabIndex={-1}
@@ -185,7 +205,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 }
 
 export function AdminSidebarToggle(props: IconButtonProps) {
+  const logger = useLogger();
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    logger.info('Sidebar toggle clicked', { trigger: 'toggle_button' });
     props.onClick?.(event);
   };
 

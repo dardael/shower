@@ -1,3 +1,6 @@
+// Named constants for focus trap timing
+const FOCUS_DELAY_MS = 100;
+
 export interface FocusTrapOptions {
   containerSelector: string;
   onEscape?: () => void;
@@ -15,17 +18,23 @@ export class FocusTrap {
   }
 
   activate(): void {
+    // Store current focus and set up event listeners
     this.previouslyFocusedElement = document.activeElement as HTMLElement;
     this.keyDownHandler = this.handleKeyDown.bind(this);
     document.addEventListener('keydown', this.keyDownHandler);
+
+    // Focus first element after a short delay
     this.focusFirstElement();
   }
 
   deactivate(): void {
+    // Clean up event listeners
     if (this.keyDownHandler) {
       document.removeEventListener('keydown', this.keyDownHandler);
       this.keyDownHandler = null;
     }
+
+    // Restore previous focus
     this.restoreFocus();
   }
 
@@ -45,13 +54,13 @@ export class FocusTrap {
   private focusFirstElement(): void {
     const focusableElements = this.getFocusableElements();
     if (focusableElements.length > 0) {
-      setTimeout(() => focusableElements[0].focus(), 100);
+      setTimeout(() => focusableElements[0].focus(), FOCUS_DELAY_MS);
     }
   }
 
   private restoreFocus(): void {
     if (this.previouslyFocusedElement?.focus) {
-      setTimeout(() => this.previouslyFocusedElement!.focus(), 100);
+      setTimeout(() => this.previouslyFocusedElement!.focus(), FOCUS_DELAY_MS);
     }
   }
 

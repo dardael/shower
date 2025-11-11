@@ -12,11 +12,11 @@ import {
 } from '@chakra-ui/react';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
-import { ThemeColorSelector } from './ThemeColorSelector';
+import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
-import { useFormState } from '../hooks/useFormState';
+import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
-import { useIconManagement } from '../hooks/useIconManagement';
+import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
 import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
 import type { ImageData } from '@/presentation/shared/components/ImageManager/types';

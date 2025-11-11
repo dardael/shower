@@ -99,7 +99,7 @@ const ThemeColorSelector = memo<ThemeColorSelectorProps>(
           border={0}
           aria-live="polite"
           aria-atomic="true"
-          style={{ whiteSpace: 'nowrap' }}
+          whiteSpace="nowrap"
         >
           {announcement}
         </Box>

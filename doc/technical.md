@@ -366,6 +366,61 @@ expect(mockLogger.info).toHaveBeenCalledWith(
 );
 ```
 
+### Admin Component Logging Patterns
+
+The admin components implement comprehensive logging patterns for user interaction tracking and debugging:
+
+#### **Sidebar Interaction Logging** (`src/presentation/admin/components/AdminSidebar.tsx`)
+
+```typescript
+// Sidebar toggle interactions
+logger.info('Sidebar toggle clicked', { trigger: 'toggle_button' });
+
+// Sidebar close events with context
+logger.info('Sidebar close requested', {
+  trigger: 'backdrop_click' | 'escape_key' | 'close_button',
+  isMobile: boolean,
+});
+
+// Focus trap state changes
+logger.debug('Focus trap activated for mobile sidebar');
+logger.debug('Focus trap deactivated for mobile sidebar');
+```
+
+#### **Navigation Logging** (`src/presentation/admin/components/AdminMenuItem.tsx`)
+
+```typescript
+// Menu item navigation with context
+logger.info('Menu item clicked', {
+  href: string,
+  label: string,
+  isActive: boolean,
+});
+```
+
+#### **Form State Logging** (`src/presentation/admin/components/WebsiteSettingsForm.tsx`)
+
+```typescript
+// Form state changes for debugging
+logger.debug('Form before unload check', { hasChanges: boolean });
+```
+
+#### **Layout Error Handling** (`src/presentation/admin/components/AdminLayout.tsx`)
+
+```typescript
+// localStorage operation errors
+storageErrorHandler.handleError(error, 'load' | 'save');
+```
+
+**Logging Best Practices Implemented:**
+
+1. **Structured Metadata**: All log entries include relevant context data
+2. **Event Trigger Tracking**: User interactions are logged with trigger sources
+3. **State Change Logging**: Component state changes are logged for debugging
+4. **Error Context**: Errors include operation context and error details
+5. **Performance Awareness**: Debug-level logging for performance-critical operations
+6. **User Privacy**: No sensitive user data is logged
+
 ### Migration from Console Logging
 
 The enhanced logging system replaces all `console.log`, `console.error`, `console.warn`, and `console.debug` statements throughout the codebase. This provides:
@@ -648,7 +703,6 @@ All UI components now use the dynamic theme system:
 
 - **SaveButton**: Removed hardcoded `colorPalette="blue"`
 - **LoginButton**: Uses global theme color for consistent branding
-- **AdminDashboard**: Dynamic accent colors matching selected theme
 - **Error Boundaries**: Theme-aware error handling interfaces
 
 #### **Form Integration** (`src/presentation/admin/components/WebsiteSettingsForm.tsx`)
