@@ -1,6 +1,8 @@
 import { config as dotenvConfig } from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import { TestDatabase } from './fixtures/test-database';
+import { getParallelExecutionGroups } from './fixtures/test-cleanup';
 
 /**
  * Global setup for Playwright tests
@@ -36,7 +38,7 @@ async function globalSetup() {
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
     'BETTERAUTH_SECRET',
-    'BETTERAUTH_URL',
+    'BETTER_AUTH_URL',
     'ADMIN_EMAIL',
     'MONGODB_URI',
   ];
@@ -46,6 +48,23 @@ async function globalSetup() {
   );
   if (missingVars.length > 0) {
     // Missing environment variables: ${missingVars.join(', ')}
+  }
+
+  // Initialize database connection for parallel execution
+  try {
+    await TestDatabase.connect();
+
+    // Log parallel execution groups for debugging
+    const parallelGroups = getParallelExecutionGroups();
+    console.log('Parallel execution groups:', parallelGroups);
+
+    // Clean database once before all tests start
+    await TestDatabase.cleanDatabase();
+
+    await TestDatabase.disconnect();
+  } catch (error) {
+    console.error('Failed to initialize test database:', error);
+    throw error;
   }
 }
 

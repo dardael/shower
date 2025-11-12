@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { TestDatabase } from '../fixtures/test-database';
 import { signIn } from '../fixtures/authHelpers';
 import { TIMEOUTS, RETRY_CONFIG } from '../constants/timeouts';
+import {
+  setupTestEnvironment,
+  teardownTestEnvironment,
+} from '../fixtures/test-cleanup';
 
 test.describe('Admin Page', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
@@ -57,19 +60,16 @@ test.describe('Admin Page', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.beforeEach(async () => {
-    // Ensure clean database state for each test in this group
-    await TestDatabase.connect();
-    await TestDatabase.cleanDatabase();
-    // Add a small delay to ensure database operations complete
-    await new Promise((resolve) => setTimeout(resolve, TIMEOUTS.QUICK));
-    // Double-check that database is actually clean
-    await TestDatabase.cleanDatabase();
+    // Use collection-based cleanup for admin-auth-tests project
+    await setupTestEnvironment('admin-auth-tests');
+    // Wait for database operations to complete
+    const { TestDatabase } = await import('../fixtures/test-database');
+    await TestDatabase.waitForOperationsComplete();
   });
 
   test.afterEach(async () => {
-    // Cleanup after each test
-    await TestDatabase.cleanDatabase();
-    await TestDatabase.disconnect();
+    // Use collection-based cleanup for admin-auth-tests project
+    await teardownTestEnvironment('admin-auth-tests');
   });
 
   test('updates website name successfully', async ({ page }) => {

@@ -132,9 +132,23 @@ shower/
 ├── test/                     # Test Layer
 │   ├── e2e/                  # End-to-end tests
 │   │   ├── admin/
+│   │   │   ├── admin-navigation.spec.ts -> Admin navigation tests
+│   │   │   ├── admin-page.spec.ts -> Admin authentication tests
+│   │   │   ├── icon-management.spec.ts -> Icon management tests
+│   │   │   ├── logging-health-check.spec.ts -> API health check tests
+│   │   │   ├── social-networks-management.spec.ts -> Social networks tests
+│   │   │   └── theme-color-management.spec.ts -> Theme color tests
+│   │   ├── public-ui-tests/
+│   │   │   └── footer-visibility.spec.ts -> Public UI tests
+│   │   ├── public/
+│   │   │   └── social-networks-footer.spec.ts -> Public social networks tests
 │   │   ├── fixtures/
 │   │   │   ├── authHelpers.ts -> Authentication test helpers
-│   │   │   └── test-database.ts -> Test database setup
+│   │   │   ├── test-cleanup.ts -> Collection-based cleanup utilities
+│   │   │   ├── test-database.ts -> Test database setup with connection pooling
+│   │   │   └── test-dependencies.ts -> Test dependency metadata
+│   │   ├── constants/
+│   │   │   └── timeouts.ts -> Test timeout constants
 │   │   ├── global-setup.ts -> Global e2e test setup
 │   │   └── tsconfig.json -> E2E test TypeScript configuration
 │   ├── unit/                 # Unit tests (following same structure as src)

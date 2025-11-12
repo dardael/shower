@@ -1,64 +1,81 @@
 ---
-description: Ensure consistent and efficient development of e2e tests using Playwright. Defines the structure, patterns, and best practices for writing, organizing, and maintaining Playwright-based end-to-end tests.
-globs: test/e2e/**/*.ts
+description: Ensure consistent and efficient development of e2e tests using Playwright with parallel execution and collection-based project organization. Defines the structure, patterns, and best practices for writing, organizing, and maintaining Playwright-based end-to-end tests.
+globs: test/e2e/**/*.ts, playwright.config.ts
 alwaysApply: false
 ---
 
 Sub rule 1: Test File Organization
-- Place e2e tests in `test/e2e/` directory.
+- Place e2e tests in `test/e2e/` directory organized by feature.
 - Name test files with `.spec.ts` extension.
-- Organize tests by feature or page functionality.
+- Each test file must be registered in `test/e2e/fixtures/test-dependencies.ts` with its collection dependencies.
+- Use the dependency registry to specify MongoDB collections used by each test file.
 
-Sub rule 2: Test Structure and Naming
+Sub rule 2: Test Project Assignment
+- Every test file must be assigned to a project based on the collections it uses.
+- Use existing projects when possible by matching collection dependencies exactly.
+- If no existing project matches the required collections, create a new project in `playwright.config.ts`.
+- Each project can only run tests that use the exact same set of collections.
+- Read-only tests should use dedicated projects separate from read-write tests.
+
+Sub rule 3: Playwright Configuration Rules
+- **NEVER modify** `workers` setting in `playwright.config.ts` - it's optimized for parallel execution.
+- **NEVER modify** `fullyParallel` option in `playwright.config.ts` - project-level parallelism handles optimization.
+- Use project-level configuration instead of global worker changes.
+- Each project defines its own test files and dependencies in `playwright.config.ts`.
+
+Sub rule 4: Test Structure and Naming
 - Use Playwright fixtures for shared context setup.
 - Group related tests using `describe` blocks.
 - Name test cases to clearly describe the scenario.
 - Follow Arrange-Act-Assert pattern within test cases.
+- Register test file dependencies in `test/e2e/fixtures/test-dependencies.ts`.
 
-Sub rule 3: Setup and Teardown
+Sub rule 5: Setup and Teardown with Collection Management
 - Use `beforeEach`/`afterEach` for test-specific setup and teardown.
 - Leverage `test.use` for scoped configuration.
+- Use collection-based cleanup: `cleanCollections(['collection1', 'collection2'])` instead of full database drops.
 - Use global setup/teardown for shared test infrastructure.
 
-Sub rule 4: Application Pre-execution Requirements
+Sub rule 6: Application Pre-execution Requirements
 - Start MongoDB service first: `docker compose up mongodb -d`
 - Build the Next.js application before running e2e tests: `docker compose run --rm app npm run build`
 - Ensure MongoDB is fully running before test execution begins.
 - Use proper wait strategies to avoid timeouts in opencode environment.
 - Verify database connection before test suite execution.
 
-Sub rule 5: Page Object Models and Helpers
+Sub rule 7: Page Object Models and Helpers
 - Prefer page object model for complex flows.
 - Create reusable helper functions for repetitive actions.
 - Encapsulate page-specific logic in dedicated page classes.
 - Use meaningful method names that describe user actions.
 
-Sub rule 6: Element Selection Strategies
+Sub rule 8: Element Selection Strategies
 - Use `data-testid` attributes for element selectors.
 - Avoid selectors that rely on text, classes, or DOM structure.
 - Prefer stable selectors that won't break with UI changes.
 - Use role-based selectors when appropriate for accessibility.
 
-Sub rule 7: Test Execution and Configuration
+Sub rule 9: Test Execution and Configuration
 - Run tests in headless mode for CI pipelines.
 - Enable video/screenshots only for failing tests.
 - Configure appropriate timeouts for network and element waits.
-- Use parallel execution for faster test suites when appropriate.
+- **DO NOT modify parallel execution settings** - use existing project-level parallelism.
 
-Sub rule 8: Mocking and Network Handling
+Sub rule 10: Mocking and Network Handling
 - Mock external network requests if required.
 - Avoid mocking internal API calls; use actual endpoints for internal APIs.
 - Use route handling for network interception when needed.
 - Test both online and offline scenarios when relevant.
 
-Sub rule 9: Assertions and Validation
+Sub rule 11: Assertions and Validation
 - Use `expect` for assertions on UI and state.
 - Prefer `toBeVisible`, `toHaveText`, `toHaveAttribute`, etc., for clarity.
 - Include meaningful assertion messages for debugging.
 - Validate both positive and negative scenarios.
 
-Sub rule 10: Test Environment Management
-- Clean up test data and state after each test.
-- Use isolated test databases or environments.
-- Ensure tests are independent and can run in any order.
+Sub rule 12: Test Environment Management with Collection Isolation
+- Clean up test data using collection-specific cleanup: `cleanCollections(['collectionName'])`
+- Use isolated test collections instead of full database environments.
+- Ensure tests are independent and can run in any order within their project.
 - Handle browser context cleanup properly.
+- Respect collection dependencies defined in test-dependencies registry and project configurations.

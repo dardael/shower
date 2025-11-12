@@ -1776,3 +1776,103 @@ The technical implementation combines robust authentication/authorization mechan
 - **User Experience**: Personalized interface with real-time theme updates and consistent visual branding
 
 This architecture provides a solid foundation for scaling the application while maintaining security best practices, comprehensive operational visibility, and enhanced user experience through dynamic theming capabilities.
+
+---
+
+## E2E Test Performance Optimization
+
+### Collection-Based Dependency Management
+
+The E2E test suite implements a sophisticated dependency tracking system for optimal parallel execution:
+
+#### Test Dependency Metadata
+
+**Location**: `test/e2e/fixtures/test-dependencies.ts`
+
+The system maps each test project to its required MongoDB collections:
+
+```typescript
+export const COLLECTION_DEPENDENCIES: CollectionDependencyRegistry = {
+  'admin-auth-tests': {
+    collections: [MONGODB_COLLECTIONS.USERS],
+    readOnly: false,
+  },
+  'admin-ui-tests': {
+    collections: [],
+    readOnly: true,
+  },
+  // ... other projects
+};
+```
+
+#### MongoDB Collection Mapping
+
+**Location**: `test/e2e/fixtures/test-dependencies.ts`
+
+Standardized collection names for consistency:
+
+```typescript
+export const MONGODB_COLLECTIONS = {
+  USERS: 'users',
+  SOCIAL_NETWORKS: 'socialNetworks',
+  WEBSITE_SETTINGS: 'websiteSettings',
+} as const;
+```
+
+#### Connection Pooling
+
+**Location**: `test/e2e/fixtures/test-database.ts`
+
+Enhanced database connection management for parallel execution:
+
+- **Max Connections**: 8 concurrent connections
+- **Connection Timeout**: 30 seconds
+- **Pool Management**: Automatic connection reuse and cleanup
+- **Targeted Cleanup**: Collection-specific instead of full database drops
+
+#### Parallel Execution Strategy
+
+**Location**: `test/e2e/fixtures/test-cleanup.ts`
+
+The system calculates optimal parallel execution groups:
+
+```typescript
+export function getParallelExecutionGroups(): string[][] {
+  // Groups projects that can run together without conflicts
+  // Read-only projects can run with any other projects
+  // Write projects are isolated by collection dependencies
+}
+```
+
+#### Project Structure
+
+**8 Independent Projects**:
+
+1. **admin-auth-tests**: Authentication tests (users collection)
+2. **admin-ui-tests**: Navigation tests (no collections)
+3. **admin-api-tests**: API health checks (no collections)
+4. **admin-settings-tests**: Icon management tests (websiteSettings collection)
+5. **admin-theme-tests**: Theme color tests (websiteSettings collection)
+6. **admin-social-tests**: Social networks tests (socialNetworks collection)
+7. **public-ui-tests**: Public UI tests (no collections)
+8. **public-social-tests**: Public social networks tests (socialNetworks read-only)
+
+**Test Responsibilities:**
+
+- **Icon Management**: Handled by `admin-settings-tests` (website icon upload/management)
+- **Theme Management**: Handled by `admin-theme-tests` (theme color selection and customization)
+
+#### Performance Benefits
+
+- **Reduced Execution Time**: Parallel execution across 8 workers
+- **Optimized Cleanup**: Only clean required collections, not entire database
+- **Resource Efficiency**: Connection pooling reduces connection overhead
+- **Test Isolation**: Dependency tracking prevents cross-test interference
+
+#### Configuration
+
+**Playwright Config**: `playwright.config.ts`
+
+- **Workers**: 8 parallel workers
+- **Projects**: 8 independent test projects
+- **fullyParallel**: false (project-level parallelization)

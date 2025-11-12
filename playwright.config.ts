@@ -20,13 +20,14 @@ if (fs.existsSync(envTestLocalPath)) {
 export default defineConfig({
   testDir: './test/e2e',
   /* Run tests in files in parallel */
+  // DO NOT MODIFY: fullyParallel is optimized for project-level parallel execution
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: false,
   /* Retry on CI only */
   retries: 0,
-  /* Opt out of parallel tests on CI. */
-  workers: 2,
+  // DO NOT MODIFY: workers is optimized for 8-project parallel distribution
+  workers: 8,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'list',
   /* Global setup and teardown for the tests */
@@ -46,12 +47,30 @@ export default defineConfig({
     headless: process.env.CI === 'true' || process.env.SHOWER_ENV === 'test',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure 8 projects for worker distribution and collection-based cleanup */
   projects: [
     {
       name: 'admin-auth-tests',
       testDir: './test/e2e/admin',
-      testMatch: '**/admin-*.spec.ts',
+      testMatch: '**/admin-page.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'admin-ui-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/admin-navigation.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'admin-api-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/logging-health-check.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         headless: true, // Force headless mode for Docker environment
@@ -60,16 +79,43 @@ export default defineConfig({
     {
       name: 'admin-settings-tests',
       testDir: './test/e2e/admin',
-      testMatch: '**/*-management.spec.ts',
+      testMatch: '**/icon-management.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         headless: true, // Force headless mode for Docker environment
       },
     },
     {
-      name: 'public-tests',
+      name: 'admin-theme-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/theme-color-management.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'admin-social-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/social-networks-management.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'public-ui-tests',
+      testDir: './test/e2e/public-ui-tests',
+      testMatch: '**/footer-visibility.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
+    {
+      name: 'public-social-tests',
       testDir: './test/e2e/public',
-      testMatch: '**/*.spec.ts',
+      testMatch: '**/social-networks-footer.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         headless: true, // Force headless mode for Docker environment
