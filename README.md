@@ -302,11 +302,66 @@ Run end-to-end tests with Playwright:
 # Start MongoDB service
 docker compose up mongodb -d
 
-# Build the Next.js application
+# Build Next.js application
 docker compose run --rm app npm run build
 
 # Run e2e tests
 docker compose run --rm -T app npm run test:e2e
+```
+
+Run with UI mode for debugging:
+
+```bash
+# Start MongoDB service
+docker compose up mongodb -d
+
+# Build the Next.js application
+docker compose run --rm app npm run build
+
+# Run e2e tests with UI
+docker compose run --rm app npm run test:e2e:ui
+```
+
+#### Parallel Test Execution
+
+This project features optimized E2E test execution with **project-level parallelization**:
+
+- **8 Test Projects**: Tests are organized into 8 independent projects for optimal worker distribution
+- **Collection-Based Cleanup**: Targeted database cleanup instead of full database drops for better performance
+- **Connection Pooling**: MongoDB connection pool with 8 max connections and 30s timeout
+- **Dependency Tracking**: Automatic mapping of test projects to required MongoDB collections
+
+**Test Projects:**
+
+- `admin-auth-tests`: Authentication and admin page tests (users collection)
+- `admin-ui-tests`: Navigation and UI tests (no collections)
+- `admin-api-tests`: API health check tests (no collections)
+- `admin-settings-tests`: Icon management tests (websiteSettings collection)
+- `admin-social-tests`: Social networks management tests (socialNetworks collection)
+- `admin-theme-tests`: Theme color management tests (websiteSettings collection)
+- `public-ui-tests`: Public UI tests (no collections)
+- `public-social-tests`: Public social networks tests (socialNetworks read-only)
+
+**Test Responsibilities:**
+
+- **Icon Management**: Handled by `admin-settings-tests` (website icon upload/management)
+- **Theme Management**: Handled by `admin-theme-tests` (theme color selection and customization)
+
+**Performance Benefits:**
+
+- Tests run in parallel across 8 workers
+- Collection-specific cleanup reduces database overhead
+- Connection pooling improves resource utilization
+- Dependency isolation prevents test interference
+
+**Run specific test projects:**
+
+```bash
+# Run only admin authentication tests
+docker compose run --rm -T app npm run test:e2e -- --project=admin-auth-tests
+
+# Run multiple specific projects
+docker compose run --rm -T app npm run test:e2e -- --project=admin-auth-tests --project=admin-ui-tests
 ```
 
 Run with UI mode for debugging:
