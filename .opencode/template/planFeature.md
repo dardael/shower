@@ -69,6 +69,6 @@
 ### Step 8: Push changes (only if confidence level is 90% or above)
 
 - Task 1: push the feature branch to the remote repository.
-- Task 2: create a pull request to merge the feature branch into the main branch. the description of the pull request must include the summary of feature address and implementation summary.
+- Task 2: create a pull request to merge the feature branch into the main branch. the description of the pull request must include the summary of feature address and implementation summary. the pull request must be linked to the related github issues.
 - Task 3: add a comment on the pull request with the last review summary.
 - Task 4: write "the feature branch has been pushed and a pull request has been created here: {link to the pull request}" at the end of the summary.
