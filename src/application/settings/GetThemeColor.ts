@@ -15,8 +15,9 @@ export class GetThemeColor implements IGetThemeColor {
 
   async execute(): Promise<ThemeColor> {
     try {
-      const settings = await this.repository.getSettingsByKey('website');
-      return settings.themeColor;
+      const setting = await this.repository.getByKey('theme-color');
+      const colorValue = setting.getValueAsString();
+      return ThemeColor.fromString(colorValue);
     } catch {
       // If no theme color is set, return default
       return ThemeColor.createDefault();

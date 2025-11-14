@@ -13,7 +13,7 @@ export const GET = withApi(async () => {
     // Get website icon through application layer
     const repository = new MongooseWebsiteSettingsRepository();
     const getWebsiteIcon = new GetWebsiteIcon(repository);
-    const icon = await getWebsiteIcon.execute('website');
+    const icon = await getWebsiteIcon.execute();
 
     if (!icon) {
       return NextResponse.json({ icon: null });
@@ -95,7 +95,7 @@ export const DELETE = withApi(
       // Get current icon to delete file
       const repository = new MongooseWebsiteSettingsRepository();
       const getWebsiteIcon = new GetWebsiteIcon(repository);
-      const currentIcon = await getWebsiteIcon.execute('website');
+      const currentIcon = await getWebsiteIcon.execute();
 
       if (currentIcon) {
         // Delete file from storage

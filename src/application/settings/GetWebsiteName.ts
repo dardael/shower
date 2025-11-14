@@ -10,7 +10,7 @@ export class GetWebsiteName implements IGetWebsiteName {
   ) {}
 
   async execute(): Promise<string> {
-    const settings = await this.repository.getSettingsByKey('name');
-    return settings.name.value;
+    const setting = await this.repository.getByKey('website-name');
+    return setting.getValueAsString();
   }
 }

@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import type { IIconMetadata } from '@/infrastructure/settings/models/WebsiteSettingsModel';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
+import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
 
 export interface IFileStorageService {
   uploadIcon(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
