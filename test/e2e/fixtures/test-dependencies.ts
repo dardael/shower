@@ -48,7 +48,10 @@ export const MONGODB_COLLECTIONS = {
  */
 export const COLLECTION_DEPENDENCIES: CollectionDependencyRegistry = {
   'admin-auth-tests': {
-    collections: [MONGODB_COLLECTIONS.USERS],
+    collections: [
+      MONGODB_COLLECTIONS.USERS,
+      MONGODB_COLLECTIONS.WEBSITE_SETTINGS,
+    ],
     readOnly: false,
   },
   'admin-ui-tests': {
@@ -88,7 +91,10 @@ export const COLLECTION_DEPENDENCIES: CollectionDependencyRegistry = {
 export const TEST_FILE_DEPENDENCIES: TestFileRegistry = {
   'admin/admin-page.spec.ts': {
     filePath: 'admin/admin-page.spec.ts',
-    collections: [MONGODB_COLLECTIONS.USERS],
+    collections: [
+      MONGODB_COLLECTIONS.USERS,
+      MONGODB_COLLECTIONS.WEBSITE_SETTINGS,
+    ],
     readOnly: false,
   },
   'admin/admin-navigation.spec.ts': {
