@@ -91,6 +91,8 @@ shower/
 │   │   ├── settings/
 │   │   │   ├── constants/
 │   │   │   ├── entities/
+│   │   │   │   ├── SocialNetwork.ts -> Social network entity
+│   │   │   │   └── WebsiteSetting.ts -> Individual website setting entity
 │   │   │   ├── repositories/
 │   │   │   ├── services/
 │   │   │   └── value-objects/
