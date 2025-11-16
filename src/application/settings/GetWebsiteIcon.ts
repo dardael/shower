@@ -16,7 +16,7 @@ export class GetWebsiteIcon implements IGetWebsiteIcon {
     const iconValue = setting.getValueAsIcon();
 
     if (!iconValue) {
-      return null;
+      return null; // No icon as default
     }
 
     return new WebsiteIcon(iconValue.url, iconValue.metadata);
