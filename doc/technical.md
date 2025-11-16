@@ -512,16 +512,103 @@ If you need to scale to multiple instances, consider these alternatives:
 
 ## Website Settings Storage
 
-The website settings are stored in MongoDB using Mongoose. Each setting is identified by a unique `key` field, allowing multiple settings to be stored in the same collection.
+The website settings are stored in MongoDB using a key-value structure where each setting is stored as a separate document with only `key` and `value` properties. This provides better flexibility, scalability, and maintainability compared to the previous single document approach.
 
 ### Schema
 
-- `key`: String, required, unique - Identifies the setting type (e.g., 'name' for website name)
-- `name`: String, required - The value of the setting (e.g., the website name)
+Each website setting document follows this structure:
 
-### Migration
+```typescript
+{
+  key: string,      // Required, unique - Identifies setting type
+  value: unknown     // Required - The setting value (flexible type)
+}
+```
 
-When upgrading from the previous singleton pattern, run the migration script `scripts/migrate-website-settings.js` to add the `key` field to existing documents.
+### Supported Setting Keys
+
+The system supports these specific setting keys:
+
+- **`website-name`**: Website name as string
+- **`website-icon`**: Website icon as object with URL and metadata
+- **`theme-color`**: Theme color as string from predefined palette
+
+### Key-Value Structure Benefits
+
+#### **Flexibility**
+
+- Each setting can have different value types (string, object, null)
+- Easy to add new setting types without schema changes
+- Independent setting management without affecting others
+
+#### **Performance**
+
+- Smaller documents for faster queries
+- Individual setting retrieval reduces data transfer
+- Better indexing opportunities on key field
+
+#### **Scalability**
+
+- Settings can be distributed across multiple collections if needed
+- Independent scaling of different setting types
+- Reduced document size limits
+
+#### **Maintainability**
+
+- Clear separation between different setting concerns
+- Easier to debug individual setting issues
+- Simpler backup and restore operations
+
+### Repository Implementation
+
+#### **MongooseWebsiteSettingsRepository** (`src/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository.ts`)
+
+The repository provides key-based operations:
+
+- **`getByKey(key)`**: Retrieves a specific setting by its key
+- **`setByKey(key, value)`**: Updates or creates a setting
+- **`exists(key)`**: Checks if a setting exists
+
+#### **Default Value Handling**
+
+The repository automatically creates default values when settings don't exist:
+
+- **website-name**: "Shower" (default website name)
+- **website-icon**: null (no icon by default)
+- **theme-color**: "blue" (default theme color)
+
+### Migration from Single Document
+
+When upgrading from the previous single document structure:
+
+#### **Data Transformation**
+
+1. **Extract Settings**: Pull individual settings from the complex document
+2. **Create Key-Value Documents**: Generate separate documents for each setting
+3. **Validate Data**: Ensure all settings have proper keys and values
+4. **Clean Legacy**: Remove the old single document structure
+
+#### **Migration Benefits**
+
+- **Query Performance**: Individual setting retrieval is much faster
+- **Data Integrity**: Each setting is independently validated
+- **Storage Efficiency**: No need to load entire settings document
+- **Future Extensibility**: Easy to add new setting types
+
+### API Integration
+
+#### **Dedicated Endpoints**
+
+Each setting type has its own API endpoint for better performance:
+
+- **GET/PUT `/api/settings/name`**: Website name management
+- **GET/PUT `/api/settings/icon`**: Website icon management
+- **GET/PUT `/api/settings/theme-color`**: Theme color management
+
+#### **Backward Compatibility**
+
+- New endpoints provide better performance for specific operations
+- Gradual migration path for API consumers
 
 ---
 

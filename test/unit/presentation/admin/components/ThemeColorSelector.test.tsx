@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 

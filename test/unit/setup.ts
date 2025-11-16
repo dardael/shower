@@ -237,7 +237,9 @@ jest.mock('@chakra-ui/react', () => {
     Toaster: ({ children, ...props }: ComponentProps) => {
       const filteredProps = filterChakraProps(props);
       // Remove toaster prop as it's a function and can't be rendered
-      const { toaster, ...safeProps } = filteredProps;
+      const safeProps = Object.fromEntries(
+        Object.entries(filteredProps).filter(([key]) => key !== 'toaster')
+      );
       return React.createElement(
         'div',
         { 'data-testid': 'toaster', ...safeProps },
@@ -247,7 +249,9 @@ jest.mock('@chakra-ui/react', () => {
     ChakraToaster: ({ children, ...props }: ComponentProps) => {
       const filteredProps = filterChakraProps(props);
       // Remove toaster prop as it's a function and can't be rendered
-      const { toaster, ...safeProps } = filteredProps;
+      const safeProps = Object.fromEntries(
+        Object.entries(filteredProps).filter(([key]) => key !== 'toaster')
+      );
       return React.createElement(
         'div',
         { 'data-testid': 'chakra-toaster', ...safeProps },
@@ -398,6 +402,18 @@ jest.mock(
   }),
   { virtual: true }
 );
+
+// Mock WebsiteSettingsModel to avoid mongoose Schema.Types.Mixed issues
+jest.mock('@/infrastructure/settings/models/WebsiteSettingsModel', () => ({
+  WebsiteSettingsModel: {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    updateOne: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+    deleteOne: jest.fn(),
+    find: jest.fn(),
+  },
+}));
 
 // Mock mongoose and related database modules
 jest.mock('mongoose', () => ({

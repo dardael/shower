@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LocalFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
-import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
-import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
-import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
+import { SettingsServiceLocator } from '@/infrastructure/container';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { withApi } from '@/infrastructure/shared/apiWrapper';
@@ -11,9 +9,8 @@ import { withApi } from '@/infrastructure/shared/apiWrapper';
 export const GET = withApi(async () => {
   try {
     // Get website icon through application layer
-    const repository = new MongooseWebsiteSettingsRepository();
-    const getWebsiteIcon = new GetWebsiteIcon(repository);
-    const icon = await getWebsiteIcon.execute('website');
+    const getWebsiteIcon = SettingsServiceLocator.getWebsiteIcon();
+    const icon = await getWebsiteIcon.execute();
 
     if (!icon) {
       return NextResponse.json({ icon: null });
@@ -30,7 +27,11 @@ export const GET = withApi(async () => {
         uploadedAt: icon.uploadedAt,
       },
     });
-  } catch {
+  } catch (error) {
+    const logger = container.resolve<Logger>('Logger');
+    logger.logErrorWithObject(error, 'Error getting website icon', {
+      method: 'GET',
+    });
     return NextResponse.json({ icon: null }, { status: 200 }); // Return null on error
   }
 });
@@ -57,9 +58,8 @@ export const POST = withApi(
       const icon = new WebsiteIcon(url, metadata);
 
       // Update website icon through application layer
-      const repository = new MongooseWebsiteSettingsRepository();
-      const updateWebsiteIcon = new UpdateWebsiteIcon(repository);
-      await updateWebsiteIcon.execute('website', icon);
+      const updateWebsiteIcon = SettingsServiceLocator.getUpdateWebsiteIcon();
+      await updateWebsiteIcon.execute(icon);
 
       return NextResponse.json({
         message: 'Website icon updated successfully',
@@ -79,9 +79,7 @@ export const POST = withApi(
         error,
       });
       return NextResponse.json(
-        {
-          error: error instanceof Error ? error.message : String(error),
-        },
+        { error: 'Failed to update website icon. Please try again later.' },
         { status: 500 }
       );
     }
@@ -93,9 +91,8 @@ export const DELETE = withApi(
   async () => {
     try {
       // Get current icon to delete file
-      const repository = new MongooseWebsiteSettingsRepository();
-      const getWebsiteIcon = new GetWebsiteIcon(repository);
-      const currentIcon = await getWebsiteIcon.execute('website');
+      const getWebsiteIcon = SettingsServiceLocator.getWebsiteIcon();
+      const currentIcon = await getWebsiteIcon.execute();
 
       if (currentIcon) {
         // Delete file from storage
@@ -104,8 +101,8 @@ export const DELETE = withApi(
       }
 
       // Remove icon from database
-      const updateWebsiteIcon = new UpdateWebsiteIcon(repository);
-      await updateWebsiteIcon.execute('website', null);
+      const updateWebsiteIcon = SettingsServiceLocator.getUpdateWebsiteIcon();
+      await updateWebsiteIcon.execute(null);
 
       return NextResponse.json({
         message: 'Website icon removed successfully',
@@ -116,7 +113,7 @@ export const DELETE = withApi(
         error,
       });
       return NextResponse.json(
-        { error: 'Internal server error' },
+        { error: 'Failed to remove website icon. Please try again later.' },
         { status: 500 }
       );
     }

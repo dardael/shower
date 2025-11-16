@@ -9,10 +9,9 @@ describe('UpdateWebsiteIcon', () => {
 
   beforeEach(() => {
     mockRepository = {
-      getSettingsByKey: jest.fn(),
-      updateSettings: jest.fn(),
-      updateIcon: jest.fn(),
-      getIcon: jest.fn(),
+      getByKey: jest.fn(),
+      setByKey: jest.fn(),
+      exists: jest.fn(),
     } as jest.Mocked<WebsiteSettingsRepository>;
     useCase = new UpdateWebsiteIcon(mockRepository);
   });
@@ -32,23 +31,29 @@ describe('UpdateWebsiteIcon', () => {
       mockIconMetadata
     );
 
-    await useCase.execute('test-key', icon);
+    const expectedIconValue = {
+      url: 'https://example.com/favicon.ico',
+      metadata: mockIconMetadata,
+    };
 
-    expect(mockRepository.updateIcon).toHaveBeenCalledWith('test-key', icon);
+    await useCase.execute(icon);
+
+    expect(mockRepository.setByKey).toHaveBeenCalledWith(
+      'website-icon',
+      expectedIconValue
+    );
   });
 
   it('should remove website icon successfully', async () => {
-    await useCase.execute('test-key', null);
+    await useCase.execute(null);
 
-    expect(mockRepository.updateIcon).toHaveBeenCalledWith('test-key', null);
+    expect(mockRepository.setByKey).toHaveBeenCalledWith('website-icon', null);
   });
 
   it('should handle repository errors', async () => {
     const error = new Error('Repository error');
-    mockRepository.updateIcon.mockRejectedValue(error);
+    mockRepository.setByKey.mockRejectedValue(error);
 
-    await expect(useCase.execute('test-key', null)).rejects.toThrow(
-      'Repository error'
-    );
+    await expect(useCase.execute(null)).rejects.toThrow('Repository error');
   });
 });

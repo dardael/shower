@@ -1,15 +1,12 @@
 import 'reflect-metadata';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
-import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
-import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
+import { WebsiteSetting } from '@/domain/settings/entities/WebsiteSetting';
 
 // Mock dependencies
 const mockWebsiteSettingsRepository: jest.Mocked<WebsiteSettingsRepository> = {
-  getSettingsByKey: jest.fn(),
-  updateSettings: jest.fn(),
-  updateIcon: jest.fn(),
-  getIcon: jest.fn(),
+  getByKey: jest.fn(),
+  setByKey: jest.fn(),
 };
 
 describe('GetWebsiteName', () => {
@@ -21,26 +18,25 @@ describe('GetWebsiteName', () => {
   });
 
   it('should return the website name from repository', async () => {
-    const websiteName = new WebsiteName('My Website');
-    const settings = new WebsiteSettings('name', websiteName);
+    const setting = new WebsiteSetting('website-name', 'My Website');
 
-    mockWebsiteSettingsRepository.getSettingsByKey.mockResolvedValue(settings);
+    mockWebsiteSettingsRepository.getByKey.mockResolvedValue(setting);
 
     const result = await useCase.execute();
 
-    expect(mockWebsiteSettingsRepository.getSettingsByKey).toHaveBeenCalledWith(
-      'name'
+    expect(mockWebsiteSettingsRepository.getByKey).toHaveBeenCalledWith(
+      'website-name'
     );
     expect(result).toBe('My Website');
   });
 
-  it('should handle repository error', async () => {
+  it('should return default value on repository error', async () => {
     const error = new Error('Database connection failed');
 
-    mockWebsiteSettingsRepository.getSettingsByKey.mockRejectedValue(error);
+    mockWebsiteSettingsRepository.getByKey.mockRejectedValue(error);
 
-    await expect(useCase.execute()).rejects.toThrow(
-      'Database connection failed'
-    );
+    const result = await useCase.execute();
+
+    expect(result).toBe('Shower'); // Default website name
   });
 });
