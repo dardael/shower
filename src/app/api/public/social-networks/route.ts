@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
-import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
 import { Logger } from '@/application/shared/Logger';
 import { getClientIP } from '@/infrastructure/shared/utils/clientIP';
+import { getApiUrl } from '@/infrastructure/shared/utils/appUrl';
 
 /**
  * Public API endpoint for social networks
@@ -21,34 +21,50 @@ export async function GET(request: NextRequest) {
   });
 
   try {
-    const getSocialNetworks = container.resolve<IGetConfiguredSocialNetworks>('IGetConfiguredSocialNetworks');
-    const socialNetworks = await getSocialNetworks.execute();
+    // Use fetch with cache tags to enable Next.js Data Cache invalidation
+    const response = await fetch(getApiUrl('/api/settings/social-networks'), {
+      next: {
+        tags: ['social-networks']
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch social networks: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch social networks');
+    }
+
+    const socialNetworks = data.data || [];
 
     // Transform to public DTO with only necessary data
-    const publicSocialNetworks = socialNetworks.map(network => ({
-      type: network.type.value,
-      url: network.url.value,
-      label: network.getDisplayLabel(),
-      icon: network.getIconComponent(),
+    const publicSocialNetworks = socialNetworks.map((network: {
+      type: string;
+      url: string;
+      label: string;
+      enabled: boolean;
+    }) => ({
+      type: network.type,
+      url: network.url,
+      label: network.label,
+      icon: network.type, // Will be resolved by frontend
     }));
 
     const duration = Date.now() - startTime;
 
     logger.logApiResponse('GET', '/api/public/social-networks', 200, duration, {
       count: publicSocialNetworks.length,
-      types: publicSocialNetworks.map(sn => sn.type),
+      types: publicSocialNetworks.map((sn: { type: string }) => sn.type),
+      cacheTag: 'social-networks',
     });
 
-    // Return with caching headers for performance
+    // Return response without HTTP cache headers - relying on Next.js Data Cache only
     return NextResponse.json({
       success: true,
       data: publicSocialNetworks,
-    }, {
-      headers: {
-        'Cache-Control': 'public, max-age=300, stale-while-revalidate=600', // 5 minutes cache
-        'CDN-Cache-Control': 'public, max-age=86400', // 24 hours CDN cache
-        'Vary': 'Accept-Encoding',
-      },
     });
   } catch (error) {
     const duration = Date.now() - startTime;

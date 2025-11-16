@@ -3,6 +3,7 @@ import type {
   IBetterAuthClientService,
   SessionData,
 } from '@/application/auth/services/IBetterAuthClientService';
+import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 
 /**
  * Client-side adapter for Better Auth
@@ -14,7 +15,7 @@ export class BetterAuthClientAdapter implements IBetterAuthClientService {
   private getClient() {
     if (!this.authClient) {
       this.authClient = createAuthClient({
-        baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        baseURL: getBaseUrl(),
       });
     }
     return this.authClient;

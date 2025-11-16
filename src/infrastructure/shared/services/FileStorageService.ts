@@ -3,6 +3,7 @@ import path from 'path';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
+import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 
 export interface IFileStorageService {
   uploadIcon(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
@@ -10,8 +11,7 @@ export interface IFileStorageService {
 }
 
 export class LocalFileStorageService implements IFileStorageService {
-  private readonly baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  private readonly baseUrl = getBaseUrl();
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
 
   constructor() {
