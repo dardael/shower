@@ -15,9 +15,7 @@ export class UpdateWebsiteName implements IUpdateWebsiteName {
   ) {}
 
   async execute(request: UpdateWebsiteNameRequest): Promise<void> {
-    const settings = await this.repository.getSettingsByKey('name');
     const newName = new WebsiteName(request.name);
-    settings.updateName(newName);
-    await this.repository.updateSettings(settings);
+    await this.repository.setByKey('website-name', newName.value);
   }
 }

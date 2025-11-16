@@ -10,7 +10,15 @@ export class GetWebsiteIcon implements IGetWebsiteIcon {
     private readonly websiteSettingsRepository: WebsiteSettingsRepository
   ) {}
 
-  async execute(key: string): Promise<WebsiteIcon | null> {
-    return await this.websiteSettingsRepository.getIcon(key);
+  async execute(): Promise<WebsiteIcon | null> {
+    const setting =
+      await this.websiteSettingsRepository.getByKey('website-icon');
+    const iconValue = setting.getValueAsIcon();
+
+    if (!iconValue) {
+      return null; // No icon as default
+    }
+
+    return new WebsiteIcon(iconValue.url, iconValue.metadata);
   }
 }

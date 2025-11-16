@@ -18,6 +18,6 @@ export const TIMEOUTS = {
 } as const;
 
 export const RETRY_CONFIG = {
-  MAX_RETRIES: 3,
+  MAX_RETRIES: 2,
   RETRY_DELAY: TIMEOUTS.SHORT,
 } as const;

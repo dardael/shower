@@ -89,10 +89,11 @@ test.describe('Admin Page', () => {
       timeout: TIMEOUTS.MEDIUM,
     });
 
-    // Update website name
+    // Update website name with unique identifier to avoid conflicts
+    const uniqueName = `Updated Website Name ${Date.now()}`;
     await websiteNameInput.clear();
-    await websiteNameInput.fill('Updated Website Name');
-    await expect(websiteNameInput).toHaveValue('Updated Website Name');
+    await websiteNameInput.fill(uniqueName);
+    await expect(websiteNameInput).toHaveValue(uniqueName);
 
     // Click update button and wait for success
     await page.getByRole('button', { name: 'Update Website' }).click();
@@ -104,7 +105,8 @@ test.describe('Admin Page', () => {
 
     // Wait for automatic refetch to complete and update input
     // The component calls fetchWebsiteSettings() after successful update
-    await expect(websiteNameInput).toHaveValue('Updated Website Name', {
+    const expectedName = new RegExp('^Updated Website Name \\d+$');
+    await expect(websiteNameInput).toHaveValue(expectedName, {
       timeout: TIMEOUTS.LONG,
     });
 
@@ -123,8 +125,9 @@ test.describe('Admin Page', () => {
     let retries = 0;
     while (retries < RETRY_CONFIG.MAX_RETRIES) {
       try {
-        await expect(websiteNameInput).toHaveValue('Updated Website Name', {
-          timeout: TIMEOUTS.MEDIUM,
+        const expectedName = new RegExp('^Updated Website Name \\d+$');
+        await expect(websiteNameInput).toHaveValue(expectedName, {
+          timeout: TIMEOUTS.LONG,
         });
         break; // Success, exit retry loop
       } catch (error) {

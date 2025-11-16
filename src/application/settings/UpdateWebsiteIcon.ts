@@ -10,7 +10,21 @@ export class UpdateWebsiteIcon implements IUpdateWebsiteIcon {
     private readonly websiteSettingsRepository: WebsiteSettingsRepository
   ) {}
 
-  async execute(key: string, icon: WebsiteIcon | null): Promise<void> {
-    await this.websiteSettingsRepository.updateIcon(key, icon);
+  async execute(_key: string, icon: WebsiteIcon | null): Promise<void> {
+    const iconValue = icon
+      ? {
+          url: icon.url,
+          metadata: {
+            filename: icon.filename,
+            originalName: icon.originalName,
+            size: icon.size,
+            format: icon.format,
+            mimeType: icon.mimeType,
+            uploadedAt: icon.uploadedAt,
+          },
+        }
+      : null;
+
+    await this.websiteSettingsRepository.setByKey('website-icon', iconValue);
   }
 }
