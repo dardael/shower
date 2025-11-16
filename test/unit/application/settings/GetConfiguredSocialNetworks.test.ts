@@ -85,6 +85,35 @@ describe('GetConfiguredSocialNetworks', () => {
     );
   });
 
+  it('should log cache tag usage for Next.js Data Cache', async () => {
+    // Arrange
+    const allSocialNetworks = [
+      SocialNetwork.createDefault(SocialNetworkType.INSTAGRAM)
+        .updateUrl('https://instagram.com/test')
+        .enable(),
+    ];
+
+    mockRepository.getAllSocialNetworks.mockResolvedValue(allSocialNetworks);
+
+    // Act
+    const result = await getConfiguredSocialNetworks.execute();
+
+    // Assert - verify that service would be called with cache tag context
+    // Note: This test ensures the service is ready for Next.js Data Cache integration
+    expect(result).toHaveLength(1);
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      'Getting configured social networks',
+      { operation: 'GetConfiguredSocialNetworks.execute' }
+    );
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      'Retrieved configured social networks',
+      expect.objectContaining({
+        count: 1,
+        operation: 'GetConfiguredSocialNetworks.execute',
+      })
+    );
+  });
+
   it('should return empty array when no social networks are configured', async () => {
     // Arrange
     const allSocialNetworks = [

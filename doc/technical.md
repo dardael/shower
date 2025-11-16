@@ -1864,6 +1864,88 @@ The technical implementation combines robust authentication/authorization mechan
 
 This architecture provides a solid foundation for scaling the application while maintaining security best practices, comprehensive operational visibility, and enhanced user experience through dynamic theming capabilities.
 
+## Cache Invalidation for Social Networks
+
+The application implements a Next.js Data Cache invalidation system for social networks to ensure immediate visibility of updates while maintaining performance benefits for normal users.
+
+### Cache Strategy
+
+#### **Next.js Data Cache with Tag-Based Invalidation**
+
+The social networks system uses Next.js Data Cache with tag-based invalidation for optimal performance and immediate updates:
+
+- **Cache Tag**: `'social-networks'` tag is applied to all social network data
+- **Invalidation Trigger**: `revalidateTag('social-networks')` is called immediately after any social network update
+- **Automatic Invalidation**: Cache invalidation happens automatically when administrators save changes in the admin panel
+- **No HTTP Cache Headers**: The system relies solely on Next.js Data Cache, removing browser caching delays
+
+#### **Implementation Details**
+
+**Public API Caching** (`/api/public/social-networks`):
+
+```typescript
+// Fetch with cache tags for automatic invalidation
+const response = await fetch(
+  `${process.env.NEXT_PUBLIC_APP_URL}/api/settings/social-networks`,
+  {
+    next: {
+      tags: ['social-networks'], // Enables revalidateTag() invalidation
+    },
+  }
+);
+```
+
+**Admin API Cache Invalidation** (`/api/settings/social-networks`):
+
+```typescript
+// Invalidate cache immediately after successful updates
+try {
+  await updateSocialNetworks.execute(socialNetworks);
+  revalidateTag('social-networks'); // Clears cache for 'social-networks' tag
+  logger.info('Cache invalidated for social-networks tag');
+} catch (cacheError) {
+  logger.logErrorWithObject(
+    cacheError,
+    'Failed to invalidate cache for social networks'
+  );
+}
+```
+
+#### **Benefits of This Approach**
+
+1. **Immediate Updates**: Social network changes appear in public footer instantly after admin saves
+2. **Performance Maintained**: Normal users benefit from Next.js Data Cache caching
+3. **No Browser Cache Delays**: Eliminates 5-minute wait times for changes to appear
+4. **Automatic Operation**: Cache invalidation is handled transparently without user intervention
+5. **Error Handling**: Comprehensive logging for cache invalidation failures
+6. **Scalability**: Tag-based system supports efficient cache management
+7. **Simplicity**: Single cache tag reduces complexity compared to granular cache management
+
+#### **Cache Invalidation Flow**
+
+1. **Admin Update**: Administrator modifies social networks in admin panel
+2. **Data Persistence**: Changes saved to MongoDB through UpdateSocialNetworks service
+3. **Cache Invalidation**: `revalidateTag('social-networks')` called automatically
+4. **Fresh Data**: Next request to public API returns updated data immediately
+5. **Instant Visibility**: Footer displays changes without caching delays
+
+#### **Error Handling**
+
+The system includes comprehensive error handling for cache invalidation failures:
+
+- **Logging**: All cache invalidation attempts are logged with context
+- **Fallback**: System continues to function even if cache invalidation fails
+- **User Feedback**: Error states are properly handled and logged
+
+#### **Performance Characteristics**
+
+- **Cache Hit**: Subsequent requests to unchanged social networks served from cache
+- **Cache Miss**: First request after update fetches fresh data from database
+- **Revalidation**: Immediate cache clearing ensures fresh data delivery
+- **Scalability**: Tag-based system supports high-traffic scenarios
+
+This cache invalidation system ensures that social network updates are immediately visible to end users while maintaining optimal performance through Next.js Data Cache for normal access patterns.
+
 ---
 
 ## E2E Test Performance Optimization

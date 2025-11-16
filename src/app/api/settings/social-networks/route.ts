@@ -9,6 +9,7 @@ import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkUrl } from '@/domain/settings/value-objects/SocialNetworkUrl';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 import { withApi } from '@/infrastructure/shared/apiWrapper';
+import { revalidateTag } from 'next/cache';
 
 export const GET = withApi(async () => {
   const logger = container.resolve<Logger>('Logger');
@@ -113,6 +114,22 @@ export const PUT = withApi(async (request: NextRequest) => {
     );
 
     await updateSocialNetworks.execute(socialNetworkObjects);
+
+    // Invalidate cache for social networks to ensure immediate visibility
+    try {
+      revalidateTag('social-networks');
+      logger.info('Cache invalidated for social-networks tag', {
+        count: socialNetworkObjects.length,
+      });
+    } catch (cacheError) {
+      logger.logErrorWithObject(
+        cacheError,
+        'Failed to invalidate cache for social networks',
+        {
+          count: socialNetworkObjects.length,
+        }
+      );
+    }
 
     logger.info('Social networks updated successfully', {
       count: socialNetworkObjects.length,
