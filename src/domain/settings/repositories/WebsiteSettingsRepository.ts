@@ -1,9 +1,9 @@
-import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
-import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import {
+  WebsiteSetting,
+  SettingValue,
+} from '@/domain/settings/entities/WebsiteSetting';
 
 export interface WebsiteSettingsRepository {
-  getSettingsByKey(key: string): Promise<WebsiteSettings>;
-  updateSettings(settings: WebsiteSettings): Promise<void>;
-  updateIcon(key: string, icon: WebsiteIcon | null): Promise<void>;
-  getIcon(key: string): Promise<WebsiteIcon | null>;
+  getByKey(key: string): Promise<WebsiteSetting>;
+  setByKey(key: string, value: SettingValue): Promise<void>;
 }

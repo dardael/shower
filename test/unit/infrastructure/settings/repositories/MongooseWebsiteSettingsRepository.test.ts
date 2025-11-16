@@ -1,8 +1,7 @@
-import { WebsiteSettings } from '@/domain/settings/entities/WebsiteSettings';
-import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
-import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { WebsiteSetting } from '@/domain/settings/entities/WebsiteSetting';
+import { Logger } from '@/application/shared/Logger';
 
-// Mock the WebsiteSettingsModel
+// Mock WebsiteSettingsModel
 const mockWebsiteSettingsModel = {
   findOne: jest.fn(),
   create: jest.fn(),
@@ -13,288 +12,237 @@ jest.mock('@/infrastructure/settings/models/WebsiteSettingsModel', () => ({
   WebsiteSettingsModel: mockWebsiteSettingsModel,
 }));
 
+// Mock Logger
+const mockLogger = {
+  warn: jest.fn(),
+} as unknown as Logger;
+
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
+
 describe('MongooseWebsiteSettingsRepository', () => {
   let repository: MongooseWebsiteSettingsRepository;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    repository = new MongooseWebsiteSettingsRepository();
+    repository = new MongooseWebsiteSettingsRepository(mockLogger);
   });
 
-  describe('getSettingsByKey', () => {
-    it('should return existing settings when document exists', async () => {
+  describe('getByKey', () => {
+    it('should return existing setting when document exists', async () => {
       const mockDoc = {
-        key: 'test-key',
-        name: 'My Website',
+        key: 'website-name',
+        value: 'My Website',
       };
 
       mockWebsiteSettingsModel.findOne.mockResolvedValue(mockDoc);
 
-      const result = await repository.getSettingsByKey('test-key');
+      const result = await repository.getByKey('website-name');
 
       expect(mockWebsiteSettingsModel.findOne).toHaveBeenCalledWith({
-        key: 'test-key',
+        key: 'website-name',
       });
-      expect(result).toBeInstanceOf(WebsiteSettings);
-      expect(result.key).toBe('test-key');
-      expect(result.name.value).toBe('My Website');
+      expect(result).toBeInstanceOf(WebsiteSetting);
+      expect(result.key).toBe('website-name');
+      expect(result.value).toBe('My Website');
     });
 
-    it('should create and return default settings when document does not exist', async () => {
+    it('should create and return default setting when document does not exist', async () => {
       const mockCreatedDoc = {
-        key: 'new-key',
-        name: 'Shower',
+        key: 'website-name',
+        value: 'Shower',
       };
 
       mockWebsiteSettingsModel.findOne.mockResolvedValue(null);
       mockWebsiteSettingsModel.create.mockResolvedValue(mockCreatedDoc);
 
-      const result = await repository.getSettingsByKey('new-key');
+      const result = await repository.getByKey('website-name');
 
       expect(mockWebsiteSettingsModel.findOne).toHaveBeenCalledWith({
-        key: 'new-key',
+        key: 'website-name',
       });
       expect(mockWebsiteSettingsModel.create).toHaveBeenCalledWith({
-        key: 'new-key',
-        name: 'Shower',
-        themeColor: 'blue',
+        key: 'website-name',
+        value: 'Shower',
       });
-      expect(result).toBeInstanceOf(WebsiteSettings);
-      expect(result.key).toBe('new-key');
-      expect(result.name.value).toBe('Shower');
+      expect(result).toBeInstanceOf(WebsiteSetting);
+      expect(result.key).toBe('website-name');
+      expect(result.value).toBe('Shower');
+    });
+
+    it('should create default icon setting when document does not exist', async () => {
+      const mockCreatedDoc = {
+        key: 'website-icon',
+        value: null,
+      };
+
+      mockWebsiteSettingsModel.findOne.mockResolvedValue(null);
+      mockWebsiteSettingsModel.create.mockResolvedValue(mockCreatedDoc);
+
+      const result = await repository.getByKey('website-icon');
+
+      expect(mockWebsiteSettingsModel.create).toHaveBeenCalledWith({
+        key: 'website-icon',
+        value: null,
+      });
+      expect(result.key).toBe('website-icon');
+      expect(result.value).toBe(null);
+    });
+
+    it('should create default theme color setting when document does not exist', async () => {
+      const mockCreatedDoc = {
+        key: 'theme-color',
+        value: 'blue',
+      };
+
+      mockWebsiteSettingsModel.findOne.mockResolvedValue(null);
+      mockWebsiteSettingsModel.create.mockResolvedValue(mockCreatedDoc);
+
+      const result = await repository.getByKey('theme-color');
+
+      expect(mockWebsiteSettingsModel.create).toHaveBeenCalledWith({
+        key: 'theme-color',
+        value: 'blue',
+      });
+      expect(result.key).toBe('theme-color');
+      expect(result.value).toBe('blue');
     });
 
     it('should handle errors from database operations', async () => {
       const error = new Error('Database connection failed');
       mockWebsiteSettingsModel.findOne.mockRejectedValue(error);
 
-      await expect(repository.getSettingsByKey('test-key')).rejects.toThrow(
+      await expect(repository.getByKey('test-key')).rejects.toThrow(
         'Database connection failed'
       );
     });
   });
 
-  describe('updateSettings', () => {
-    it('should update existing settings', async () => {
-      const websiteName = new WebsiteName('Updated Website');
-      const settings = new WebsiteSettings('test-key', websiteName);
-
+  describe('setByKey', () => {
+    it('should update existing setting', async () => {
       mockWebsiteSettingsModel.updateOne.mockResolvedValue({
         acknowledged: true,
       });
 
       await expect(
-        repository.updateSettings(settings)
+        repository.setByKey('website-name', 'Updated Website')
       ).resolves.toBeUndefined();
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'test-key' },
-        { name: 'Updated Website', icon: null, themeColor: 'blue' },
+        { key: 'website-name' },
+        { value: 'Updated Website' },
         { upsert: true }
       );
     });
 
-    it('should create new settings when upserting', async () => {
-      const websiteName = new WebsiteName('New Website');
-      const settings = new WebsiteSettings('new-key', websiteName);
-
+    it('should create new setting when upserting', async () => {
       mockWebsiteSettingsModel.updateOne.mockResolvedValue({
         acknowledged: true,
       });
 
       await expect(
-        repository.updateSettings(settings)
+        repository.setByKey('theme-color', 'red')
       ).resolves.toBeUndefined();
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'new-key' },
-        { name: 'New Website', icon: null, themeColor: 'blue' },
+        { key: 'theme-color' },
+        { value: 'red' },
+        { upsert: true }
+      );
+    });
+
+    it('should set icon value', async () => {
+      const iconValue = {
+        url: 'https://example.com/favicon.ico',
+        metadata: {
+          filename: 'favicon.ico',
+          originalName: 'favicon.ico',
+          size: 1024,
+          format: 'ico',
+          mimeType: 'image/x-icon',
+          uploadedAt: new Date('2024-01-01T00:00:00Z'),
+        },
+      };
+
+      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
+        acknowledged: true,
+      });
+
+      await repository.setByKey('website-icon', iconValue);
+
+      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
+        { key: 'website-icon' },
+        { value: iconValue },
+        { upsert: true }
+      );
+    });
+
+    it('should set null icon value', async () => {
+      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
+        acknowledged: true,
+      });
+
+      await repository.setByKey('website-icon', null);
+
+      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
+        { key: 'website-icon' },
+        { value: null },
         { upsert: true }
       );
     });
 
     it('should handle errors during update', async () => {
-      const websiteName = new WebsiteName('Test Website');
-      const settings = new WebsiteSettings('test-key', websiteName);
       const error = new Error('Update failed');
-
       mockWebsiteSettingsModel.updateOne.mockRejectedValue(error);
 
-      await expect(repository.updateSettings(settings)).rejects.toThrow(
+      await expect(repository.setByKey('test-key', 'value')).rejects.toThrow(
         'Update failed'
       );
     });
   });
 
-  describe('icon functionality', () => {
-    const mockIconMetadata = {
-      filename: 'favicon-123.ico',
-      originalName: 'favicon.ico',
-      size: 1024,
-      format: 'ico',
-      mimeType: 'image/x-icon',
-      uploadedAt: new Date('2024-01-01T00:00:00Z'),
-    };
-
-    it('should get settings with icon', async () => {
+  describe('mapDocumentToEntity', () => {
+    it('should map document to entity correctly', async () => {
       const mockDoc = {
-        key: 'test-key',
-        name: 'My Website',
-        icon: {
-          url: 'https://example.com/favicon.ico',
-          metadata: mockIconMetadata,
-        },
+        key: 'website-name',
+        value: 'Test Website',
       };
 
       mockWebsiteSettingsModel.findOne.mockResolvedValue(mockDoc);
 
-      const result = await repository.getSettingsByKey('test-key');
+      const result = await repository.getByKey('website-name');
 
-      expect(result).toBeInstanceOf(WebsiteSettings);
-      expect(result.key).toBe('test-key');
-      expect(result.name.value).toBe('My Website');
-      expect(result.icon).not.toBeNull();
-      expect(result.icon?.url).toBe('https://example.com/favicon.ico');
-      expect(result.icon?.filename).toBe('favicon-123.ico');
+      expect(result.key).toBe('website-name');
+      expect(result.value).toBe('Test Website');
+      expect(result.isString()).toBe(true);
+      expect(result.isIcon()).toBe(false);
     });
 
-    it('should get settings without icon', async () => {
+    it('should map icon document to entity correctly', async () => {
+      const iconValue = {
+        url: 'https://example.com/favicon.ico',
+        metadata: {
+          filename: 'favicon.ico',
+          originalName: 'favicon.ico',
+          size: 1024,
+          format: 'ico',
+          mimeType: 'image/x-icon',
+          uploadedAt: new Date('2024-01-01T00:00:00Z'),
+        },
+      };
+
       const mockDoc = {
-        key: 'test-key',
-        name: 'My Website',
-        icon: null,
+        key: 'website-icon',
+        value: iconValue,
       };
 
       mockWebsiteSettingsModel.findOne.mockResolvedValue(mockDoc);
 
-      const result = await repository.getSettingsByKey('test-key');
+      const result = await repository.getByKey('website-icon');
 
-      expect(result.icon).toBeNull();
-    });
-
-    it('should update settings with icon', async () => {
-      const websiteName = new WebsiteName('Updated Website');
-      const icon = new WebsiteIcon(
-        'https://example.com/favicon.ico',
-        mockIconMetadata
-      );
-      const settings = new WebsiteSettings('test-key', websiteName, icon);
-
-      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
-        acknowledged: true,
-      });
-
-      await repository.updateSettings(settings);
-
-      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'test-key' },
-        {
-          name: 'Updated Website',
-          icon: {
-            url: 'https://example.com/favicon.ico',
-            metadata: mockIconMetadata,
-          },
-          themeColor: 'blue',
-        },
-        { upsert: true }
-      );
-    });
-
-    it('should update settings removing icon', async () => {
-      const websiteName = new WebsiteName('Updated Website');
-      const settings = new WebsiteSettings('test-key', websiteName, null);
-
-      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
-        acknowledged: true,
-      });
-
-      await repository.updateSettings(settings);
-
-      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'test-key' },
-        {
-          name: 'Updated Website',
-          icon: null,
-          themeColor: 'blue',
-        },
-        { upsert: true }
-      );
-    });
-
-    it('should update icon only', async () => {
-      const icon = new WebsiteIcon(
-        'https://example.com/new-favicon.ico',
-        mockIconMetadata
-      );
-
-      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
-        acknowledged: true,
-      });
-
-      await repository.updateIcon('test-key', icon);
-
-      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'test-key' },
-        {
-          icon: {
-            url: 'https://example.com/new-favicon.ico',
-            metadata: mockIconMetadata,
-          },
-        },
-        { upsert: true }
-      );
-    });
-
-    it('should remove icon only', async () => {
-      mockWebsiteSettingsModel.updateOne.mockResolvedValue({
-        acknowledged: true,
-      });
-
-      await repository.updateIcon('test-key', null);
-
-      expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
-        { key: 'test-key' },
-        { icon: null },
-        { upsert: true }
-      );
-    });
-
-    it('should get icon only', async () => {
-      const mockDoc = {
-        icon: {
-          url: 'https://example.com/favicon.ico',
-          metadata: mockIconMetadata,
-        },
-      };
-
-      mockWebsiteSettingsModel.findOne.mockResolvedValue(mockDoc);
-
-      const result = await repository.getIcon('test-key');
-
-      expect(result).not.toBeNull();
-      expect(result?.url).toBe('https://example.com/favicon.ico');
-      expect(result?.filename).toBe('favicon-123.ico');
-    });
-
-    it('should return null when no icon exists', async () => {
-      const mockDoc = {
-        icon: null,
-      };
-
-      mockWebsiteSettingsModel.findOne.mockResolvedValue(mockDoc);
-
-      const result = await repository.getIcon('test-key');
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null when settings document does not exist', async () => {
-      mockWebsiteSettingsModel.findOne.mockResolvedValue(null);
-
-      const result = await repository.getIcon('test-key');
-
-      expect(result).toBeNull();
+      expect(result.key).toBe('website-icon');
+      expect(result.value).toEqual(iconValue);
+      expect(result.isString()).toBe(false);
+      expect(result.isIcon()).toBe(true);
     });
   });
 });

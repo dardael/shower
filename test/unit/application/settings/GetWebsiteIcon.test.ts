@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { GetWebsiteIcon } from '@/application/settings/GetWebsiteIcon';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
+import { WebsiteSetting } from '@/domain/settings/entities/WebsiteSetting';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 
 describe('GetWebsiteIcon', () => {
@@ -9,10 +10,9 @@ describe('GetWebsiteIcon', () => {
 
   beforeEach(() => {
     mockRepository = {
-      getSettingsByKey: jest.fn(),
-      updateSettings: jest.fn(),
-      updateIcon: jest.fn(),
-      getIcon: jest.fn(),
+      getByKey: jest.fn(),
+      setByKey: jest.fn(),
+      exists: jest.fn(),
     } as jest.Mocked<WebsiteSettingsRepository>;
     useCase = new GetWebsiteIcon(mockRepository);
   });
@@ -27,35 +27,38 @@ describe('GetWebsiteIcon', () => {
       uploadedAt: new Date('2024-01-01T00:00:00Z'),
     };
 
-    const expectedIcon = new WebsiteIcon(
-      'https://example.com/favicon.ico',
-      mockIconMetadata
-    );
-    mockRepository.getIcon.mockResolvedValue(expectedIcon);
+    const iconValue = {
+      url: 'https://example.com/favicon.ico',
+      metadata: mockIconMetadata,
+    };
 
-    const result = await useCase.execute('test-key');
+    const setting = new WebsiteSetting('website-icon', iconValue);
+    mockRepository.getByKey.mockResolvedValue(setting);
 
-    expect(mockRepository.getIcon).toHaveBeenCalledWith('test-key');
-    expect(result).toBe(expectedIcon);
+    const result = await useCase.execute();
+
+    expect(mockRepository.getByKey).toHaveBeenCalledWith('website-icon');
+    expect(result).toBeInstanceOf(WebsiteIcon);
     expect(result?.url).toBe('https://example.com/favicon.ico');
     expect(result?.filename).toBe('favicon-123.ico');
   });
 
   it('should return null when no icon exists', async () => {
-    mockRepository.getIcon.mockResolvedValue(null);
+    const setting = new WebsiteSetting('website-icon', null);
+    mockRepository.getByKey.mockResolvedValue(setting);
 
-    const result = await useCase.execute('test-key');
+    const result = await useCase.execute();
 
-    expect(mockRepository.getIcon).toHaveBeenCalledWith('test-key');
+    expect(mockRepository.getByKey).toHaveBeenCalledWith('website-icon');
     expect(result).toBeNull();
   });
 
-  it('should handle repository errors', async () => {
+  it('should return null on repository errors', async () => {
     const error = new Error('Repository error');
-    mockRepository.getIcon.mockRejectedValue(error);
+    mockRepository.getByKey.mockRejectedValue(error);
 
-    await expect(useCase.execute('test-key')).rejects.toThrow(
-      'Repository error'
-    );
+    const result = await useCase.execute();
+
+    expect(result).toBeNull(); // Default website icon
   });
 });

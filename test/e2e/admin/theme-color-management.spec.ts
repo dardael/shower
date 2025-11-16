@@ -40,6 +40,9 @@ test.describe('Theme Color Management', () => {
     const redButton = page.locator('button[aria-label*="Select red"]');
     await redButton.click();
 
+    // Wait a moment for the state to update
+    await page.waitForTimeout(100);
+
     // Verify red button is now selected
     await expect(redButton).toHaveAttribute('data-selected', 'true');
   });
