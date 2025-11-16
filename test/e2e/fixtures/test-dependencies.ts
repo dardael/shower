@@ -79,7 +79,10 @@ export const COLLECTION_DEPENDENCIES: CollectionDependencyRegistry = {
     readOnly: true,
   },
   'admin-theme-tests': {
-    collections: [MONGODB_COLLECTIONS.WEBSITE_SETTINGS],
+    collections: [
+      MONGODB_COLLECTIONS.WEBSITE_SETTINGS,
+      MONGODB_COLLECTIONS.USERS,
+    ],
     readOnly: false,
   },
 } as const;
