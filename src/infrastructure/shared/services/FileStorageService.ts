@@ -48,10 +48,10 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    // Validate file size (2MB max)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      throw new Error('File size must be less than 2MB.');
+      throw new Error('File size must be less than 5MB.');
     }
 
     // Generate unique filename
@@ -64,9 +64,44 @@ export class LocalFileStorageService implements IFileStorageService {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Validate buffer was created correctly
+    if (buffer.length !== file.size) {
+      const logger = container.resolve<Logger>('Logger');
+      logger.error('Buffer size mismatch', {
+        originalSize: file.size,
+        bufferSize: buffer.length,
+        filename: file.name,
+      });
+      throw new Error(
+        `File buffer conversion failed: expected ${file.size} bytes, got ${buffer.length} bytes`
+      );
+    }
+
     // Save file to public/icons directory
     const filePath = path.join(this.iconsDir, filename);
-    await fs.writeFile(filePath, buffer);
+    try {
+      await fs.writeFile(filePath, buffer);
+
+      // Verify file was written correctly
+      const stats = await fs.stat(filePath);
+      const logger = container.resolve<Logger>('Logger');
+      logger.debug('Icon file saved successfully', {
+        filename,
+        filePath,
+        size: stats.size,
+        originalSize: file.size,
+      });
+    } catch (writeError) {
+      const logger = container.resolve<Logger>('Logger');
+      logger.error('Failed to write icon file to disk', {
+        filename,
+        filePath,
+        error: writeError,
+      });
+      throw new Error(
+        `Failed to save icon file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
+      );
+    }
 
     // Return URL that will be served by the API route
     const url = `${this.baseUrl}/api/icons/${filename}`;
@@ -92,6 +127,16 @@ export class LocalFileStorageService implements IFileStorageService {
         | 'image/webp',
       uploadedAt: new Date(),
     };
+
+    const logger = container.resolve<Logger>('Logger');
+    logger.debug('Created icon metadata', {
+      filename,
+      originalName: file.name,
+      size: file.size,
+      format: extension,
+      mimeType: file.type,
+      url,
+    });
 
     return { url, metadata };
   }

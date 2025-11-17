@@ -54,16 +54,15 @@ async function globalSetup() {
   try {
     await TestDatabase.connect();
 
-    // Log parallel execution groups for debugging
-    const parallelGroups = getParallelExecutionGroups();
-    console.log('Parallel execution groups:', parallelGroups);
+    // Calculate parallel execution groups for test optimization
+    getParallelExecutionGroups();
 
     // Clean database once before all tests start
     await TestDatabase.cleanDatabase();
 
     await TestDatabase.disconnect();
   } catch (error) {
-    console.error('Failed to initialize test database:', error);
+    // Failed to initialize test database
     throw error;
   }
 }

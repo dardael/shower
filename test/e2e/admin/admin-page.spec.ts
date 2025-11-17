@@ -5,6 +5,10 @@ import {
   setupTestEnvironment,
   teardownTestEnvironment,
 } from '../fixtures/test-cleanup';
+import {
+  ensureCleanToastState,
+  resetWebsiteSettings,
+} from '../fixtures/testHelpers';
 
 test.describe('Admin Page', () => {
   test('redirects to login when not authenticated', async ({ page }) => {
@@ -59,12 +63,21 @@ test.describe('Admin Page', () => {
 
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ page }) => {
     // Use collection-based cleanup for admin-auth-tests project
     await setupTestEnvironment('admin-auth-tests');
     // Wait for database operations to complete
     const { TestDatabase } = await import('../fixtures/test-database');
     await TestDatabase.waitForOperationsComplete();
+
+    // Force reset website settings to default state
+    await resetWebsiteSettings(page);
+
+    // Clear any existing toasts
+    await ensureCleanToastState(page);
+
+    // Additional wait to ensure data is settled
+    await page.waitForTimeout(500);
   });
 
   test.afterEach(async () => {
@@ -78,6 +91,9 @@ test.describe('Admin Page', () => {
     // Navigate to website settings page to ensure fresh state
     await page.goto('/admin/website-settings');
     await page.waitForLoadState('networkidle');
+
+    // Clear any existing toasts before starting test
+    await ensureCleanToastState(page);
 
     // Wait for page to load and data to be fetched
     const websiteNameInput = page.getByLabel('Website Name');
@@ -98,9 +114,9 @@ test.describe('Admin Page', () => {
     // Click update button and wait for success
     await page.getByRole('button', { name: 'Update Website' }).click();
 
-    // Check for success message first
+    // Check for success message first - use first() to handle strict mode
     await expect(
-      page.getByText('Website settings updated successfully')
+      page.getByText('Website settings updated successfully').first()
     ).toBeVisible({ timeout: TIMEOUTS.MEDIUM });
 
     // Wait for automatic refetch to complete and update input
@@ -144,6 +160,9 @@ test.describe('Admin Page', () => {
   test('validates input field requirements', async ({ page }) => {
     await signIn(page);
 
+    // Clear any existing toasts before starting test
+    await ensureCleanToastState(page);
+
     // Wait for settings to be loaded
     await page.waitForResponse(
       (response) =>
@@ -171,6 +190,10 @@ test.describe('Admin Page', () => {
 
   test('handles server errors gracefully', async ({ page }) => {
     await signIn(page);
+
+    // Clear any existing toasts before starting test
+    await ensureCleanToastState(page);
+
     // Intercept the API call and mock a server error
     await page.route('/api/settings', async (route) => {
       await route.fulfill({
@@ -186,7 +209,7 @@ test.describe('Admin Page', () => {
     await websiteNameInput.fill('This will fail', { timeout: TIMEOUTS.MEDIUM });
     await page.getByRole('button', { name: 'Update Website' }).click();
 
-    // Check for error message
-    await expect(page.getByText('Server error')).toBeVisible();
+    // Check for error message - use first() to handle strict mode
+    await expect(page.getByText('Server error').first()).toBeVisible();
   });
 });

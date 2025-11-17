@@ -85,6 +85,10 @@ export const COLLECTION_DEPENDENCIES: CollectionDependencyRegistry = {
     ],
     readOnly: false,
   },
+  'website-settings-toast-tests': {
+    collections: [MONGODB_COLLECTIONS.WEBSITE_SETTINGS],
+    readOnly: false,
+  },
 } as const;
 
 /**
@@ -134,5 +138,10 @@ export const TEST_FILE_DEPENDENCIES: TestFileRegistry = {
     filePath: 'public-ui-tests/footer-visibility.spec.ts',
     collections: [],
     readOnly: true,
+  },
+  'admin/website-settings-toast.spec.ts': {
+    filePath: 'admin/website-settings-toast.spec.ts',
+    collections: [MONGODB_COLLECTIONS.WEBSITE_SETTINGS],
+    readOnly: false,
   },
 } as const;

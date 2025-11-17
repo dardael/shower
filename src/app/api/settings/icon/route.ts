@@ -50,6 +50,34 @@ export const POST = withApi(
         );
       }
 
+      // Validate file type
+      const allowedTypes = [
+        'image/x-icon',
+        'image/vnd.microsoft.icon',
+        'image/png',
+        'image/jpeg',
+        'image/svg+xml',
+        'image/gif',
+        'image/webp',
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json(
+          {
+            error:
+              'Invalid file type. Only ICO, PNG, JPG, SVG, GIF, and WebP formats are allowed.',
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: 'File size too large. Maximum size is 5MB.' },
+          { status: 400 }
+        );
+      }
+
       // Upload file using storage service
       const fileStorageService = new LocalFileStorageService();
       const { url, metadata } = await fileStorageService.uploadIcon(file);
@@ -77,6 +105,8 @@ export const POST = withApi(
       const logger = container.resolve<Logger>('Logger');
       logger.logErrorWithObject(error, 'Error updating website icon', {
         error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
       });
       return NextResponse.json(
         { error: 'Failed to update website icon. Please try again later.' },

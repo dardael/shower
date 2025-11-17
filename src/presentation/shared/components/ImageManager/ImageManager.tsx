@@ -33,6 +33,7 @@ export default function ImageManager({
   showFormatInfo = true,
   allowDelete = true,
   allowReplace = true,
+  disableSuccessToast = false,
 }: ImageManagerProps) {
   const [imageState, setImageState] = useState<ImageState>(
     currentImage ? 'preview' : 'empty'
@@ -167,12 +168,14 @@ export default function ImageManager({
         URL.revokeObjectURL(objectUrl);
 
         setImageState('preview');
-        toaster.create({
-          title: currentImage
-            ? 'Image replaced successfully'
-            : 'Image uploaded successfully',
-          type: 'success',
-        });
+        if (!disableSuccessToast) {
+          toaster.create({
+            title: currentImage
+              ? 'Image replaced successfully'
+              : 'Image uploaded successfully',
+            type: 'success',
+          });
+        }
       } catch (error) {
         const errorObj: ValidationError = {
           type: 'UPLOAD_FAILED',
@@ -193,6 +196,7 @@ export default function ImageManager({
       onImageReplace,
       onValidationError,
       toaster,
+      disableSuccessToast,
     ]
   );
 

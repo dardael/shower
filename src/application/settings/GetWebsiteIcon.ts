@@ -1,4 +1,4 @@
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import type { IGetWebsiteIcon } from './IGetWebsiteIcon';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
@@ -7,6 +7,7 @@ import { VALID_SETTING_KEYS } from '@/domain/settings/constants/SettingKeys';
 @injectable()
 export class GetWebsiteIcon implements IGetWebsiteIcon {
   constructor(
+    @inject('WebsiteSettingsRepository')
     private readonly websiteSettingsRepository: WebsiteSettingsRepository
   ) {}
 

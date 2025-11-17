@@ -3,7 +3,6 @@ import { renderHook, act } from '@testing-library/react';
 import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext';
 import { Logger } from '@/application/shared/Logger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
-import { ImageMetadata } from '@/presentation/shared/components/ImageManager/types';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -64,17 +63,9 @@ describe('useIconManagement', () => {
       );
 
       const file = new File(['test'], 'icon.png', { type: 'image/png' });
-      const metadata: ImageMetadata = {
-        filename: 'icon.png',
-        originalName: 'icon.png',
-        size: 1024,
-        format: 'png',
-        mimeType: 'image/png',
-        uploadedAt: new Date(),
-      };
 
       await act(async () => {
-        await result.current.handleIconUpload(file, metadata);
+        await result.current.handleIconUpload(file);
       });
 
       expect(fetch).toHaveBeenCalledWith('/api/settings/icon', {
@@ -101,67 +92,45 @@ describe('useIconManagement', () => {
       };
       (fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
 
+      const onMessage = jest.fn();
       const { result } = renderHook(
         () =>
           useIconManagement({
             onIconChange: jest.fn(),
-            onMessage: jest.fn(),
+            onMessage,
           }),
         { wrapper }
       );
 
       const file = new File(['test'], 'icon.png', { type: 'image/png' });
-      const metadata: ImageMetadata = {
-        filename: 'icon.png',
-        originalName: 'icon.png',
-        size: 1024,
-        format: 'png',
-        mimeType: 'image/png',
-        uploadedAt: new Date(),
-      };
 
       await act(async () => {
-        await expect(
-          result.current.handleIconUpload(file, metadata)
-        ).rejects.toThrow('Upload failed');
+        await result.current.handleIconUpload(file);
       });
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Failed to upload website icon',
-        {
-          error: expect.any(Error),
-        }
-      );
+      expect(onMessage).toHaveBeenCalledWith('Upload failed');
     });
 
     it('should handle network error', async () => {
       (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
 
+      const onMessage = jest.fn();
       const { result } = renderHook(
         () =>
           useIconManagement({
             onIconChange: jest.fn(),
-            onMessage: jest.fn(),
+            onMessage,
           }),
         { wrapper }
       );
 
       const file = new File(['test'], 'icon.png', { type: 'image/png' });
-      const metadata: ImageMetadata = {
-        filename: 'icon.png',
-        originalName: 'icon.png',
-        size: 1024,
-        format: 'png',
-        mimeType: 'image/png',
-        uploadedAt: new Date(),
-      };
 
-      await expect(
-        act(async () => {
-          await result.current.handleIconUpload(file, metadata);
-        })
-      ).rejects.toThrow('Network error');
+      await act(async () => {
+        await result.current.handleIconUpload(file);
+      });
 
+      expect(onMessage).toHaveBeenCalledWith('Network error');
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to upload website icon',
         {
@@ -210,27 +179,21 @@ describe('useIconManagement', () => {
       };
       (fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
 
+      const onMessage = jest.fn();
       const { result } = renderHook(
         () =>
           useIconManagement({
             onIconChange: jest.fn(),
-            onMessage: jest.fn(),
+            onMessage,
           }),
         { wrapper }
       );
 
       await act(async () => {
-        await expect(result.current.handleIconDelete()).rejects.toThrow(
-          'Delete failed'
-        );
+        await result.current.handleIconDelete();
       });
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Failed to delete website icon',
-        {
-          error: expect.any(Error),
-        }
-      );
+      expect(onMessage).toHaveBeenCalledWith('Delete failed');
     });
   });
 
@@ -266,7 +229,7 @@ describe('useIconManagement', () => {
 
       expect(result.current.iconConfig).toEqual({
         acceptedFormats: ['ico', 'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'],
-        maxFileSize: 2 * 1024 * 1024, // 2MB
+        maxFileSize: 5 * 1024 * 1024, // 5MB
         previewSize: { width: '64px', height: '64px' },
         aspectRatio: '1:1',
       });
@@ -318,19 +281,11 @@ describe('useIconManagement', () => {
 
       // Start upload
       const file = new File(['test'], 'icon.png', { type: 'image/png' });
-      const metadata: ImageMetadata = {
-        filename: 'icon.png',
-        originalName: 'icon.png',
-        size: 1024,
-        format: 'png',
-        mimeType: 'image/png',
-        uploadedAt: new Date(),
-      };
 
       // Start the upload and check loading state
       let uploadPromise: Promise<void>;
       await act(async () => {
-        uploadPromise = result.current.handleIconUpload(file, metadata);
+        uploadPromise = result.current.handleIconUpload(file);
       });
 
       // Check loading state after act completes

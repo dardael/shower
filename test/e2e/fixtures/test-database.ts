@@ -117,9 +117,9 @@ export class TestDatabase {
     const cleanupPromises = collectionNames.map(async (collectionName) => {
       try {
         await this.cleanCollection(collectionName);
-      } catch (error) {
+      } catch {
         // Log error but continue with other collections
-        console.warn(`Failed to clean collection '${collectionName}':`, error);
+        // Failed to clean collection, continuing with others
       }
     });
 
@@ -202,7 +202,7 @@ export class TestDatabase {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    // If we timeout, don't fail - just log and continue
-    console.warn('Database operations may not have completed within timeout');
+    // If we timeout, don't fail - just continue
+    // Database operations may not have completed within timeout
   }
 }

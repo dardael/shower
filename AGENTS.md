@@ -251,3 +251,10 @@ This ensures MongoDB is available for database operations and the application is
 **User**: dardael
 **repo**: shower
 ```
+
+## Active Technologies
+- TypeScript 5.0+ with Next.js 15 + Chakra UI v3, React 18, Next.js API routes (001-toast-notifications)
+- MongoDB for website settings persistence (001-toast-notifications)
+
+## Recent Changes
+- 001-toast-notifications: Added TypeScript 5.0+ with Next.js 15 + Chakra UI v3, React 18, Next.js API routes

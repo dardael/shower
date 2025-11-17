@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import type { IUpdateWebsiteIcon } from './IUpdateWebsiteIcon';
 import type { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
@@ -8,6 +8,7 @@ import { VALID_SETTING_KEYS } from '@/domain/settings/constants/SettingKeys';
 @injectable()
 export class UpdateWebsiteIcon implements IUpdateWebsiteIcon {
   constructor(
+    @inject('WebsiteSettingsRepository')
     private readonly websiteSettingsRepository: WebsiteSettingsRepository
   ) {}
 

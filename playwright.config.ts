@@ -121,6 +121,15 @@ export default defineConfig({
         headless: true, // Force headless mode for Docker environment
       },
     },
+    {
+      name: 'website-settings-toast-tests',
+      testDir: './test/e2e/admin',
+      testMatch: '**/website-settings-toast.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true, // Force headless mode for Docker environment
+      },
+    },
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',

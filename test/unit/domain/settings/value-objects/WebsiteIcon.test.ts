@@ -74,10 +74,10 @@ describe('WebsiteIcon', () => {
     });
 
     it('should throw error when size exceeds limit', () => {
-      const invalidMetadata = { ...validMetadata, size: 3 * 1024 * 1024 }; // 3MB
+      const invalidMetadata = { ...validMetadata, size: 6 * 1024 * 1024 }; // 6MB (exceeds 5MB limit)
       expect(() => {
         new WebsiteIcon(validUrl, invalidMetadata);
-      }).toThrow('Website icon size cannot exceed 2MB');
+      }).toThrow('Website icon size cannot exceed 5MB');
     });
 
     it('should throw error when format is invalid', () => {

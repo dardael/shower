@@ -71,8 +71,8 @@ export class WebsiteIcon {
       throw new Error('Website icon original name cannot be empty');
     }
 
-    // Validate file size (max 2MB for favicon)
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    // Validate file size (max 5MB for favicon)
+    const maxSize = 5 * 1024 * 1024; // 5MB
     if (metadata.size <= 0) {
       throw new Error('Website icon size must be greater than 0');
     }

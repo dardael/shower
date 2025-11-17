@@ -17,6 +17,7 @@ import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
+import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
 import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
 import type { ImageData } from '@/presentation/shared/components/ImageManager/types';
@@ -29,10 +30,10 @@ export default function WebsiteSettingsForm({
   initialName,
 }: WebsiteSettingsFormProps) {
   const logger = useLogger();
+  const { showToast } = useToastNotifications();
   const [name, setName] = useState(initialName);
   const { themeColor, setThemeColor } = useDynamicTheme();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
 
   // Form state management for unsaved changes detection
@@ -102,10 +103,13 @@ export default function WebsiteSettingsForm({
       });
       markAsInitialized();
     } catch {
-      setMessage('Failed to load website settings. Please try again later.');
+      showToast(
+        'Failed to load website settings. Please try again later.',
+        'error'
+      );
       setCurrentIcon(null);
     }
-  }, [setThemeColor, updateInitialValues, markAsInitialized]);
+  }, [setThemeColor, updateInitialValues, markAsInitialized, showToast]);
 
   useEffect(() => {
     fetchWebsiteSettings();
@@ -114,7 +118,6 @@ export default function WebsiteSettingsForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const response = await fetch('/api/settings', {
@@ -128,14 +131,14 @@ export default function WebsiteSettingsForm({
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Website settings updated successfully!');
+        showToast('Website settings updated successfully!', 'success');
         markAsClean();
         await fetchWebsiteSettings();
       } else {
-        setMessage(data.error || 'Failed to update website name');
+        showToast(data.error || 'Failed to update website name', 'error');
       }
     } catch {
-      setMessage('An error occurred while updating the website name');
+      showToast('An error occurred while updating the website name', 'error');
     } finally {
       setLoading(false);
     }
@@ -155,7 +158,8 @@ export default function WebsiteSettingsForm({
       setCurrentIcon(iconData);
       updateFieldValue('icon', iconData);
     },
-    onMessage: setMessage,
+    onMessage: (message: string) => showToast(message, 'error'),
+    onSuccess: (message: string) => showToast(message, 'success'),
   });
 
   return (
@@ -214,6 +218,7 @@ export default function WebsiteSettingsForm({
             </Field.Label>
             <Input
               id="name"
+              data-testid="website-name-input"
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
@@ -272,6 +277,7 @@ export default function WebsiteSettingsForm({
                 showFormatInfo={true}
                 allowDelete={true}
                 allowReplace={true}
+                disableSuccessToast={true}
               />
             </Box>
             <Field.HelperText
@@ -297,6 +303,7 @@ export default function WebsiteSettingsForm({
           <Box w="full">
             <SaveButton
               type="submit"
+              data-testid="save-website-button"
               isLoading={loading}
               loadingText="Updating..."
               width="full"
@@ -306,27 +313,6 @@ export default function WebsiteSettingsForm({
           </Box>
         </Stack>
       </form>
-
-      {message && (
-        <Text
-          mt={4}
-          fontSize="sm"
-          fontWeight="medium"
-          px={3}
-          py={2}
-          borderRadius="md"
-          bg={
-            message.includes('successfully') ? 'success.subtle' : 'error.subtle'
-          }
-          color={message.includes('successfully') ? 'success.fg' : 'error.fg'}
-          border="1px solid"
-          borderColor={
-            message.includes('successfully') ? 'success.border' : 'error.border'
-          }
-        >
-          {message}
-        </Text>
-      )}
     </Box>
   );
 }

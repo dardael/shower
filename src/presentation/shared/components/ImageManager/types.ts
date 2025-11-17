@@ -67,4 +67,5 @@ export interface ImageManagerProps {
   showFormatInfo?: boolean;
   allowDelete?: boolean;
   allowReplace?: boolean;
+  disableSuccessToast?: boolean; // Disable built-in success toast
 }
