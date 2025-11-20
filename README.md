@@ -49,7 +49,6 @@ shower/
 │   ├── unit/            # Unit tests
 │   │   └── performance/ # Performance tests
 │   └── e2e/             # End-to-end tests
-├── doc/                 # Documentation
 ├── logs/                # Generated log files
 └── public/              # Static assets
 ```
@@ -547,5 +546,3 @@ The enhanced logging system follows the same hexagonal architecture principles a
 - **Memory Management**: Automatic cleanup and garbage collection
 - **Compression**: Reduces storage requirements for historical logs
 - **Smart Rotation**: Prevents disk space issues while maintaining retention
-
-For detailed technical documentation, see [`doc/technical.md`](doc/technical.md).

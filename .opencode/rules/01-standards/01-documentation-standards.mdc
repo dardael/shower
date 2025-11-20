@@ -1,28 +1,9 @@
 ---
-description: Establish comprehensive documentation standards for functional documentation, technical documentation, README.md, and AGENTS.md to ensure clear separation of concerns, developer onboarding, and maintainable project documentation.
-globs: doc/**/*.{md}, README.md, AGENTS.md
+description: Establish comprehensive documentation standards for README.md and AGENTS.md
+globs: README.md, AGENTS.md
 alwaysApply: true
 ---
-
-Sub rule 1: Functional Documentation (doc/functionnal.md)
-- Write all functional documentation in `doc/functionnal.md`
-- Use non-technical language accessible to non-developers
-- Focus on user behavior, workflows, and business requirements
-- Include step-by-step instructions for user interactions
-- Document the "why" behind features, not just the "what"
-- Use clear headings and bullet points for readability
-- Update when user-facing features change
-
-Sub rule 2: Technical Documentation (doc/technical.md)
-- Write all technical documentation in `doc/technical.md`
-- Do not include implementation details, and code examples
-- Never include explicit file paths or links to existing files
-- Document API endpoints, environment variables, and configuration
-- Include troubleshooting guides and common issues
-- Update when technical implementation changes
-- Explain Architecture and design decisions
-
-Sub rule 3: README.md Content Standards
+Sub rule 1: README.md Content Standards
 - Include all developer setup information in README.md
 - Document environment variables with examples and descriptions
 - List all Docker and npm commands with clear descriptions
@@ -32,7 +13,7 @@ Sub rule 3: README.md Content Standards
 - Include deployment instructions and considerations
 - Update when project setup or commands change
 
-Sub rule 4: AGENTS.md Content Standards
+Sub rule 2: AGENTS.md Content Standards
 - Maintain current codebase file structure in AGENTS.md (only directories and important files)
 - Update file structure whenever files are created, renamed, updated, or deleted
 - Include all directories and important files with brief descriptions

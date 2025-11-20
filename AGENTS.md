@@ -203,9 +203,6 @@ shower/
 ├── .prettierignore
 ├── .prettierrc.js
 ├── AGENTS.md
-├── doc/
-│   ├── functionnal.md
-│   └── technical.md
 ├── Dockerfile
 ├── docker-compose.yml
 ├── eslint.config.mjs
@@ -253,8 +250,10 @@ This ensures MongoDB is available for database operations and the application is
 ```
 
 ## Active Technologies
+
 - TypeScript 5.0+ with Next.js 15 + Chakra UI v3, React 18, Next.js API routes (001-toast-notifications)
 - MongoDB for website settings persistence (001-toast-notifications)
 
 ## Recent Changes
+
 - 001-toast-notifications: Added TypeScript 5.0+ with Next.js 15 + Chakra UI v3, React 18, Next.js API routes
