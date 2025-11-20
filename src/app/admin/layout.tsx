@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 async function getAdminWebsiteName(): Promise<string> {
-  return fetchWebsiteName(' Admin');
+  return fetchWebsiteName();
 }
 
 async function getAdminWebsiteIcon(): Promise<string | null> {

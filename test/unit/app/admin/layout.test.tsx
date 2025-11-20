@@ -7,9 +7,7 @@ import { initializeDatabaseForLayout } from '@/infrastructure/shared/layoutUtils
 // Mock dependencies
 jest.mock('@/infrastructure/shared/layoutUtils', () => ({
   initializeDatabaseForLayout: jest.fn(),
-  fetchWebsiteName: jest.fn((suffix?: string) =>
-    suffix ? `Shower${suffix}` : 'Shower'
-  ),
+  fetchWebsiteName: jest.fn(() => 'Shower'),
   fetchWebsiteIcon: jest.fn(() => Promise.resolve(null)),
 }));
 
@@ -76,7 +74,7 @@ describe('AdminLayout', () => {
       const adminLayoutModule = await import('@/app/admin/layout');
       const metadata = await adminLayoutModule.generateMetadata();
 
-      expect(metadata.title).toBe('Shower Admin');
+      expect(metadata.title).toBe('Shower');
       expect(metadata.description).toBe('Admin panel for Shower website');
     } finally {
       // Restore original environment
@@ -120,7 +118,7 @@ describe('AdminLayout', () => {
     const adminLayoutModule = await import('@/app/admin/layout');
     const metadata = await adminLayoutModule.generateMetadata();
 
-    expect(metadata.title).toBe('Shower Admin');
+    expect(metadata.title).toBe('Shower');
   });
 
   it('should use default admin icon when API fails', async () => {

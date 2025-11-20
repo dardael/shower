@@ -30,10 +30,10 @@ export async function initializeDatabaseForLayout(): Promise<void> {
  * Shared utility function to fetch website name from API
  * Used by both root and admin layouts to avoid code duplication
  */
-export async function fetchWebsiteName(suffix?: string): Promise<string> {
+export async function fetchWebsiteName(): Promise<string> {
   // Only fetch during runtime, not during build
   if (process.env.NEXT_PHASE === 'phase-production-build') {
-    return suffix ? `Shower${suffix}` : 'Shower'; // Default during build
+    return 'Shower'; // Default during build
   }
 
   try {
@@ -48,10 +48,9 @@ export async function fetchWebsiteName(suffix?: string): Promise<string> {
     }
 
     const data = await response.json();
-    const baseName = data.name || 'Shower';
-    return suffix ? `${baseName}${suffix}` : baseName;
+    return data.name || 'Shower';
   } catch {
-    return suffix ? `Shower${suffix}` : 'Shower'; // Default fallback
+    return 'Shower'; // Default fallback
   }
 }
 
