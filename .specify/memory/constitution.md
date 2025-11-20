@@ -18,7 +18,7 @@ All development MUST follow Domain-Driven Design and Hexagonal Architecture patt
 
 ### II. Test-Driven Quality
 
-Comprehensive testing is NON-NEGOTIABLE and MUST precede implementation. Unit tests with Jest for business logic and services, integration tests for API contracts, and end-to-end tests with Playwright for complete user workflows. All tests MUST be written before implementation, must fail initially, and only pass when correct functionality is implemented. Test coverage MUST be maintained for all critical paths with performance tests validating the enhanced logging system's 14,000+ logs/sec capability.
+Comprehensive testing is NON-NEGOTIABLE and MUST precede implementation. Unit tests with Jest for business logic and services, and integration tests for API contracts. All tests MUST be written before implementation, must fail initially, and only pass when correct functionality is implemented.
 
 ### III. Production-Grade Observability
 
@@ -55,7 +55,7 @@ All development MUST maintain clean architecture principles with proper separati
 
 ### Development Workflow Requirements
 
-All development MUST follow established workflow: feature branch creation, comprehensive testing, linting/formatting validation, and successful build before merge. Pre-commit hooks enforce code quality, pre-push hooks validate test coverage and build success. MongoDB MUST be running for e2e tests, application MUST be built before test execution. All tests MUST pass in CI/CD pipeline with performance benchmarks meeting or exceeding established baselines.
+All development MUST follow established workflow: feature branch creation, comprehensive testing, linting/formatting validation, and successful build before merge. Pre-commit hooks enforce code quality, pre-push hooks validate test coverage and build success.
 
 ### Review and Compliance Requirements
 

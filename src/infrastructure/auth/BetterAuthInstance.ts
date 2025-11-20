@@ -51,8 +51,7 @@ const authConfig: Record<string, unknown> = {
     },
     cookiePrefix: 'better-auth',
   },
-  trustedOrigins:
-    process.env.NODE_ENV === 'development' ? ['http://localhost:3000'] : [],
+  trustedOrigins: [process.env.NEXT_PUBLIC_APP_URL],
 };
 
 // Add database configuration only if available

@@ -33,7 +33,7 @@ Key technologies:
 - **Dependency Injection**: Tsyringe
 - **Styling**: Chakra UI
 - **Logging**: Production-grade async logging system with structured output
-- **Testing**: Jest for unit tests, Playwright for integration tests
+- **Testing**: Jest for unit tests
 
 ## Project Structure
 
@@ -48,7 +48,6 @@ shower/
 ├── test/
 │   ├── unit/            # Unit tests
 │   │   └── performance/ # Performance tests
-│   └── e2e/             # End-to-end tests
 ├── logs/                # Generated log files
 └── public/              # Static assets
 ```
@@ -291,91 +290,6 @@ The logging system includes comprehensive performance tests that run automatical
 - Memory efficiency and leak prevention
 - Large metadata object processing
 
-### Integration Tests
-
-Run end-to-end tests with Playwright:
-
-**Important**: Before running e2e tests, you must start MongoDB and build the application:
-
-```bash
-# Start MongoDB service
-docker compose up mongodb -d
-
-# Build Next.js application
-docker compose run --rm app npm run build
-
-# Run e2e tests
-docker compose run --rm -T app npm run test:e2e
-```
-
-Run with UI mode for debugging:
-
-```bash
-# Start MongoDB service
-docker compose up mongodb -d
-
-# Build the Next.js application
-docker compose run --rm app npm run build
-
-# Run e2e tests with UI
-docker compose run --rm app npm run test:e2e:ui
-```
-
-#### Parallel Test Execution
-
-This project features optimized E2E test execution with **project-level parallelization**:
-
-- **8 Test Projects**: Tests are organized into 8 independent projects for optimal worker distribution
-- **Collection-Based Cleanup**: Targeted database cleanup instead of full database drops for better performance
-- **Connection Pooling**: MongoDB connection pool with 8 max connections and 30s timeout
-- **Dependency Tracking**: Automatic mapping of test projects to required MongoDB collections
-
-**Test Projects:**
-
-- `admin-auth-tests`: Authentication and admin page tests (users collection)
-- `admin-ui-tests`: Navigation and UI tests (no collections)
-- `admin-api-tests`: API health check tests (no collections)
-- `admin-settings-tests`: Icon management tests (websiteSettings collection)
-- `admin-social-tests`: Social networks management tests (socialNetworks collection)
-- `admin-theme-tests`: Theme color management tests (websiteSettings collection)
-- `public-ui-tests`: Public UI tests (no collections)
-- `public-social-tests`: Public social networks tests (socialNetworks read-only)
-
-**Test Responsibilities:**
-
-- **Icon Management**: Handled by `admin-settings-tests` (website icon upload/management)
-- **Theme Management**: Handled by `admin-theme-tests` (theme color selection and customization)
-
-**Performance Benefits:**
-
-- Tests run in parallel across 8 workers
-- Collection-specific cleanup reduces database overhead
-- Connection pooling improves resource utilization
-- Dependency isolation prevents test interference
-
-**Run specific test projects:**
-
-```bash
-# Run only admin authentication tests
-docker compose run --rm -T app npm run test:e2e -- --project=admin-auth-tests
-
-# Run multiple specific projects
-docker compose run --rm -T app npm run test:e2e -- --project=admin-auth-tests --project=admin-ui-tests
-```
-
-Run with UI mode for debugging:
-
-```bash
-# Start MongoDB service
-docker compose up mongodb -d
-
-# Build the Next.js application
-docker compose run --rm app npm run build
-
-# Run e2e tests with UI
-docker compose run --rm app npm run test:e2e:ui
-```
-
 ### Git Hooks
 
 This project uses Husky for git hooks:
@@ -385,17 +299,16 @@ This project uses Husky for git hooks:
 
 ## Commands Summary
 
-| Command                                           | Description                                |
-| ------------------------------------------------- | ------------------------------------------ |
-| `docker compose run --rm app npm install`         | Install npm dependencies                   |
-| `docker compose up app`                           | Start development server                   |
-| `docker compose up mongodb -d`                    | Start MongoDB service (required for e2e)   |
-| `docker compose run --rm app npm run build`       | Build for production (required for e2e)    |
-| `docker compose run --rm app npm run start`       | Start production server                    |
-| `docker compose run --rm app npm run lint`        | Run ESLint                                 |
-| `docker compose run --rm app npm run format`      | Format code with Prettier                  |
-| `docker compose run --rm app npm test`            | Run all unit tests (including performance) |
-| `docker compose run --rm -T app npm run test:e2e` | Run integration tests (requires setup)     |
+| Command                                      | Description                                |
+| -------------------------------------------- | ------------------------------------------ |
+| `docker compose run --rm app npm install`    | Install npm dependencies                   |
+| `docker compose up app`                      | Start development server                   |
+| `docker compose up mongodb -d`               | Start MongoDB service                      |
+| `docker compose run --rm app npm run build`  | Build for production                       |
+| `docker compose run --rm app npm run start`  | Start production server                    |
+| `docker compose run --rm app npm run lint`   | Run ESLint                                 |
+| `docker compose run --rm app npm run format` | Format code with Prettier                  |
+| `docker compose run --rm app npm test`       | Run all unit tests (including performance) |
 
 ## Monitoring and Observability
 

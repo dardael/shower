@@ -37,7 +37,7 @@ export async function fetchWebsiteName(suffix?: string): Promise<string> {
   }
 
   try {
-    const baseUrl = process.env.SHOWER_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
     const response = await fetch(`${baseUrl}/api/settings/name`, {
       cache: 'no-store', // Ensure fresh data
@@ -66,7 +66,7 @@ export async function fetchWebsiteIcon(): Promise<string | null> {
   }
 
   try {
-    const baseUrl = process.env.SHOWER_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
     const response = await fetch(`${baseUrl}/api/settings/icon`, {
       cache: 'no-store', // Ensure fresh data

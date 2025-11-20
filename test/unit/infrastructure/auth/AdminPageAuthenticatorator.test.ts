@@ -21,7 +21,10 @@ jest.mock('next/headers', () => ({
 // Mock next/navigation
 const mockNotFound = jest.fn();
 jest.mock('next/navigation', () => ({
-  notFound: () => mockNotFound(),
+  notFound: () => {
+    mockNotFound();
+    throw new Error('NOT_FOUND');
+  },
 }));
 
 // Import mocked modules
@@ -112,57 +115,6 @@ describe('AdminPageAuthenticatorator', () => {
       const result = await authenticator.getSession();
 
       expect(result).toEqual(mockSession);
-    });
-
-    it('should create mock session in test environment with test cookie', async () => {
-      const originalEnv = process.env.SHOWER_ENV;
-      process.env.SHOWER_ENV = 'test';
-
-      try {
-        const headersObj = new Headers();
-        headersObj.set(
-          'cookie',
-          'better-auth.session_token=test-session-token; test-user-data={"email":"test@example.com","isAdmin":true}'
-        );
-
-        mockHeaders.mockReturnValue(headersObj);
-        mockAuth.api.getSession.mockResolvedValue(null);
-
-        const result = await authenticator.getSession();
-
-        expect(result).toEqual({
-          user: {
-            id: 'test-user-test-example-com',
-            email: 'test@example.com',
-            name: 'Test Admin',
-            image: null,
-          },
-          session: {
-            id: 'test-session-id',
-            userId: 'test-user-test-example-com',
-            expiresAt: expect.any(Date),
-          },
-        });
-      } finally {
-        process.env.SHOWER_ENV = originalEnv;
-      }
-    });
-
-    it('should return null when no session available', async () => {
-      const originalEnv = process.env.SHOWER_ENV;
-      process.env.SHOWER_ENV = 'test';
-
-      try {
-        const headersObj = new Headers();
-        mockHeaders.mockReturnValue(headersObj);
-        mockAuth.api.getSession.mockResolvedValue(null);
-
-        const result = await authenticator.getSession();
-
-        expect(result).toBeNull();
-      } finally {
-        process.env.SHOWER_ENV = originalEnv;
-      }
     });
   });
 
@@ -257,7 +209,7 @@ describe('AdminPageAuthenticatorator', () => {
     it('should call notFound when no session', async () => {
       jest.spyOn(authenticator, 'getSession').mockResolvedValue(null);
 
-      await authenticator.authenticate();
+      await expect(authenticator.authenticate()).rejects.toThrow('NOT_FOUND');
 
       expect(mockNotFound).toHaveBeenCalled();
     });

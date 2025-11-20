@@ -40,17 +40,14 @@ shower/
 │   │   │   ├── icons/
 │   │   │   │   └── [filename]/
 │   │   │   │       └── route.ts      -> Icon serving endpoint
-│   │   │   ├── settings/
-│   │   │   │   ├── icon/
-│   │   │   │   │   └── route.ts      -> Website icon API
-│   │   │   │   ├── name/
-│   │   │   │   │   └── route.ts      -> Website name API
-│   │   │   │   ├── social-networks/
-│   │   │   │   │   └── route.ts      -> Social networks API
-│   │   │   │   └── route.ts          -> General settings API
-│   │   │   └── test/
-│   │   │       └── auth/
-│   │   │           └── route.ts      -> Test authentication endpoint
+│   │   │   └── settings/
+│   │   │       ├── icon/
+│   │   │       │   └── route.ts      -> Website icon API
+│   │   │       ├── name/
+│   │   │       │   └── route.ts      -> Website name API
+│   │   │       ├── social-networks/
+│   │   │       │   └── route.ts      -> Social networks API
+│   │   │       └── route.ts          -> General settings API
 │   │   ├── globals.css               -> Global styles
 │   │   ├── layout.tsx                -> Root layout component
 │   │   └── page.tsx                  -> Home page route `/`
@@ -132,27 +129,6 @@ shower/
 │   │   │   └── layoutUtils.ts -> Layout utilities for database initialization and route detection
 │   │   ├── container.ts -> Dependency injection container
 ├── test/                     # Test Layer
-│   ├── e2e/                  # End-to-end tests
-│   │   ├── admin/
-│   │   │   ├── admin-navigation.spec.ts -> Admin navigation tests
-│   │   │   ├── admin-page.spec.ts -> Admin authentication tests
-│   │   │   ├── icon-management.spec.ts -> Icon management tests
-│   │   │   ├── logging-health-check.spec.ts -> API health check tests
-│   │   │   ├── social-networks-management.spec.ts -> Social networks tests
-│   │   │   └── theme-color-management.spec.ts -> Theme color tests
-│   │   ├── public-ui-tests/
-│   │   │   └── footer-visibility.spec.ts -> Public UI tests
-│   │   ├── public/
-│   │   │   └── social-networks-footer.spec.ts -> Public social networks tests
-│   │   ├── fixtures/
-│   │   │   ├── authHelpers.ts -> Authentication test helpers
-│   │   │   ├── test-cleanup.ts -> Collection-based cleanup utilities
-│   │   │   ├── test-database.ts -> Test database setup with connection pooling
-│   │   │   └── test-dependencies.ts -> Test dependency metadata
-│   │   ├── constants/
-│   │   │   └── timeouts.ts -> Test timeout constants
-│   │   ├── global-setup.ts -> Global e2e test setup
-│   │   └── tsconfig.json -> E2E test TypeScript configuration
 │   ├── unit/                 # Unit tests (following same structure as src)
 │   │   ├── application/
 │   │   │   ├── auth/
@@ -190,7 +166,6 @@ shower/
 │   │   └── types.d.ts -> Test type definitions
 ├── .dockerignore
 ├── .env
-├── .env.test
 ├── .gitignore
 ├── .husky/
 │   ├── pre-commit
@@ -212,7 +187,6 @@ shower/
 ├── opencode.json
 ├── package-lock.json
 ├── package.json
-├── playwright.config.ts
 ├── README.md
 └── tsconfig.json
 
@@ -229,19 +203,7 @@ you must use docker compose to run all commands in order to have the same enviro
 - **Lint**: `docker compose run --rm app npm run lint` (ESLint with Next.js, TypeScript, Prettier)
 - **Format**: `docker compose run --rm app npm run format` (Prettier)
 - **Type Check**: `docker compose run --rm app npm run build:strict` (TypeScript strict mode)
-- **e2etests**: `docker compose run --rm -T app npm run test:e2e` (Playwright - requires MongoDB and build)
 - **Test All**: `docker compose run --rm app npm run test` (Jest with ts-jest)
-- **Single Test**: `docker compose run --rm app npm run test -- tests/file.test.ts` or `docker compose run --rm app npm run test -- --testNamePattern="pattern"`
-
-## E2E Test Prerequisites
-
-Before running e2e tests, you must complete these steps in order:
-
-1. **Start MongoDB service**: `docker compose up mongodb -d`
-2. **Build the application**: `docker compose run --rm app npm run build`
-3. **Run e2e tests**: `docker compose run --rm -T app npm run test:e2e`
-
-This ensures MongoDB is available for database operations and the application is properly built before Playwright tests execute, preventing timeouts in the opencode environment.
 
 ## Github
 

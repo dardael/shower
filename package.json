@@ -11,9 +11,7 @@
     "check-format": "prettier --check .",
     "prepare": "husky",
     "build:strict": "tsc --noEmit --strict",
-    "test": "jest",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test": "jest"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

@@ -12,12 +12,11 @@ declare global {
       BETTER_AUTH_SECRET: string;
       BETTERAUTH_URL?: string;
 
-      // Application URL Configuration
-      SHOWER_URL: string;
-
       // Environment
-      SHOWER_ENV?: 'development' | 'production' | 'test';
       NODE_ENV: 'development' | 'production' | 'test';
+
+      //NEXT
+      NEXT_PUBLIC_APP_URL: string;
 
       // Logging Configuration
       LOG_FOLDER: string;
@@ -37,11 +36,6 @@ declare global {
 
       // Database
       MONGO_URI: string;
-      MONGODB_URI_TEST?: string;
-
-      // Test authentication settings
-      NEXTAUTH_TEST_AUTH?: string;
-      TEST_ADMIN_EMAIL?: string;
 
       // NPM Configuration
       NPM_CONFIG_UPDATE_NOTIFIER: string;

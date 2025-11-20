@@ -240,9 +240,16 @@ export class ClientLogAuthenticationService {
     const originsEnv = process.env.CLIENT_LOG_ALLOWED_ORIGINS;
     if (!originsEnv) {
       // Default to same origin and localhost for development
-      return process.env.NODE_ENV === 'production'
-        ? []
-        : ['http://localhost:3000', 'https://localhost:3000'];
+      if (process.env.NODE_ENV === 'production') {
+        return [];
+      }
+
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      // Provide both HTTP and HTTPS versions for development
+      return [
+        appUrl.replace(/^https?:\/\//, 'http://'),
+        appUrl.replace(/^https?:\/\//, 'https://'),
+      ].filter((origin, index, arr) => arr.indexOf(origin) === index); // Remove duplicates
     }
 
     return originsEnv

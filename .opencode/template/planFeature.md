@@ -38,8 +38,7 @@
 - [] Task 2: Check eslint. if it goes wrong, fix the issues.
 - [] Task 3: Check prettier. if it goes wrong, fix the issues.
 - [] Task 4: check that unit tests pass. if it goes wrong, fix the issues.
-- [] Task 5: check that end to end tests pass. if it goes wrong, fix the issues.
-- [] Task 6: Perform manual testing to ensure the feature works as expected using browsermcp mcp. if it goes wrong, fix the issues.
+- [] Task 5: Perform manual testing to ensure the feature works as expected using browsermcp mcp. if it goes wrong, fix the issues.
 
 ### Step 5: Documentation
 
