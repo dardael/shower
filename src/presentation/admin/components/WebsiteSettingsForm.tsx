@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Heading,
   Stack,
@@ -55,7 +55,9 @@ export default function WebsiteSettingsForm({
     },
   });
 
-  const fetchWebsiteSettings = useCallback(async () => {
+  const fetchWebsiteSettingsRef = useRef(async () => {});
+
+  fetchWebsiteSettingsRef.current = async () => {
     try {
       // Fetch all settings in parallel for better performance
       const [settingsResponse, iconResponse] = await Promise.all([
@@ -112,7 +114,11 @@ export default function WebsiteSettingsForm({
       );
       setCurrentIcon(null);
     }
-  }, [setThemeColor, updateInitialValues, markAsInitialized, showToast]);
+  };
+
+  const fetchWebsiteSettings = useCallback(() => {
+    return fetchWebsiteSettingsRef.current();
+  }, []);
 
   useEffect(() => {
     fetchWebsiteSettings();

@@ -83,7 +83,9 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     };
   }, []);
 
-  const fetchSocialNetworks = useCallback(async () => {
+  const fetchSocialNetworksRef = useRef(async () => {});
+
+  fetchSocialNetworksRef.current = async () => {
     logger.info('Fetching social networks');
     try {
       const response = await fetch('/api/settings/social-networks');
@@ -103,7 +105,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         throw new Error(data.error || 'Failed to fetch social networks');
       }
     } catch (error) {
-      logger.logErrorWithObject(error, 'Failed to fetch social networks');
+      logger.logError('Failed to fetch social networks', { error });
       const message = 'Failed to load social networks';
       if (!toastMessagesRef.current.has(message)) {
         toaster.create({
@@ -121,7 +123,11 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [clearToastMessage, logger, updateInitialValues, markAsInitialized]);
+  };
+
+  const fetchSocialNetworks = useCallback(() => {
+    return fetchSocialNetworksRef.current();
+  }, []);
 
   const handleUrlChange = useCallback(
     (type: SocialNetworkType, url: string) => {
@@ -263,7 +269,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         throw new Error(data.error || 'Failed to update social networks');
       }
     } catch (error) {
-      logger.logErrorWithObject(error, 'Failed to update social networks');
+      logger.logError('Failed to update social networks', { error });
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       const message = `Failed to update social networks: ${errorMessage}`;

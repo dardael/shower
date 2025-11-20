@@ -1,8 +1,10 @@
 'use client';
 
-import { useLogger } from '@/presentation/shared/contexts/LoggerContext';
+import { Logger } from '@/application/shared/Logger';
 
-export { useLogger };
+export function useLogger(): Logger {
+  return new Logger();
+}
 
-// Re-export for convenience
-export type { LoggerContextValue } from '@/presentation/shared/contexts/LoggerContext';
+// Re-export Logger type for backward compatibility
+export type { Logger };
