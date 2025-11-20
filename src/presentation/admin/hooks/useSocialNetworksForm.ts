@@ -103,7 +103,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         throw new Error(data.error || 'Failed to fetch social networks');
       }
     } catch (error) {
-      logger.logErrorWithObject(error, 'Failed to fetch social networks');
+      logger.logError('Failed to fetch social networks', { error });
       const message = 'Failed to load social networks';
       if (!toastMessagesRef.current.has(message)) {
         toaster.create({
@@ -263,7 +263,7 @@ export function useSocialNetworksForm(): UseSocialNetworksFormReturn {
         throw new Error(data.error || 'Failed to update social networks');
       }
     } catch (error) {
-      logger.logErrorWithObject(error, 'Failed to update social networks');
+      logger.logError('Failed to update social networks', { error });
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       const message = `Failed to update social networks: ${errorMessage}`;

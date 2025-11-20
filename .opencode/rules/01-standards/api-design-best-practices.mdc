@@ -39,7 +39,7 @@ Sub rule 6: Authentication and Security
 - Use environment variables for configuration, never hardcoded secrets
 
 Sub rule 8: Logging and Monitoring
-- Use structured logging with the enhanced logging system
+- Use simple console logging with environment-based log level filtering
 - Log API requests with method, URL, and user context: `logger.logApiRequest()`
 - Log API responses with status code and duration: `logger.logApiResponse()`
 - Include correlation IDs for request tracking

@@ -1,7 +1,8 @@
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 import type { ILogger } from '@/application/shared/ILogger';
-import { ContextualLogger, type LogContext } from './ContextualLogger';
-import { PerformanceMonitor } from './PerformanceMonitor';
+import {
+  BackendLog,
+  type Timer,
+} from '@/infrastructure/shared/services/BackendLog';
 
 export interface PerformanceMetrics {
   operation: string;
@@ -17,63 +18,227 @@ export interface SecurityContext {
   metadata?: Record<string, unknown>;
 }
 
-export class Logger {
-  private performanceMonitor?: PerformanceMonitor;
+/**
+ * Simple performance monitor for the simplified logging system
+ */
+class SimplePerformanceMonitor {
+  constructor(private backendLog: BackendLog) {}
 
-  constructor(private readonly logger: ILogger) {
-    // Initialize performance monitor in production or when explicitly enabled
-    if (
-      process.env.NODE_ENV === 'production' ||
-      process.env.ENABLE_PERFORMANCE_MONITORING === 'true'
+  startTimer(operation: string, metadata?: Record<string, unknown>): Timer {
+    return this.backendLog.startTimer(operation, metadata);
+  }
+
+  endTimer(timer: Timer, additionalMetadata?: Record<string, unknown>): void {
+    this.backendLog.endTimer(timer, additionalMetadata);
+  }
+
+  async measure<T>(
+    operation: string,
+    fn: () => Promise<T>,
+    metadata?: Record<string, unknown>
+  ): Promise<T> {
+    const timer = this.startTimer(operation, metadata);
+    try {
+      const result = await fn();
+      this.endTimer(timer, { success: true });
+      return result;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.endTimer(timer, {
+        success: false,
+        error: errorMessage,
+      });
+      throw error;
+    }
+  }
+}
+
+export class Logger implements ILogger {
+  private backendLog: BackendLog;
+
+  constructor() {
+    this.backendLog = new BackendLog();
+  }
+
+  // Interface implementation methods
+  logDebug(message: string, metadata?: Record<string, unknown>): void {
+    this.backendLog.debug(message, metadata || {});
+  }
+
+  logInfo(message: string, metadata?: Record<string, unknown>): void {
+    this.backendLog.info(message, metadata || {});
+  }
+
+  logWarning(message: string, metadata?: Record<string, unknown>): void {
+    this.backendLog.warn(message, metadata || {});
+  }
+
+  logError(message: string, metadata?: Record<string, unknown>): void {
+    this.backendLog.error(message, metadata || {});
+  }
+
+  // Direct logging methods - consistent with console API (for convenience)
+  debug(message: string, ...data: unknown[]): void {
+    if (data.length === 0) {
+      this.logDebug(message);
+    } else if (
+      data.length === 1 &&
+      typeof data[0] === 'object' &&
+      data[0] !== null
     ) {
-      this.performanceMonitor = new PerformanceMonitor(this);
+      this.logDebug(message, data[0] as Record<string, unknown>);
+    } else {
+      this.logDebug(message, { data });
     }
   }
 
-  /**
-   * Normalize any value to an Error instance
-   */
-  private normalizeError(error: unknown): Error {
-    return error instanceof Error ? error : new Error(String(error));
+  info(message: string, ...data: unknown[]): void {
+    if (data.length === 0) {
+      this.logInfo(message);
+    } else if (
+      data.length === 1 &&
+      typeof data[0] === 'object' &&
+      data[0] !== null
+    ) {
+      this.logInfo(message, data[0] as Record<string, unknown>);
+    } else {
+      this.logInfo(message, { data });
+    }
   }
 
-  // Direct logging methods - consistent with console API
-  debug(message: string, metadata?: Record<string, unknown>): void {
-    this.logger.logDebug(message, metadata);
+  warn(message: string, ...data: unknown[]): void {
+    if (data.length === 0) {
+      this.logWarning(message);
+    } else if (
+      data.length === 1 &&
+      typeof data[0] === 'object' &&
+      data[0] !== null
+    ) {
+      this.logWarning(message, data[0] as Record<string, unknown>);
+    } else {
+      this.logWarning(message, { data });
+    }
   }
 
-  info(message: string, metadata?: Record<string, unknown>): void {
-    this.logger.logInfo(message, metadata);
+  error(message: string, ...data: unknown[]): void {
+    if (data.length === 0) {
+      this.logError(message);
+    } else if (
+      data.length === 1 &&
+      typeof data[0] === 'object' &&
+      data[0] !== null
+    ) {
+      this.logError(message, data[0] as Record<string, unknown>);
+    } else {
+      this.logError(message, { data });
+    }
   }
 
-  warn(message: string, metadata?: Record<string, unknown>): void {
-    this.logger.logWarning(message, metadata);
-  }
-
-  error(message: string, metadata?: Record<string, unknown>): void {
-    this.logger.logError(message, metadata);
-  }
-
-  // Level-based logging (consistent with LogMessage)
+  // Add missing methods from old interface for backward compatibility
   execute(
-    level: LogLevel,
+    level: unknown,
     message: string,
     metadata?: Record<string, unknown>
   ): void {
-    if (level.equals(LogLevel.DEBUG)) {
-      this.debug(message, metadata);
-    } else if (level.equals(LogLevel.INFO)) {
-      this.info(message, metadata);
-    } else if (level.equals(LogLevel.WARNING)) {
-      this.warn(message, metadata);
-    } else if (level.equals(LogLevel.ERROR)) {
-      this.error(message, metadata);
+    // For backward compatibility - map to appropriate log level
+    const meta = metadata || {};
+
+    if (!level) {
+      this.info(message, meta);
+      return;
+    }
+
+    // Handle string levels
+    if (typeof level === 'string') {
+      const upperLevel = level.toUpperCase();
+      if (upperLevel.includes('DEBUG')) this.debug(message, meta);
+      else if (upperLevel.includes('INFO')) this.info(message, meta);
+      else if (upperLevel.includes('WARN') || upperLevel.includes('WARNING'))
+        this.warn(message, meta);
+      else if (upperLevel.includes('ERROR')) this.error(message, meta);
+      else this.info(message, meta);
+      return;
+    }
+
+    // Handle objects with toString method
+    if (typeof level === 'object' && level !== null) {
+      const levelStr = String(level).toUpperCase();
+      if (levelStr.includes('DEBUG')) this.debug(message, meta);
+      else if (levelStr.includes('INFO')) this.info(message, meta);
+      else if (levelStr.includes('WARN') || levelStr.includes('WARNING'))
+        this.warn(message, meta);
+      else if (levelStr.includes('ERROR')) this.error(message, meta);
+      else this.info(message, meta);
+      return;
+    }
+
+    // Default to info
+    this.info(message, meta);
+  }
+
+  withContext(): Logger {
+    // Return a new logger instance (simplified)
+    return new Logger();
+  }
+
+  batch(
+    entries: Array<{
+      level?: unknown;
+      message?: string;
+      metadata?: Record<string, unknown>;
+    }>
+  ): void {
+    // Process batch entries (simplified)
+    entries.forEach((entry) => {
+      if (entry.level && entry.message) {
+        this.execute(entry.level, entry.message, entry.metadata || {});
+      }
+    });
+  }
+
+  logIf(
+    condition: boolean,
+    level: unknown,
+    message: string,
+    metadata?: Record<string, unknown>
+  ): void {
+    if (condition) {
+      this.execute(level, message, metadata || {});
     }
   }
 
-  // Context-aware logging
-  withContext(context: LogContext): ContextualLogger {
-    return new ContextualLogger(this.logger, context);
+  debugIf(
+    message: string,
+    condition: boolean = true,
+    metadata?: Record<string, unknown>
+  ): void {
+    if (condition) {
+      this.debug(message, metadata || {});
+    }
+  }
+
+  child(): Logger {
+    return new Logger();
+  }
+
+  getPerformanceMonitor(): SimplePerformanceMonitor {
+    return new SimplePerformanceMonitor(this.backendLog);
+  }
+
+  getPerformanceStatistics(): Record<string, unknown> {
+    return {
+      totalMetrics: 0,
+      activeMetrics: 0,
+      totalAlerts: 0,
+      criticalAlerts: 0,
+      warningAlerts: 0,
+      recentAlerts: [],
+    };
+  }
+
+  setPerformanceThreshold(): void {
+    // No-op in simplified version
   }
 
   // Convenience methods for common scenarios
@@ -81,8 +246,8 @@ export class Logger {
   /**
    * Log errors with proper error object handling
    */
-  logError(message: string, metadata?: Record<string, unknown>): void {
-    this.error(message, {
+  logErrorWithType(message: string, metadata?: Record<string, unknown>): void {
+    this.logError(message, {
       ...metadata,
       type: 'error',
     });
@@ -98,7 +263,7 @@ export class Logger {
     metadata?: Record<string, unknown>
   ): void {
     const normalizedError = this.normalizeError(error);
-    this.error(message || normalizedError.message, {
+    this.logError(message || normalizedError.message, {
       ...metadata,
       error: {
         name: normalizedError.name,
@@ -137,9 +302,8 @@ export class Logger {
     duration: number,
     metadata?: Record<string, unknown>
   ): void {
-    const level = statusCode >= 400 ? LogLevel.WARNING : LogLevel.INFO;
-    this.execute(
-      level,
+    const level = statusCode >= 400 ? 'warn' : 'info';
+    this[level](
       `API Response: ${method} ${url} - ${statusCode} (${duration}ms)`,
       {
         ...metadata,
@@ -159,11 +323,7 @@ export class Logger {
     operation: string,
     metadata?: Record<string, unknown>
   ): PerformanceMetrics {
-    return {
-      operation,
-      startTime: Date.now(),
-      metadata,
-    };
+    return this.backendLog.startTimer(operation, metadata);
   }
 
   /**
@@ -173,20 +333,7 @@ export class Logger {
     metrics: PerformanceMetrics,
     additionalMetadata?: Record<string, unknown>
   ): void {
-    const duration = Date.now() - metrics.startTime;
-    const level = duration > 1000 ? LogLevel.WARNING : LogLevel.INFO;
-
-    this.execute(
-      level,
-      `Performance: ${metrics.operation} took ${duration}ms`,
-      {
-        ...metrics.metadata,
-        ...additionalMetadata,
-        operation: metrics.operation,
-        duration,
-        type: 'performance',
-      }
-    );
+    this.backendLog.endTimer(metrics, additionalMetadata);
   }
 
   /**
@@ -197,11 +344,6 @@ export class Logger {
     fn: () => Promise<T>,
     metadata?: Record<string, unknown>
   ): Promise<T> {
-    // Use performance monitor if available, otherwise fall back to simple timer
-    if (this.performanceMonitor) {
-      return this.performanceMonitor.measure(operation, fn, metadata);
-    }
-
     const timer = this.startTimer(operation, metadata);
     try {
       const result = await fn();
@@ -271,96 +413,9 @@ export class Logger {
   }
 
   /**
-   * Create a child logger with additional context
+   * Normalize any value to an Error instance
    */
-  child(context: LogContext): Logger {
-    const contextualLogger = new ContextualLogger(this.logger, context);
-
-    // Return a new Logger that uses the contextual logger internally
-    return new Logger({
-      logDebug: (message: string, metadata?: Record<string, unknown>) =>
-        contextualLogger.logDebug(message, metadata),
-      logInfo: (message: string, metadata?: Record<string, unknown>) =>
-        contextualLogger.logInfo(message, metadata),
-      logWarning: (message: string, metadata?: Record<string, unknown>) =>
-        contextualLogger.logWarning(message, metadata),
-      logError: (message: string, metadata?: Record<string, unknown>) =>
-        contextualLogger.logError(message, metadata),
-    });
-  }
-
-  /**
-   * Batch multiple log entries
-   */
-  batch(
-    entries: Array<{
-      level: LogLevel;
-      message: string;
-      metadata?: Record<string, unknown>;
-    }>
-  ): void {
-    entries.forEach((entry) => {
-      this.execute(entry.level, entry.message, entry.metadata);
-    });
-  }
-
-  /**
-   * Conditional logging
-   */
-  logIf(
-    condition: boolean,
-    level: LogLevel,
-    message: string,
-    metadata?: Record<string, unknown>
-  ): void {
-    if (condition) {
-      this.execute(level, message, metadata);
-    }
-  }
-
-  /**
-   * Debug logging with automatic environment check
-   */
-  debugIf(
-    message: string,
-    condition: boolean = true,
-    metadata?: Record<string, unknown>
-  ): void {
-    if (process.env.NODE_ENV !== 'production' && condition) {
-      this.debug(message, metadata);
-    }
-  }
-
-  /**
-   * Get performance monitor instance
-   */
-  getPerformanceMonitor(): PerformanceMonitor | undefined {
-    return this.performanceMonitor;
-  }
-
-  /**
-   * Get performance statistics
-   */
-  getPerformanceStatistics() {
-    return (
-      this.performanceMonitor?.getStatistics() || {
-        totalMetrics: 0,
-        activeMetrics: 0,
-        totalAlerts: 0,
-        criticalAlerts: 0,
-        warningAlerts: 0,
-        recentAlerts: [],
-      }
-    );
-  }
-
-  /**
-   * Set performance threshold for an operation
-   */
-  setPerformanceThreshold(
-    operation: string,
-    threshold: { warning: number; critical: number }
-  ): void {
-    this.performanceMonitor?.setThreshold(operation, threshold);
+  private normalizeError(error: unknown): Error {
+    return error instanceof Error ? error : new Error(String(error));
   }
 }

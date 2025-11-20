@@ -9,8 +9,15 @@ import {
 } from '@chakra-ui/react';
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
 
 export default function NotAuthorized() {
+  const logger = useLogger();
+
+  logger.info('NotAuthorized component mounted');
+  logger.debug('User attempted to access admin area without permissions');
+  logger.warn('Access denied - insufficient permissions');
+
   return (
     <Container
       maxW="container.md"

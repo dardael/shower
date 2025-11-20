@@ -32,10 +32,9 @@ Sub rule 4: Error Handling
 - Log errors with sufficient context
 
 Sub rule 5: Logging Practices
-- Never use `console.log`, `console.error`, `console.warn`, or `console.debug` in production code
-- Use the enhanced logging system with proper architecture separation:
-  - Server-side: `Logger` class with dependency injection
-  - Client-side: `useLogger` hook with React context
+- Use simple console logging with environment-based log level filtering
+- Server-side: `Logger` class with dependency injection
+- Client-side: `useLogger` hook with direct console output
 - Server-side import: `import { Logger } from '@/application/shared/Logger'`
 - Server-side usage: `constructor(@inject('Logger') private logger: Logger)`
 - Client-side import: `import { useLogger } from '@/presentation/shared/hooks/useLogger'`
@@ -43,7 +42,7 @@ Sub rule 5: Logging Practices
 - Use appropriate methods: `logger.debug()`, `logger.info()`, `logger.warn()`, `logger.error()`
 - Include structured metadata in all log entries for better debugging and monitoring
 - Use specialized methods: `logger.logApiRequest()`, `logger.logError()`, `logger.logSecurity()`, `logger.measure()`
-- For detailed logging guidelines and examples, see the enhanced-logging-system and client-side-logging-architecture rules
+- Configure log levels with environment variables: `LOG_LEVEL` (server) and `NEXT_PUBLIC_LOG_LEVEL` (client)
 
 Sub rule 6: TypeScript Specific Clean Code
 - Use interfaces over types for object shapes that can be extended

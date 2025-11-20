@@ -461,7 +461,7 @@ beforeAll(() => {
 
   // Register Logger using the mock
   container.register<Logger>('Logger', {
-    useFactory: () => new Logger(mockILogger),
+    useFactory: () => new Logger(),
   });
 });
 

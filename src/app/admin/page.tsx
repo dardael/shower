@@ -6,7 +6,6 @@ import LoginButton from '@/presentation/shared/components/LoginButton';
 import NotAuthorized from '@/presentation/admin/components/NotAuthorized';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
-import { LogLevel } from '@/domain/shared/value-objects/LogLevel';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -108,7 +107,7 @@ export default async function AdminPage() {
     await dbConnection.connect();
   } catch (error) {
     const logger = container.resolve<Logger>('Logger');
-    logger.execute(LogLevel.ERROR, 'Database connection error', { error });
+    logger.logError('Database connection error', { error });
     dbError = error instanceof Error ? error : new Error(String(error));
 
     // In development environment, show a helpful error message

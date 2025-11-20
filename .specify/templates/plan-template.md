@@ -35,7 +35,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 - **Architecture-First Development**: Must follow DDD and Hexagonal Architecture with proper layer separation
 - **Test-Driven Quality**: Must include comprehensive unit, integration, and e2e testing strategy
-- **Production-Grade Observability**: Must implement enhanced logging system (no console methods)
+- **Simplified Logging Approach**: Simple console logging permitted with optional structured logging
 - **Security by Default**: Must include authentication/authorization for admin features
 - **Performance-Conscious Development**: Must address async operations, caching, and optimization
 
@@ -44,7 +44,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 - [ ] Architecture follows Domain-Driven Design patterns
 - [ ] Layer dependencies flow inward only (Presentation → Application → Domain → Infrastructure)
 - [ ] Testing strategy covers unit, integration, and e2e scenarios
-- [ ] Enhanced logging system integration planned
+- [ ] Simple console logging approach implemented
 - [ ] Security controls implemented for protected features
 - [ ] Performance considerations addressed (async, caching, optimization)
 

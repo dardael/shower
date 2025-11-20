@@ -1,9 +1,9 @@
 <!--
 Sync Impact Report:
-- Version change: 0.0.0 → 1.1.0 (principle refinement + template updates)
-- Modified principles: Principle V (Performance-Conscious → Clean Architecture Compliance)
+- Version change: 1.2.0 → 1.3.0 (added FrontendLog and BackendLog wrapper objects)
+- Modified principles: Principle III (Simplified Logging Approach - updated with wrapper objects)
 - Added sections: None
-- Removed sections: tasks.md template and references
+- Removed sections: None
 - Templates requiring updates: ✅ plan-template.md, ✅ spec-template.md
 - Follow-up TODOs: None
 -->
@@ -20,9 +20,9 @@ All development MUST follow Domain-Driven Design and Hexagonal Architecture patt
 
 Comprehensive testing is NON-NEGOTIABLE and MUST precede implementation. Unit tests with Jest for business logic and services, and integration tests for API contracts. All tests MUST be written before implementation, must fail initially, and only pass when correct functionality is implemented.
 
-### III. Production-Grade Observability
+### III. Simplified Logging Approach
 
-Enhanced logging system MUST be used throughout all application layers - NO console.log, console.error, console.warn, or console.debug permitted. Structured logging with metadata, correlation IDs, and performance monitoring is mandatory. Server-side uses Logger with dependency injection, client-side uses useLogger hook. All operations MUST include appropriate log levels (DEBUG, INFO, WARN, ERROR) with specialized methods for API requests, security events, and performance measurement. This system is designed for single-instance deployments only.
+Simple console logging is implemented through FrontendLog and BackendLog wrapper objects throughout all application layers. FrontendLog provides client-side console logging with environment-based log level filtering (LOG_LEVEL: DEBUG, INFO, WARN, ERROR). BackendLog provides server-side console logging with the same filtering mechanism. Both wrappers implement log(), error(), warn(), debug(), startTimer(), and endTimer() methods. Server-side uses dependency injection for logging services, client-side uses React hooks. All operations include appropriate log levels for effective debugging and monitoring.
 
 ### IV. Security by Default
 
@@ -41,7 +41,7 @@ All development MUST maintain clean architecture principles with proper separati
 - **Authentication**: BetterAuth with Google OAuth provider
 - **Testing**: Jest for unit tests, Playwright for e2e tests with collection-based cleanup
 - **Architecture**: DDD with Hexagonal patterns, dependency injection with Tsyringe
-- **Logging**: Enhanced async logging system with structured JSON output and file rotation
+- **Logging**: FrontendLog and BackendLog wrapper objects with console logging and environment-based log level filtering
 
 ### Code Quality Standards
 
@@ -65,4 +65,4 @@ Every pull request MUST verify constitution compliance: architecture adherence, 
 
 This constitution supersedes all other development practices and guidelines. Amendments require documentation update, team approval, and migration plan for existing code. All development MUST reference this constitution for architectural decisions, testing requirements, security implementation, and clean architecture standards. Complex deviations from constitution MUST be justified with technical rationale and approved by team consensus. Use AGENTS.md for runtime development guidance and specific implementation patterns.
 
-**Version**: 1.1.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-01-17
+**Version**: 1.3.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-11-20

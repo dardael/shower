@@ -18,8 +18,6 @@ import type { IBetterAuthClientService } from '@/application/auth/services/IBett
 import type { IAuthorizeAdminAccess } from '@/application/auth/IAuthorizeAdminAccess';
 import type { ILogger } from '@/application/shared/ILogger';
 import { Logger } from '@/application/shared/Logger';
-import { FileLoggerAdapter } from '@/infrastructure/shared/adapters/FileLoggerAdapter';
-import { LogFormatterService } from '@/domain/shared/services/LogFormatterService';
 import { AdminAccessPolicy } from '@/domain/auth/value-objects/AdminAccessPolicy';
 import { AuthorizeAdminAccess } from '@/application/auth/AuthorizeAdminAccess';
 import { BetterAuthClientAdapter } from '@/infrastructure/auth/adapters/BetterAuthClientAdapter';
@@ -50,20 +48,14 @@ import { SocialNetworkValidationService } from '@/domain/settings/services/Socia
 import { SocialNetworkUrlNormalizationService } from '@/domain/settings/services/SocialNetworkUrlNormalizationService';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
 
-// Register simple logger to avoid circular dependencies
-container.register<ILogger>('ILogger', {
-  useFactory: () => {
-    const formatter = new LogFormatterService();
-    return new FileLoggerAdapter(formatter);
-  },
-});
-
 // Register unified logger
 container.register<Logger>('Logger', {
-  useFactory: () => {
-    const baseLogger = container.resolve<ILogger>('ILogger');
-    return new Logger(baseLogger);
-  },
+  useFactory: () => new Logger(),
+});
+
+// Register ILogger interface for backward compatibility
+container.register<ILogger>('ILogger', {
+  useFactory: () => container.resolve<Logger>('Logger'),
 });
 
 // Register auth services

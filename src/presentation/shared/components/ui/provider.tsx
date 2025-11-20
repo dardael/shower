@@ -10,33 +10,8 @@ import {
 } from '@/presentation/shared/DynamicThemeProvider';
 import { useEffect, useState } from 'react';
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
-import { Logger } from '@/application/shared/Logger';
-import { RemoteLoggerAdapter } from '@/infrastructure/shared/adapters/RemoteLoggerAdapter';
-import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext';
-
-// Type guard to check if the adapter is RemoteLoggerAdapter
-function isRemoteLoggerAdapter(
-  adapter: unknown
-): adapter is RemoteLoggerAdapter {
-  return adapter instanceof RemoteLoggerAdapter;
-}
-
-// Helper function to safely access the RemoteLoggerAdapter from Logger
-function getLoggerAdapter(logger: Logger): RemoteLoggerAdapter | null {
-  try {
-    // Access the private logger property through type assertion with unknown intermediate
-    const loggerAsUnknown = logger as unknown;
-    const loggerWithAdapter = loggerAsUnknown as { logger: unknown };
-    const adapter = loggerWithAdapter.logger;
-
-    if (isRemoteLoggerAdapter(adapter)) {
-      return adapter;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
+import { useLogger } from '@/presentation/shared/hooks/useLogger';
+import { FrontendLog } from '@/infrastructure/shared/services/FrontendLog';
 
 // Type definitions for webpack hot module replacement
 interface WebpackHot {
@@ -59,7 +34,7 @@ function DynamicChakraProvider({ children }: { children: React.ReactNode }) {
   return <ChakraProvider value={dynamicSystem}>{children}</ChakraProvider>;
 }
 
-async function getInitialThemeColor(logger: Logger): Promise<ThemeColorToken> {
+async function getInitialThemeColor(): Promise<ThemeColorToken> {
   try {
     const response = await fetch('/api/settings/theme-color', {
       cache: 'force-cache',
@@ -73,7 +48,9 @@ async function getInitialThemeColor(logger: Logger): Promise<ThemeColorToken> {
     const data = await response.json();
     return data.themeColor || 'blue';
   } catch (error) {
-    logger.warn('Failed to fetch initial theme color, using default', {
+    // Use FrontendLog for consistent logging
+    const frontendLog = new FrontendLog();
+    frontendLog.warn('Failed to fetch initial theme color, using default', {
       error: error instanceof Error ? error.message : 'Unknown error',
       fallbackColor: 'blue',
     });
@@ -83,17 +60,15 @@ async function getInitialThemeColor(logger: Logger): Promise<ThemeColorToken> {
 
 function ThemeProviderWithInitialColor({
   children,
-  logger,
 }: {
   children: React.ReactNode;
-  logger: Logger;
 }) {
   const [initialThemeColor, setInitialThemeColor] =
     useState<ThemeColorToken>('blue');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getInitialThemeColor(logger)
+    getInitialThemeColor()
       .then((color) => {
         setInitialThemeColor(color);
       })
@@ -102,7 +77,7 @@ function ThemeProviderWithInitialColor({
         setInitialThemeColor('blue');
       })
       .finally(() => setIsLoading(false));
-  }, [logger]);
+  }, []);
 
   if (isLoading) {
     // Show a minimal loading state to prevent visual flicker
@@ -124,84 +99,32 @@ function ThemeProviderWithInitialColor({
 }
 
 function ProviderWithLogger(props: ColorModeProviderProps) {
-  const [logger] = useState(
-    () => new Logger(RemoteLoggerAdapter.getInstance())
-  );
-
-  useEffect(() => {
-    // Cleanup RemoteLoggerAdapter when component unmounts
-    // This prevents memory leaks during development hot reloading
-    return () => {
-      const adapter = getLoggerAdapter(logger);
-      if (adapter && typeof adapter.cleanup === 'function') {
-        adapter.cleanup();
-      }
-    };
-  }, [logger]);
+  const logger = useLogger();
 
   // Development-specific cleanup for hot module reloading
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      // Add cleanup for hot module replacement
-      const handleHotReload = () => {
-        const adapter = getLoggerAdapter(logger);
-        if (adapter && typeof adapter.cleanup === 'function') {
-          adapter.cleanup();
-        }
-      };
-
-      // Memory leak detection in development
-      const checkMemoryLeaks = () => {
-        const adapter = getLoggerAdapter(logger);
-        if (adapter && typeof adapter.getQueueSize === 'function') {
-          // Check for potential memory leaks
-          const queueSize = adapter.getQueueSize();
-          if (queueSize && queueSize > 100) {
-            logger.warn(
-              `RemoteLogger: Large queue size detected (${queueSize}), potential memory leak`,
-              { queueSize, threshold: 100 }
-            );
-          }
-        }
-      };
-
       // Listen for hot module replacement events
       if (typeof window !== 'undefined') {
         const extendedWindow = window as ExtendedWindow;
         if (extendedWindow.__webpack_require__?.hot) {
+          const handleHotReload = () => {
+            logger.info('Hot module replacement triggered');
+          };
+
           extendedWindow.__webpack_require__.hot.addDisposeHandler(
             handleHotReload
           );
         }
       }
-
-      // Periodic memory leak check in development
-      const memoryCheckInterval = setInterval(checkMemoryLeaks, 30000); // Check every 30 seconds
-
-      return () => {
-        // Remove hot module replacement handler
-        if (typeof window !== 'undefined') {
-          const extendedWindow = window as ExtendedWindow;
-          if (extendedWindow.__webpack_require__?.hot?.removeDisposeHandler) {
-            extendedWindow.__webpack_require__.hot.removeDisposeHandler(
-              handleHotReload
-            );
-          }
-        }
-
-        // Clear memory check interval
-        clearInterval(memoryCheckInterval);
-      };
     }
   }, [logger]);
 
   return (
-    <LoggerProvider logger={logger}>
-      <ThemeProviderWithInitialColor logger={logger}>
-        <ColorModeProvider {...props} />
-        <Toaster />
-      </ThemeProviderWithInitialColor>
-    </LoggerProvider>
+    <ThemeProviderWithInitialColor>
+      <ColorModeProvider {...props} />
+      <Toaster />
+    </ThemeProviderWithInitialColor>
   );
 }
 

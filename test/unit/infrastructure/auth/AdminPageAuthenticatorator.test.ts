@@ -73,7 +73,11 @@ describe('AdminPageAuthenticatorator', () => {
       startTimer: jest.fn(),
       endTimer: jest.fn(),
       measure: jest.fn(),
-      getPerformanceMonitor: jest.fn(),
+      getPerformanceMonitor: jest.fn().mockReturnValue({
+        startTimer: jest.fn(),
+        endTimer: jest.fn(),
+        measure: jest.fn(),
+      }),
       getPerformanceStatistics: jest.fn(),
       setPerformanceThreshold: jest.fn(),
     } as unknown as jest.Mocked<Logger>;

@@ -100,7 +100,7 @@
 ### Quality Requirements
 
 - **QR-001**: System MUST implement comprehensive testing (unit, integration, e2e)
-- **QR-002**: System MUST use enhanced logging system (NO console methods permitted)
+- **QR-002**: System MUST use simple console logging with optional structured logging
 - **QR-003**: System MUST implement authentication/authorization for protected features
 - **QR-004**: System MUST follow clean architecture principles with proper separation of concerns
 
