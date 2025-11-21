@@ -14,13 +14,20 @@ export class GetSocialNetworks implements IGetSocialNetworks {
   ) {}
 
   async execute(): Promise<SocialNetwork[]> {
-    const socialNetworks = await this.repository.getAllSocialNetworks();
+    const existingNetworks = await this.repository.getAllSocialNetworks();
+    const allDefaults = this.factory.createAllDefaults();
 
-    // If no social networks exist, return defaults
-    if (socialNetworks.length === 0) {
-      return this.factory.createAllDefaults();
+    // If no social networks exist, return all defaults
+    if (existingNetworks.length === 0) {
+      return allDefaults;
     }
 
-    return socialNetworks;
+    // Merge existing data with defaults to ensure all types are present
+    return allDefaults.map((defaultNetwork) => {
+      const existing = existingNetworks.find(
+        (network) => network.type.value === defaultNetwork.type.value
+      );
+      return existing || defaultNetwork;
+    });
   }
 }
