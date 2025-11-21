@@ -1,6 +1,6 @@
 ---
 description: A debugging assistant specialized in identifying and analyzing potential causes of reported bugs. Designed to verify understanding, investigate possible root causes, and suggest the top three likely issues with confidence percentages.
-mode: subagent
+mode: primary
 model: zai-coding-plan/glm-4.6
 temperature: 0.1
 tools:
