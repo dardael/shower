@@ -14,6 +14,7 @@ import ImageManager from '@/presentation/shared/components/ImageManager/ImageMan
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
+import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
@@ -33,6 +34,8 @@ export default function WebsiteSettingsForm({
   const { showToast } = useToastNotifications();
   const [name, setName] = useState(initialName);
   const { themeColor, setThemeColor } = useDynamicTheme();
+  const { updateThemeColor: updateThemeColorWithCache } =
+    useThemeColorContext();
   const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
 
@@ -133,6 +136,8 @@ export default function WebsiteSettingsForm({
       if (response.ok) {
         showToast('Website settings updated successfully!', 'success');
         markAsClean();
+        // Refresh theme color to invalidate cache
+        await updateThemeColorWithCache(themeColor);
         await fetchWebsiteSettings();
       } else {
         showToast(data.error || 'Failed to update website name', 'error');
@@ -293,9 +298,14 @@ export default function WebsiteSettingsForm({
 
           <ThemeColorSelector
             selectedColor={themeColor}
-            onColorChange={(color) => {
-              setThemeColor(color);
-              updateFieldValue('themeColor', color);
+            onColorChange={async (color) => {
+              try {
+                await updateThemeColorWithCache(color);
+                setThemeColor(color);
+                updateFieldValue('themeColor', color);
+              } catch {
+                // Error is already handled by the hook
+              }
             }}
             disabled={loading}
           />

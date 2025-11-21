@@ -4,15 +4,14 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
 import { Toaster } from './toaster';
 import { createDynamicSystem } from '@/presentation/shared/theme';
-import {
-  DynamicThemeProvider,
-  useDynamicTheme,
-} from '@/presentation/shared/DynamicThemeProvider';
+import { DynamicThemeProvider } from '@/presentation/shared/DynamicThemeProvider';
+import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { useEffect, useState } from 'react';
-import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 import { Logger } from '@/application/shared/Logger';
 import { RemoteLoggerAdapter } from '@/infrastructure/shared/adapters/RemoteLoggerAdapter';
 import { LoggerProvider } from '@/presentation/shared/contexts/LoggerContext';
+import { ThemeColorProvider } from '@/presentation/shared/contexts/ThemeColorContext';
+import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
 // Type guard to check if the adapter is RemoteLoggerAdapter
 function isRemoteLoggerAdapter(
@@ -53,61 +52,39 @@ interface ExtendedWindow extends Window {
 }
 
 function DynamicChakraProvider({ children }: { children: React.ReactNode }) {
-  const { themeColor } = useDynamicTheme();
+  const { themeColor } = useThemeColorContext();
   const dynamicSystem = createDynamicSystem(themeColor);
 
   return <ChakraProvider value={dynamicSystem}>{children}</ChakraProvider>;
 }
 
-async function getInitialThemeColor(logger: Logger): Promise<ThemeColorToken> {
-  try {
-    const response = await fetch('/api/settings/theme-color', {
-      cache: 'force-cache',
-      next: { revalidate: 300 }, // Cache for 5 minutes
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.themeColor || 'blue';
-  } catch (error) {
-    logger.warn('Failed to fetch initial theme color, using default', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      fallbackColor: 'blue',
-    });
-    return 'blue';
-  }
-}
-
 function ThemeProviderWithInitialColor({
   children,
-  logger,
 }: {
   children: React.ReactNode;
-  logger: Logger;
 }) {
-  const [initialThemeColor, setInitialThemeColor] =
-    useState<ThemeColorToken>('blue');
-  const [isLoading, setIsLoading] = useState(true);
+  return (
+    <ThemeColorProvider>
+      <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+    </ThemeColorProvider>
+  );
+}
 
-  useEffect(() => {
-    getInitialThemeColor(logger)
-      .then((color) => {
-        setInitialThemeColor(color);
-      })
-      .catch(() => {
-        // Error already logged in getInitialThemeColor, but ensure fallback
-        setInitialThemeColor('blue');
-      })
-      .finally(() => setIsLoading(false));
-  }, [logger]);
+function ThemeProviderWrapper({ children }: { children: React.ReactNode }) {
+  const { isLoading } = useThemeColorContext();
 
   if (isLoading) {
     // Show a minimal loading state to prevent visual flicker
+    // Get stored theme color to avoid blue flash
+    if (typeof window !== 'undefined') {
+      void (
+        (localStorage.getItem('shower-theme-color') as ThemeColorToken) ||
+        'blue'
+      );
+    }
+
     return (
-      <DynamicThemeProvider initialThemeColor="blue">
+      <DynamicThemeProvider>
         <DynamicChakraProvider>
           <div style={{ opacity: 0 }} />
         </DynamicChakraProvider>
@@ -117,7 +94,7 @@ function ThemeProviderWithInitialColor({
 
   // If there was an error fetching theme color, still render with fallback
   return (
-    <DynamicThemeProvider initialThemeColor={initialThemeColor}>
+    <DynamicThemeProvider>
       <DynamicChakraProvider>{children}</DynamicChakraProvider>
     </DynamicThemeProvider>
   );
@@ -197,7 +174,7 @@ function ProviderWithLogger(props: ColorModeProviderProps) {
 
   return (
     <LoggerProvider logger={logger}>
-      <ThemeProviderWithInitialColor logger={logger}>
+      <ThemeProviderWithInitialColor>
         <ColorModeProvider {...props} />
         <Toaster />
       </ThemeProviderWithInitialColor>

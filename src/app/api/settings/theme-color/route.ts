@@ -190,7 +190,10 @@ export const POST = withApi(
       };
       return NextResponse.json(response, {
         headers: {
-          'Cache-Control': 'no-cache, must-revalidate',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+          Expires: '0',
+          'X-Cache-Invalidate': 'theme-color',
         },
       });
     } catch (error) {

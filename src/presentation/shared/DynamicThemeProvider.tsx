@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
+import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 
 interface DynamicThemeContextType {
   themeColor: ThemeColorToken;
@@ -14,15 +15,13 @@ const DynamicThemeContext = createContext<DynamicThemeContextType | undefined>(
 
 interface DynamicThemeProviderProps {
   children: ReactNode;
-  initialThemeColor: ThemeColorToken;
+  initialThemeColor?: ThemeColorToken;
 }
 
 export function DynamicThemeProvider({
   children,
-  initialThemeColor,
-}: DynamicThemeProviderProps) {
-  const [themeColor, setThemeColor] =
-    useState<ThemeColorToken>(initialThemeColor);
+}: Omit<DynamicThemeProviderProps, 'initialThemeColor'>) {
+  const { themeColor, setThemeColor } = useThemeColorContext();
 
   const value: DynamicThemeContextType = {
     themeColor,
