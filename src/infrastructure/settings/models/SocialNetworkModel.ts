@@ -16,7 +16,9 @@ export const SocialNetworkSchema = new Schema<ISocialNetwork>(
     },
     url: {
       type: String,
-      required: true,
+      required: function (this: ISocialNetwork) {
+        return this.enabled; // Only required when enabled is true
+      },
       default: '',
       validate: {
         validator: function (this: ISocialNetwork, value: string) {
