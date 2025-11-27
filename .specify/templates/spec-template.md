@@ -88,26 +88,18 @@
 - **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events using enhanced logging system"]
-
-### Architecture Requirements
-
-- **AR-001**: System MUST follow Domain-Driven Design with clear domain boundaries
-- **AR-002**: System MUST implement Hexagonal Architecture with proper layer separation
-- **AR-003**: Dependencies MUST flow inward only (Presentation → Application → Domain → Infrastructure)
-- **AR-004**: System MUST use dependency injection for loose coupling
-
-### Quality Requirements
-
-- **QR-001**: System MUST implement comprehensive testing (unit, integration, e2e)
-- **QR-002**: System MUST use simple console logging with optional structured logging
-- **QR-003**: System MUST implement authentication/authorization for protected features
-- **QR-004**: System MUST follow clean architecture principles with proper separation of concerns
+- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-006**: System MUST ensure proper contrast ratios for text and UI elements in both light and dark modes
+- **FR-007**: UI components MUST be tested for readability across all supported themes
+- **FR-008**: Theme color specified in admin dashboard MUST be used consistently throughout frontend when color customization is needed
+- **FR-009**: Code MUST implement only strict minimum required for current feature (YAGNI principle)
+- **FR-010**: Code MUST avoid duplication through reusable functions and components (DRY principle)
+- **FR-011**: Code MUST be simple, readable, and clear with straightforward implementations (KISS principle)
 
 _Example of marking unclear requirements:_
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-012**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-013**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities _(include if feature involves data)_
 

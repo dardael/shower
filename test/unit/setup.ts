@@ -10,37 +10,28 @@ process.setMaxListeners(50);
 
 // Suppress React act() warnings for renderHook async operations
 const originalError = console.error;
+const suppressedPatterns = [
+  'was not wrapped in act',
+  'not configured to support act',
+  'wrap-tests-with-act',
+  'should be wrapped into act',
+  'cannot be a child of',
+  'hydration error',
+  'does not recognize',
+  'on a DOM element',
+  'appear in DOM as a custom attribute',
+  'spell it as lowercase',
+  'passed it from a parent component',
+  'not valid as a React child',
+  'Theme toggle failed:',
+];
+
 beforeAll(() => {
   console.error = (...args: unknown[]) => {
-    // Convert all args to string for checking
-    const fullMessage = args.map((arg) => String(arg)).join(' ');
-
-    // Suppress act() warnings that are known false positives in renderHook tests
-    if (
-      fullMessage.includes(
-        'An update to TestComponent inside a test was not wrapped in act'
-      ) ||
-      fullMessage.includes(
-        'The current testing environment is not configured to support act'
-      ) ||
-      fullMessage.includes('wrap-tests-with-act') ||
-      fullMessage.includes(
-        'When testing, code that causes React state updates should be wrapped into act'
-      ) ||
-      fullMessage.includes('In HTML, <html> cannot be a child of <div>') ||
-      fullMessage.includes('This will cause a hydration error') ||
-      fullMessage.includes('React does not recognize that') ||
-      fullMessage.includes('on a DOM element') ||
-      fullMessage.includes(
-        'If you intentionally want it to appear in DOM as a custom attribute'
-      ) ||
-      fullMessage.includes('spell it as lowercase') ||
-      fullMessage.includes('accidentally passed it from a parent component') ||
-      fullMessage.includes('Functions are not valid as a React child')
-    ) {
+    const message = args.map((arg) => String(arg)).join(' ');
+    if (suppressedPatterns.some((pattern) => message.includes(pattern))) {
       return;
     }
-
     originalError.call(console, ...args);
   };
 });
@@ -314,6 +305,35 @@ jest.mock('@/presentation/shared/components/ui/provider', () => ({
 jest.mock('@/presentation/shared/DynamicThemeProvider', () => ({
   DynamicThemeProvider: ({ children }: ComponentProps) => children,
   useDynamicTheme: () => ({ themeColor: 'blue' }),
+}));
+
+// Track color mode state for the mock - can be modified by tests
+let mockColorModeState = 'light';
+
+// Export for tests to modify
+export const setMockColorMode = (mode: string) => {
+  mockColorModeState = mode;
+};
+
+export const resetMockColorMode = () => {
+  mockColorModeState = 'light';
+};
+
+// Mock color-mode hook with reactive state
+jest.mock('@/presentation/shared/components/ui/color-mode', () => ({
+  useColorMode: () => ({
+    colorMode: mockColorModeState,
+    setColorMode: (mode: string) => {
+      mockColorModeState = mode;
+    },
+    toggleColorMode: () => {
+      mockColorModeState = mockColorModeState === 'dark' ? 'light' : 'dark';
+    },
+  }),
+  useColorModeValue: <T>(light: T, dark: T) =>
+    mockColorModeState === 'dark' ? dark : light,
+  ColorModeButton: () => null,
+  ColorModeProvider: ({ children }: ComponentProps) => children,
 }));
 
 // Mock next/navigation

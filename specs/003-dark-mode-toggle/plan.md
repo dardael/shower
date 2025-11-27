@@ -18,7 +18,7 @@ Implement a dark mode toggle button in the admin panel menu using Chakra UI v3's
 **Target Platform**: Web browser (admin interface only)  
 **Project Type**: Web application with DDD architecture  
 **Performance Goals**: Theme switching within 1 second, immediate visual feedback  
-**Constraints**: Admin-only functionality, localStorage dependency, browser compatibility  
+**Constraints**: Admin-only functionality, localStorage dependency, browser compatibility (Chrome, Firefox, Safari, Edge latest versions)  
 **Scale/Scope**: Single admin interface component with theme persistence
 
 ## Constitution Check
@@ -77,12 +77,13 @@ src/
 │       │   └── ui/
 │       ├── contexts/
 │       │   └── ThemeContext.tsx  # NEW: Theme context
+│       │   └── DynamicThemeProvider.tsx  # NEW: Dynamic theme provider
 │       └── hooks/
 │           └── useLogger.ts
 ├── domain/               # Domain Layer (entities, business rules)
 │   └── settings/
 │       ├── entities/
-│       │   └── ThemePreference.ts  # NEW: Theme preference entity
+│       │       └── BrowserThemePreference.ts  # NEW: Browser theme preference entity
 │       ├── value-objects/
 │       │   └── ThemeMode.ts        # NEW: Theme mode value object
 │       └── services/
@@ -107,7 +108,7 @@ test/                     # Test Layer
 │   ├── domain/
 │   │   └── settings/
 │   │       └── entities/
-│   │           └── ThemePreference.test.ts   # NEW: Entity tests
+│   │           └── BrowserThemePreference.test.ts   # NEW: Entity tests
 │   └── application/
 │       └── settings/
 │           └── LocalStorageThemeService.test.ts  # NEW: Service tests
@@ -121,7 +122,7 @@ test/                     # Test Layer
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
-| -------------------------- | ------------------ | ------------------------------------ |
-| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
+| Violation                                                                                                             | Why Needed                                                                                                                     | Simpler Alternative Rejected Because |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| localStorage storage requirement                                                                                      | Theme preferences are user-specific, browser-local settings that don't need server persistence or cross-device synchronization |
+| localStorage provides instant access, no server overhead, and aligns with user expectation of per-browser preferences |

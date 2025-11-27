@@ -31,8 +31,9 @@ Key technologies:
 
 - **Authentication**: BetterAuth with Google OAuth
 - **Dependency Injection**: Tsyringe
-- **Styling**: Chakra UI
-- **Logging**: Simple console logging with environment-based log level filtering
+- **Styling**: Chakra UI v3 with dark mode support
+- **Theme Management**: Browser localStorage persistence with system preference detection
+- **Logging**: Enhanced logging system with performance monitoring
 - **Testing**: Jest for unit tests
 
 ## Project Structure
@@ -51,6 +52,26 @@ shower/
 ├── logs/                # Generated log files
 └── public/              # Static assets
 ```
+
+## Dark Mode Feature
+
+The admin interface includes a dark mode toggle that allows users to switch between light and dark themes:
+
+### Features
+
+- **Automatic Theme Detection**: Detects browser/system theme preference on first access
+- **Manual Toggle**: Click the moon/sun icon in the admin sidebar to switch themes
+- **Persistent Storage**: Theme preference is saved in browser localStorage across sessions
+- **Performance Optimized**: Theme switching completes within 100ms with performance monitoring
+- **Accessibility**: Full WCAG 2.1 AA compliance with keyboard navigation and screen reader support
+- **Admin Only**: Theme functionality is limited to admin interface, public pages remain unaffected
+
+### Usage
+
+1. Access the admin panel at `/admin`
+2. Look for the theme toggle button (moon/sun icon) in the sidebar header
+3. Click to toggle between light and dark modes
+4. Theme preference is automatically saved and persists across browser sessions
 
 ## Admin Access Setup
 

@@ -14,7 +14,9 @@ Implement a feature based on a detailed plan derived from a user story.
 
 # Rules
 
-- Respect YAGNI principle: "You Ain't Gonna Need It".
+- Respect YAGNI principle: "You Aren't Gonna Need It".
+- Respect DRY principle: "Don't Repeat Yourself".
+- Respect KISS principle: "Keep It Simple, Stupid".
 - Do not create more functionality beyond the plan provided and the user story.
 
 # MCP

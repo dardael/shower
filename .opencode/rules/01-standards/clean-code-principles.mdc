@@ -71,6 +71,20 @@ Sub rule 9: Code Duplication (DRY)
 - Avoid copy-pasting code; refactor instead
 - Use constants for repeated values
 
+Sub rule 10: YAGNI (You Aren't Gonna Need It)
+- Implement only strict minimum required for current feature requirements
+- No functionality based on speculative future needs or potential use cases
+- Focus on delivering value now rather than anticipating future requirements
+- Prevent over-engineering and unnecessary abstractions
+- Maintain code simplicity by avoiding features that may never be used
+
+Sub rule 11: KISS (Keep It Simple, Stupid)
+- Write simple, readable, and clear code with straightforward implementations
+- Avoid complex solutions in favor of simpler approaches that meet requirements
+- Ensure code structure is immediately understandable by other developers
+- Minimize cognitive load and reduce likelihood of introducing bugs
+- Prioritize simplicity over unnecessary complexity
+
 Sub rule 10: Readability and Formatting
 - Follow consistent formatting (use Prettier)
 - Use meaningful whitespace to improve readability

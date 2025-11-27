@@ -14,6 +14,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { AdminMenuItem } from '@/presentation/admin/components/AdminMenuItem';
 import { FocusTrap } from '@/presentation/shared/utils/focusTrap';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
+import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 
 export interface AdminSidebarProps {
   isOpen: boolean;
@@ -111,18 +112,21 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         >
           Admin Panel
         </Text>
-        {isMobile && (
-          <IconButton
-            aria-label="Close sidebar"
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            color="fg.muted"
-            _hover={{ bg: 'bg.muted', color: 'fg' }}
-          >
-            <FiX size={18} />
-          </IconButton>
-        )}
+        <HStack gap={2}>
+          <DarkModeToggle size="sm" />
+          {isMobile && (
+            <IconButton
+              aria-label="Close sidebar"
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              color="fg.muted"
+              _hover={{ bg: 'bg.muted', color: 'fg' }}
+            >
+              <FiX size={18} />
+            </IconButton>
+          )}
+        </HStack>
       </HStack>
 
       {/* Navigation Menu */}

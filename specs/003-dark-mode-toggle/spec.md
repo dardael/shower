@@ -15,6 +15,16 @@
 - Q: How should the disabled toggle appear visually? → A: Gray with Tooltip - Visually disabled with hover tooltip explaining why
 - Q: What takes priority for initial theme detection? → A: Browser Preference Only - Ignore OS setting, use browser's preferred color scheme
 
+### Session 2025-11-24
+
+- Q: How should QR-002 align with Principle III's logging approach? → A: Allow FrontendLog/BackendLog wrapper objects per constitution, prohibiting only direct console method calls
+- Q: What is the correct performance metric for theme switching? → A: 1 second - Confirmed as the target for SC-001 and T041 task
+- Q: How should persistence requirements be consolidated to eliminate duplication? → A: Merge FR-004, FR-005, FR-006 into single comprehensive requirement covering localStorage persistence, application on subsequent visits, and session maintenance
+- Q: How should User Story overlap be resolved to eliminate duplication? → A: Remove persistence acceptance criteria from User Story 2, keep User Story 3 focused entirely on persistence
+- Q: What specific visual indication should the toggle button provide? → A: Use sun icon for light mode, moon icon for dark mode on toggle button
+- Q: Should cross-tab synchronization be included in requirements? → A: No cross-tab sync required (each tab independent)
+- Q: Which terminology should be standardized for theme preference entity? → A: Use "BrowserThemePreference" throughout all artifacts (more descriptive)
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Initial Theme Detection (Priority: P1)
@@ -43,9 +53,8 @@ As an admin user, I want to toggle between light and dark modes using a button i
 
 **Acceptance Scenarios**:
 
-1. **Given** the admin panel is in light mode, **When** I click the dark mode toggle button, **Then** the interface immediately switches to dark mode
-2. **Given** the admin panel is in dark mode, **When** I click the dark mode toggle button, **Then** the interface immediately switches to light mode
-3. **Given** I have toggled to dark mode, **When** I refresh the page, **Then** the dark mode persists
+1. **Given** admin panel is in light mode, **When** I click dark mode toggle button, **Then** the interface immediately switches to dark mode
+2. **Given** admin panel is in dark mode, **When** I click the dark mode toggle button, **Then** the interface immediately switches to light mode
 
 ---
 
@@ -68,9 +77,10 @@ As an admin user, I want my theme preference to be saved in the current browser 
 ### Edge Cases
 
 - What happens when the user's browser theme changes while they have a saved preference? (Resolved: Saved preference takes priority)
-- How does the system handle users who have disabled JavaScript in their browser?
-- What happens when localStorage is unavailable or disabled?
+- How does the system handle users who have disabled JavaScript in their browser? (Resolved: Default to light mode with no theme toggle functionality)
+- What happens when localStorage quota is exceeded? (Resolved: Clear theme preference data and default to browser preference with user notification)
 - How should the toggle button appear when disabled? (Resolved: Gray with tooltip)
+- What happens when localStorage is unavailable or disabled? (Resolved: Gracefully degrade with disabled toggle and explanatory tooltip)
 
 ## Requirements _(mandatory)_
 
@@ -78,14 +88,16 @@ As an admin user, I want my theme preference to be saved in the current browser 
 
 - **FR-001**: System MUST detect user's browser theme preference on first access (ignoring OS setting)
 - **FR-002**: System MUST provide a toggle button in the admin panel menu horizontally aligned with "Admin Panel" label
-- **FR-008**: System MUST apply theme only to admin panel interface, not public-facing pages
-- **FR-003**: System MUST immediately switch between light and dark themes when the toggle button is clicked
-- **FR-004**: System MUST persist user's theme preference in browser localStorage
-- **FR-005**: System MUST apply saved theme preference on subsequent admin panel accesses
-- **FR-006**: System MUST maintain theme state across page refreshes within the same session
-- **FR-007**: System MUST provide visual indication of current theme mode on the toggle button
-- **FR-009**: System MUST disable theme toggle when localStorage is unavailable and show visual indication
-- **FR-010**: System MUST display tooltip explaining storage limitation when toggle is disabled
+- **FR-003**: System MUST switch between light and dark themes within 1 second when the toggle button is clicked (timing measured as immediately perceptible to the user)
+- **FR-004**: System MUST persist user's theme preference in the browser's local storage when changed, apply it across page refreshes within the same browser session, and apply it when user returns to admin panel in subsequent browser sessions
+- **FR-005**: System MUST provide visual indication of current theme mode on the toggle button using sun icon for light mode and moon icon for dark mode
+- **FR-006**: System MUST disable theme toggle when localStorage is unavailable, show visual indication with gray opacity and disabled cursor, and display tooltip with message "Theme preferences unavailable: Local storage is disabled in your browser"
+- **FR-007**: System MUST apply theme only to admin panel interface, not public-facing pages
+- **FR-008**: System MUST handle browser storage unavailability gracefully by logging warning appropriately and defaulting to browser preference without interrupting user experience
+- **FR-009**: System MUST provide accessible theme toggle that is usable by people with disabilities, including keyboard navigation, screen reader compatibility, and clear visual indicators
+- **FR-010**: System MUST handle browser storage quota exceeded by clearing existing theme preference data, logging error appropriately, defaulting to browser preference, and displaying user notification about storage quota issue
+- **FR-011**: System MUST NOT synchronize theme preferences across browser tabs (each tab operates independently)
+- **FR-012**: System MUST support theme functionality across modern browsers
 
 ### Architecture Requirements
 
@@ -97,21 +109,22 @@ As an admin user, I want my theme preference to be saved in the current browser 
 ### Quality Requirements
 
 - **QR-001**: System MUST implement comprehensive testing
-- **QR-002**: System MUST use enhanced logging system (NO console methods permitted)
+- **QR-002**: System MUST use appropriate error logging for all operations (NO direct console method calls permitted)
 - **QR-003**: System MUST implement authentication/authorization for protected features
 - **QR-004**: System MUST follow clean architecture principles with proper separation of concerns
 
 ### Key Entities
 
-- **BrowserThemePreference**: Represents a browser-stored theme preference with attributes for theme mode (light/dark) stored in localStorage
-- **ThemeMode**: Value object representing the available theme modes (light, dark, system)
+- **BrowserThemePreference**: Represents a browser-stored theme preference with attributes for theme mode (light/dark) stored in localStorage (canonical term across all artifacts)
+- **ThemeMode**: Value object representing the available theme modes (light, dark)
+- **StorageKey**: Value object representing the localStorage key used for theme persistence
 
 ## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of admin users can toggle between themes within 1 second of clicking the button
+- **SC-001**: 100% of admin users can toggle between themes within 1 second of clicking the button (timing measured as immediately perceptible to the user)
 - **SC-002**: 95% of users have their theme preference correctly applied on return visits
-- **SC-003**: Theme toggle button is visually accessible and discoverable by 90% of new admin users within 30 seconds
-- **SC-004**: Zero theme-related errors or visual inconsistencies across all supported browsers
+- **SC-003**: Theme toggle button is accessible to users with disabilities and is discoverable by 90% of new admin users within 30 seconds
+- **SC-004**: Zero theme-related JavaScript errors or visual inconsistencies across all supported browsers (Chrome, Firefox, Safari, Edge latest versions)
 - **SC-005**: Theme preference persistence works for 100% of users across browser sessions in the same browser

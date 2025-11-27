@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report:
-- Version change: 1.2.0 → 1.3.0 (added FrontendLog and BackendLog wrapper objects)
-- Modified principles: Principle III (Simplified Logging Approach - updated with wrapper objects)
-- Added sections: None
+- Version change: 1.6.1 → 1.7.0 (added YAGNI, DRY, KISS principles for minimal code implementation)
+- Modified principles: None
+- Added sections: Principle VII (YAGNI), Principle VIII (DRY), Principle IX (KISS)
 - Removed sections: None
-- Templates requiring updates: ✅ plan-template.md, ✅ spec-template.md
+- Templates requiring updates: ✅ plan-template.md, ✅ spec-template.md, ✅ tasks-template.md
 - Follow-up TODOs: None
 -->
 
@@ -16,13 +16,13 @@ Sync Impact Report:
 
 All development MUST follow Domain-Driven Design and Hexagonal Architecture patterns with strict layer separation. Domain layer contains business logic and entities, Application layer handles use cases, Infrastructure layer manages external dependencies, and Presentation layer contains UI components. Cross-layer dependencies MUST flow inward only (Presentation → Application → Domain → Infrastructure). This architecture ensures maintainability, testability, and scalability while preventing architectural drift.
 
-### II. Test-Driven Quality
+### II. Focused Testing Approach
 
-Comprehensive testing is NON-NEGOTIABLE and MUST precede implementation. Unit tests with Jest for business logic and services, and integration tests for API contracts. All tests MUST be written before implementation, must fail initially, and only pass when correct functionality is implemented.
+Testing MUST be limited to unit tests and integration tests ONLY when explicitly requested. Unit tests cover individual components and functions in isolation, integration tests verify component interactions and data flow. Tests MUST focus on common cases and typical user scenarios, avoiding edge case over-testing. Over-mocking is prohibited - use real implementations whenever possible and only mock external dependencies (API calls, database, file system). Tests are written ONLY when specifically asked for in feature requirements, with emphasis on maintainability and avoiding test brittleness.
 
-### III. Simplified Logging Approach
+### III. Simplicity-First Implementation
 
-Simple console logging is implemented through FrontendLog and BackendLog wrapper objects throughout all application layers. FrontendLog provides client-side console logging with environment-based log level filtering (LOG_LEVEL: DEBUG, INFO, WARN, ERROR). BackendLog provides server-side console logging with the same filtering mechanism. Both wrappers implement log(), error(), warn(), debug(), startTimer(), and endTimer() methods. Server-side uses dependency injection for logging services, client-side uses React hooks. All operations include appropriate log levels for effective debugging and monitoring.
+Performance monitoring MUST NOT be included in final production code to maintain simplicity and reduce complexity. Performance monitoring may be used temporarily during feature development for optimization purposes, but MUST be removed before code completion. All production code should prioritize readability, maintainability, and simplicity over performance measurement and monitoring capabilities. This ensures clean, focused codebases that are easier to understand and maintain.
 
 ### IV. Security by Default
 
@@ -32,6 +32,22 @@ All admin functionality MUST be protected by authentication and authorization. G
 
 All development MUST maintain clean architecture principles with proper separation of concerns, dependency injection, and SOLID principles. Domain layer contains business logic, Application layer handles use cases, Infrastructure layer manages external dependencies, and Presentation layer contains UI components. Cross-layer dependencies MUST flow inward only, interfaces MUST be properly segregated, and code MUST remain testable and maintainable. This ensures long-term sustainability and prevents technical debt accumulation.
 
+### VI. Accessibility-First Design
+
+All frontend components MUST ensure proper contrast ratios for both light and dark modes to maintain readability and accessibility. Text MUST never match its background color (e.g., white text on white background, black text on black background). Design decisions MUST prioritize contrast compliance using semantic color tokens (bg="bg.subtle", color="fg") and theme-aware styling. Components MUST be tested in both light and dark themes to ensure text remains legible and interactive elements remain visible. The theme color specified in admin dashboard settings MUST be used consistently throughout the frontend when color customization is needed, ensuring visual cohesion and brand consistency across the application. This ensures inclusive design, prevents usability issues, and maintains professional appearance across different theme preferences.
+
+### VII. YAGNI (You Aren't Gonna Need It)
+
+Code MUST implement only the strict minimum required for current feature requirements. No functionality should be added based on speculative future needs or potential use cases. Development MUST focus on delivering value now rather than anticipating future requirements. This prevents over-engineering, reduces complexity, and maintains code simplicity by avoiding unnecessary abstractions and features that may never be used.
+
+### VIII. DRY (Don't Repeat Yourself)
+
+Code MUST avoid duplication by extracting common logic into reusable functions, components, or utilities. Repeated code patterns MUST be refactored into shared abstractions. Data structures and business logic MUST be centralized to prevent inconsistencies. This ensures maintainability, reduces bugs from inconsistent updates, and creates a single source of truth for each piece of functionality.
+
+### IX. KISS (Keep It Simple, Stupid)
+
+Code MUST be simple, readable, and clear with straightforward implementations. Complex solutions MUST be avoided in favor of simpler approaches that meet requirements. Code structure MUST be immediately understandable by other developers without extensive documentation. This ensures maintainability, reduces cognitive load, and minimizes the likelihood of introducing bugs through unnecessary complexity.
+
 ## Development Standards
 
 ### Technology Stack Requirements
@@ -39,7 +55,7 @@ All development MUST maintain clean architecture principles with proper separati
 - **Frontend**: Next.js 15 with App Router, TypeScript strict mode, Chakra UI v3 for components
 - **Backend**: Next.js API routes with MongoDB for data persistence
 - **Authentication**: BetterAuth with Google OAuth provider
-- **Testing**: Jest for unit tests, Playwright for e2e tests with collection-based cleanup
+- **Testing**: Jest for unit tests and integration tests (only when explicitly requested)
 - **Architecture**: DDD with Hexagonal patterns, dependency injection with Tsyringe
 - **Logging**: FrontendLog and BackendLog wrapper objects with console logging and environment-based log level filtering
 
@@ -55,14 +71,14 @@ All development MUST maintain clean architecture principles with proper separati
 
 ### Development Workflow Requirements
 
-All development MUST follow established workflow: feature branch creation, comprehensive testing, linting/formatting validation, and successful build before merge. Pre-commit hooks enforce code quality, pre-push hooks validate test coverage and build success.
+All development MUST follow established workflow: feature branch creation, focused testing (unit and integration tests only when explicitly asked), linting/formatting validation, and successful build before merge. Pre-commit hooks enforce code quality, pre-push hooks validate build success and test execution when tests are present.
 
 ### Review and Compliance Requirements
 
-Every pull request MUST verify constitution compliance: architecture adherence, test coverage, logging implementation, security controls, and clean architecture principles. Code reviews MUST validate layer separation, dependency direction, and proper use of dependency injection. Security reviews MUST ensure authentication/authorization implementation and absence of sensitive data exposure. Architecture reviews MUST validate SOLID principles and proper separation of concerns.
+Every pull request MUST verify constitution compliance: architecture adherence, focused testing approach (unit/integration only when asked, avoid over-mocking), simplicity-first implementation (no performance monitoring in final code), accessibility-first design (proper contrast for light/dark modes, consistent theme color usage), YAGNI (minimal implementation for current requirements only), DRY (no code duplication), KISS (simple, readable code), logging implementation, security controls, and clean architecture principles. Code reviews MUST validate layer separation, dependency direction, proper use of dependency injection, absence of performance monitoring code, contrast compliance for theme support, consistent use of admin-configured theme colors, minimal feature implementation, absence of code duplication, and code simplicity. Security reviews MUST ensure authentication/authorization implementation and absence of sensitive data exposure. Architecture reviews MUST validate SOLID principles and proper separation of concerns.
 
 ## Governance
 
-This constitution supersedes all other development practices and guidelines. Amendments require documentation update, team approval, and migration plan for existing code. All development MUST reference this constitution for architectural decisions, testing requirements, security implementation, and clean architecture standards. Complex deviations from constitution MUST be justified with technical rationale and approved by team consensus. Use AGENTS.md for runtime development guidance and specific implementation patterns.
+This constitution supersedes all other development practices and guidelines. Amendments require documentation update, team approval, and migration plan for existing code. All development MUST reference this constitution for architectural decisions, testing requirements, simplicity-first implementation, accessibility-first design, YAGNI, DRY, KISS principles, security implementation, and clean architecture standards. Complex deviations from constitution MUST be justified with technical rationale and approved by team consensus. Use AGENTS.md for runtime development guidance and specific implementation patterns.
 
-**Version**: 1.3.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-11-20
+**Version**: 1.7.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-11-27
