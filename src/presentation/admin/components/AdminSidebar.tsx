@@ -15,6 +15,7 @@ import { AdminMenuItem } from '@/presentation/admin/components/AdminMenuItem';
 import { FocusTrap } from '@/presentation/shared/utils/focusTrap';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
+import LogoutButton from '@/presentation/shared/components/LogoutButton';
 
 export interface AdminSidebarProps {
   isOpen: boolean;
@@ -113,6 +114,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           Admin Panel
         </Text>
         <HStack gap={2}>
+          <LogoutButton />
           <DarkModeToggle size="sm" />
           {isMobile && (
             <IconButton

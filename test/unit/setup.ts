@@ -118,6 +118,9 @@ const chakraStyleProps = [
   'flex',
   'w',
   'h',
+  'loading',
+  'colorPalette',
+  'boxSize',
 
   'asChild',
 ];
@@ -160,6 +163,12 @@ jest.mock('@chakra-ui/react', () => {
     defineConfig: jest.fn(() => ({})),
     createSystem: jest.fn(() => ({})),
     ChakraProvider: ({ children }: ComponentProps) => children,
+    ClientOnly: ({ children }: ComponentProps) => children,
+    Skeleton: ({ ...props }: ComponentProps) =>
+      React.createElement('div', {
+        'data-testid': 'skeleton',
+        ...filterChakraProps(props),
+      }),
     IconButton: ({ children, ...props }: ComponentProps) => {
       return React.createElement('button', filterChakraProps(props), children);
     },

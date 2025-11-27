@@ -213,6 +213,9 @@ you must use docker compose to run all commands in order to have the same enviro
 
 ## Active Technologies
 
+- TypeScript 5.0+ with Next.js 15 + React 18, Chakra UI v3, BetterAuth, react-icons (004-logout-button)
+- MongoDB (for session management via BetterAuth) (004-logout-button)
+
 - Browser localStorage for theme persistence (003-dark-mode-toggle)
 
 - TypeScript 5.0+ with Next.js 15 + Next.js 15, React 18, Chakra UI v3, MongoDB (002-simplify-logging)
