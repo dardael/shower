@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
+import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import { PublicHeaderMenuItem } from './PublicHeaderMenuItem';
 import type { PublicHeaderMenuProps } from './types';
 
@@ -29,10 +30,18 @@ export function PublicHeaderMenu({
         role="banner"
         aria-label="Site header"
       >
-        <Flex justify="center" align="center" maxW="container.xl" mx="auto">
+        <Flex
+          justify="space-between"
+          align="center"
+          maxW="container.xl"
+          mx="auto"
+        >
           <Text color="fg.muted" fontSize="sm">
             No menu items configured yet
           </Text>
+          <Box>
+            <DarkModeToggle size="sm" variant="ghost" />
+          </Box>
         </Flex>
       </Box>
     );
@@ -53,21 +62,28 @@ export function PublicHeaderMenu({
       aria-label="Site header"
     >
       <Flex
-        as="nav"
-        justify="center"
+        justify="space-between"
         align="center"
-        gap={{ base: 2, md: 4 }}
         maxW="container.xl"
         mx="auto"
-        flexWrap="wrap"
-        role="navigation"
-        aria-label="Main navigation"
       >
-        {menuItems.map((item) => (
-          <Box key={item.id} color="colorPalette.contrast">
-            <PublicHeaderMenuItem text={item.text} />
-          </Box>
-        ))}
+        <Flex
+          as="nav"
+          align="center"
+          gap={{ base: 2, md: 4 }}
+          flexWrap="wrap"
+          role="navigation"
+          aria-label="Main navigation"
+        >
+          {menuItems.map((item) => (
+            <Box key={item.id} color={{ base: 'black', _dark: 'white' }}>
+              <PublicHeaderMenuItem text={item.text} />
+            </Box>
+          ))}
+        </Flex>
+        <Box color={{ base: 'black', _dark: 'white' }}>
+          <DarkModeToggle size="sm" variant="ghost" />
+        </Box>
       </Flex>
     </Box>
   );

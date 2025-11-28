@@ -266,6 +266,8 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+- TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, next-themes (existing) (007-public-dark-mode)
+- Browser localStorage (existing theme persistence via next-themes) (007-public-dark-mode)
 
 - MongoDB via Mongoose (existing MenuItemModel) (006-public-header-menu)
 
