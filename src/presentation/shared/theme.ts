@@ -94,7 +94,7 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.white}', _dark: '{colors.red.50}' },
             },
             contrast: {
-              value: { _light: '{colors.white}', _dark: '{colors.red.900}' },
+              value: { _light: '{colors.red.900}', _dark: '{colors.red.900}' },
             },
             border: {
               value: { _light: '{colors.red.200}', _dark: '#b91c1c' },
@@ -134,7 +134,10 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.white}', _dark: '{colors.orange.50}' },
             },
             contrast: {
-              value: { _light: '{colors.white}', _dark: '{colors.orange.900}' },
+              value: {
+                _light: '{colors.orange.900}',
+                _dark: '{colors.orange.900}',
+              },
             },
             border: {
               value: { _light: '{colors.orange.200}', _dark: '#c2410c' },
@@ -154,7 +157,10 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.white}', _dark: '{colors.teal.50}' },
             },
             contrast: {
-              value: { _light: '{colors.white}', _dark: '{colors.teal.900}' },
+              value: {
+                _light: '{colors.teal.900}',
+                _dark: '{colors.teal.900}',
+              },
             },
             border: {
               value: { _light: '{colors.teal.200}', _dark: '#115e59' },
@@ -174,7 +180,10 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.white}', _dark: '{colors.pink.50}' },
             },
             contrast: {
-              value: { _light: '{colors.white}', _dark: '{colors.pink.900}' },
+              value: {
+                _light: '{colors.pink.900}',
+                _dark: '{colors.pink.900}',
+              },
             },
             border: {
               value: { _light: '{colors.pink.200}', _dark: '#be185d' },
@@ -194,7 +203,10 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.white}', _dark: '{colors.cyan.50}' },
             },
             contrast: {
-              value: { _light: '{colors.white}', _dark: '{colors.cyan.900}' },
+              value: {
+                _light: '{colors.cyan.900}',
+                _dark: '{colors.cyan.900}',
+              },
             },
             border: {
               value: { _light: '{colors.cyan.200}', _dark: '#0e7490' },

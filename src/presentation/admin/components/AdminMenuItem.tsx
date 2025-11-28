@@ -40,7 +40,7 @@ export function AdminMenuItem({
       p={3}
       borderRadius="lg"
       bg={isActive ? 'colorPalette.subtle' : 'transparent'}
-      color={isActive ? 'colorPalette.fg' : 'fg'}
+      color={isActive ? 'colorPalette.solid' : 'fg'}
       border="1px solid"
       borderColor={isActive ? 'colorPalette.border' : 'transparent'}
       _hover={{
@@ -57,12 +57,16 @@ export function AdminMenuItem({
         <Text
           fontSize="sm"
           fontWeight="medium"
-          color="inherit"
+          color={isActive ? 'colorPalette.contrast' : 'inherit'}
           textAlign="left"
         >
           {label}
         </Text>
-        <Text fontSize="xs" color="fg.muted" textAlign="left">
+        <Text
+          fontSize="xs"
+          color={isActive ? 'colorPalette.contrast' : 'fg.muted'}
+          textAlign="left"
+        >
           {description}
         </Text>
       </VStack>
