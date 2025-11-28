@@ -9,6 +9,7 @@ import {
 } from '@/infrastructure/shared/layoutUtils';
 import { Provider } from '@/presentation/shared/components/ui/provider';
 import { SocialNetworksFooterContainer } from '@/presentation/shared/components/SocialNetworksFooter';
+import { PublicHeaderMenuContainer } from '@/presentation/shared/components/PublicHeaderMenu';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -51,6 +52,7 @@ export default async function RootLayout({
     <html suppressHydrationWarning>
       <body>
         <Provider>
+          <PublicHeaderMenuContainer />
           {children}
           <SocialNetworksFooterContainer />
         </Provider>
