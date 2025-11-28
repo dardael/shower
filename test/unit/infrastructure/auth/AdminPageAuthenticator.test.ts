@@ -1,4 +1,4 @@
-import { AdminPageAuthenticatorator } from '@/infrastructure/auth/AdminPageAuthenticatorator';
+import { AdminPageAuthenticator } from '@/infrastructure/auth/AdminPageAuthenticator';
 import { Logger } from '@/application/shared/Logger';
 
 // Mock dependencies
@@ -43,8 +43,8 @@ beforeAll(() => {
   ).auth = mockAuth;
 });
 
-describe('AdminPageAuthenticatorator', () => {
-  let authenticator: AdminPageAuthenticatorator;
+describe('AdminPageAuthenticator', () => {
+  let authenticator: AdminPageAuthenticator;
   let mockLogger: jest.Mocked<Logger>;
 
   beforeEach(() => {
@@ -93,7 +93,7 @@ describe('AdminPageAuthenticatorator', () => {
       };
     });
 
-    authenticator = new AdminPageAuthenticatorator();
+    authenticator = new AdminPageAuthenticator();
   });
 
   describe('getSession', () => {

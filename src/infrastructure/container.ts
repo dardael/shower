@@ -47,6 +47,16 @@ import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactor
 import { SocialNetworkValidationService } from '@/domain/settings/services/SocialNetworkValidationService';
 import { SocialNetworkUrlNormalizationService } from '@/domain/settings/services/SocialNetworkUrlNormalizationService';
 import type { ISocialNetworkUrlNormalizationService } from '@/domain/settings/services/ISocialNetworkUrlNormalizationService';
+import type { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepository';
+import type { IGetMenuItems } from '@/application/menu/IGetMenuItems';
+import type { IAddMenuItem } from '@/application/menu/IAddMenuItem';
+import type { IRemoveMenuItem } from '@/application/menu/IRemoveMenuItem';
+import type { IReorderMenuItems } from '@/application/menu/IReorderMenuItems';
+import { MongooseMenuItemRepository } from '@/infrastructure/menu/repositories/MongooseMenuItemRepository';
+import { GetMenuItems } from '@/application/menu/GetMenuItems';
+import { AddMenuItem } from '@/application/menu/AddMenuItem';
+import { RemoveMenuItem } from '@/application/menu/RemoveMenuItem';
+import { ReorderMenuItems } from '@/application/menu/ReorderMenuItems';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -146,6 +156,27 @@ container.register<ISocialNetworkUrlNormalizationService>(
     },
   }
 );
+
+// Register menu services
+container.register<MenuItemRepository>('MenuItemRepository', {
+  useClass: MongooseMenuItemRepository,
+});
+
+container.register<IGetMenuItems>('IGetMenuItems', {
+  useClass: GetMenuItems,
+});
+
+container.register<IAddMenuItem>('IAddMenuItem', {
+  useClass: AddMenuItem,
+});
+
+container.register<IRemoveMenuItem>('IRemoveMenuItem', {
+  useClass: RemoveMenuItem,
+});
+
+container.register<IReorderMenuItems>('IReorderMenuItems', {
+  useClass: ReorderMenuItems,
+});
 
 // Service locator pattern for server components
 export class AuthServiceLocator {

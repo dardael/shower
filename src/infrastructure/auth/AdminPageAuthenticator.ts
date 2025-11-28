@@ -18,7 +18,7 @@ interface Session {
   };
 }
 
-export class AdminPageAuthenticatorator {
+export class AdminPageAuthenticator {
   constructor() {}
 
   async getSession(): Promise<Session | null> {

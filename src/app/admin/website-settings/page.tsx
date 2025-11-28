@@ -1,4 +1,4 @@
-import { AdminPageAuthenticatorator } from '@/infrastructure/auth/AdminPageAuthenticatorator';
+import { AdminPageAuthenticator } from '@/infrastructure/auth/AdminPageAuthenticator';
 import { AdminLayout } from '@/presentation/admin/components/AdminLayout';
 import WebsiteSettingsForm from '@/presentation/admin/components/WebsiteSettingsForm';
 import { fetchWebsiteName } from '@/infrastructure/shared/layoutUtils';
@@ -17,7 +17,7 @@ async function getWebsiteName(): Promise<string> {
 }
 
 export default async function WebsiteSettingsPage() {
-  const authenticator = new AdminPageAuthenticatorator();
+  const authenticator = new AdminPageAuthenticator();
   await authenticator.authenticate();
 
   const websiteName = await getWebsiteName();
