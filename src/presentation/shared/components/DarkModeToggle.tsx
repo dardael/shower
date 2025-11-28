@@ -77,6 +77,7 @@ export default function DarkModeToggle({
         boxSize={buttonSize}
         role="switch"
         aria-checked={isDark}
+        color={isDark ? 'white' : 'black'}
         _hover={{
           bg: 'bg.muted',
           borderColor: 'border.emphasized',
@@ -87,7 +88,7 @@ export default function DarkModeToggle({
           ringOffset: '2px',
         }}
       >
-        {isDark ? <LuSun color="white" /> : <LuMoon color="black" />}
+        {isDark ? <LuSun /> : <LuMoon />}
       </IconButton>
     </ClientOnly>
   );
