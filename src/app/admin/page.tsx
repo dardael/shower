@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { AdminPageAuthenticatorator } from '@/infrastructure/auth/AdminPageAuthenticatorator';
+import { AdminPageAuthenticator } from '@/infrastructure/auth/AdminPageAuthenticator';
 import { DatabaseConnection } from '@/infrastructure/shared/databaseConnection';
 import { VStack, Heading, Box, AbsoluteCenter, Text } from '@chakra-ui/react';
 import LoginButton from '@/presentation/shared/components/LoginButton';
@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export default async function AdminPage() {
-  const authenticator = new AdminPageAuthenticatorator();
+  const authenticator = new AdminPageAuthenticator();
   const effectiveSession = await authenticator.getSession();
 
   if (!effectiveSession || !effectiveSession.user?.email) {

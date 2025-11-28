@@ -33,6 +33,11 @@ const menuItems = [
     label: 'Social Networks',
     description: 'Configure social media links',
   },
+  {
+    href: '/admin/menu',
+    label: 'Navigation Menu',
+    description: 'Configure website navigation',
+  },
 ];
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {

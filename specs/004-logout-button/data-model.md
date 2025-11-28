@@ -29,13 +29,13 @@ This feature does not introduce new data entities or modify existing data schema
 **Session Lifecycle**:
 
 1. **Creation**: Session created on successful Google OAuth authentication
-2. **Validation**: Session checked by `AdminPageAuthenticatorator.getSession()`
+2. **Validation**: Session checked by `AdminPageAuthenticator.getSession()`
 3. **Termination**: Session cleared via `authClient.signOut()` (this feature)
 
 **Related Interfaces**:
 
 - `IBetterAuthClientService.signOut(): Promise<void>` - Logout operation
-- `IAdminPageAuthenticatorator.getSession(): Promise<Session | null>` - Session retrieval
+- `IAdminPageAuthenticator.getSession(): Promise<Session | null>` - Session retrieval
 
 ### User (Existing Entity)
 

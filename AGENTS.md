@@ -29,6 +29,8 @@ shower/
 │   │   ├── admin/
 │   │   │   ├── layout.tsx             -> Admin layout component
 │   │   │   ├── page.tsx              -> Route `/admin` (redirects to first section)
+│   │   │   ├── menu/
+│   │   │   │   └── page.tsx          -> Route `/admin/menu` (navigation menu configuration)
 │   │   │   ├── social-networks/
 │   │   │   │   └── page.tsx          -> Route `/admin/social-networks`
 │   │   │   └── website-settings/
@@ -43,6 +45,11 @@ shower/
 │   │   │   └── settings/
 │   │   │       ├── icon/
 │   │   │       │   └── route.ts      -> Website icon API
+│   │   │       ├── menu/
+│   │   │       │   ├── route.ts      -> Menu items API (GET, POST, PUT)
+│   │   │       │   ├── types.ts      -> Menu API types
+│   │   │       │   └── [id]/
+│   │   │       │       └── route.ts  -> Menu item by ID API (DELETE)
 │   │   │       ├── name/
 │   │   │       │   └── route.ts      -> Website name API
 │   │   │       ├── social-networks/
@@ -57,7 +64,8 @@ shower/
 │   │   │   │   ├── AdminLayout.tsx -> Admin layout wrapper with sidebar state management
 │   │   │   │   ├── AdminSidebar.tsx -> Collapsible sidebar navigation component
 │   │   │   │   ├── AdminMenuItem.tsx -> Individual navigation menu item component
-│   │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
+│   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
+│   │   │   │   ├── MenuConfigForm.tsx -> Navigation menu configuration form with drag-and-drop
 │   │   │   │   ├── NotAuthorized.tsx -> Unauthorized access component
 │   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
 │   │   │   │   ├── ThemeColorSelector.tsx -> Theme color selection component
@@ -85,6 +93,13 @@ shower/
 │   │   │   ├── entities/
 │   │   │   ├── services/
 │   │   │   └── value-objects/
+│   │   ├── menu/
+│   │   │   ├── entities/
+│   │   │   │   └── MenuItem.ts       -> Menu item entity with id, text, position
+│   │   │   ├── repositories/
+│   │   │   │   └── MenuItemRepository.ts -> Menu item repository interface
+│   │   │   └── value-objects/
+│   │   │       └── MenuItemText.ts   -> Menu item text value object with validation
 │   │   ├── settings/
 │   │   │   ├── constants/
 │   │   │   ├── entities/
@@ -102,6 +117,15 @@ shower/
 │   ├── application/          # Application Layer (use-cases, services)
 │   │   ├── auth/
 │   │   │   ├── services/
+│   │   ├── menu/
+│   │   │   ├── AddMenuItem.ts        -> Add menu item use case
+│   │   │   ├── GetMenuItems.ts       -> Get all menu items use case
+│   │   │   ├── IAddMenuItem.ts       -> Add menu item interface
+│   │   │   ├── IGetMenuItems.ts      -> Get menu items interface
+│   │   │   ├── IRemoveMenuItem.ts    -> Remove menu item interface
+│   │   │   ├── IReorderMenuItems.ts  -> Reorder menu items interface
+│   │   │   ├── RemoveMenuItem.ts     -> Remove menu item use case
+│   │   │   └── ReorderMenuItems.ts   -> Reorder menu items use case
 │   │   ├── settings/
 │   │   └── shared/
 │   │       ├── ContextualLogger.ts -> Contextual logging service
@@ -111,6 +135,11 @@ shower/
 │   ├── infrastructure/       # Infrastructure Layer (adapters, database)
 │   │   ├── auth/
 │   │   │   ├── adapters/
+│   │   ├── menu/
+│   │   │   ├── models/
+│   │   │   │   └── MenuItemModel.ts  -> Mongoose schema for menu items
+│   │   │   └── repositories/
+│   │   │       └── MongooseMenuItemRepository.ts -> MongoDB menu item repository
 │   │   ├── settings/
 │   │   │   ├── models/
 │   │   │   └── repositories/
@@ -132,11 +161,16 @@ shower/
 │   ├── unit/                 # Unit tests (following same structure as src)
 │   │   ├── application/
 │   │   │   ├── auth/
+│   │   │   ├── menu/
+│   │   │   │   └── AddMenuItem.test.ts -> Add menu item use case tests
 │   │   │   ├── settings/
 │   │   │   └── shared/
 │   │   ├── domain/
 │   │   │   ├── auth/
 │   │   │   │   └── value-objects/
+│   │   │   ├── menu/
+│   │   │   │   └── entities/
+│   │   │   │       └── MenuItem.test.ts -> Menu item entity and value object tests
 │   │   │   ├── settings/
 │   │   │   │   ├── entities/
 │   │   │   │   ├── services/
@@ -212,6 +246,9 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+
+- TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop (005-menu-config)
+- MongoDB via Mongoose (following existing WebsiteSettingsModel pattern) (005-menu-config)
 
 - TypeScript 5.0+ with Next.js 15 + React 18, Chakra UI v3, BetterAuth, react-icons (004-logout-button)
 - MongoDB (for session management via BetterAuth) (004-logout-button)
