@@ -42,6 +42,11 @@ shower/
 │   │   │   ├── icons/
 │   │   │   │   └── [filename]/
 │   │   │   │       └── route.ts      -> Icon serving endpoint
+│   │   │   ├── public/
+│   │   │   │   ├── menu/
+│   │   │   │   │   └── route.ts      -> Public menu items API (GET)
+│   │   │   │   └── social-networks/
+│   │   │   │       └── route.ts      -> Public social networks API (GET)
 │   │   │   └── settings/
 │   │   │       ├── icon/
 │   │   │       │   └── route.ts      -> Website icon API
@@ -76,6 +81,21 @@ shower/
 │   │       │   ├── ImageManager/
 │   │       │   │   ├── ImageManager.tsx -> Image upload/management component
 │   │       │   │   └── types.ts        -> Image manager types
+│   │       │   ├── PublicHeaderMenu/
+│   │       │   │   ├── index.ts        -> Barrel exports
+│   │       │   │   ├── types.ts        -> TypeScript interfaces
+│   │       │   │   ├── usePublicHeaderMenu.ts -> Data fetching hook
+│   │       │   │   ├── PublicHeaderMenu.tsx -> Main header component
+│   │       │   │   ├── PublicHeaderMenuContainer.tsx -> Container with route detection
+│   │       │   │   └── PublicHeaderMenuItem.tsx -> Individual menu item display
+│   │       │   ├── SocialNetworksFooter/
+│   │       │   │   ├── index.ts        -> Barrel exports
+│   │       │   │   ├── types.ts        -> TypeScript interfaces
+│   │       │   │   ├── useSocialNetworksFooter.ts -> Data fetching hook
+│   │       │   │   ├── SocialNetworksFooter.tsx -> Main footer component
+│   │       │   │   ├── SocialNetworksFooterContainer.tsx -> Container with route detection
+│   │       │   │   ├── SocialNetworkItem.tsx -> Individual social network display
+│   │       │   │   └── SocialNetworkIcon.tsx -> Social network icon component
 │   │       │   ├── ui/
 │   │       │   │   ├── color-mode.tsx -> Color mode provider
 │   │       │   │   ├── provider.tsx   -> UI provider wrapper
@@ -247,6 +267,8 @@ you must use docker compose to run all commands in order to have the same enviro
 
 ## Active Technologies
 
+- MongoDB via Mongoose (existing MenuItemModel) (006-public-header-menu)
+
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop (005-menu-config)
 - MongoDB via Mongoose (following existing WebsiteSettingsModel pattern) (005-menu-config)
 
@@ -262,4 +284,5 @@ you must use docker compose to run all commands in order to have the same enviro
 
 ## Recent Changes
 
+- 006-public-header-menu: Added public header menu component with theme color integration and dark mode support
 - 001-toast-notifications: Added TypeScript 5.0+ with Next.js 15 + Chakra UI v3, React 18, Next.js API routes
