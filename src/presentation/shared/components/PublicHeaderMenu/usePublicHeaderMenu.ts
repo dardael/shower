@@ -1,25 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { PublicMenuItem } from './types';
+import type { PublicMenuItem, PublicLogo } from './types';
 
 interface UsePublicHeaderMenuReturn {
   menuItems: PublicMenuItem[] | null;
+  logo: PublicLogo | null;
   isLoading: boolean;
   error: string | null;
 }
 
 /**
- * Hook for fetching menu items data for header
+ * Hook for fetching menu items and logo data for header
  * Handles loading states and error management
  */
 export function usePublicHeaderMenu(): UsePublicHeaderMenuReturn {
   const [menuItems, setMenuItems] = useState<PublicMenuItem[] | null>(null);
+  const [logo, setLogo] = useState<PublicLogo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchMenuItems(): Promise<void> {
+    async function fetchHeaderData(): Promise<void> {
       try {
         setIsLoading(true);
         setError(null);
@@ -27,27 +29,47 @@ export function usePublicHeaderMenu(): UsePublicHeaderMenuReturn {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch('/api/public/menu', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal,
-        });
+        const [menuResponse, logoResponse] = await Promise.all([
+          fetch('/api/public/menu', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+          }),
+          fetch('/api/public/logo', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+          }),
+        ]);
 
         clearTimeout(timeoutId);
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch menu items: ${response.status}`);
+        if (!menuResponse.ok) {
+          throw new Error(`Failed to fetch menu items: ${menuResponse.status}`);
         }
 
-        const data = await response.json();
+        const menuData = await menuResponse.json();
 
-        if (!data.success) {
-          throw new Error(data.error || 'Failed to fetch menu items');
+        if (!menuData.success) {
+          throw new Error(menuData.error || 'Failed to fetch menu items');
         }
 
-        setMenuItems(data.data || []);
+        setMenuItems(menuData.data || []);
+
+        if (logoResponse.ok) {
+          const logoData = await logoResponse.json();
+          if (logoData.success && logoData.data) {
+            setLogo(logoData.data);
+          } else {
+            setLogo(null);
+          }
+        } else {
+          setLogo(null);
+        }
       } catch (err) {
         let errorMessage = 'Unknown error occurred';
 
@@ -65,11 +87,12 @@ export function usePublicHeaderMenu(): UsePublicHeaderMenuReturn {
       }
     }
 
-    fetchMenuItems();
+    fetchHeaderData();
   }, []);
 
   return {
     menuItems,
+    logo,
     isLoading,
     error,
   };

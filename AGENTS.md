@@ -43,6 +43,8 @@ shower/
 │   │   │   │   └── [filename]/
 │   │   │   │       └── route.ts      -> Icon serving endpoint
 │   │   │   ├── public/
+│   │   │   │   ├── logo/
+│   │   │   │   │   └── route.ts      -> Public header logo API (GET)
 │   │   │   │   ├── menu/
 │   │   │   │   │   └── route.ts      -> Public menu items API (GET)
 │   │   │   │   └── social-networks/
@@ -50,6 +52,8 @@ shower/
 │   │   │   └── settings/
 │   │   │       ├── icon/
 │   │   │       │   └── route.ts      -> Website icon API
+│   │   │       ├── logo/
+│   │   │       │   └── route.ts      -> Header logo API (GET, POST, DELETE)
 │   │   │       ├── menu/
 │   │   │       │   ├── route.ts      -> Menu items API (GET, POST, PUT)
 │   │   │       │   ├── types.ts      -> Menu API types
@@ -70,12 +74,13 @@ shower/
 │   │   │   │   ├── AdminSidebar.tsx -> Collapsible sidebar navigation component
 │   │   │   │   ├── AdminMenuItem.tsx -> Individual navigation menu item component
 │   │   │   ├── AdminErrorBoundary.tsx -> Error boundary for admin pages
-│   │   │   │   ├── MenuConfigForm.tsx -> Navigation menu configuration form with drag-and-drop
+│   │   │   │   ├── MenuConfigForm.tsx -> Navigation menu configuration form with drag-and-drop and logo upload
 │   │   │   │   ├── NotAuthorized.tsx -> Unauthorized access component
 │   │   │   │   ├── SocialNetworksForm.tsx -> Social networks management form
 │   │   │   │   ├── ThemeColorSelector.tsx -> Theme color selection component
 │   │   │   │   └── WebsiteSettingsForm.tsx -> Website settings management form
 │   │   │   └── hooks/
+│   │   │       └── useLogoManagement.ts -> Logo upload/delete management hook
 │   │   └── shared/
 │   │       ├── components/
 │   │       │   ├── ImageManager/
@@ -128,6 +133,8 @@ shower/
 │   │   │   ├── repositories/
 │   │   │   ├── services/
 │   │   │   └── value-objects/
+│   │   │       ├── BaseImage.ts     -> Abstract base class for image value objects
+│   │   │       └── HeaderLogo.ts    -> Header logo value object (extends BaseImage)
 │   │   └── shared/
 │   │       ├── services/
 │   │       │   ├── EnhancedLogFormatterService.ts -> Enhanced log formatting service
@@ -266,8 +273,11 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, next-themes (existing) (007-public-dark-mode)
 - Browser localStorage (existing theme persistence via next-themes) (007-public-dark-mode)
+- TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, existing ImageManager component (008-header-logo)
+- MongoDB via Mongoose (WebsiteSettingsModel for logo metadata) (008-header-logo)
 
 - MongoDB via Mongoose (existing MenuItemModel) (006-public-header-menu)
 

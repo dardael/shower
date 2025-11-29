@@ -45,13 +45,17 @@ export class WebsiteSetting {
   }
 
   getValueAsIcon(): { url: string; metadata: IIconMetadata } | null {
+    return this.getValueAsImage();
+  }
+
+  getValueAsImage(): { url: string; metadata: IIconMetadata } | null {
     if (
       this._value === null ||
       (typeof this._value === 'object' && 'url' in this._value)
     ) {
       return this._value as { url: string; metadata: IIconMetadata } | null;
     }
-    throw new Error('Value is not an icon object');
+    throw new Error('Value is not an image object');
   }
 
   isString(): boolean {

@@ -32,6 +32,9 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
+import { useLogoManagement } from '@/presentation/admin/hooks/useLogoManagement';
+import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import type { ImageData } from '@/presentation/shared/components/ImageManager/types';
 import type { MenuItemDTO } from '@/app/api/settings/menu/types';
 
 interface SortableMenuItemProps {
@@ -108,6 +111,7 @@ export default function MenuConfigForm() {
   const [loading, setLoading] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+  const [currentLogo, setCurrentLogo] = useState<ImageData | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -115,6 +119,22 @@ export default function MenuConfigForm() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const {
+    logoLoading,
+    handleLogoUpload,
+    handleLogoDelete,
+    handleLogoReplace,
+    handleLogoValidationError,
+    logoConfig,
+    logoLabels,
+  } = useLogoManagement({
+    onLogoChange: (logoData) => {
+      setCurrentLogo(logoData);
+    },
+    onMessage: (message: string) => showToast(message, 'error'),
+    onSuccess: (message: string) => showToast(message, 'success'),
+  });
 
   const fetchMenuItems = useCallback(async () => {
     try {
@@ -134,9 +154,31 @@ export default function MenuConfigForm() {
     }
   }, [logger, showToast]);
 
+  const fetchLogo = useCallback(async () => {
+    try {
+      const response = await fetch('/api/settings/logo');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.logo) {
+          setCurrentLogo({
+            url: data.logo.url,
+            filename: data.logo.filename,
+            size: data.logo.size,
+            format: data.logo.format,
+          });
+        } else {
+          setCurrentLogo(null);
+        }
+      }
+    } catch (error) {
+      logger.logErrorWithObject(error, 'Error fetching logo');
+    }
+  }, [logger]);
+
   useEffect(() => {
     fetchMenuItems();
-  }, [fetchMenuItems]);
+    fetchLogo();
+  }, [fetchMenuItems, fetchLogo]);
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,6 +309,44 @@ export default function MenuConfigForm() {
       </VStack>
 
       <Stack gap={{ base: 4, md: 6 }}>
+        <Field.Root>
+          <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
+            Header Logo
+          </Field.Label>
+          <Box
+            bg="bg.canvas"
+            borderColor="border"
+            borderWidth="2px"
+            borderRadius="lg"
+            p={4}
+          >
+            <ImageManager
+              currentImage={currentLogo}
+              config={logoConfig}
+              labels={logoLabels}
+              onImageUpload={handleLogoUpload}
+              onImageDelete={handleLogoDelete}
+              onImageReplace={handleLogoReplace}
+              onValidationError={handleLogoValidationError}
+              disabled={logoLoading}
+              loading={logoLoading}
+              showFileSize={true}
+              showFormatInfo={true}
+              allowDelete={true}
+              allowReplace={true}
+              disableSuccessToast={true}
+            />
+          </Box>
+          <Field.HelperText
+            fontSize={{ base: 'xs', md: 'sm' }}
+            color="fg.muted"
+            mt={2}
+          >
+            Upload a logo that appears at the left of your header navigation.
+            Recommended size is 120x60 pixels or similar aspect ratio.
+          </Field.HelperText>
+        </Field.Root>
+
         <form onSubmit={handleAddItem}>
           <Field.Root>
             <Field.Label

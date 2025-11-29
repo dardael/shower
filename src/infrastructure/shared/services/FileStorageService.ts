@@ -8,15 +8,59 @@ import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 export interface IFileStorageService {
   uploadIcon(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
   deleteIcon(filename: string): Promise<void>;
+  uploadLogo(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
+  deleteLogo(filename: string): Promise<void>;
 }
+
+interface UploadConfig {
+  allowedTypes: string[];
+  maxSizeBytes: number;
+  filenamePrefix: string;
+  defaultExtension: string;
+  typeErrorMessage: string;
+  sizeErrorMessage: string;
+  entityName: string;
+}
+
+const ICON_UPLOAD_CONFIG: UploadConfig = {
+  allowedTypes: [
+    'image/x-icon',
+    'image/vnd.microsoft.icon',
+    'image/png',
+    'image/jpeg',
+    'image/svg+xml',
+    'image/gif',
+    'image/webp',
+  ],
+  maxSizeBytes: 5 * 1024 * 1024,
+  filenamePrefix: 'favicon',
+  defaultExtension: 'ico',
+  typeErrorMessage:
+    'Invalid file type. Only ICO, PNG, JPG, SVG, GIF, and WebP files are allowed.',
+  sizeErrorMessage: 'File size must be less than 5MB.',
+  entityName: 'icon',
+};
+
+const LOGO_UPLOAD_CONFIG: UploadConfig = {
+  allowedTypes: [
+    'image/png',
+    'image/jpeg',
+    'image/svg+xml',
+    'image/gif',
+    'image/webp',
+  ],
+  maxSizeBytes: 2 * 1024 * 1024,
+  filenamePrefix: 'logo',
+  defaultExtension: 'png',
+  typeErrorMessage:
+    'Invalid file type. Only PNG, JPG, SVG, GIF, and WebP formats are allowed.',
+  sizeErrorMessage: 'File size too large. Maximum size is 2MB.',
+  entityName: 'logo',
+};
 
 export class LocalFileStorageService implements IFileStorageService {
   private readonly baseUrl = getBaseUrl();
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
-
-  constructor() {
-    // Directory will be ensured before operations
-  }
 
   private async ensureIconsDirectory(): Promise<void> {
     try {
@@ -26,45 +70,28 @@ export class LocalFileStorageService implements IFileStorageService {
     }
   }
 
-  async uploadIcon(
-    file: File
+  private async uploadImage(
+    file: File,
+    config: UploadConfig
   ): Promise<{ url: string; metadata: IIconMetadata }> {
-    // Ensure icons directory exists
     await this.ensureIconsDirectory();
 
-    // Validate file type
-    const allowedTypes = [
-      'image/x-icon',
-      'image/vnd.microsoft.icon',
-      'image/png',
-      'image/jpeg',
-      'image/svg+xml',
-      'image/gif',
-      'image/webp',
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error(
-        'Invalid file type. Only ICO, PNG, JPG, SVG, GIF, and WebP files are allowed.'
-      );
+    if (!config.allowedTypes.includes(file.type)) {
+      throw new Error(config.typeErrorMessage);
     }
 
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (file.size > maxSize) {
-      throw new Error('File size must be less than 5MB.');
+    if (file.size > config.maxSizeBytes) {
+      throw new Error(config.sizeErrorMessage);
     }
 
-    // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 8);
-    const extension = file.name.split('.').pop() || 'ico';
-    const filename = `favicon-${timestamp}-${randomString}.${extension}`;
+    const extension = file.name.split('.').pop() || config.defaultExtension;
+    const filename = `${config.filenamePrefix}-${timestamp}-${randomString}.${extension}`;
 
-    // Convert File to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Validate buffer was created correctly
     if (buffer.length !== file.size) {
       const logger = container.resolve<Logger>('Logger');
       logger.error('Buffer size mismatch', {
@@ -77,15 +104,13 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    // Save file to public/icons directory
     const filePath = path.join(this.iconsDir, filename);
     try {
       await fs.writeFile(filePath, buffer);
 
-      // Verify file was written correctly
       const stats = await fs.stat(filePath);
       const logger = container.resolve<Logger>('Logger');
-      logger.debug('Icon file saved successfully', {
+      logger.debug(`${config.entityName} file saved successfully`, {
         filename,
         filePath,
         size: stats.size,
@@ -93,17 +118,16 @@ export class LocalFileStorageService implements IFileStorageService {
       });
     } catch (writeError) {
       const logger = container.resolve<Logger>('Logger');
-      logger.error('Failed to write icon file to disk', {
+      logger.error(`Failed to write ${config.entityName} file to disk`, {
         filename,
         filePath,
         error: writeError,
       });
       throw new Error(
-        `Failed to save icon file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
+        `Failed to save ${config.entityName} file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
       );
     }
 
-    // Return URL that will be served by the API route
     const url = `${this.baseUrl}/api/icons/${filename}`;
 
     const metadata: IIconMetadata = {
@@ -120,6 +144,7 @@ export class LocalFileStorageService implements IFileStorageService {
         | 'webp',
       mimeType: file.type as
         | 'image/x-icon'
+        | 'image/vnd.microsoft.icon'
         | 'image/png'
         | 'image/jpeg'
         | 'image/svg+xml'
@@ -129,7 +154,7 @@ export class LocalFileStorageService implements IFileStorageService {
     };
 
     const logger = container.resolve<Logger>('Logger');
-    logger.debug('Created icon metadata', {
+    logger.debug(`Created ${config.entityName} metadata`, {
       filename,
       originalName: file.name,
       size: file.size,
@@ -141,22 +166,43 @@ export class LocalFileStorageService implements IFileStorageService {
     return { url, metadata };
   }
 
-  async deleteIcon(filename: string): Promise<void> {
-    // Ensure icons directory exists
+  private async deleteImage(
+    filename: string,
+    entityName: string
+  ): Promise<void> {
     await this.ensureIconsDirectory();
 
     try {
       const filePath = path.join(this.iconsDir, filename);
       await fs.unlink(filePath);
       const logger = container.resolve<Logger>('Logger');
-      logger.info(`Deleted icon file: ${filename}`);
+      logger.info(`Deleted ${entityName} file: ${filename}`);
     } catch (error) {
       const logger = container.resolve<Logger>('Logger');
       logger.logErrorWithObject(
         error,
-        `Failed to delete icon file ${filename}`
+        `Failed to delete ${entityName} file ${filename}`
       );
-      // Don't throw error - file might not exist
     }
+  }
+
+  async uploadIcon(
+    file: File
+  ): Promise<{ url: string; metadata: IIconMetadata }> {
+    return this.uploadImage(file, ICON_UPLOAD_CONFIG);
+  }
+
+  async deleteIcon(filename: string): Promise<void> {
+    return this.deleteImage(filename, 'icon');
+  }
+
+  async uploadLogo(
+    file: File
+  ): Promise<{ url: string; metadata: IIconMetadata }> {
+    return this.uploadImage(file, LOGO_UPLOAD_CONFIG);
+  }
+
+  async deleteLogo(filename: string): Promise<void> {
+    return this.deleteImage(filename, 'logo');
   }
 }

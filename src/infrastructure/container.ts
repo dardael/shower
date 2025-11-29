@@ -32,6 +32,8 @@ import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocial
 import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
 import type { IGetThemeColor } from '@/application/settings/IGetThemeColor';
 import type { IUpdateThemeColor } from '@/application/settings/IUpdateThemeColor';
+import type { IGetHeaderLogo } from '@/application/settings/IGetHeaderLogo';
+import type { IUpdateHeaderLogo } from '@/application/settings/IUpdateHeaderLogo';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -41,6 +43,8 @@ import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetwork
 import { GetConfiguredSocialNetworks } from '@/application/settings/GetConfiguredSocialNetworks';
 import { GetThemeColor } from '@/application/settings/GetThemeColor';
 import { UpdateThemeColor } from '@/application/settings/UpdateThemeColor';
+import { GetHeaderLogo } from '@/application/settings/GetHeaderLogo';
+import { UpdateHeaderLogo } from '@/application/settings/UpdateHeaderLogo';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -128,6 +132,14 @@ container.register<IGetThemeColor>('IGetThemeColor', {
 
 container.register<IUpdateThemeColor>('IUpdateThemeColor', {
   useClass: UpdateThemeColor,
+});
+
+container.register<IGetHeaderLogo>('IGetHeaderLogo', {
+  useClass: GetHeaderLogo,
+});
+
+container.register<IUpdateHeaderLogo>('IUpdateHeaderLogo', {
+  useClass: UpdateHeaderLogo,
 });
 
 // Register factory services
@@ -220,6 +232,14 @@ export class SettingsServiceLocator {
 
   static getUpdateThemeColor(): IUpdateThemeColor {
     return container.resolve('IUpdateThemeColor');
+  }
+
+  static getHeaderLogo(): IGetHeaderLogo {
+    return container.resolve('IGetHeaderLogo');
+  }
+
+  static getUpdateHeaderLogo(): IUpdateHeaderLogo {
+    return container.resolve('IUpdateHeaderLogo');
   }
 }
 

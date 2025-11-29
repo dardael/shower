@@ -2,6 +2,7 @@ export const VALID_SETTING_KEYS = {
   WEBSITE_NAME: 'website-name',
   WEBSITE_ICON: 'website-icon',
   THEME_COLOR: 'theme-color',
+  HEADER_LOGO: 'header-logo',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(

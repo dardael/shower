@@ -116,7 +116,7 @@ describe('WebsiteSetting', () => {
     it('should throw error for non-icon values', () => {
       const setting = new WebsiteSetting('website-name', 'Test Site');
       expect(() => setting.getValueAsIcon()).toThrow(
-        'Value is not an icon object'
+        'Value is not an image object'
       );
     });
   });

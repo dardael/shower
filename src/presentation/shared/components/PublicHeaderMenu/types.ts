@@ -10,6 +10,15 @@ export interface PublicMenuItem {
 }
 
 /**
+ * Public logo data structure for API response
+ */
+export interface PublicLogo {
+  url: string;
+  filename: string;
+  format: string;
+}
+
+/**
  * Props for PublicHeaderMenuItem component
  */
 export interface PublicHeaderMenuItemProps {
@@ -21,5 +30,6 @@ export interface PublicHeaderMenuItemProps {
  */
 export interface PublicHeaderMenuProps {
   menuItems?: PublicMenuItem[];
+  logo?: PublicLogo | null;
   colorPalette?: ThemeColorToken;
 }
