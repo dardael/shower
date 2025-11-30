@@ -1,4 +1,5 @@
 Sub rule 1: Test Simplicity
+
 - Test only main behaviors
 - Avoid testing implementation details
 - Focus on what the code does, not how it does it
@@ -6,23 +7,27 @@ Sub rule 1: Test Simplicity
 - Keep assertions focused on the expected outcome
 
 Sub rule 2: Test Structure
+
 - Name test files as `ModuleName.test.ts`
 - Group related tests using `describe` blocks
 - Use descriptive test names that explain the behavior
 - Follow Arrange-Act-Assert pattern
 
 Sub rule 3: Minimal Mocking
+
 - Mock only external dependencies (API calls, database, file system)
 - Never mock Chakra UI components or React components
 - Use real implementations when possible
 - Avoid mocking internal application logic
 
 Sub rule 4: Test Isolation
+
 - No shared state between tests
 - Use `beforeEach` only for essential setup
 - Avoid complex setup procedures
 - Keep tests independent and fast
 
 Sub rule 5: Console Output Suppression
+
 - Ensure clean test output with no console warnings or errors visible in test results
 - Mock all console methods that might be called during test execution

@@ -40,14 +40,21 @@ import type { MenuItemDTO } from '@/app/api/settings/menu/types';
 interface SortableMenuItemProps {
   item: MenuItemDTO;
   onDelete: (id: string) => void;
+  onEdit: (id: string, text: string) => void;
   isDeleting: boolean;
+  isUpdating: boolean;
 }
 
 function SortableMenuItem({
   item,
   onDelete,
+  onEdit,
   isDeleting,
+  isUpdating,
 }: SortableMenuItemProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(item.text);
+
   const {
     attributes,
     listeners,
@@ -61,6 +68,37 @@ function SortableMenuItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+  };
+
+  const handleSave = (): void => {
+    const trimmedText = editText.trim();
+    if (trimmedText && trimmedText !== item.text) {
+      onEdit(item.id, trimmedText);
+    }
+    setIsEditing(false);
+    setEditText(item.text);
+  };
+
+  const handleCancel = (): void => {
+    setIsEditing(false);
+    setEditText(item.text);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancel();
+    }
+  };
+
+  const handleStartEdit = (): void => {
+    if (!isUpdating && !isDeleting) {
+      setEditText(item.text);
+      setIsEditing(true);
+    }
   };
 
   return (
@@ -85,9 +123,42 @@ function SortableMenuItem({
       >
         <FiMenu size={18} />
       </Box>
-      <Text flex={1} color="fg" fontSize="md">
-        {item.text}
-      </Text>
+      {isEditing ? (
+        <Input
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleSave}
+          autoFocus
+          maxLength={100}
+          flex={1}
+          size="sm"
+          bg="bg.canvas"
+          borderColor="colorPalette.solid"
+          borderWidth="2px"
+          color="fg"
+          _focus={{
+            borderColor: 'colorPalette.solid',
+            boxShadow: '0 0 0 2px colorPalette.subtle',
+          }}
+        />
+      ) : (
+        <Text
+          flex={1}
+          color="fg"
+          fontSize="md"
+          onClick={handleStartEdit}
+          cursor={isUpdating || isDeleting ? 'default' : 'pointer'}
+          _hover={
+            isUpdating || isDeleting
+              ? undefined
+              : { textDecoration: 'underline' }
+          }
+          opacity={isUpdating ? 0.6 : 1}
+        >
+          {item.text}
+        </Text>
+      )}
       <IconButton
         aria-label="Delete menu item"
         variant="ghost"
@@ -95,7 +166,7 @@ function SortableMenuItem({
         color="fg.muted"
         _hover={{ color: 'red.500', bg: 'red.50' }}
         onClick={() => onDelete(item.id)}
-        disabled={isDeleting}
+        disabled={isDeleting || isUpdating || isEditing}
       >
         <FiTrash2 size={16} />
       </IconButton>
@@ -111,6 +182,7 @@ export default function MenuConfigForm() {
   const [loading, setLoading] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+  const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [currentLogo, setCurrentLogo] = useState<ImageData | null>(null);
 
   const sensors = useSensors(
@@ -228,6 +300,33 @@ export default function MenuConfigForm() {
       showToast('Failed to remove menu item', 'error');
     } finally {
       setDeletingItemId(null);
+    }
+  };
+
+  const handleUpdateItem = async (id: string, text: string): Promise<void> => {
+    try {
+      setUpdatingItemId(id);
+      const response = await fetch(`/api/settings/menu/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setItems((prev) =>
+          prev.map((item) => (item.id === id ? data.item : item))
+        );
+        showToast('Menu item updated successfully', 'success');
+      } else {
+        const data = await response.json();
+        showToast(data.error || 'Failed to update menu item', 'error');
+      }
+    } catch (error) {
+      logger.logErrorWithObject(error, 'Error updating menu item');
+      showToast('Failed to update menu item', 'error');
+    } finally {
+      setUpdatingItemId(null);
     }
   };
 
@@ -450,7 +549,9 @@ export default function MenuConfigForm() {
                       key={item.id}
                       item={item}
                       onDelete={handleDeleteItem}
+                      onEdit={handleUpdateItem}
                       isDeleting={deletingItemId === item.id}
+                      isUpdating={updatingItemId === item.id}
                     />
                   ))}
                 </VStack>
