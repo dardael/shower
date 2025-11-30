@@ -62,6 +62,16 @@ export class MenuItem {
     );
   }
 
+  withText(text: MenuItemText): MenuItem {
+    return new MenuItem(
+      this._id,
+      text,
+      this._position,
+      this._createdAt,
+      new Date()
+    );
+  }
+
   equals(other: MenuItem | null | undefined): boolean {
     if (!other) {
       return false;

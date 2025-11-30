@@ -1,10 +1,12 @@
 Sub rule 1: API Structure and Organization
+
 - Use RESTful conventions: GET for retrieval, POST for creation, PUT for updates, DELETE for removal
 - Organize endpoints by resource hierarchy: `/api/settings`, `/api/settings/theme-color`, `/api/settings/icon`
 - Use descriptive endpoint names that clearly indicate the resource and operation
 - Maintain consistent URL patterns across all API routes
 
 Sub rule 2: Request and Response Formats
+
 - Use consistent JSON request/response format across all endpoints
 - Include success messages in responses for POST/PUT operations: `{ "message": "Operation successful" }`
 - Use standard error format: `{ "error": "Error description" }`
@@ -12,6 +14,7 @@ Sub rule 2: Request and Response Formats
 - Use HTTP status codes appropriately: 200 for success, 400 for client errors, 401 for auth, 500 for server errors
 
 Sub rule 4: Performance Optimization
+
 - Use static imports instead of dynamic imports for security and performance
 - Implement parallel data fetching with Promise.all for multiple related operations
 - Use appropriate caching strategies: `cache: 'no-store'` for fresh data, default for cacheable data
@@ -19,11 +22,13 @@ Sub rule 4: Performance Optimization
 - Implement proper database connection management and query optimization
 
 Sub rule 5: Error Handling and Validation
+
 - Use try-catch blocks with comprehensive error logging
 - Implement proper error boundaries and graceful degradation
 - Log errors with sufficient context for debugging and monitoring
 
 Sub rule 6: Authentication and Security
+
 - Apply authentication middleware consistently across protected endpoints
 - Use the `withApi` wrapper for standardized authentication and logging
 - Implement proper authorization checks for admin-only operations
@@ -31,14 +36,17 @@ Sub rule 6: Authentication and Security
 - Use environment variables for configuration, never hardcoded secrets
 
 Sub rule 8: Logging and Monitoring
+
 - Use simple console logging with environment-based log level filtering
 - Log API requests with method, URL, and user context: `logger.logApiRequest()`
 - Log API responses with status code and duration: `logger.logApiResponse()`
 
 Sub rule 9: Testing and Quality Assurance
+
 - Test only common scenarios
 
 Sub rule 10: Type Safety and Validation
+
 - Use TypeScript interfaces for all request/response types
 - Define explicit types for API parameters and return values
 - Use proper type guards for runtime validation

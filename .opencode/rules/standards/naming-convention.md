@@ -1,17 +1,21 @@
 Sub rule 1: General Guidelines
+
 - Use `PascalCase` for React components, classes, and TypeScript interfaces.
 - Use `camelCase` for variables, functions, and method names.
 - Use `UPPER_SNAKE_CASE` for constants, including environment variables and configuration values.
 - Do not use abbreviations in any names.
 
 Sub rule 2: File and Folder Names
+
 - Match the file name to the default export for components and modules (e.g., `WebsiteSettingsForm.tsx` for a component named `WebsiteSettingsForm`).
 - Group related files into directories named after their feature, module, or entity.
 
 Sub rule 3: Domain-Specific Naming
+
 - Prefix interfaces with `I` followed by a descriptive name (e.g., `IAuthenticateUser`, `IUpdateWebsiteName`).
 - Use descriptive, singular nouns for entities (e.g., `User`, `WebsiteSettings`).
 - Use descriptive verbs for services and use cases (e.g., `AuthenticateUser`, `UpdateWebsiteName`).
 
 Sub rule 4: Test Files
+
 - Use the same name as the file under test, suffixed with `.test` (e.g., `AuthenticateUser.test.ts` for `AuthenticateUser.ts`).

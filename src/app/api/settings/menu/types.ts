@@ -32,3 +32,12 @@ export interface DeleteMenuItemResponse {
 export interface MenuErrorResponse {
   error: string;
 }
+
+export interface UpdateMenuItemRequest {
+  text: string;
+}
+
+export interface UpdateMenuItemResponse {
+  message: string;
+  item: MenuItemDTO;
+}

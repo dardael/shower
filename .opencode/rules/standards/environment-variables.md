@@ -1,19 +1,23 @@
 Sub rule 1: Environment File Structure
+
 - Use `.env` for non-sensitive production variables
 - Use `.env.local` for sensitive production variables (passwords, API keys, secrets)
 
 Sub rule 2: Production Environment Setup
+
 - Place non-sensitive variables in `.env`: `NEXT_PUBLIC_APP_URL=`, `NODE_ENV=production`
 - Place sensitive variables in `.env.local`: `DATABASE_URL=`, `SECRET_KEY=`, `API_TOKEN=`
 - Add empty placeholders for sensitive variables in `.env`: `DATABASE_URL=`, `SECRET_KEY=`
 - Never commit `.env.local` to version control
 
 Sub rule 3: Variable Classification
+
 - Sensitive variables: passwords, API keys, secret tokens, database URLs, private keys
 - Non-sensitive variables: URLs, ports, feature flags, public configuration, environment names
 - When in doubt, treat variables as sensitive and use `.local` files
 - Use TypeScript interfaces to type environment variables
 
 Sub rule 4: Documentation
+
 - Document environment variables only in `README.md`
 - Provide clear setup instructions for new developers in documentation
