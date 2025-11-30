@@ -6,7 +6,6 @@ alwaysApply: true
 
 Sub rule 1: Meaningful Names
 - Use descriptive and pronounceable names for variables, functions, and classes
-- Avoid abbreviations and single-letter variables except for loop counters
 - Use verbs for function names (e.g., `getUserData`, `calculateTotal`)
 - Use nouns for class names (e.g., `UserService`, `DatabaseConnection`)
 - Name interfaces descriptively with `I` prefix: `IUserService`, `IRepository`
@@ -21,28 +20,15 @@ Sub rule 2: Small and Focused Functions
 Sub rule 3: Code Organization and Structure
 - Group related code together
 - Keep files focused on a single responsibility
-- Organize imports: external libraries first, then internal modules
-- Avoid deep nesting (more than 3 levels)
 
 Sub rule 4: Error Handling
 - Handle errors at the appropriate level
 - Use specific error types with descriptive messages
 - Avoid catching exceptions without proper handling
-- Use Result/Either patterns for better error handling
-- Log errors with sufficient context
 
 Sub rule 5: Logging Practices
-- Use simple console logging with environment-based log level filtering
 - Server-side: `Logger` class with dependency injection
 - Client-side: `useLogger` hook with direct console output
-- Server-side import: `import { Logger } from '@/application/shared/Logger'`
-- Server-side usage: `constructor(@inject('Logger') private logger: Logger)`
-- Client-side import: `import { useLogger } from '@/presentation/shared/hooks/useLogger'`
-- Client-side usage: `const logger = useLogger()`
-- Use appropriate methods: `logger.debug()`, `logger.info()`, `logger.warn()`, `logger.error()`
-- Include structured metadata in all log entries for better debugging and monitoring
-- Use specialized methods: `logger.logApiRequest()`, `logger.logError()`, `logger.logSecurity()`, `logger.measure()`
-- Configure log levels with environment variables: `LOG_LEVEL` (server) and `NEXT_PUBLIC_LOG_LEVEL` (client)
 
 Sub rule 6: TypeScript Specific Clean Code
 - Use interfaces over types for object shapes that can be extended
@@ -85,13 +71,7 @@ Sub rule 11: KISS (Keep It Simple, Stupid)
 - Minimize cognitive load and reduce likelihood of introducing bugs
 - Prioritize simplicity over unnecessary complexity
 
-Sub rule 10: Readability and Formatting
-- Follow consistent formatting (use Prettier)
-- Use meaningful whitespace to improve readability
-- Keep lines under 80 characters when possible
-- Use descriptive variable names even in short scopes
-
-Sub rule 11: Testing and Clean Code
+Sub rule 12: Testing and Clean Code
 - Write tests that are easy to understand
 - Use descriptive test names that explain the behavior
 - Keep tests simple and focused

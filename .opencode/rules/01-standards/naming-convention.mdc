@@ -11,7 +11,6 @@ Sub rule 1: General Guidelines
 - Do not use abbreviations in any names.
 
 Sub rule 2: File and Folder Names
-- Use `kebab-case` for file and folder names.
 - Match the file name to the default export for components and modules (e.g., `WebsiteSettingsForm.tsx` for a component named `WebsiteSettingsForm`).
 - Group related files into directories named after their feature, module, or entity.
 
@@ -22,7 +21,3 @@ Sub rule 3: Domain-Specific Naming
 
 Sub rule 4: Test Files
 - Use the same name as the file under test, suffixed with `.test` (e.g., `AuthenticateUser.test.ts` for `AuthenticateUser.ts`).
-
-Sub rule 5: Special Cases
-- Avoid using reserved keywords or language-specific identifiers.
-- Use descriptive names that clearly convey the purpose of the variable, function, or class.

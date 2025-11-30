@@ -25,8 +25,6 @@ Sub rule 4: Performance Optimization
 - Implement proper database connection management and query optimization
 
 Sub rule 5: Error Handling and Validation
-- Validate all input parameters with proper error messages
-- Return specific error messages for validation failures: `"Invalid theme color provided"`
 - Use try-catch blocks with comprehensive error logging
 - Implement proper error boundaries and graceful degradation
 - Log errors with sufficient context for debugging and monitoring
@@ -42,14 +40,9 @@ Sub rule 8: Logging and Monitoring
 - Use simple console logging with environment-based log level filtering
 - Log API requests with method, URL, and user context: `logger.logApiRequest()`
 - Log API responses with status code and duration: `logger.logApiResponse()`
-- Include correlation IDs for request tracking
 
 Sub rule 9: Testing and Quality Assurance
-- Write comprehensive unit tests for all API endpoints
-- Test both success and error scenarios
-- Mock external dependencies while testing business logic
-- Use consistent test data and fixtures
-- Validate response schemas and status codes
+- Test only common scenarios
 
 Sub rule 10: Type Safety and Validation
 - Use TypeScript interfaces for all request/response types

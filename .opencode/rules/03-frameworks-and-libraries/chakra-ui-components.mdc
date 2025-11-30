@@ -24,7 +24,6 @@ Sub rule 3: Dark Mode Support
 - Use `color="fg"` or `color="fg.muted"` for text colors
 - Apply border colors with `borderColor="border"` for theme consistency
 - Use `_dark` pseudo-prop for dark mode specific styles: `bg={{ base: "white", _dark: "black" }}`
-- Use `useColorModeValue` hook for conditional values: `useColorModeValue("light", "dark")`
 - Import color mode components: `ColorModeButton`, `DarkMode`, `LightMode` from color-mode module
 
 Sub rule 4: Styling and Spacing

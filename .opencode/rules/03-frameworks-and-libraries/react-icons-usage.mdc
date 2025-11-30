@@ -7,11 +7,8 @@ alwaysApply: false
 Sub rule 1: Import React Icons
 - Import icons from `react-icons` library instead of using inline SVG
 - Use specific icon imports: `import { FcGoogle } from 'react-icons/fc'`
-- Use icon sets: `fa` (Font Awesome), `fi` (Feather), `hi` (Heroicons), `io` (Ionicons), `bs` (Bootstrap), `fc` (Flat Color), etc.
 
 Sub rule 2: Icon Implementation
-- Use icon components directly: `<FcGoogle size={20} />`
-- Apply size using `size` prop instead of width/height attributes
 - Use `color` prop for icon coloring when needed
 - Wrap icons in Chakra UI components for consistent spacing
 
@@ -21,13 +18,7 @@ Sub rule 3: Styling and Sizing
 - Use Chakra spacing utilities for icon spacing: `gap={2}`, `gap={3}`
 - Apply color through Chakra theme: `color="fg.muted"` or via icon `color` prop
 
-Sub rule 4: Performance Considerations
-- React Icons are tree-shakable, only import used icons
-- Icons are optimized SVG components bundled with the library
-- Avoid creating custom icon components unless absolutely necessary
-- Use consistent icon sets throughout the application for visual harmony
-
-Sub rule 6: Accessibility
+Sub rule 4: Accessibility
 - Use `aria-label` on icon containers when icons convey meaning
 - Ensure icons have sufficient color contrast for accessibility
 - Use Chakra's built-in accessibility features with icon components
