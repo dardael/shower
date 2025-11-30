@@ -339,8 +339,6 @@ jest.mock('@/presentation/shared/components/ui/color-mode', () => ({
       mockColorModeState = mockColorModeState === 'dark' ? 'light' : 'dark';
     },
   }),
-  useColorModeValue: <T>(light: T, dark: T) =>
-    mockColorModeState === 'dark' ? dark : light,
   ColorModeButton: () => null,
   ColorModeProvider: ({ children }: ComponentProps) => children,
 }));

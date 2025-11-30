@@ -3,7 +3,6 @@
 import React from 'react';
 import ErrorBoundary from '@/presentation/shared/components/ErrorBoundary';
 import { Box, VStack, Heading, Text, Button } from '@chakra-ui/react';
-import { useColorModeValue } from '@/presentation/shared/components/ui/color-mode';
 
 interface AdminErrorFallbackProps {
   error?: Error;
@@ -11,31 +10,26 @@ interface AdminErrorFallbackProps {
 }
 
 function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
-  const bg = useColorModeValue('bg.subtle', 'bg.subtle');
-  const borderColor = useColorModeValue('border', 'border');
-  const headingColor = useColorModeValue('fg', 'fg');
-  const textColor = useColorModeValue('fg.muted', 'fg.muted');
-
   return (
     <Box
-      bg={bg}
+      bg="bg.subtle"
       borderRadius="2xl"
       p={{ base: 6, md: 8 }}
       border="1px solid"
-      borderColor={borderColor}
+      borderColor="border"
       minHeight="400px"
     >
       <VStack align="center" gap={6} maxW="md" textAlign="center" mx="auto">
         <Heading
           as="h2"
           size={{ base: 'lg', md: 'xl' }}
-          color={headingColor}
+          color="fg"
           fontWeight="semibold"
         >
           Admin Panel Error
         </Heading>
 
-        <Text color={textColor} fontSize={{ base: 'sm', md: 'md' }}>
+        <Text color="fg.muted" fontSize={{ base: 'sm', md: 'md' }}>
           {process.env.NODE_ENV === 'development'
             ? `Admin error: ${error?.message || 'An unexpected error occurred in the admin panel'}`
             : 'An error occurred in the admin panel. Please try again or contact support.'}

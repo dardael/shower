@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Box, VStack, Heading, Text, Button } from '@chakra-ui/react';
-import { useColorModeValue } from '@/presentation/shared/components/ui/color-mode';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -67,18 +66,13 @@ interface DefaultErrorFallbackProps {
 }
 
 function DefaultErrorFallback({ error, reset }: DefaultErrorFallbackProps) {
-  const bg = useColorModeValue('bg.subtle', 'bg.subtle');
-  const borderColor = useColorModeValue('border', 'border');
-  const headingColor = useColorModeValue('fg', 'fg');
-  const textColor = useColorModeValue('fg.muted', 'fg.muted');
-
   return (
     <Box
-      bg={bg}
+      bg="bg.subtle"
       borderRadius="2xl"
       p={{ base: 6, md: 8 }}
       border="1px solid"
-      borderColor={borderColor}
+      borderColor="border"
       minH="400px"
       display="flex"
       alignItems="center"
@@ -88,13 +82,13 @@ function DefaultErrorFallback({ error, reset }: DefaultErrorFallbackProps) {
         <Heading
           as="h2"
           size={{ base: 'lg', md: 'xl' }}
-          color={headingColor}
+          color="fg"
           fontWeight="semibold"
         >
           Something went wrong
         </Heading>
 
-        <Text color={textColor} fontSize={{ base: 'sm', md: 'md' }}>
+        <Text color="fg.muted" fontSize={{ base: 'sm', md: 'md' }}>
           {process.env.NODE_ENV === 'development'
             ? error?.message || 'An unexpected error occurred'
             : 'An unexpected error occurred. Please try again or contact support if the problem persists.'}
