@@ -1,4 +1,5 @@
 Sub rule 1: Component Structure
+
 - Import Chakra UI components from `@chakra-ui/react`
 - Use Chakra UI layout components (`Box`, `Stack`, `Flex`, `Grid`) instead of custom divs
 - Prefer semantic Chakra components (`Container`, `Heading`, `Text`) over HTML elements
@@ -7,6 +8,7 @@ Sub rule 1: Component Structure
   - Use {"my ' text"} when a text has a caracter to encode to avoid to write the encoded caracter
 
 Sub rule 2: Responsive Design
+
 - Use Chakra's responsive object syntax: `{{ base: 'sm', md: 'lg', xl: 'xl' }}`
 - Use range notation for better control: `{{ mdDown: 'full', md: 'auto' }}`
 - Use single breakpoint notation: `{{ lgOnly: 'block' }}` for specific breakpoints
@@ -14,6 +16,7 @@ Sub rule 2: Responsive Design
 - Use `hideFrom="md"` and `hideBelow="md"` for conditional visibility
 
 Sub rule 3: Dark Mode Support
+
 - Use semantic color tokens: `bg="bg.subtle"`, `bg="bg.muted"` instead of hard colors
 - Use `color="fg"` or `color="fg.muted"` for text colors
 - Apply border colors with `borderColor="border"` for theme consistency
@@ -21,6 +24,7 @@ Sub rule 3: Dark Mode Support
 - Import color mode components: `ColorModeButton`, `DarkMode`, `LightMode` from color-mode module
 
 Sub rule 4: Styling and Spacing
+
 - Use Chakra's spacing scale (`2`, `4`, `8`, etc.) instead of arbitrary values
 - Apply semantic props: `textAlign="center"` instead of style props
 - Use `colorPalette` system for dynamic theming: `colorPalette="blue"`
@@ -29,6 +33,7 @@ Sub rule 4: Styling and Spacing
 - Use `divideY`, `divideX` for borders between elements
 
 Sub rule 5: Conditional Styling and States
+
 - Use pseudo-props for states: `_hover={{ bg: "blue.600" }}`, `_focus={{ ring: "2px" }}`
 - Use `_active`, `_disabled` for interaction states
 - Use `_groupHover` with `className="group"` for parent-child state styling
@@ -36,18 +41,21 @@ Sub rule 5: Conditional Styling and States
 - Apply ARIA-based styling: `_expanded={{ bg: "gray.500" }}`, `_loading={{ opacity: 0.5 }}`
 
 Sub rule 6: Accessibility
+
 - Use Chakra's built-in accessibility features and ARIA support
 - Apply proper `aria` labels when using custom components
 - Ensure keyboard navigation works with Chakra components
 - Use focus ring customization: `focusRingWidth="2px"`, `focusRingStyle="dashed"`
 
 Sub rule 7: Component Composition
+
 - Wrap components in `Box` or `Stack` for layout structure
 - Use `VStack` for vertical layouts, `HStack` for horizontal
 - Use `chakra()` factory to style external components
 - Use `layerStyle` and `textStyle` for consistent styling patterns
 
 Sub rule 8: Form Component Patterns (Chakra UI v3)
+
 - Use `Field.Root` with `invalid` prop for form validation instead of `Input invalid`
 - Structure forms as: `<Field.Root><Field.Label/><Input/><Field.ErrorText/></Field.Root>`
 - Use compound components for checkboxes: `<Checkbox.Root><Checkbox.HiddenInput/><Checkbox.Control><Checkbox.Indicator/></Checkbox.Control><Checkbox.Label/></Checkbox.Root>`

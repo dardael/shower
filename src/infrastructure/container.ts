@@ -56,11 +56,13 @@ import type { IGetMenuItems } from '@/application/menu/IGetMenuItems';
 import type { IAddMenuItem } from '@/application/menu/IAddMenuItem';
 import type { IRemoveMenuItem } from '@/application/menu/IRemoveMenuItem';
 import type { IReorderMenuItems } from '@/application/menu/IReorderMenuItems';
+import type { IUpdateMenuItem } from '@/application/menu/IUpdateMenuItem';
 import { MongooseMenuItemRepository } from '@/infrastructure/menu/repositories/MongooseMenuItemRepository';
 import { GetMenuItems } from '@/application/menu/GetMenuItems';
 import { AddMenuItem } from '@/application/menu/AddMenuItem';
 import { RemoveMenuItem } from '@/application/menu/RemoveMenuItem';
 import { ReorderMenuItems } from '@/application/menu/ReorderMenuItems';
+import { UpdateMenuItem } from '@/application/menu/UpdateMenuItem';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -188,6 +190,10 @@ container.register<IRemoveMenuItem>('IRemoveMenuItem', {
 
 container.register<IReorderMenuItems>('IReorderMenuItems', {
   useClass: ReorderMenuItems,
+});
+
+container.register<IUpdateMenuItem>('IUpdateMenuItem', {
+  useClass: UpdateMenuItem,
 });
 
 // Service locator pattern for server components
