@@ -1,7 +1,5 @@
 ---
 description: review code changes
-agent: plan
-model: zai-coding-plan/glm-4.6
 ---
 
 make a review of the commits in the current branch that are not in main branch:
