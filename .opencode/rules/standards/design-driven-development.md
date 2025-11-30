@@ -1,9 +1,3 @@
----
-description: Ensure alignment of design artifacts with development to facilitate Design Driven Development (DDD) and Hexagonal Architecture. Establish a structured workflow where designs directly influence the structure and implementation of code across all layers in your existing architecture. This rule ensures consistent user experience, adherence to business goals, and efficient development lifecycles.
-globs: apps/frontend/**/*.tsx
-alwaysApply: false
----
-
 Sub rule 1: Design Implementation Guidelines
 - Implement domain-driven design in the `src/domain` layer for entities, value-objects, and services.
 - Implement use cases derived from designs in the `src/application` layer to encapsulate business logic.

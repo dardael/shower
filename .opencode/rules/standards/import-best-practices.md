@@ -1,9 +1,3 @@
----
-description: Define when to use static imports versus dynamic imports for optimal performance, code readability, and maintainability across TypeScript and JavaScript modules.
-globs: src/**/*.{ts,tsx,js,jsx}
-alwaysApply: true
----
-
 Sub rule 1: Use Static Imports by Default
 - Import all core modules, utilities, and domain entities using static imports
 - Use static imports for dependencies needed immediately when the module loads

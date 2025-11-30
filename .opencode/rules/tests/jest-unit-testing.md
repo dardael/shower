@@ -1,9 +1,3 @@
----
-description: Rules for writing simple, maintainable unit tests focusing on main behaviors without over-mocking or over-testing.
-globs: test/unit/**/*.test.ts
-alwaysApply: false
----
-
 Sub rule 1: Test Simplicity
 - Test only main behaviors
 - Avoid testing implementation details

@@ -1,9 +1,3 @@
----
-description: Ensure that the code adheres to the SOLID principles to enhance maintainability, scalability, and readability in the project's architecture.
-globs: src/**/*.ts
-alwaysApply: true
----
-
 Sub rule 1: Single Responsibility Principle
 
 - Each class, function, or module should have one and only one responsibility.

@@ -1,9 +1,3 @@
----
-description: Defines the structure and management of environment variables across development, testing, and production environments, ensuring secure handling of sensitive data and consistent configuration.
-globs: .env*
-alwaysApply: false
----
-
 Sub rule 1: Environment File Structure
 - Use `.env` for non-sensitive production variables
 - Use `.env.local` for sensitive production variables (passwords, API keys, secrets)

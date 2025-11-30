@@ -1,9 +1,3 @@
----
-description: Enforce the use of Chakra UI v3 as the default component library for all React components, ensuring consistent styling, responsive design, and dark mode support across the application using modern v3 patterns.
-globs: src/presentation/**/*.tsx
-alwaysApply: false
----
-
 Sub rule 1: Component Structure
 - Import Chakra UI components from `@chakra-ui/react`
 - Use Chakra UI layout components (`Box`, `Stack`, `Flex`, `Grid`) instead of custom divs

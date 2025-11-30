@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [".opencode/rules/*/*.mdc"],
+  "instructions": [".opencode/rules/standards/*.md"],
   "model": "zai-coding-plan/glm-4.6",
   "mcp": {
     "browsermcp": {

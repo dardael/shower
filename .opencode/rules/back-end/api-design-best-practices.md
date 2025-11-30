@@ -1,9 +1,3 @@
----
-description: Establish comprehensive API design standards ensuring consistency, performance, backward compatibility, and security across all REST API endpoints in Next.js applications.
-globs: src/app/api/**/*.ts
-alwaysApply: true
----
-
 Sub rule 1: API Structure and Organization
 - Use RESTful conventions: GET for retrieval, POST for creation, PUT for updates, DELETE for removal
 - Organize endpoints by resource hierarchy: `/api/settings`, `/api/settings/theme-color`, `/api/settings/icon`

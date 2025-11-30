@@ -1,9 +1,3 @@
----
-description: Enforce UI development constraints to maintain simplicity, performance, and accessibility by prohibiting animations, transitions, device capability detection, and glass morphism effects across all React components.
-globs: src/presentation/**/*.tsx
-alwaysApply: false
----
-
 Sub rule 1: Animation and Transition Restrictions
 - Do not add CSS transitions or animations to any UI elements
 - Avoid `transition` properties in styles or CSS classes

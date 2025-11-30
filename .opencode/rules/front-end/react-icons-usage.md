@@ -1,9 +1,3 @@
----
-description: Enforce the use of React Icons library instead of inline SVG elements for consistent iconography, better maintainability, and optimized performance across React components.
-globs: src/presentation/**/*.tsx
-alwaysApply: false
----
-
 Sub rule 1: Import React Icons
 - Import icons from `react-icons` library instead of using inline SVG
 - Use specific icon imports: `import { FcGoogle } from 'react-icons/fc'`

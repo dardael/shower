@@ -1,9 +1,3 @@
----
-description: Specifies naming conventions for all identifiers across the codebase, ensuring consistency, readability, and alignment with the project's architecture and style guide.
-globs: **/*.{js,jsx,ts,tsx}
-alwaysApply: true
----
-
 Sub rule 1: General Guidelines
 - Use `PascalCase` for React components, classes, and TypeScript interfaces.
 - Use `camelCase` for variables, functions, and method names.

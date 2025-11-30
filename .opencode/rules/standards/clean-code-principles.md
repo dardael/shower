@@ -1,9 +1,3 @@
----
-description: Enforce clean code principles across the codebase to ensure maintainability, readability, and quality. This rule covers general clean code practices with specific guidance for TypeScript and Next.js projects.
-globs: src/**/*.{ts,tsx,js,jsx}
-alwaysApply: true
----
-
 Sub rule 1: Meaningful Names
 - Use descriptive and pronounceable names for variables, functions, and classes
 - Use verbs for function names (e.g., `getUserData`, `calculateTotal`)

@@ -1,9 +1,3 @@
----
-description: Enforce TypeScript strict mode compliance and best practices for type safety, eliminating implicit any types and ensuring robust type checking throughout the codebase.
-globs: src/**/*.{ts,tsx}
-alwaysApply: true
----
-
 Sub rule 1: Type Safety
 - Never use `any` type; use `unknown` for truly unknown data
 - Always provide explicit return types for functions

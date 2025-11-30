@@ -1,8 +1,3 @@
----
-description: Establish comprehensive documentation standards for README.md and AGENTS.md
-globs: README.md, AGENTS.md
-alwaysApply: true
----
 Sub rule 1: README.md Content Standards
 - Include all developer setup information in README.md
 - Document environment variables with examples and descriptions
