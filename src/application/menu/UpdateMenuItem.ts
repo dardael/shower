@@ -3,6 +3,7 @@ import type { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepo
 import type { IUpdateMenuItem } from '@/application/menu/IUpdateMenuItem';
 import type { MenuItem } from '@/domain/menu/entities/MenuItem';
 import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
+import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
 
 @injectable()
 export class UpdateMenuItem implements IUpdateMenuItem {
@@ -11,14 +12,17 @@ export class UpdateMenuItem implements IUpdateMenuItem {
     private readonly repository: MenuItemRepository
   ) {}
 
-  async execute(id: string, text: string): Promise<MenuItem> {
+  async execute(id: string, text: string, url: string): Promise<MenuItem> {
     const existingItem = await this.repository.findById(id);
     if (!existingItem) {
       throw new Error('Menu item not found');
     }
 
     const menuItemText = MenuItemText.create(text);
-    const updatedItem = existingItem.withText(menuItemText);
+    const menuItemUrl = MenuItemUrl.create(url);
+    const updatedItem = existingItem
+      .withText(menuItemText)
+      .withUrl(menuItemUrl);
 
     return this.repository.save(updatedItem);
   }

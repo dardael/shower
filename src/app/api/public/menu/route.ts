@@ -28,6 +28,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const publicMenuItems = menuItems.map((item) => ({
       id: item.id,
       text: item.text.value,
+      url: item.url.value,
       position: item.position,
     }));
 

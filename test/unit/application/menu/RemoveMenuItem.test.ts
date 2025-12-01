@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { RemoveMenuItem } from '@/application/menu/RemoveMenuItem';
 import { MenuItem } from '@/domain/menu/entities/MenuItem';
 import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
+import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
 import type { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepository';
 
 const mockMenuItemRepository: jest.Mocked<MenuItemRepository> = {
@@ -25,6 +26,7 @@ describe('RemoveMenuItem', () => {
     const existingItem = MenuItem.reconstitute(
       'item-id-123',
       MenuItemText.create('Home'),
+      MenuItemUrl.create('/home'),
       0,
       new Date(),
       new Date()
@@ -55,6 +57,7 @@ describe('RemoveMenuItem', () => {
     const existingItem = MenuItem.reconstitute(
       'item-id-456',
       MenuItemText.create('About'),
+      MenuItemUrl.create('/about'),
       1,
       new Date(),
       new Date()

@@ -1,5 +1,6 @@
 export interface AddMenuItemRequest {
   text: string;
+  url: string;
 }
 
 export interface ReorderMenuItemsRequest {
@@ -9,6 +10,7 @@ export interface ReorderMenuItemsRequest {
 export interface MenuItemDTO {
   id: string;
   text: string;
+  url: string;
   position: number;
 }
 
@@ -35,6 +37,7 @@ export interface MenuErrorResponse {
 
 export interface UpdateMenuItemRequest {
   text: string;
+  url: string;
 }
 
 export interface UpdateMenuItemResponse {

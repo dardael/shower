@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IMenuItem extends Document {
   text: string;
+  url: string;
   position: number;
   createdAt: Date;
   updatedAt: Date;
@@ -13,6 +14,12 @@ export const MenuItemSchema = new Schema<IMenuItem>(
       type: String,
       required: true,
       maxlength: 100,
+      trim: true,
+    },
+    url: {
+      type: String,
+      required: true,
+      maxlength: 2048,
       trim: true,
     },
     position: {

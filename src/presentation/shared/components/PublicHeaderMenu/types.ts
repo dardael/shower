@@ -6,6 +6,7 @@ import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPale
 export interface PublicMenuItem {
   id: string;
   text: string;
+  url: string;
   position: number;
 }
 
@@ -23,6 +24,7 @@ export interface PublicLogo {
  */
 export interface PublicHeaderMenuItemProps {
   text: string;
+  url: string;
 }
 
 /**

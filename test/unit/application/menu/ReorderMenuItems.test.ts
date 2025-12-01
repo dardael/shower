@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { ReorderMenuItems } from '@/application/menu/ReorderMenuItems';
 import { MenuItem } from '@/domain/menu/entities/MenuItem';
 import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
+import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
 import type { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepository';
 
 const mockMenuItemRepository: jest.Mocked<MenuItemRepository> = {
@@ -26,6 +27,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'id-1',
         MenuItemText.create('Home'),
+        MenuItemUrl.create('/home'),
         0,
         new Date(),
         new Date()
@@ -33,6 +35,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'id-2',
         MenuItemText.create('About'),
+        MenuItemUrl.create('/about'),
         1,
         new Date(),
         new Date()
@@ -40,6 +43,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'id-3',
         MenuItemText.create('Contact'),
+        MenuItemUrl.create('/contact'),
         2,
         new Date(),
         new Date()
@@ -62,6 +66,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'id-1',
         MenuItemText.create('Home'),
+        MenuItemUrl.create('/home'),
         0,
         new Date(),
         new Date()
@@ -90,6 +95,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'a',
         MenuItemText.create('First'),
+        MenuItemUrl.create('/first'),
         5,
         new Date(),
         new Date()
@@ -97,6 +103,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'b',
         MenuItemText.create('Second'),
+        MenuItemUrl.create('/second'),
         10,
         new Date(),
         new Date()
@@ -118,6 +125,7 @@ describe('ReorderMenuItems', () => {
       MenuItem.reconstitute(
         'id-1',
         MenuItemText.create('Home'),
+        MenuItemUrl.create('/home'),
         0,
         new Date(),
         new Date()

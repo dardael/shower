@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import type { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepository';
 import { MenuItem } from '@/domain/menu/entities/MenuItem';
 import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
+import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
 import { MenuItemModel } from '@/infrastructure/menu/models/MenuItemModel';
 import { Logger } from '@/application/shared/Logger';
 
@@ -32,6 +33,7 @@ export class MongooseMenuItemRepository implements MenuItemRepository {
 
       if (existingDocument) {
         existingDocument.text = menuItem.text.value;
+        existingDocument.url = menuItem.url.value;
         existingDocument.position = menuItem.position;
         await existingDocument.save();
         return menuItem;
@@ -41,6 +43,7 @@ export class MongooseMenuItemRepository implements MenuItemRepository {
     // Create new document - let MongoDB generate the _id
     const createdDoc = await MenuItemModel.create({
       text: menuItem.text.value,
+      url: menuItem.url.value,
       position: menuItem.position,
     });
 
@@ -78,15 +81,18 @@ export class MongooseMenuItemRepository implements MenuItemRepository {
   private mapToDomain(doc: {
     _id: unknown;
     text: string;
+    url: string;
     position: number;
     createdAt: Date;
     updatedAt: Date;
   }): MenuItem {
     try {
       const text = MenuItemText.create(doc.text);
+      const url = MenuItemUrl.create(doc.url);
       return MenuItem.reconstitute(
         String(doc._id),
         text,
+        url,
         doc.position,
         doc.createdAt,
         doc.updatedAt
@@ -98,6 +104,7 @@ export class MongooseMenuItemRepository implements MenuItemRepository {
         {
           id: String(doc._id),
           text: doc.text,
+          url: doc.url,
           position: doc.position,
         }
       );

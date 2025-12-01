@@ -40,7 +40,7 @@ import type { MenuItemDTO } from '@/app/api/settings/menu/types';
 interface SortableMenuItemProps {
   item: MenuItemDTO;
   onDelete: (id: string) => void;
-  onEdit: (id: string, text: string) => void;
+  onEdit: (id: string, text: string, url: string) => void;
   isDeleting: boolean;
   isUpdating: boolean;
 }
@@ -54,6 +54,7 @@ function SortableMenuItem({
 }: SortableMenuItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(item.text);
+  const [editUrl, setEditUrl] = useState(item.url);
 
   const {
     attributes,
@@ -72,16 +73,23 @@ function SortableMenuItem({
 
   const handleSave = (): void => {
     const trimmedText = editText.trim();
-    if (trimmedText && trimmedText !== item.text) {
-      onEdit(item.id, trimmedText);
+    const trimmedUrl = editUrl.trim();
+    if (
+      trimmedText &&
+      trimmedUrl &&
+      (trimmedText !== item.text || trimmedUrl !== item.url)
+    ) {
+      onEdit(item.id, trimmedText, trimmedUrl);
     }
     setIsEditing(false);
     setEditText(item.text);
+    setEditUrl(item.url);
   };
 
   const handleCancel = (): void => {
     setIsEditing(false);
     setEditText(item.text);
+    setEditUrl(item.url);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -97,6 +105,7 @@ function SortableMenuItem({
   const handleStartEdit = (): void => {
     if (!isUpdating && !isDeleting) {
       setEditText(item.text);
+      setEditUrl(item.url);
       setIsEditing(true);
     }
   };
@@ -124,29 +133,47 @@ function SortableMenuItem({
         <FiMenu size={18} />
       </Box>
       {isEditing ? (
-        <Input
-          value={editText}
-          onChange={(e) => setEditText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleSave}
-          autoFocus
-          maxLength={100}
-          flex={1}
-          size="sm"
-          bg="bg.canvas"
-          borderColor="colorPalette.solid"
-          borderWidth="2px"
-          color="fg"
-          _focus={{
-            borderColor: 'colorPalette.solid',
-            boxShadow: '0 0 0 2px colorPalette.subtle',
-          }}
-        />
+        <VStack flex={1} gap={2} align="stretch">
+          <Input
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Menu item text"
+            autoFocus
+            maxLength={100}
+            size="sm"
+            bg="bg.canvas"
+            borderColor="colorPalette.solid"
+            borderWidth="2px"
+            color="fg"
+            _focus={{
+              borderColor: 'colorPalette.solid',
+              boxShadow: '0 0 0 2px colorPalette.subtle',
+            }}
+          />
+          <Input
+            value={editUrl}
+            onChange={(e) => setEditUrl(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            placeholder="URL (e.g., /about)"
+            maxLength={2048}
+            size="sm"
+            bg="bg.canvas"
+            borderColor="colorPalette.solid"
+            borderWidth="2px"
+            color="fg"
+            _focus={{
+              borderColor: 'colorPalette.solid',
+              boxShadow: '0 0 0 2px colorPalette.subtle',
+            }}
+          />
+        </VStack>
       ) : (
-        <Text
+        <VStack
           flex={1}
-          color="fg"
-          fontSize="md"
+          align="start"
+          gap={0}
           onClick={handleStartEdit}
           cursor={isUpdating || isDeleting ? 'default' : 'pointer'}
           _hover={
@@ -156,8 +183,13 @@ function SortableMenuItem({
           }
           opacity={isUpdating ? 0.6 : 1}
         >
-          {item.text}
-        </Text>
+          <Text color="fg" fontSize="md">
+            {item.text}
+          </Text>
+          <Text color="fg.muted" fontSize="sm">
+            {item.url}
+          </Text>
+        </VStack>
       )}
       <IconButton
         aria-label="Delete menu item"
@@ -179,6 +211,7 @@ export default function MenuConfigForm() {
   const { showToast } = useToastNotifications();
   const [items, setItems] = useState<MenuItemDTO[]>([]);
   const [newItemText, setNewItemText] = useState('');
+  const [newItemUrl, setNewItemUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [addingItem, setAddingItem] = useState(false);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
@@ -254,20 +287,24 @@ export default function MenuConfigForm() {
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemText.trim()) return;
+    if (!newItemText.trim() || !newItemUrl.trim()) return;
 
     try {
       setAddingItem(true);
       const response = await fetch('/api/settings/menu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: newItemText.trim() }),
+        body: JSON.stringify({
+          text: newItemText.trim(),
+          url: newItemUrl.trim(),
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setItems((prev) => [...prev, data.item]);
         setNewItemText('');
+        setNewItemUrl('');
         showToast('Menu item added successfully', 'success');
       } else {
         const data = await response.json();
@@ -303,13 +340,17 @@ export default function MenuConfigForm() {
     }
   };
 
-  const handleUpdateItem = async (id: string, text: string): Promise<void> => {
+  const handleUpdateItem = async (
+    id: string,
+    text: string,
+    url: string
+  ): Promise<void> => {
     try {
       setUpdatingItemId(id);
       const response = await fetch(`/api/settings/menu/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, url }),
       });
 
       if (response.ok) {
@@ -457,57 +498,89 @@ export default function MenuConfigForm() {
             >
               Add New Menu Item
             </Field.Label>
-            <HStack gap={2}>
-              <Input
-                id="new-menu-item"
-                data-testid="new-menu-item-input"
-                value={newItemText}
-                onChange={(e) => setNewItemText(e.target.value)}
-                placeholder="Enter menu item text"
-                maxLength={100}
-                flex={1}
-                minW="200px"
-                bg="bg.canvas"
-                borderColor="border"
-                borderWidth="2px"
-                borderRadius="lg"
-                fontSize={{ base: 'sm', md: 'md' }}
-                px={4}
-                py={2}
-                h={{ base: '40px', md: '44px' }}
-                color="fg"
-                _placeholder={{ color: 'fg.muted' }}
-                _focus={{
-                  borderColor: 'colorPalette.solid',
-                  boxShadow: '0 0 0 3px colorPalette.subtle',
-                }}
-                _hover={{
-                  borderColor: 'border.emphasized',
-                }}
-              />
-              <IconButton
-                type="submit"
-                data-testid="add-menu-item-button"
-                aria-label="Add menu item"
-                disabled={!newItemText.trim() || addingItem}
-                loading={addingItem}
-                variant="solid"
-                size="md"
-                borderRadius="lg"
-                _dark={{
-                  bg: 'colorPalette.solid',
-                  _hover: { bg: 'colorPalette.emphasized' },
-                }}
-              >
-                <FiPlus size={18} />
-              </IconButton>
-            </HStack>
+            <VStack gap={2} align="stretch">
+              <HStack gap={2}>
+                <Input
+                  id="new-menu-item"
+                  data-testid="new-menu-item-input"
+                  value={newItemText}
+                  onChange={(e) => setNewItemText(e.target.value)}
+                  placeholder="Enter menu item text"
+                  maxLength={100}
+                  flex={1}
+                  minW="150px"
+                  bg="bg.canvas"
+                  borderColor="border"
+                  borderWidth="2px"
+                  borderRadius="lg"
+                  fontSize={{ base: 'sm', md: 'md' }}
+                  px={4}
+                  py={2}
+                  h={{ base: '40px', md: '44px' }}
+                  color="fg"
+                  _placeholder={{ color: 'fg.muted' }}
+                  _focus={{
+                    borderColor: 'colorPalette.solid',
+                    boxShadow: '0 0 0 3px colorPalette.subtle',
+                  }}
+                  _hover={{
+                    borderColor: 'border.emphasized',
+                  }}
+                />
+                <Input
+                  id="new-menu-item-url"
+                  data-testid="new-menu-item-url-input"
+                  value={newItemUrl}
+                  onChange={(e) => setNewItemUrl(e.target.value)}
+                  placeholder="URL (e.g., /about)"
+                  maxLength={2048}
+                  flex={1}
+                  minW="150px"
+                  bg="bg.canvas"
+                  borderColor="border"
+                  borderWidth="2px"
+                  borderRadius="lg"
+                  fontSize={{ base: 'sm', md: 'md' }}
+                  px={4}
+                  py={2}
+                  h={{ base: '40px', md: '44px' }}
+                  color="fg"
+                  _placeholder={{ color: 'fg.muted' }}
+                  _focus={{
+                    borderColor: 'colorPalette.solid',
+                    boxShadow: '0 0 0 3px colorPalette.subtle',
+                  }}
+                  _hover={{
+                    borderColor: 'border.emphasized',
+                  }}
+                />
+                <IconButton
+                  type="submit"
+                  data-testid="add-menu-item-button"
+                  aria-label="Add menu item"
+                  disabled={
+                    !newItemText.trim() || !newItemUrl.trim() || addingItem
+                  }
+                  loading={addingItem}
+                  variant="solid"
+                  size="md"
+                  borderRadius="lg"
+                  _dark={{
+                    bg: 'colorPalette.solid',
+                    _hover: { bg: 'colorPalette.emphasized' },
+                  }}
+                >
+                  <FiPlus size={18} />
+                </IconButton>
+              </HStack>
+            </VStack>
             <Field.HelperText
               fontSize={{ base: 'xs', md: 'sm' }}
               color="fg.muted"
               mt={2}
             >
-              Enter the display text for the menu item. Maximum 100 characters.
+              Enter the display text and URL for the menu item. URL must be a
+              relative path (e.g., /about, contact).
             </Field.HelperText>
           </Field.Root>
         </form>

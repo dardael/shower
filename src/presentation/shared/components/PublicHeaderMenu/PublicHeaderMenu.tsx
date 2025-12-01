@@ -103,7 +103,7 @@ export function PublicHeaderMenu({
           )}
           {menuItems.map((item) => (
             <Box key={item.id} color={{ base: 'black', _dark: 'white' }}>
-              <PublicHeaderMenuItem text={item.text} />
+              <PublicHeaderMenuItem text={item.text} url={item.url} />
             </Box>
           ))}
         </Flex>

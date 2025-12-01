@@ -73,22 +73,28 @@ export const PATCH = withApiParams<MenuItemParams, NextResponse>(
 
       const body = (await request.json()) as UpdateMenuItemRequest;
 
-      if (!body.text || typeof body.text !== 'string') {
+      if (
+        !body.text ||
+        typeof body.text !== 'string' ||
+        !body.url ||
+        typeof body.url !== 'string'
+      ) {
         return NextResponse.json(
-          { error: 'Menu item text is required' },
+          { error: 'ID, text, and URL are required' },
           { status: 400 }
         );
       }
 
       const updateMenuItem =
         container.resolve<UpdateMenuItem>('IUpdateMenuItem');
-      const menuItem = await updateMenuItem.execute(id, body.text);
+      const menuItem = await updateMenuItem.execute(id, body.text, body.url);
 
       const response: UpdateMenuItemResponse = {
         message: 'Menu item updated successfully',
         item: {
           id: menuItem.id,
           text: menuItem.text.value,
+          url: menuItem.url.value,
           position: menuItem.position,
         },
       };
@@ -105,7 +111,8 @@ export const PATCH = withApiParams<MenuItemParams, NextResponse>(
         }
         if (
           error.message.includes('cannot be empty') ||
-          error.message.includes('cannot exceed')
+          error.message.includes('cannot exceed') ||
+          error.message.includes('must be a relative path')
         ) {
           return NextResponse.json({ error: error.message }, { status: 400 });
         }

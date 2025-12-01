@@ -113,7 +113,11 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+- TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, tsyringe (DI), @dnd-kit/core, Mongoose (010-menu-item-url)
 
 - Browser localStorage
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop, BetterAuth, react-icons
 - MongoDB via Mongoose
+
+## Recent Changes
+- 010-menu-item-url: Added TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, tsyringe (DI), @dnd-kit/core, Mongoose

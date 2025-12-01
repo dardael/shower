@@ -25,6 +25,7 @@ export const GET = withApi(
         items: menuItems.map((item) => ({
           id: item.id,
           text: item.text.value,
+          url: item.url.value,
           position: item.position,
         })),
       };
@@ -48,21 +49,27 @@ export const POST = withApi(
     try {
       const body = (await request.json()) as AddMenuItemRequest;
 
-      if (!body.text || typeof body.text !== 'string') {
+      if (
+        !body.text ||
+        typeof body.text !== 'string' ||
+        !body.url ||
+        typeof body.url !== 'string'
+      ) {
         return NextResponse.json(
-          { error: 'Menu item text is required' },
+          { error: 'Text and URL are required' },
           { status: 400 }
         );
       }
 
       const addMenuItem = container.resolve<AddMenuItem>('IAddMenuItem');
-      const menuItem = await addMenuItem.execute(body.text);
+      const menuItem = await addMenuItem.execute(body.text, body.url);
 
       const response: AddMenuItemResponse = {
         message: 'Menu item added successfully',
         item: {
           id: menuItem.id,
           text: menuItem.text.value,
+          url: menuItem.url.value,
           position: menuItem.position,
         },
       };
@@ -76,7 +83,8 @@ export const POST = withApi(
       if (error instanceof Error) {
         if (
           error.message.includes('cannot be empty') ||
-          error.message.includes('cannot exceed')
+          error.message.includes('cannot exceed') ||
+          error.message.includes('must be a relative path')
         ) {
           return NextResponse.json({ error: error.message }, { status: 400 });
         }

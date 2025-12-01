@@ -1,5 +1,5 @@
 import type { MenuItem } from '@/domain/menu/entities/MenuItem';
 
 export interface IUpdateMenuItem {
-  execute(id: string, text: string): Promise<MenuItem>;
+  execute(id: string, text: string, url: string): Promise<MenuItem>;
 }
