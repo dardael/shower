@@ -19,8 +19,8 @@ module.exports = {
     ],
   },
   moduleNameMapper: {
+    '\\.(css|scss|sass)$': 'identity-obj-proxy',
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^.+\\.(css|scss|sass)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ['<rootDir>/test/unit/setup.ts'],
   transformIgnorePatterns: [

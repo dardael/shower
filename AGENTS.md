@@ -6,7 +6,7 @@ This project aims to create a robust, scalable, and maintainable web application
 
 - It's designed to allow the user to create it's showcase website in a simple and efficient way.
 - The is an admin screen protected by authentication, and a public screen to display the showcase.
-- The user can create its pages, add sections to the pages, and customize the sections with different components.
+- The user can create its pages, modify them and delete them.
 - The user can also manage the website settings, such as the theme color, navigation, and footer.
 
 Since this project is in creation, no need to handle backward compatibility.
@@ -113,11 +113,8 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
-- TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, tsyringe (DI), @dnd-kit/core, Mongoose (010-menu-item-url)
 
 - Browser localStorage
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop, BetterAuth, react-icons
 - MongoDB via Mongoose
-
-## Recent Changes
-- 010-menu-item-url: Added TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, tsyringe (DI), @dnd-kit/core, Mongoose
+- Tiptap (@tiptap/react, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link) for rich text editing

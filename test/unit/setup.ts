@@ -452,11 +452,19 @@ jest.mock('mongoose', () => ({
     disconnect: jest.fn(() => Promise.resolve()),
     models: {},
   },
-  Schema: jest.fn(() => ({
-    pre: jest.fn(),
-    post: jest.fn(),
-    index: jest.fn(),
-  })),
+  Schema: Object.assign(
+    jest.fn(() => ({
+      pre: jest.fn(),
+      post: jest.fn(),
+      index: jest.fn(),
+    })),
+    {
+      Types: {
+        ObjectId: 'ObjectId',
+        Mixed: 'Mixed',
+      },
+    }
+  ),
   model: jest.fn(),
   models: {},
 }));

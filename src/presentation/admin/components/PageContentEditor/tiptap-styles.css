@@ -1,0 +1,55 @@
+.tiptap-editor-wrapper .tiptap {
+  outline: none;
+  min-height: 180px;
+  color: var(--chakra-colors-fg);
+}
+
+.tiptap-editor-wrapper .tiptap p {
+  margin-bottom: 0.5rem;
+  color: var(--chakra-colors-fg);
+}
+
+.tiptap-editor-wrapper .tiptap h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--chakra-colors-fg);
+}
+
+.tiptap-editor-wrapper .tiptap h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: var(--chakra-colors-fg);
+}
+
+.tiptap-editor-wrapper .tiptap h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--chakra-colors-fg);
+}
+
+.tiptap-editor-wrapper .tiptap ul,
+.tiptap-editor-wrapper .tiptap ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap-editor-wrapper .tiptap li {
+  margin-bottom: 0.25rem;
+}
+
+.tiptap-editor-wrapper .tiptap a,
+.tiptap-editor-wrapper .tiptap .tiptap-link {
+  color: var(--chakra-colors-color-palette-solid, #3182ce);
+  text-decoration: underline;
+}
+
+.tiptap-editor-wrapper .tiptap img,
+.tiptap-editor-wrapper .tiptap .tiptap-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  margin: 0.5rem 0;
+}

@@ -63,6 +63,16 @@ import { AddMenuItem } from '@/application/menu/AddMenuItem';
 import { RemoveMenuItem } from '@/application/menu/RemoveMenuItem';
 import { ReorderMenuItems } from '@/application/menu/ReorderMenuItems';
 import { UpdateMenuItem } from '@/application/menu/UpdateMenuItem';
+import type { IPageContentRepository } from '@/domain/pages/repositories/IPageContentRepository';
+import { MongoosePageContentRepository } from '@/infrastructure/pages/repositories/MongoosePageContentRepository';
+import type { ICreatePageContent } from '@/application/pages/interfaces/ICreatePageContent';
+import type { IGetPageContent } from '@/application/pages/interfaces/IGetPageContent';
+import type { IUpdatePageContent } from '@/application/pages/interfaces/IUpdatePageContent';
+import type { IDeletePageContent } from '@/application/pages/interfaces/IDeletePageContent';
+import { CreatePageContent } from '@/application/pages/use-cases/CreatePageContent';
+import { GetPageContent } from '@/application/pages/use-cases/GetPageContent';
+import { UpdatePageContent } from '@/application/pages/use-cases/UpdatePageContent';
+import { DeletePageContent } from '@/application/pages/use-cases/DeletePageContent';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -194,6 +204,27 @@ container.register<IReorderMenuItems>('IReorderMenuItems', {
 
 container.register<IUpdateMenuItem>('IUpdateMenuItem', {
   useClass: UpdateMenuItem,
+});
+
+// Register page content services
+container.register<IPageContentRepository>('PageContentRepository', {
+  useClass: MongoosePageContentRepository,
+});
+
+container.register<ICreatePageContent>('ICreatePageContent', {
+  useClass: CreatePageContent,
+});
+
+container.register<IGetPageContent>('IGetPageContent', {
+  useClass: GetPageContent,
+});
+
+container.register<IUpdatePageContent>('IUpdatePageContent', {
+  useClass: UpdatePageContent,
+});
+
+container.register<IDeletePageContent>('IDeletePageContent', {
+  useClass: DeletePageContent,
 });
 
 // Service locator pattern for server components

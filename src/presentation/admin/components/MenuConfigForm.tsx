@@ -12,7 +12,7 @@ import {
   HStack,
   IconButton,
 } from '@chakra-ui/react';
-import { FiPlus, FiTrash2, FiMenu } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiMenu, FiEdit } from 'react-icons/fi';
 import {
   DndContext,
   closestCenter,
@@ -34,6 +34,7 @@ import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
 import { useLogoManagement } from '@/presentation/admin/hooks/useLogoManagement';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import PageContentEditor from '@/presentation/admin/components/PageContentEditor/PageContentEditor';
 import type { ImageData } from '@/presentation/shared/components/ImageManager/types';
 import type { MenuItemDTO } from '@/app/api/settings/menu/types';
 
@@ -41,6 +42,7 @@ interface SortableMenuItemProps {
   item: MenuItemDTO;
   onDelete: (id: string) => void;
   onEdit: (id: string, text: string, url: string) => void;
+  onEditContent: (id: string, text: string) => void;
   isDeleting: boolean;
   isUpdating: boolean;
 }
@@ -49,6 +51,7 @@ function SortableMenuItem({
   item,
   onDelete,
   onEdit,
+  onEditContent,
   isDeleting,
   isUpdating,
 }: SortableMenuItemProps) {
@@ -192,6 +195,17 @@ function SortableMenuItem({
         </VStack>
       )}
       <IconButton
+        aria-label="Edit page content"
+        variant="ghost"
+        size="sm"
+        color="fg.muted"
+        _hover={{ color: 'colorPalette.solid', bg: 'colorPalette.subtle' }}
+        onClick={() => onEditContent(item.id, item.text)}
+        disabled={isDeleting || isUpdating || isEditing}
+      >
+        <FiEdit size={16} />
+      </IconButton>
+      <IconButton
         aria-label="Delete menu item"
         variant="ghost"
         size="sm"
@@ -217,6 +231,10 @@ export default function MenuConfigForm() {
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [currentLogo, setCurrentLogo] = useState<ImageData | null>(null);
+  const [editingContentItem, setEditingContentItem] = useState<{
+    id: string;
+    text: string;
+  } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -623,6 +641,9 @@ export default function MenuConfigForm() {
                       item={item}
                       onDelete={handleDeleteItem}
                       onEdit={handleUpdateItem}
+                      onEditContent={(id, text) =>
+                        setEditingContentItem({ id, text })
+                      }
                       isDeleting={deletingItemId === item.id}
                       isUpdating={updatingItemId === item.id}
                     />
@@ -632,6 +653,15 @@ export default function MenuConfigForm() {
             </DndContext>
           )}
         </Box>
+
+        {editingContentItem && (
+          <Box mt={6}>
+            <PageContentEditor
+              menuItemId={editingContentItem.id}
+              menuItemText={editingContentItem.text}
+            />
+          </Box>
+        )}
       </Stack>
     </Box>
   );

@@ -5,10 +5,6 @@ import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 
 type NextRouteHandler<T = unknown> = (request: NextRequest) => Promise<T>;
-type NextRouteHandlerWithParams<T = unknown> = (
-  request: NextRequest,
-  { params }: { params: Record<string, unknown> }
-) => Promise<T>;
 
 interface ApiWrapperOptions {
   requireAuth?: boolean;
