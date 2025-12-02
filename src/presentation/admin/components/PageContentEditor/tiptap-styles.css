@@ -63,3 +63,17 @@
 span[data-theme-color] {
   color: var(--chakra-colors-color-palette-solid);
 }
+
+/* Text alignment styles */
+.tiptap-editor-wrapper .tiptap [style*='text-align: left'] {
+  text-align: left;
+}
+.tiptap-editor-wrapper .tiptap [style*='text-align: center'] {
+  text-align: center;
+}
+.tiptap-editor-wrapper .tiptap [style*='text-align: right'] {
+  text-align: right;
+}
+.tiptap-editor-wrapper .tiptap [style*='text-align: justify'] {
+  text-align: justify;
+}

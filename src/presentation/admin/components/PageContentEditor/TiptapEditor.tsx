@@ -4,8 +4,19 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
 import { Box, HStack, IconButton, Input } from '@chakra-ui/react';
-import { FiBold, FiItalic, FiList, FiLink, FiImage } from 'react-icons/fi';
+import {
+  FiBold,
+  FiItalic,
+  FiList,
+  FiLink,
+  FiImage,
+  FiAlignLeft,
+  FiAlignCenter,
+  FiAlignRight,
+  FiAlignJustify,
+} from 'react-icons/fi';
 import {
   LuHeading1,
   LuHeading2,
@@ -48,6 +59,11 @@ export default function TiptapEditor({
         },
       }),
       ThemeColorMark,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right', 'justify'],
+        defaultAlignment: 'left',
+      }),
     ],
     content,
     editable: !disabled,
@@ -195,6 +211,56 @@ export default function TiptapEditor({
           disabled={disabled}
         >
           <LuListOrdered />
+        </IconButton>
+        <IconButton
+          aria-label="Align Left"
+          size="sm"
+          variant={editor.isActive({ textAlign: 'left' }) ? 'solid' : 'ghost'}
+          color={
+            editor.isActive({ textAlign: 'left' }) ? 'colorPalette.fg' : 'fg'
+          }
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          disabled={disabled}
+        >
+          <FiAlignLeft />
+        </IconButton>
+        <IconButton
+          aria-label="Align Center"
+          size="sm"
+          variant={editor.isActive({ textAlign: 'center' }) ? 'solid' : 'ghost'}
+          color={
+            editor.isActive({ textAlign: 'center' }) ? 'colorPalette.fg' : 'fg'
+          }
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          disabled={disabled}
+        >
+          <FiAlignCenter />
+        </IconButton>
+        <IconButton
+          aria-label="Align Right"
+          size="sm"
+          variant={editor.isActive({ textAlign: 'right' }) ? 'solid' : 'ghost'}
+          color={
+            editor.isActive({ textAlign: 'right' }) ? 'colorPalette.fg' : 'fg'
+          }
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          disabled={disabled}
+        >
+          <FiAlignRight />
+        </IconButton>
+        <IconButton
+          aria-label="Justify"
+          size="sm"
+          variant={
+            editor.isActive({ textAlign: 'justify' }) ? 'solid' : 'ghost'
+          }
+          color={
+            editor.isActive({ textAlign: 'justify' }) ? 'colorPalette.fg' : 'fg'
+          }
+          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+          disabled={disabled}
+        >
+          <FiAlignJustify />
         </IconButton>
         <IconButton
           aria-label="Add Link"

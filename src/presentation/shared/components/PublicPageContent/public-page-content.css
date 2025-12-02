@@ -68,3 +68,17 @@
 .public-page-content span[data-theme-color] {
   color: var(--chakra-colors-color-palette-solid);
 }
+
+/* Text alignment styles */
+.public-page-content [style*='text-align: left'] {
+  text-align: left;
+}
+.public-page-content [style*='text-align: center'] {
+  text-align: center;
+}
+.public-page-content [style*='text-align: right'] {
+  text-align: right;
+}
+.public-page-content [style*='text-align: justify'] {
+  text-align: justify;
+}
