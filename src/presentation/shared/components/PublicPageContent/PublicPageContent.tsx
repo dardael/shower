@@ -41,8 +41,18 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
       'blockquote',
       'code',
       'pre',
+      'span',
     ],
-    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target', 'rel'],
+    ALLOWED_ATTR: [
+      'href',
+      'src',
+      'alt',
+      'title',
+      'target',
+      'rel',
+      'class',
+      'data-theme-color',
+    ],
     ALLOW_DATA_ATTR: false,
   });
 

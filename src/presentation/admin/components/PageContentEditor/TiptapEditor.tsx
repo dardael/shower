@@ -12,8 +12,10 @@ import {
   LuHeading3,
   LuListOrdered,
 } from 'react-icons/lu';
+import { MdFormatColorText } from 'react-icons/md';
 import { useState, useCallback, useEffect } from 'react';
 import './tiptap-styles.css';
+import { ThemeColorMark } from './ThemeColorMark';
 
 interface TiptapEditorProps {
   content: string;
@@ -45,6 +47,7 @@ export default function TiptapEditor({
           class: 'tiptap-link',
         },
       }),
+      ThemeColorMark,
     ],
     content,
     editable: !disabled,
@@ -120,6 +123,16 @@ export default function TiptapEditor({
           disabled={disabled}
         >
           <FiItalic />
+        </IconButton>
+        <IconButton
+          aria-label="Theme Color"
+          size="sm"
+          variant={editor.isActive('themeColor') ? 'solid' : 'ghost'}
+          color={editor.isActive('themeColor') ? 'colorPalette.fg' : 'fg'}
+          onClick={() => editor.chain().focus().toggleThemeColor().run()}
+          disabled={disabled}
+        >
+          <MdFormatColorText />
         </IconButton>
         <IconButton
           aria-label="Heading 1"

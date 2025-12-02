@@ -63,3 +63,8 @@
 .public-page-content em {
   font-style: italic;
 }
+
+.public-page-content .theme-color-text,
+.public-page-content span[data-theme-color] {
+  color: var(--chakra-colors-color-palette-solid);
+}

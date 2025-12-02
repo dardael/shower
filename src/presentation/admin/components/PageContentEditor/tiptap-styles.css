@@ -53,3 +53,13 @@
   border-radius: 0.375rem;
   margin: 0.5rem 0;
 }
+
+.tiptap-editor-wrapper .tiptap .theme-color-text,
+.theme-color-text {
+  color: var(--chakra-colors-color-palette-solid);
+}
+
+.tiptap-editor-wrapper .tiptap span[data-theme-color],
+span[data-theme-color] {
+  color: var(--chakra-colors-color-palette-solid);
+}
