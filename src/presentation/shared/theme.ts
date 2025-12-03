@@ -219,6 +219,9 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
       html: {
         colorPalette: themeColor,
       },
+      body: {
+        fontFamily: 'var(--website-font, system-ui, sans-serif)',
+      },
     },
   });
 }

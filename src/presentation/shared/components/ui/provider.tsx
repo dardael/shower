@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { ThemeColorProvider } from '@/presentation/shared/contexts/ThemeColorContext';
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
+import { FontProvider } from '@/presentation/shared/components/FontProvider';
 
 // Type definitions for webpack hot module replacement
 interface WebpackHot {
@@ -60,7 +61,9 @@ function ThemeProviderWrapper({ children }: { children: React.ReactNode }) {
     return (
       <DynamicThemeProvider>
         <DynamicChakraProvider>
-          <div style={{ opacity: 0 }} />
+          <FontProvider>
+            <div style={{ opacity: 0 }} />
+          </FontProvider>
         </DynamicChakraProvider>
       </DynamicThemeProvider>
     );
@@ -69,7 +72,9 @@ function ThemeProviderWrapper({ children }: { children: React.ReactNode }) {
   // If there was an error fetching theme color, still render with fallback
   return (
     <DynamicThemeProvider>
-      <DynamicChakraProvider>{children}</DynamicChakraProvider>
+      <DynamicChakraProvider>
+        <FontProvider>{children}</FontProvider>
+      </DynamicChakraProvider>
     </DynamicThemeProvider>
   );
 }

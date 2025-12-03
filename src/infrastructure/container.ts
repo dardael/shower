@@ -34,6 +34,9 @@ import type { IGetThemeColor } from '@/application/settings/IGetThemeColor';
 import type { IUpdateThemeColor } from '@/application/settings/IUpdateThemeColor';
 import type { IGetHeaderLogo } from '@/application/settings/IGetHeaderLogo';
 import type { IUpdateHeaderLogo } from '@/application/settings/IUpdateHeaderLogo';
+import type { IGetWebsiteFont } from '@/application/settings/IGetWebsiteFont';
+import type { IUpdateWebsiteFont } from '@/application/settings/IUpdateWebsiteFont';
+import type { IGetAvailableFonts } from '@/application/settings/IGetAvailableFonts';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -45,6 +48,9 @@ import { GetThemeColor } from '@/application/settings/GetThemeColor';
 import { UpdateThemeColor } from '@/application/settings/UpdateThemeColor';
 import { GetHeaderLogo } from '@/application/settings/GetHeaderLogo';
 import { UpdateHeaderLogo } from '@/application/settings/UpdateHeaderLogo';
+import { GetWebsiteFont } from '@/application/settings/GetWebsiteFont';
+import { UpdateWebsiteFont } from '@/application/settings/UpdateWebsiteFont';
+import { GetAvailableFonts } from '@/application/settings/GetAvailableFonts';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -152,6 +158,18 @@ container.register<IGetHeaderLogo>('IGetHeaderLogo', {
 
 container.register<IUpdateHeaderLogo>('IUpdateHeaderLogo', {
   useClass: UpdateHeaderLogo,
+});
+
+container.register<IGetWebsiteFont>('IGetWebsiteFont', {
+  useClass: GetWebsiteFont,
+});
+
+container.register<IUpdateWebsiteFont>('IUpdateWebsiteFont', {
+  useClass: UpdateWebsiteFont,
+});
+
+container.register<IGetAvailableFonts>('IGetAvailableFonts', {
+  useClass: GetAvailableFonts,
 });
 
 // Register factory services
@@ -277,6 +295,18 @@ export class SettingsServiceLocator {
 
   static getUpdateHeaderLogo(): IUpdateHeaderLogo {
     return container.resolve('IUpdateHeaderLogo');
+  }
+
+  static getGetWebsiteFont(): IGetWebsiteFont {
+    return container.resolve('IGetWebsiteFont');
+  }
+
+  static getUpdateWebsiteFont(): IUpdateWebsiteFont {
+    return container.resolve('IUpdateWebsiteFont');
+  }
+
+  static getGetAvailableFonts(): IGetAvailableFonts {
+    return container.resolve('IGetAvailableFonts');
   }
 }
 

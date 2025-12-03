@@ -1,6 +1,7 @@
 import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
+import { WebsiteFont } from '@/domain/settings/value-objects/WebsiteFont';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
 import {
   VALID_SETTING_KEYS,
@@ -134,6 +135,13 @@ export class WebsiteSetting {
     return new WebsiteSetting(VALID_SETTING_KEYS.THEME_COLOR, themeColor.value);
   }
 
+  static createWebsiteFont(websiteFont: WebsiteFont): WebsiteSetting {
+    return new WebsiteSetting(
+      VALID_SETTING_KEYS.WEBSITE_FONT,
+      websiteFont.value
+    );
+  }
+
   // Type validation methods
   static isValidWebsiteNameKey(key: string): boolean {
     return key === VALID_SETTING_KEYS.WEBSITE_NAME;
@@ -145,6 +153,10 @@ export class WebsiteSetting {
 
   static isValidThemeColorKey(key: string): boolean {
     return key === VALID_SETTING_KEYS.THEME_COLOR;
+  }
+
+  static isValidWebsiteFontKey(key: string): boolean {
+    return key === VALID_SETTING_KEYS.WEBSITE_FONT;
   }
 
   static isValidSettingKey(key: string): boolean {
@@ -162,5 +174,9 @@ export class WebsiteSetting {
 
   static createDefaultThemeColor(): WebsiteSetting {
     return new WebsiteSetting(VALID_SETTING_KEYS.THEME_COLOR, 'blue');
+  }
+
+  static createDefaultWebsiteFont(): WebsiteSetting {
+    return new WebsiteSetting(VALID_SETTING_KEYS.WEBSITE_FONT, 'Inter');
   }
 }

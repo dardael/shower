@@ -13,8 +13,10 @@ import {
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
+import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
+import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
@@ -36,6 +38,11 @@ export default function WebsiteSettingsForm({
   const { themeColor, setThemeColor } = useDynamicTheme();
   const { updateThemeColor: updateThemeColorWithCache } =
     useThemeColorContext();
+  const {
+    websiteFont,
+    updateWebsiteFont: updateWebsiteFontWithCache,
+    isLoading: fontLoading,
+  } = useWebsiteFontContext();
   const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
 
@@ -314,6 +321,20 @@ export default function WebsiteSettingsForm({
               }
             }}
             disabled={loading}
+          />
+
+          <FontSelector
+            selectedFont={websiteFont}
+            onFontChange={async (font) => {
+              try {
+                await updateWebsiteFontWithCache(font);
+                updateFieldValue('websiteFont', font);
+              } catch {
+                showToast('Failed to update website font', 'error');
+              }
+            }}
+            disabled={loading}
+            isLoading={fontLoading}
           />
 
           <Box w="full">
