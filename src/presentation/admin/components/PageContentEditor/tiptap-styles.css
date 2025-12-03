@@ -77,3 +77,100 @@ span[data-theme-color] {
 .tiptap-editor-wrapper .tiptap [style*='text-align: justify'] {
   text-align: justify;
 }
+
+/* Selected image outline for light/dark modes */
+.tiptap-editor-wrapper .tiptap .ProseMirror-selectednode img,
+.tiptap-editor-wrapper .tiptap img.ProseMirror-selectednode,
+.tiptap-editor-wrapper .tiptap [data-resize-container] img {
+  outline: 2px solid var(--chakra-colors-color-palette-solid);
+  outline-offset: 2px;
+}
+
+/* Resize container styles */
+.tiptap-editor-wrapper .tiptap [data-resize-container] {
+  display: block;
+}
+
+/* Image alignment styles - wrap images for alignment */
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-container]:has(img[data-text-align='left']) {
+  text-align: left;
+}
+
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-container]:has(img[data-text-align='center']) {
+  text-align: center;
+}
+
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-container]:has(img[data-text-align='right']) {
+  text-align: right;
+}
+
+/* Direct image alignment (without resize container) */
+.tiptap-editor-wrapper .tiptap img[data-text-align='left'] {
+  display: block;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap img[data-text-align='center'] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap img[data-text-align='right'] {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.tiptap-editor-wrapper .tiptap [data-resize-wrapper] {
+  display: inline-block;
+  position: relative;
+}
+
+/* Resize handle styles - corner handles */
+.tiptap-editor-wrapper .tiptap [data-resize-handle] {
+  width: 12px;
+  height: 12px;
+  background: var(--chakra-colors-color-palette-solid, #3182ce);
+  border: 2px solid white;
+  border-radius: 2px;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Corner handle cursors */
+.tiptap-editor-wrapper .tiptap [data-resize-handle='top-left'] {
+  cursor: nwse-resize;
+  transform: translate(-50%, -50%);
+}
+
+.tiptap-editor-wrapper .tiptap [data-resize-handle='top-right'] {
+  cursor: nesw-resize;
+  transform: translate(50%, -50%);
+}
+
+.tiptap-editor-wrapper .tiptap [data-resize-handle='bottom-left'] {
+  cursor: nesw-resize;
+  transform: translate(-50%, 50%);
+}
+
+.tiptap-editor-wrapper .tiptap [data-resize-handle='bottom-right'] {
+  cursor: nwse-resize;
+  transform: translate(50%, 50%);
+}
+
+/* Draggable cursor styles */
+.tiptap-editor-wrapper .tiptap img {
+  cursor: grab;
+}
+
+.tiptap-editor-wrapper .tiptap img:active {
+  cursor: grabbing;
+}

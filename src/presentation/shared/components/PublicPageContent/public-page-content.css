@@ -56,6 +56,30 @@
   margin: 1rem 0;
 }
 
+/* When explicit dimensions set via resize, respect them but cap at container width */
+.public-page-content img[style*='width'] {
+  max-width: 100%;
+}
+
+/* Image alignment styles */
+.public-page-content img[data-text-align='left'] {
+  display: block;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.public-page-content img[data-text-align='center'] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.public-page-content img[data-text-align='right'] {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
 .public-page-content strong {
   font-weight: bold;
 }

@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
+import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
   FiBold,
@@ -30,6 +31,103 @@ import './tiptap-styles.css';
 import { ThemeColorMark } from './ThemeColorMark';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 
+const ResizableImage = Image.extend({
+  draggable: true,
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      textAlign: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-text-align'),
+        renderHTML: (attributes) => {
+          if (!attributes.textAlign) {
+            return {};
+          }
+          return { 'data-text-align': attributes.textAlign };
+        },
+      },
+    };
+  },
+}).configure({
+  HTMLAttributes: {
+    class: 'tiptap-image',
+  },
+  resize: {
+    enabled: true,
+    directions: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    minWidth: 50,
+    minHeight: 50,
+    alwaysPreserveAspectRatio: true,
+  },
+});
+
+const setImageAlignment = (
+  editor: Editor,
+  imagePos: number,
+  alignment: 'left' | 'center' | 'right'
+): void => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image') {
+    // Update the node attributes
+    const { tr } = editor.state;
+    editor.view.dispatch(
+      tr.setNodeMarkup(imagePos, undefined, {
+        ...node.attrs,
+        textAlign: alignment,
+      })
+    );
+
+    // Apply alignment to the DOM container
+    applyImageAlignmentToDOM(editor, imagePos, alignment);
+  }
+};
+
+const applyImageAlignmentToDOM = (
+  editor: Editor,
+  imagePos: number,
+  alignment: string | null
+): void => {
+  const domNode = editor.view.nodeDOM(imagePos) as HTMLElement | null;
+  if (domNode) {
+    // The domNode could be the container or the image itself
+    const container = domNode.hasAttribute?.('data-resize-container')
+      ? domNode
+      : (domNode.closest?.('[data-resize-container]') as HTMLElement | null);
+
+    if (container) {
+      if (alignment === 'center') {
+        container.style.justifyContent = 'center';
+      } else if (alignment === 'right') {
+        container.style.justifyContent = 'flex-end';
+      } else {
+        container.style.justifyContent = 'flex-start';
+      }
+    }
+  }
+};
+
+const syncAllImageAlignments = (editor: Editor): void => {
+  const { doc } = editor.state;
+  doc.descendants((node, pos) => {
+    if (node.type.name === 'image' && node.attrs.textAlign) {
+      applyImageAlignmentToDOM(editor, pos, node.attrs.textAlign);
+    }
+    return true;
+  });
+};
+
+const isImageAlignmentActive = (
+  editor: Editor,
+  imagePos: number,
+  alignment: 'left' | 'center' | 'right'
+): boolean => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image') {
+    return node.attrs.textAlign === alignment;
+  }
+  return false;
+};
+
 interface TiptapEditorProps {
   content: string;
   onChange: (content: string) => void;
@@ -52,6 +150,7 @@ export default function TiptapEditor({
   const [linkUrl, setLinkUrl] = useState('');
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedImagePos, setSelectedImagePos] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
 
@@ -133,11 +232,7 @@ export default function TiptapEditor({
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image.configure({
-        HTMLAttributes: {
-          class: 'tiptap-image',
-        },
-      }),
+      ResizableImage,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -156,9 +251,25 @@ export default function TiptapEditor({
     immediatelyRender: false,
     onCreate: ({ editor: ed }) => {
       editorRef.current = ed;
+      // Sync image alignments after initial render
+      setTimeout(() => syncAllImageAlignments(ed), 0);
     },
     onUpdate: ({ editor: ed }) => {
       onChange(ed.getHTML());
+      // Sync image alignments after content update
+      syncAllImageAlignments(ed);
+    },
+    onSelectionUpdate: ({ editor: ed }) => {
+      // Track selected image position
+      const { selection } = ed.state;
+      if (
+        selection instanceof NodeSelection &&
+        selection.node.type.name === 'image'
+      ) {
+        setSelectedImagePos(selection.from);
+      } else {
+        setSelectedImagePos(null);
+      }
     },
     editorProps: {
       handleDrop: (_view, event, _slice, moved) => {
@@ -191,6 +302,35 @@ export default function TiptapEditor({
             }
           }
         }
+        return false;
+      },
+      handleClick: (view, pos, event) => {
+        // Check if clicked on an image
+        const target = event.target as HTMLElement;
+        const imageElement = target.closest('img');
+        if (imageElement) {
+          // Find the image node position
+          const { doc } = view.state;
+          let imagePos: number | null = null;
+          doc.descendants((node, nodePos) => {
+            if (node.type.name === 'image' && imagePos === null) {
+              // Check if this is the clicked image by comparing DOM nodes
+              const domNode = view.nodeDOM(nodePos);
+              if (
+                domNode &&
+                (domNode === imageElement || domNode.contains(imageElement))
+              ) {
+                imagePos = nodePos;
+              }
+            }
+            return imagePos === null;
+          });
+          if (imagePos !== null) {
+            setSelectedImagePos(imagePos);
+            return false;
+          }
+        }
+        setSelectedImagePos(null);
         return false;
       },
     },
@@ -359,11 +499,31 @@ export default function TiptapEditor({
         <IconButton
           aria-label="Align Left"
           size="sm"
-          variant={editor.isActive({ textAlign: 'left' }) ? 'solid' : 'ghost'}
-          color={
-            editor.isActive({ textAlign: 'left' }) ? 'colorPalette.fg' : 'fg'
+          variant={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'left')
+                ? 'solid'
+                : 'ghost'
+              : editor.isActive({ textAlign: 'left' })
+                ? 'solid'
+                : 'ghost'
           }
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          color={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'left')
+                ? 'colorPalette.fg'
+                : 'fg'
+              : editor.isActive({ textAlign: 'left' })
+                ? 'colorPalette.fg'
+                : 'fg'
+          }
+          onClick={() => {
+            if (selectedImagePos !== null) {
+              setImageAlignment(editor, selectedImagePos, 'left');
+            } else {
+              editor.chain().focus().setTextAlign('left').run();
+            }
+          }}
           disabled={disabled}
         >
           <FiAlignLeft />
@@ -371,11 +531,31 @@ export default function TiptapEditor({
         <IconButton
           aria-label="Align Center"
           size="sm"
-          variant={editor.isActive({ textAlign: 'center' }) ? 'solid' : 'ghost'}
-          color={
-            editor.isActive({ textAlign: 'center' }) ? 'colorPalette.fg' : 'fg'
+          variant={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'center')
+                ? 'solid'
+                : 'ghost'
+              : editor.isActive({ textAlign: 'center' })
+                ? 'solid'
+                : 'ghost'
           }
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          color={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'center')
+                ? 'colorPalette.fg'
+                : 'fg'
+              : editor.isActive({ textAlign: 'center' })
+                ? 'colorPalette.fg'
+                : 'fg'
+          }
+          onClick={() => {
+            if (selectedImagePos !== null) {
+              setImageAlignment(editor, selectedImagePos, 'center');
+            } else {
+              editor.chain().focus().setTextAlign('center').run();
+            }
+          }}
           disabled={disabled}
         >
           <FiAlignCenter />
@@ -383,11 +563,31 @@ export default function TiptapEditor({
         <IconButton
           aria-label="Align Right"
           size="sm"
-          variant={editor.isActive({ textAlign: 'right' }) ? 'solid' : 'ghost'}
-          color={
-            editor.isActive({ textAlign: 'right' }) ? 'colorPalette.fg' : 'fg'
+          variant={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'right')
+                ? 'solid'
+                : 'ghost'
+              : editor.isActive({ textAlign: 'right' })
+                ? 'solid'
+                : 'ghost'
           }
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          color={
+            selectedImagePos !== null
+              ? isImageAlignmentActive(editor, selectedImagePos, 'right')
+                ? 'colorPalette.fg'
+                : 'fg'
+              : editor.isActive({ textAlign: 'right' })
+                ? 'colorPalette.fg'
+                : 'fg'
+          }
+          onClick={() => {
+            if (selectedImagePos !== null) {
+              setImageAlignment(editor, selectedImagePos, 'right');
+            } else {
+              editor.chain().focus().setTextAlign('right').run();
+            }
+          }}
           disabled={disabled}
         >
           <FiAlignRight />
@@ -402,7 +602,7 @@ export default function TiptapEditor({
             editor.isActive({ textAlign: 'justify' }) ? 'colorPalette.fg' : 'fg'
           }
           onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-          disabled={disabled}
+          disabled={disabled || selectedImagePos !== null}
         >
           <FiAlignJustify />
         </IconButton>
