@@ -71,6 +71,8 @@ import { ReorderMenuItems } from '@/application/menu/ReorderMenuItems';
 import { UpdateMenuItem } from '@/application/menu/UpdateMenuItem';
 import type { IPageContentRepository } from '@/domain/pages/repositories/IPageContentRepository';
 import { MongoosePageContentRepository } from '@/infrastructure/pages/repositories/MongoosePageContentRepository';
+import type { IFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
+import { LocalFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
 import type { ICreatePageContent } from '@/application/pages/interfaces/ICreatePageContent';
 import type { IGetPageContent } from '@/application/pages/interfaces/IGetPageContent';
 import type { IUpdatePageContent } from '@/application/pages/interfaces/IUpdatePageContent';
@@ -102,6 +104,11 @@ container.register<AdminAccessPolicyService>('AdminAccessPolicyService', {
 // Register application services
 container.register<IAuthorizeAdminAccess>('IAuthorizeAdminAccess', {
   useClass: AuthorizeAdminAccess,
+});
+
+// Register file storage service
+container.register<IFileStorageService>('IFileStorageService', {
+  useClass: LocalFileStorageService,
 });
 
 // Register settings services

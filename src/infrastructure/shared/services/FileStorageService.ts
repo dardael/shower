@@ -10,6 +10,10 @@ export interface IFileStorageService {
   deleteIcon(filename: string): Promise<void>;
   uploadLogo(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
   deleteLogo(filename: string): Promise<void>;
+  uploadPageContentImage(
+    file: File
+  ): Promise<{ url: string; metadata: IIconMetadata }>;
+  deletePageContentImage(filename: string): Promise<void>;
 }
 
 interface UploadConfig {
@@ -58,23 +62,44 @@ const LOGO_UPLOAD_CONFIG: UploadConfig = {
   entityName: 'logo',
 };
 
+const PAGE_CONTENT_IMAGE_CONFIG: UploadConfig = {
+  allowedTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
+  maxSizeBytes: 5 * 1024 * 1024,
+  filenamePrefix: 'page-content',
+  defaultExtension: 'png',
+  typeErrorMessage:
+    'Invalid file type. Only PNG, JPG, GIF, and WebP files are allowed.',
+  sizeErrorMessage: 'File size must be less than 5MB.',
+  entityName: 'page content image',
+};
+
 export class LocalFileStorageService implements IFileStorageService {
   private readonly baseUrl = getBaseUrl();
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
+  private readonly pageContentImagesDir = path.join(
+    process.cwd(),
+    'public',
+    'page-content-images'
+  );
 
-  private async ensureIconsDirectory(): Promise<void> {
+  private async ensureDirectory(dir: string): Promise<void> {
     try {
-      await fs.access(this.iconsDir);
+      await fs.access(dir);
     } catch {
-      await fs.mkdir(this.iconsDir, { recursive: true });
+      await fs.mkdir(dir, { recursive: true });
     }
   }
 
   private async uploadImage(
     file: File,
-    config: UploadConfig
+    config: UploadConfig,
+    targetDir?: string,
+    apiPath?: string
   ): Promise<{ url: string; metadata: IIconMetadata }> {
-    await this.ensureIconsDirectory();
+    const directory = targetDir || this.iconsDir;
+    const apiRoute = apiPath || '/api/icons';
+
+    await this.ensureDirectory(directory);
 
     if (!config.allowedTypes.includes(file.type)) {
       throw new Error(config.typeErrorMessage);
@@ -104,7 +129,7 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    const filePath = path.join(this.iconsDir, filename);
+    const filePath = path.join(directory, filename);
     try {
       await fs.writeFile(filePath, buffer);
 
@@ -128,7 +153,7 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    const url = `${this.baseUrl}/api/icons/${filename}`;
+    const url = `${this.baseUrl}${apiRoute}/${filename}`;
 
     const metadata: IIconMetadata = {
       filename,
@@ -168,12 +193,14 @@ export class LocalFileStorageService implements IFileStorageService {
 
   private async deleteImage(
     filename: string,
-    entityName: string
+    entityName: string,
+    targetDir?: string
   ): Promise<void> {
-    await this.ensureIconsDirectory();
+    const directory = targetDir || this.iconsDir;
+    await this.ensureDirectory(directory);
 
     try {
-      const filePath = path.join(this.iconsDir, filename);
+      const filePath = path.join(directory, filename);
       await fs.unlink(filePath);
       const logger = container.resolve<Logger>('Logger');
       logger.info(`Deleted ${entityName} file: ${filename}`);
@@ -204,5 +231,24 @@ export class LocalFileStorageService implements IFileStorageService {
 
   async deleteLogo(filename: string): Promise<void> {
     return this.deleteImage(filename, 'logo');
+  }
+
+  async uploadPageContentImage(
+    file: File
+  ): Promise<{ url: string; metadata: IIconMetadata }> {
+    return this.uploadImage(
+      file,
+      PAGE_CONTENT_IMAGE_CONFIG,
+      this.pageContentImagesDir,
+      '/api/page-content-images'
+    );
+  }
+
+  async deletePageContentImage(filename: string): Promise<void> {
+    return this.deleteImage(
+      filename,
+      'page content image',
+      this.pageContentImagesDir
+    );
   }
 }

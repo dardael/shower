@@ -114,6 +114,7 @@ you must use docker compose to run all commands in order to have the same enviro
 
 ## Active Technologies
 
+- Local file system (public/page-content-images/)
 - Browser localStorage
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop, BetterAuth, react-icons, Google Fonts CSS API
 - MongoDB via Mongoose

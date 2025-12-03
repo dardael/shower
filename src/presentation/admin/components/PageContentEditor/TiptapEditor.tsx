@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
-import { Box, HStack, IconButton, Input } from '@chakra-ui/react';
+import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
   FiBold,
   FiItalic,
@@ -24,9 +24,11 @@ import {
   LuListOrdered,
 } from 'react-icons/lu';
 import { MdFormatColorText } from 'react-icons/md';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { Editor } from '@tiptap/react';
 import './tiptap-styles.css';
 import { ThemeColorMark } from './ThemeColorMark';
+import { toaster } from '@/presentation/shared/components/ui/toaster';
 
 interface TiptapEditorProps {
   content: string;
@@ -34,15 +36,99 @@ interface TiptapEditorProps {
   disabled?: boolean;
 }
 
+const ALLOWED_IMAGE_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'image/webp',
+];
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
 export default function TiptapEditor({
   content,
   onChange,
   disabled = false,
 }: TiptapEditorProps) {
   const [linkUrl, setLinkUrl] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
   const [showLinkInput, setShowLinkInput] = useState(false);
-  const [showImageInput, setShowImageInput] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<Editor | null>(null);
+
+  const validateFile = useCallback((file: File): string | null => {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return 'Invalid file type. Only PNG, JPG, GIF, and WebP files are allowed.';
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return 'File size must be less than 5MB.';
+    }
+    return null;
+  }, []);
+
+  const uploadImage = useCallback(
+    async (file: File): Promise<void> => {
+      const validationError = validateFile(file);
+      if (validationError) {
+        toaster.create({
+          title: 'Upload failed',
+          description: validationError,
+          type: 'error',
+        });
+        return;
+      }
+
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch('/api/page-content-images', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error || 'Failed to upload image. Please try again.'
+          );
+        }
+
+        const { image } = await response.json();
+        editorRef.current?.chain().focus().setImage({ src: image.url }).run();
+      } catch (error) {
+        toaster.create({
+          title: 'Upload failed',
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Failed to upload image. Please try again.',
+          type: 'error',
+        });
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [validateFile]
+  );
+
+  const handleFileInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      const file = event.target.files?.[0];
+      if (file) {
+        uploadImage(file);
+      }
+      // Reset input so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    },
+    [uploadImage]
+  );
+
+  const handleImageButtonClick = useCallback((): void => {
+    fileInputRef.current?.click();
+  }, []);
 
   const editor = useEditor({
     extensions: [
@@ -68,8 +154,45 @@ export default function TiptapEditor({
     content,
     editable: !disabled,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+    onCreate: ({ editor: ed }) => {
+      editorRef.current = ed;
+    },
+    onUpdate: ({ editor: ed }) => {
+      onChange(ed.getHTML());
+    },
+    editorProps: {
+      handleDrop: (_view, event, _slice, moved) => {
+        if (moved || disabled || isUploading) {
+          return false;
+        }
+        const file = event.dataTransfer?.files[0];
+        if (file && file.type.startsWith('image/')) {
+          event.preventDefault();
+          uploadImage(file);
+          return true;
+        }
+        return false;
+      },
+      handlePaste: (_view, event) => {
+        if (disabled || isUploading) {
+          return false;
+        }
+        const items = event.clipboardData?.items;
+        if (!items) {
+          return false;
+        }
+        for (const item of Array.from(items)) {
+          if (item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) {
+              event.preventDefault();
+              uploadImage(file);
+              return true;
+            }
+          }
+        }
+        return false;
+      },
     },
   });
 
@@ -92,14 +215,6 @@ export default function TiptapEditor({
     }
   }, [editor, linkUrl]);
 
-  const handleAddImage = useCallback(() => {
-    if (imageUrl && editor) {
-      editor.chain().focus().setImage({ src: imageUrl }).run();
-      setImageUrl('');
-      setShowImageInput(false);
-    }
-  }, [editor, imageUrl]);
-
   if (!editor) {
     return null;
   }
@@ -111,7 +226,36 @@ export default function TiptapEditor({
       borderRadius="lg"
       overflow="hidden"
       bg="bg.canvas"
+      position="relative"
     >
+      {/* Hidden file input for image upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp"
+        style={{ display: 'none' }}
+        onChange={handleFileInputChange}
+        disabled={disabled || isUploading}
+      />
+
+      {/* Loading overlay */}
+      {isUploading && (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="blackAlpha.400"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          zIndex={10}
+        >
+          <Spinner size="lg" color="colorPalette.solid" />
+        </Box>
+      )}
+
       <HStack
         p={2}
         borderBottomWidth="1px"
@@ -269,22 +413,18 @@ export default function TiptapEditor({
           color={showLinkInput ? 'colorPalette.fg' : 'fg'}
           onClick={() => {
             setShowLinkInput(!showLinkInput);
-            setShowImageInput(false);
           }}
           disabled={disabled}
         >
           <FiLink />
         </IconButton>
         <IconButton
-          aria-label="Add Image"
+          aria-label="Upload Image"
           size="sm"
-          variant={showImageInput ? 'solid' : 'ghost'}
-          color={showImageInput ? 'colorPalette.fg' : 'fg'}
-          onClick={() => {
-            setShowImageInput(!showImageInput);
-            setShowLinkInput(false);
-          }}
-          disabled={disabled}
+          variant="ghost"
+          color="fg"
+          onClick={handleImageButtonClick}
+          disabled={disabled || isUploading}
         >
           <FiImage />
         </IconButton>
@@ -318,38 +458,6 @@ export default function TiptapEditor({
             disabled={!linkUrl}
           >
             <FiLink />
-          </IconButton>
-        </HStack>
-      )}
-
-      {showImageInput && (
-        <HStack
-          p={2}
-          borderBottomWidth="1px"
-          borderColor="border"
-          bg="bg.subtle"
-        >
-          <Input
-            placeholder="Enter image URL"
-            size="sm"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleAddImage();
-              }
-            }}
-          />
-          <IconButton
-            aria-label="Apply Image"
-            size="sm"
-            variant="solid"
-            color="colorPalette.fg"
-            onClick={handleAddImage}
-            disabled={!imageUrl}
-          >
-            <FiImage />
           </IconButton>
         </HStack>
       )}
