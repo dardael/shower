@@ -4,6 +4,7 @@ export const VALID_SETTING_KEYS = {
   THEME_COLOR: 'theme-color',
   HEADER_LOGO: 'header-logo',
   WEBSITE_FONT: 'website-font',
+  BACKGROUND_COLOR: 'background-color',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(

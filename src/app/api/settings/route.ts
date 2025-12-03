@@ -4,6 +4,7 @@ import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { withApi } from '@/infrastructure/shared/apiWrapper';
 import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
+import { BackgroundColor } from '@/domain/settings/value-objects/BackgroundColor';
 import {
   isValidThemeColor,
   getThemeColorErrorMessage,
@@ -31,27 +32,32 @@ export const GET = withApi(
 
       // Get current settings
       const getThemeColor = SettingsServiceLocator.getGetThemeColor();
+      const getBackgroundColor = SettingsServiceLocator.getGetBackgroundColor();
       const getWebsiteName = SettingsServiceLocator.getWebsiteName();
 
-      const [themeColor, websiteName] = await Promise.all([
+      const [themeColor, backgroundColor, websiteName] = await Promise.all([
         getThemeColor.execute(),
+        getBackgroundColor.execute(),
         getWebsiteName.execute(),
       ]);
 
       logger.info('Website settings retrieved successfully', {
         websiteName: websiteName,
         themeColor: themeColor?.value,
+        backgroundColor: backgroundColor?.value,
       });
 
       const duration = Date.now() - startTime;
       logger.logApiResponse('GET', '/api/settings', 200, duration, {
         websiteName: websiteName,
         themeColor: themeColor?.value,
+        backgroundColor: backgroundColor?.value,
       });
 
       const response: GetSettingsResponse = {
         name: websiteName,
         ...(themeColor && { themeColor: themeColor.value }),
+        ...(backgroundColor && { backgroundColor: backgroundColor.value }),
       };
       return NextResponse.json(response);
     } catch (error) {
@@ -87,7 +93,7 @@ export const POST = withApi(
 
       // Parse request body
       const body = (await request.json()) as UpdateSettingsRequest;
-      const { name, themeColor } = body;
+      const { name, themeColor, backgroundColor } = body;
 
       // Validate inputs
       if (name && typeof name !== 'string') {
@@ -116,6 +122,21 @@ export const POST = withApi(
         return NextResponse.json(errorResponse, { status: 400 });
       }
 
+      if (backgroundColor && !isValidThemeColor(backgroundColor)) {
+        logger.warn('Invalid background color provided', {
+          backgroundColor,
+        });
+
+        const duration = Date.now() - startTime;
+        logger.logApiResponse('POST', '/api/settings', 400, duration);
+
+        const errorResponse: SettingsErrorResponse = {
+          error:
+            'Invalid background color provided. Must be one of: blue, red, green, purple, orange, teal, pink, cyan',
+        };
+        return NextResponse.json(errorResponse, { status: 400 });
+      }
+
       // Update name if provided
       if (name && typeof name === 'string') {
         const updateWebsiteName = SettingsServiceLocator.getUpdateWebsiteName();
@@ -133,10 +154,22 @@ export const POST = withApi(
         });
       }
 
+      // Update background color if provided
+      if (backgroundColor && typeof backgroundColor === 'string') {
+        const updateBackgroundColor =
+          SettingsServiceLocator.getUpdateBackgroundColor();
+        const backgroundColorValue = BackgroundColor.create(backgroundColor);
+        await updateBackgroundColor.execute(backgroundColorValue);
+        logger.info('Background color updated successfully', {
+          newBackgroundColor: backgroundColorValue.value,
+        });
+      }
+
       const duration = Date.now() - startTime;
       logger.logApiResponse('POST', '/api/settings', 200, duration, {
         name,
         themeColor,
+        backgroundColor,
       });
 
       const response: UpdateSettingsResponse = {

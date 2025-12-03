@@ -6,6 +6,7 @@ import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPale
 export interface GetSettingsResponse {
   name: string;
   themeColor?: ThemeColorToken;
+  backgroundColor?: ThemeColorToken;
 }
 
 /**
@@ -14,6 +15,7 @@ export interface GetSettingsResponse {
 export interface UpdateSettingsRequest {
   name?: string;
   themeColor?: string;
+  backgroundColor?: string;
 }
 
 /**

@@ -13,9 +13,11 @@ import {
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
+import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
+import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
@@ -38,6 +40,12 @@ export default function WebsiteSettingsForm({
   const { themeColor, setThemeColor } = useDynamicTheme();
   const { updateThemeColor: updateThemeColorWithCache } =
     useThemeColorContext();
+  const {
+    backgroundColor,
+    updateBackgroundColor: updateBackgroundColorWithCache,
+    setBackgroundColor,
+    isLoading: backgroundColorLoading,
+  } = useBackgroundColorContext();
   const {
     websiteFont,
     updateWebsiteFont: updateWebsiteFontWithCache,
@@ -84,6 +92,10 @@ export default function WebsiteSettingsForm({
         if (settingsData.themeColor) {
           setThemeColor(settingsData.themeColor);
           newValues.themeColor = settingsData.themeColor;
+        }
+        if (settingsData.backgroundColor) {
+          setBackgroundColor(settingsData.backgroundColor);
+          newValues.backgroundColor = settingsData.backgroundColor;
         }
       }
 
@@ -141,7 +153,7 @@ export default function WebsiteSettingsForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, themeColor }),
+        body: JSON.stringify({ name, themeColor, backgroundColor }),
       });
 
       const data = await response.json();
@@ -149,8 +161,9 @@ export default function WebsiteSettingsForm({
       if (response.ok) {
         showToast('Website settings updated successfully!', 'success');
         markAsClean();
-        // Refresh theme color to invalidate cache
+        // Refresh theme color and background color to invalidate cache
         await updateThemeColorWithCache(themeColor);
+        await updateBackgroundColorWithCache(backgroundColor);
         await fetchWebsiteSettings();
       } else {
         showToast(data.error || 'Failed to update website name', 'error');
@@ -321,6 +334,21 @@ export default function WebsiteSettingsForm({
               }
             }}
             disabled={loading}
+          />
+
+          <BackgroundColorSelector
+            selectedColor={backgroundColor}
+            onColorChange={async (color) => {
+              try {
+                await updateBackgroundColorWithCache(color);
+                setBackgroundColor(color);
+                updateFieldValue('backgroundColor', color);
+              } catch {
+                // Error is already handled by the hook
+              }
+            }}
+            disabled={loading}
+            isLoading={backgroundColorLoading}
           />
 
           <FontSelector

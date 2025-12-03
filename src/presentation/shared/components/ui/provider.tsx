@@ -1,7 +1,11 @@
 'use client';
 
 import { ChakraProvider } from '@chakra-ui/react';
-import { ColorModeProvider, type ColorModeProviderProps } from './color-mode';
+import {
+  ColorModeProvider,
+  useColorMode,
+  type ColorModeProviderProps,
+} from './color-mode';
 import { Toaster } from './toaster';
 import { createDynamicSystem } from '@/presentation/shared/theme';
 import { DynamicThemeProvider } from '@/presentation/shared/DynamicThemeProvider';
@@ -11,6 +15,47 @@ import { ThemeColorProvider } from '@/presentation/shared/contexts/ThemeColorCon
 import { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { FontProvider } from '@/presentation/shared/components/FontProvider';
+import {
+  BackgroundColorProvider,
+  useBackgroundColorContext,
+} from '@/presentation/shared/contexts/BackgroundColorContext';
+
+// Background color hex mappings for light and dark modes
+const BACKGROUND_COLOR_MAP: Record<
+  ThemeColorToken,
+  { light: string; dark: string }
+> = {
+  blue: { light: '#eff6ff', dark: '#1e3a5f' },
+  red: { light: '#fef2f2', dark: '#450a0a' },
+  green: { light: '#f0fdf4', dark: '#14532d' },
+  purple: { light: '#faf5ff', dark: '#3b0764' },
+  orange: { light: '#fff7ed', dark: '#431407' },
+  teal: { light: '#f0fdfa', dark: '#134e4a' },
+  pink: { light: '#fdf2f8', dark: '#500724' },
+  cyan: { light: '#ecfeff', dark: '#164e63' },
+};
+
+// Component that applies background color to the body element
+function BackgroundColorApplier({ children }: { children: React.ReactNode }) {
+  const { backgroundColor, isLoading } = useBackgroundColorContext();
+  const { colorMode } = useColorMode();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const colorConfig = BACKGROUND_COLOR_MAP[backgroundColor];
+    if (!colorConfig) return;
+
+    const bgColor = colorMode === 'dark' ? colorConfig.dark : colorConfig.light;
+    document.body.style.backgroundColor = bgColor;
+
+    return () => {
+      document.body.style.backgroundColor = '';
+    };
+  }, [backgroundColor, colorMode, isLoading]);
+
+  return <>{children}</>;
+}
 
 // Type definitions for webpack hot module replacement
 interface WebpackHot {
@@ -40,7 +85,9 @@ function ThemeProviderWithInitialColor({
 }) {
   return (
     <ThemeColorProvider>
-      <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+      <BackgroundColorProvider>
+        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+      </BackgroundColorProvider>
     </ThemeColorProvider>
   );
 }
@@ -103,7 +150,9 @@ function ProviderWithLogger(props: ColorModeProviderProps) {
 
   return (
     <ThemeProviderWithInitialColor>
-      <ColorModeProvider {...props} />
+      <ColorModeProvider {...props}>
+        <BackgroundColorApplier>{props.children}</BackgroundColorApplier>
+      </ColorModeProvider>
       <Toaster />
     </ThemeProviderWithInitialColor>
   );

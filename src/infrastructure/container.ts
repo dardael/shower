@@ -32,6 +32,8 @@ import type { IUpdateSocialNetworks } from '@/application/settings/IUpdateSocial
 import type { IGetConfiguredSocialNetworks } from '@/application/settings/IGetConfiguredSocialNetworks';
 import type { IGetThemeColor } from '@/application/settings/IGetThemeColor';
 import type { IUpdateThemeColor } from '@/application/settings/IUpdateThemeColor';
+import type { IGetBackgroundColor } from '@/application/settings/IGetBackgroundColor';
+import type { IUpdateBackgroundColor } from '@/application/settings/IUpdateBackgroundColor';
 import type { IGetHeaderLogo } from '@/application/settings/IGetHeaderLogo';
 import type { IUpdateHeaderLogo } from '@/application/settings/IUpdateHeaderLogo';
 import type { IGetWebsiteFont } from '@/application/settings/IGetWebsiteFont';
@@ -46,6 +48,8 @@ import { UpdateSocialNetworks } from '@/application/settings/UpdateSocialNetwork
 import { GetConfiguredSocialNetworks } from '@/application/settings/GetConfiguredSocialNetworks';
 import { GetThemeColor } from '@/application/settings/GetThemeColor';
 import { UpdateThemeColor } from '@/application/settings/UpdateThemeColor';
+import { GetBackgroundColor } from '@/application/settings/GetBackgroundColor';
+import { UpdateBackgroundColor } from '@/application/settings/UpdateBackgroundColor';
 import { GetHeaderLogo } from '@/application/settings/GetHeaderLogo';
 import { UpdateHeaderLogo } from '@/application/settings/UpdateHeaderLogo';
 import { GetWebsiteFont } from '@/application/settings/GetWebsiteFont';
@@ -157,6 +161,14 @@ container.register<IGetThemeColor>('IGetThemeColor', {
 
 container.register<IUpdateThemeColor>('IUpdateThemeColor', {
   useClass: UpdateThemeColor,
+});
+
+container.register<IGetBackgroundColor>('IGetBackgroundColor', {
+  useClass: GetBackgroundColor,
+});
+
+container.register<IUpdateBackgroundColor>('IUpdateBackgroundColor', {
+  useClass: UpdateBackgroundColor,
 });
 
 container.register<IGetHeaderLogo>('IGetHeaderLogo', {
@@ -294,6 +306,14 @@ export class SettingsServiceLocator {
 
   static getUpdateThemeColor(): IUpdateThemeColor {
     return container.resolve('IUpdateThemeColor');
+  }
+
+  static getGetBackgroundColor(): IGetBackgroundColor {
+    return container.resolve('IGetBackgroundColor');
+  }
+
+  static getUpdateBackgroundColor(): IUpdateBackgroundColor {
+    return container.resolve('IUpdateBackgroundColor');
   }
 
   static getHeaderLogo(): IGetHeaderLogo {
