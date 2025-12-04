@@ -172,3 +172,87 @@ span[data-theme-color] {
 .tiptap-editor-wrapper .tiptap img:active {
   cursor: grabbing;
 }
+
+/* Image with overlay container */
+.tiptap-editor-wrapper .tiptap .image-with-overlay {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Text overlay base styles */
+.tiptap-editor-wrapper .tiptap .text-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  pointer-events: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Overlay vertical positions */
+.tiptap-editor-wrapper .tiptap .text-overlay-top {
+  top: 0;
+}
+
+.tiptap-editor-wrapper .tiptap .text-overlay-center {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tiptap-editor-wrapper .tiptap .text-overlay-bottom {
+  bottom: 0;
+}
+
+/* Overlay horizontal alignments */
+.tiptap-editor-wrapper .tiptap .text-overlay-align-left {
+  text-align: left;
+}
+
+.tiptap-editor-wrapper .tiptap .text-overlay-align-center {
+  text-align: center;
+}
+
+.tiptap-editor-wrapper .tiptap .text-overlay-align-right {
+  text-align: right;
+}
+
+/* Selected image with overlay */
+.tiptap-editor-wrapper .tiptap .image-with-overlay.ProseMirror-selectednode img,
+.tiptap-editor-wrapper
+  .tiptap
+  .ProseMirror-selectednode
+  .image-with-overlay
+  img {
+  outline: 2px solid var(--chakra-colors-color-palette-solid);
+  outline-offset: 2px;
+}
+
+/* Image with overlay alignment */
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-text-align='left'] {
+  display: block;
+  width: fit-content;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-text-align='center'] {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-text-align='right'] {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+}

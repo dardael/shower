@@ -1,15 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Box,
-  IconButton,
-  Text,
-  Popover as ChakraPopover,
-  Button,
-} from '@chakra-ui/react';
-import { MdTextFields } from 'react-icons/md';
-import type { Editor } from '@tiptap/react';
+import { Box, Text, Button, Popover as ChakraPopover } from '@chakra-ui/react';
 import {
   AVAILABLE_FONTS,
   getFontsByCategory,
@@ -18,87 +10,73 @@ import {
 } from '@/domain/settings/constants/AvailableFonts';
 import { loadGoogleFont } from '@/presentation/shared/utils/loadGoogleFont';
 
-interface FontPickerProps {
-  editor: Editor;
-  disabled?: boolean;
-}
-
 interface PopoverOpenChangeDetails {
   open: boolean;
 }
 
-export function FontPicker({
-  editor,
+interface FontPickerPopoverProps {
+  /** Current selected font family */
+  selectedFont: string;
+  /** Callback when a font is selected */
+  onFontSelect: (fontName: string) => void;
+  /** Whether the picker is disabled */
+  disabled?: boolean;
+  /** Title shown in the popover */
+  title?: string;
+  /** Trigger element to render */
+  trigger: React.ReactNode;
+}
+
+// Track if fonts have been loaded to avoid redundant iteration
+let fontsLoaded = false;
+
+/**
+ * Reusable font picker popover component.
+ * Displays fonts organized by category with preview.
+ */
+export function FontPickerPopover({
+  selectedFont,
+  onFontSelect,
   disabled = false,
-}: FontPickerProps): React.ReactElement {
+  title = 'Font',
+  trigger,
+}: FontPickerPopoverProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const fontsByCategory = getFontsByCategory();
 
-  const handleFontSelect = useCallback(
-    (fontName: string): void => {
-      editor.chain().focus().setFontFamily(fontName).run();
-      setIsOpen(false);
-    },
-    [editor]
-  );
-
-  const handleRemoveFont = useCallback((): void => {
-    editor.chain().focus().unsetFontFamily().run();
-    setIsOpen(false);
-  }, [editor]);
-
-  const getActiveFontFamily = useCallback((): string | null => {
-    const attributes = editor.getAttributes('textStyle');
-    return attributes.fontFamily || null;
-  }, [editor]);
-
+  // Load fonts when picker opens (only once per session)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !fontsLoaded) {
       AVAILABLE_FONTS.forEach((font) => {
         loadGoogleFont(font.name);
       });
+      fontsLoaded = true;
     }
   }, [isOpen]);
 
-  const activeFontFamily = getActiveFontFamily();
+  const handleFontSelect = useCallback(
+    (fontName: string): void => {
+      onFontSelect(fontName);
+      setIsOpen(false);
+    },
+    [onFontSelect]
+  );
 
   return (
     <ChakraPopover.Root
       open={isOpen}
       onOpenChange={(e: PopoverOpenChangeDetails) => setIsOpen(e.open)}
     >
-      <ChakraPopover.Trigger asChild>
-        <IconButton
-          aria-label="Font"
-          size="sm"
-          variant={activeFontFamily ? 'solid' : 'ghost'}
-          color={activeFontFamily ? 'colorPalette.fg' : 'fg'}
-          disabled={disabled}
-        >
-          <MdTextFields />
-        </IconButton>
+      <ChakraPopover.Trigger asChild disabled={disabled}>
+        {trigger}
       </ChakraPopover.Trigger>
       <ChakraPopover.Positioner>
-        <ChakraPopover.Content width="auto" maxH="400px" overflowY="auto">
+        <ChakraPopover.Content width="auto" maxH="300px" overflowY="auto">
           <ChakraPopover.Body>
             <Box p={2}>
-              <Text fontSize="sm" fontWeight="medium" mb={2}>
-                Font Family
+              <Text fontSize="sm" fontWeight="medium" mb={2} color="fg">
+                {title}
               </Text>
-
-              <Button
-                aria-label="Default"
-                size="sm"
-                variant={!activeFontFamily ? 'solid' : 'ghost'}
-                color={!activeFontFamily ? 'colorPalette.fg' : 'fg'}
-                width="100%"
-                justifyContent="flex-start"
-                onClick={handleRemoveFont}
-                mb={2}
-              >
-                Default
-              </Button>
-
               {(Object.keys(fontsByCategory) as FontCategory[]).map(
                 (category) => (
                   <Box key={category} mb={3}>
@@ -115,13 +93,9 @@ export function FontPicker({
                         key={font.name}
                         aria-label={font.name}
                         size="sm"
-                        variant={
-                          activeFontFamily === font.name ? 'solid' : 'ghost'
-                        }
+                        variant={selectedFont === font.name ? 'solid' : 'ghost'}
                         color={
-                          activeFontFamily === font.name
-                            ? 'colorPalette.fg'
-                            : 'fg'
+                          selectedFont === font.name ? 'colorPalette.fg' : 'fg'
                         }
                         width="100%"
                         justifyContent="flex-start"

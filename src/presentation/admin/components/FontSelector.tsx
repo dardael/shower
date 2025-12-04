@@ -5,6 +5,7 @@ import { memo, useState, useEffect, useMemo, useCallback } from 'react';
 import {
   getFontsByCategory,
   getFontByName,
+  FONT_CATEGORY_LABELS,
   type FontCategory,
   type FontMetadata,
 } from '@/domain/settings/constants/AvailableFonts';
@@ -32,14 +33,6 @@ interface FontPreviewProps {
   fontMetadata: FontMetadata | undefined;
   isPreview: boolean;
 }
-
-const CATEGORY_LABELS: Record<FontCategory, string> = {
-  'sans-serif': 'Sans-Serif',
-  serif: 'Serif',
-  display: 'Display',
-  handwriting: 'Handwriting',
-  monospace: 'Monospace',
-};
 
 // Inject Google Fonts link for preview
 function usePreviewFontLoader(fontName: string | null): void {
@@ -276,7 +269,7 @@ const FontSelector = memo<FontSelectorProps>(
                 letterSpacing="wide"
                 mb={2}
               >
-                {CATEGORY_LABELS[category]}
+                {FONT_CATEGORY_LABELS[category]}
               </Text>
               <HStack gap={2} wrap="wrap" width="full">
                 {fontsByCategory[category].map((font) => (

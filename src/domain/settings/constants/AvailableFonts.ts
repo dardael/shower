@@ -9,6 +9,17 @@ export type FontCategory =
   | 'monospace';
 
 /**
+ * Display labels for font categories
+ */
+export const FONT_CATEGORY_LABELS: Record<FontCategory, string> = {
+  'sans-serif': 'Sans Serif',
+  serif: 'Serif',
+  display: 'Display',
+  handwriting: 'Handwriting',
+  monospace: 'Monospace',
+};
+
+/**
  * Metadata for each available font
  */
 export interface FontMetadata {

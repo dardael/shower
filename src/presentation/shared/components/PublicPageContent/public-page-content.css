@@ -107,3 +107,118 @@
 .public-page-content [style*='text-align: justify'] {
   text-align: justify;
 }
+
+/* Image with overlay container */
+.public-page-content .image-with-overlay {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  margin: 1rem 0;
+}
+
+.public-page-content .image-with-overlay img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+/* Text overlay base styles */
+.public-page-content .text-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Overlay vertical positions */
+.public-page-content .text-overlay-top {
+  top: 0;
+}
+
+.public-page-content .text-overlay-center {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.public-page-content .text-overlay-bottom {
+  bottom: 0;
+}
+
+/* Overlay horizontal alignments */
+.public-page-content .text-overlay-align-left {
+  text-align: left;
+}
+
+.public-page-content .text-overlay-align-center {
+  text-align: center;
+}
+
+.public-page-content .text-overlay-align-right {
+  text-align: right;
+}
+
+/* Image with overlay alignment */
+.public-page-content .image-with-overlay[data-text-align='left'] {
+  display: block;
+  width: fit-content;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.public-page-content .image-with-overlay[data-text-align='center'] {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.public-page-content .image-with-overlay[data-text-align='right'] {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* Responsive overlay scaling */
+@media (max-width: 768px) {
+  .public-page-content .text-overlay {
+    padding: 0.5rem;
+  }
+
+  /* Scale down font sizes for tablet */
+  .public-page-content .text-overlay[style*='font-size: 32px'] {
+    font-size: 24px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 24px'] {
+    font-size: 18px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 18px'] {
+    font-size: 16px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 14px'] {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .public-page-content .text-overlay {
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Further scale down font sizes for mobile */
+  .public-page-content .text-overlay[style*='font-size: 32px'] {
+    font-size: 18px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 24px'] {
+    font-size: 16px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 18px'] {
+    font-size: 14px !important;
+  }
+  .public-page-content .text-overlay[style*='font-size: 14px'] {
+    font-size: 11px !important;
+  }
+}

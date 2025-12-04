@@ -32,6 +32,11 @@ import './tiptap-styles.css';
 import { ColorPicker } from './ColorPicker';
 import { FontPicker } from './FontPicker';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
+import { Tooltip } from '@/presentation/shared/components/ui/tooltip';
+import { ImageWithOverlay } from './extensions/ImageWithOverlay';
+import { OverlayToolbar } from './OverlayToolbar';
+import { FiType } from 'react-icons/fi';
+import { DEFAULT_OVERLAY_TEXT } from '@/domain/pages/types/ImageOverlay';
 
 const ResizableImage = Image.extend({
   draggable: true,
@@ -69,7 +74,7 @@ const setImageAlignment = (
   alignment: 'left' | 'center' | 'right'
 ): void => {
   const node = editor.state.doc.nodeAt(imagePos);
-  if (node?.type.name === 'image') {
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
     // Update the node attributes
     const { tr } = editor.state;
     editor.view.dispatch(
@@ -79,8 +84,10 @@ const setImageAlignment = (
       })
     );
 
-    // Apply alignment to the DOM container
-    applyImageAlignmentToDOM(editor, imagePos, alignment);
+    // Apply alignment to the DOM container (for resize container)
+    if (node.type.name === 'image') {
+      applyImageAlignmentToDOM(editor, imagePos, alignment);
+    }
   }
 };
 
@@ -124,7 +131,7 @@ const isImageAlignmentActive = (
   alignment: 'left' | 'center' | 'right'
 ): boolean => {
   const node = editor.state.doc.nodeAt(imagePos);
-  if (node?.type.name === 'image') {
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
     return node.attrs.textAlign === alignment;
   }
   return false;
@@ -153,6 +160,7 @@ export default function TiptapEditor({
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImagePos, setSelectedImagePos] = useState<number | null>(null);
+  const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
 
@@ -235,6 +243,7 @@ export default function TiptapEditor({
     extensions: [
       StarterKit,
       ResizableImage,
+      ImageWithOverlay,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -264,15 +273,18 @@ export default function TiptapEditor({
       syncAllImageAlignments(ed);
     },
     onSelectionUpdate: ({ editor: ed }) => {
-      // Track selected image position
+      // Track selected image position and type
       const { selection } = ed.state;
       if (
         selection instanceof NodeSelection &&
-        selection.node.type.name === 'image'
+        (selection.node.type.name === 'image' ||
+          selection.node.type.name === 'imageWithOverlay')
       ) {
         setSelectedImagePos(selection.from);
+        setSelectedNodeType(selection.node.type.name);
       } else {
         setSelectedImagePos(null);
+        setSelectedNodeType(null);
       }
     },
     editorProps: {
@@ -308,7 +320,7 @@ export default function TiptapEditor({
         }
         return false;
       },
-      handleClick: (view, pos, event) => {
+      handleClick: (view, _pos, event) => {
         // Check if clicked on an image
         const target = event.target as HTMLElement;
         const imageElement = target.closest('img');
@@ -316,8 +328,13 @@ export default function TiptapEditor({
           // Find the image node position
           const { doc } = view.state;
           let imagePos: number | null = null;
+          let nodeTypeName: string | null = null;
           doc.descendants((node, nodePos) => {
-            if (node.type.name === 'image' && imagePos === null) {
+            if (
+              (node.type.name === 'image' ||
+                node.type.name === 'imageWithOverlay') &&
+              imagePos === null
+            ) {
               // Check if this is the clicked image by comparing DOM nodes
               const domNode = view.nodeDOM(nodePos);
               if (
@@ -325,16 +342,19 @@ export default function TiptapEditor({
                 (domNode === imageElement || domNode.contains(imageElement))
               ) {
                 imagePos = nodePos;
+                nodeTypeName = node.type.name;
               }
             }
             return imagePos === null;
           });
           if (imagePos !== null) {
             setSelectedImagePos(imagePos);
+            setSelectedNodeType(nodeTypeName);
             return false;
           }
         }
         setSelectedImagePos(null);
+        setSelectedNodeType(null);
         return false;
       },
     },
@@ -358,6 +378,13 @@ export default function TiptapEditor({
       setShowLinkInput(false);
     }
   }, [editor, linkUrl]);
+
+  const handleAddOverlay = useCallback(() => {
+    if (editor && selectedImagePos !== null && selectedNodeType === 'image') {
+      editor.commands.addOverlay(DEFAULT_OVERLAY_TEXT, selectedImagePos);
+      setSelectedNodeType('imageWithOverlay');
+    }
+  }, [editor, selectedImagePos, selectedNodeType]);
 
   if (!editor) {
     return null;
@@ -624,7 +651,31 @@ export default function TiptapEditor({
         >
           <FiImage />
         </IconButton>
+        {/* Add Text Overlay button - only visible when plain image is selected */}
+        {selectedImagePos !== null && selectedNodeType === 'image' && (
+          <Tooltip content="Add Text Overlay">
+            <IconButton
+              aria-label="Add Text Overlay"
+              size="sm"
+              variant="ghost"
+              color="fg"
+              onClick={handleAddOverlay}
+              disabled={disabled}
+            >
+              <FiType />
+            </IconButton>
+          </Tooltip>
+        )}
       </HStack>
+
+      {/* Overlay toolbar - visible when imageWithOverlay is selected */}
+      {selectedImagePos !== null && selectedNodeType === 'imageWithOverlay' && (
+        <OverlayToolbar
+          editor={editor}
+          disabled={disabled}
+          imagePos={selectedImagePos}
+        />
+      )}
 
       {showLinkInput && (
         <HStack
