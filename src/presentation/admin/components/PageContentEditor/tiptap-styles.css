@@ -256,3 +256,31 @@ span[data-theme-color] {
   margin-left: auto;
   margin-right: 0;
 }
+
+/* Full-width image styles */
+.tiptap-editor-wrapper .tiptap img[data-full-width='true'] {
+  width: 100% !important;
+  max-width: none;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-full-width='true'] {
+  width: 100%;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-full-width='true'] img {
+  width: 100%;
+}
+
+/* Override resize container for full-width images */
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-container]:has(img[data-full-width='true']) {
+  width: 100% !important;
+  display: block;
+}
+
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-wrapper]:has(img[data-full-width='true']) {
+  width: 100% !important;
+}

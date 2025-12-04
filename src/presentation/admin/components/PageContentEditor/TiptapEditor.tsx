@@ -19,6 +19,7 @@ import {
   FiAlignCenter,
   FiAlignRight,
   FiAlignJustify,
+  FiMaximize2,
 } from 'react-icons/fi';
 import {
   LuHeading1,
@@ -51,6 +52,17 @@ const ResizableImage = Image.extend({
             return {};
           }
           return { 'data-text-align': attributes.textAlign };
+        },
+      },
+      fullWidth: {
+        default: false,
+        parseHTML: (element) =>
+          element.getAttribute('data-full-width') === 'true',
+        renderHTML: (attributes) => {
+          if (!attributes.fullWidth) {
+            return {};
+          }
+          return { 'data-full-width': 'true' };
         },
       },
     };
@@ -135,6 +147,30 @@ const isImageAlignmentActive = (
     return node.attrs.textAlign === alignment;
   }
   return false;
+};
+
+const isFullWidthActive = (editor: Editor, imagePos: number): boolean => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
+    return node.attrs.fullWidth === true;
+  }
+  return false;
+};
+
+const toggleFullWidth = (editor: Editor, imagePos: number): void => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
+    const { tr } = editor.state;
+    const newFullWidth = !node.attrs.fullWidth;
+    editor.view.dispatch(
+      tr.setNodeMarkup(imagePos, undefined, {
+        ...node.attrs,
+        fullWidth: newFullWidth,
+        // When setting fullWidth, we don't need to clear the width
+        // because fullWidth takes precedence in rendering
+      })
+    );
+  }
 };
 
 interface TiptapEditorProps {
@@ -271,6 +307,49 @@ export default function TiptapEditor({
       onChange(ed.getHTML());
       // Sync image alignments after content update
       syncAllImageAlignments(ed);
+    },
+    onTransaction: ({ editor: ed, transaction }) => {
+      // Detect resize operations and remove fullWidth when user resizes
+      if (!transaction.docChanged) return;
+
+      transaction.steps.forEach((step) => {
+        // Check if this is a node attribute change (resize changes width attribute)
+        const stepMap = step.getMap();
+        stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
+          // Check nodes in the affected range
+          ed.state.doc.nodesBetween(newStart, newEnd, (node, pos) => {
+            if (
+              node.type.name === 'image' ||
+              node.type.name === 'imageWithOverlay'
+            ) {
+              // Check if this node had fullWidth and now has a width set (indicating resize)
+              // We need to check the original document for this
+              const oldNode = transaction.before.nodeAt(pos);
+              if (
+                oldNode &&
+                oldNode.attrs.fullWidth &&
+                node.attrs.width &&
+                !oldNode.attrs.width
+              ) {
+                // User just resized a full-width image - clear fullWidth
+                setTimeout(() => {
+                  const currentNode = ed.state.doc.nodeAt(pos);
+                  if (currentNode?.attrs.fullWidth) {
+                    const { tr } = ed.state;
+                    ed.view.dispatch(
+                      tr.setNodeMarkup(pos, undefined, {
+                        ...currentNode.attrs,
+                        fullWidth: false,
+                      })
+                    );
+                  }
+                }, 0);
+              }
+            }
+            return true;
+          });
+        });
+      });
     },
     onSelectionUpdate: ({ editor: ed }) => {
       // Track selected image position and type
@@ -663,6 +742,27 @@ export default function TiptapEditor({
               disabled={disabled}
             >
               <FiType />
+            </IconButton>
+          </Tooltip>
+        )}
+        {/* Full Width button - visible when any image is selected */}
+        {selectedImagePos !== null && (
+          <Tooltip content="Toggle Full Width">
+            <IconButton
+              aria-label="Toggle Full Width"
+              size="sm"
+              variant={
+                isFullWidthActive(editor, selectedImagePos) ? 'solid' : 'ghost'
+              }
+              color={
+                isFullWidthActive(editor, selectedImagePos)
+                  ? 'colorPalette.fg'
+                  : 'fg'
+              }
+              onClick={() => toggleFullWidth(editor, selectedImagePos)}
+              disabled={disabled}
+            >
+              <FiMaximize2 />
             </IconButton>
           </Tooltip>
         )}

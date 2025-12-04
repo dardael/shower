@@ -176,6 +176,17 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
           return { 'data-overlay-align': attributes.overlayAlign };
         },
       },
+      fullWidth: {
+        default: false,
+        parseHTML: (element) =>
+          element.getAttribute('data-full-width') === 'true',
+        renderHTML: (attributes) => {
+          if (!attributes.fullWidth) {
+            return {};
+          }
+          return { 'data-full-width': 'true' };
+        },
+      },
     };
   },
 
@@ -200,9 +211,15 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
       overlayFontSize,
       overlayPosition,
       overlayAlign,
+      fullWidth,
     } = node.attrs;
 
-    const imgStyle = width ? `width: ${width}px;` : '';
+    // When fullWidth is true, use width: 100%; otherwise use fixed width if set
+    const imgStyle = fullWidth
+      ? 'width: 100%;'
+      : width
+        ? `width: ${width}px;`
+        : '';
     const imgAttrs: Record<string, string> = {
       src: src || '',
       class: 'tiptap-image',
@@ -213,20 +230,25 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
     if (textAlign) imgAttrs['data-text-align'] = textAlign;
 
     // Build wrapper style for alignment (inline styles survive DOMPurify)
-    let wrapperStyle =
-      'position: relative; display: block; width: fit-content;';
-    if (textAlign === 'center') {
-      wrapperStyle += ' margin-left: auto; margin-right: auto;';
-    } else if (textAlign === 'right') {
-      wrapperStyle += ' margin-left: auto; margin-right: 0;';
-    } else {
-      wrapperStyle += ' margin-left: 0; margin-right: auto;';
+    // When fullWidth is true, use width: 100% instead of fit-content
+    let wrapperStyle = fullWidth
+      ? 'position: relative; display: block; width: 100%;'
+      : 'position: relative; display: block; width: fit-content;';
+    if (!fullWidth) {
+      if (textAlign === 'center') {
+        wrapperStyle += ' margin-left: auto; margin-right: auto;';
+      } else if (textAlign === 'right') {
+        wrapperStyle += ' margin-left: auto; margin-right: 0;';
+      } else {
+        wrapperStyle += ' margin-left: 0; margin-right: auto;';
+      }
     }
 
     const wrapperAttrs = mergeAttributes(this.options.HTMLAttributes, {
       class: 'image-with-overlay',
       style: wrapperStyle,
       'data-text-align': textAlign,
+      'data-full-width': fullWidth ? 'true' : null,
       'data-overlay-text': overlayText,
       'data-overlay-color': overlayColor,
       'data-overlay-font': overlayFontFamily,
@@ -281,6 +303,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
               title: node.attrs.title,
               width: node.attrs.width,
               textAlign: node.attrs.textAlign,
+              fullWidth: node.attrs.fullWidth || false,
               overlayText: text,
               overlayColor: DEFAULT_OVERLAY_CONFIG.color,
               overlayFontFamily: DEFAULT_OVERLAY_CONFIG.fontFamily,
@@ -332,6 +355,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
               title: node.attrs.title,
               width: node.attrs.width,
               textAlign: node.attrs.textAlign,
+              fullWidth: node.attrs.fullWidth || false,
             });
 
             // Replace imageWithOverlay with plain image

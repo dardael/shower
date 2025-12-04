@@ -182,6 +182,20 @@
   margin-right: 0;
 }
 
+/* Full-width image styles */
+.public-page-content img[data-full-width='true'] {
+  width: 100% !important;
+  max-width: none;
+}
+
+.public-page-content .image-with-overlay[data-full-width='true'] {
+  width: 100%;
+}
+
+.public-page-content .image-with-overlay[data-full-width='true'] img {
+  width: 100%;
+}
+
 /* Responsive overlay scaling */
 @media (max-width: 768px) {
   .public-page-content .text-overlay {
