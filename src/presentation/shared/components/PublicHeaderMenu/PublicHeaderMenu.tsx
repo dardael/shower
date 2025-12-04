@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Box, Flex, Text, Image } from '@chakra-ui/react';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import { PublicHeaderMenuItem } from './PublicHeaderMenuItem';
@@ -41,14 +42,17 @@ export function PublicHeaderMenu({
         >
           <Flex align="center" gap={{ base: 2, md: 4 }}>
             {logo && !logoError && (
-              <Image
-                src={logo.url}
-                alt="Site logo"
-                h={{ base: '32px', md: '40px' }}
-                w="auto"
-                objectFit="contain"
-                onError={() => setLogoError(true)}
-              />
+              <Link href="/" aria-label="Go to homepage">
+                <Image
+                  src={logo.url}
+                  alt="Site logo"
+                  h={{ base: '32px', md: '40px' }}
+                  w="auto"
+                  objectFit="contain"
+                  cursor="pointer"
+                  onError={() => setLogoError(true)}
+                />
+              </Link>
             )}
             <Text color="fg.muted" fontSize="sm">
               No menu items configured yet
@@ -91,15 +95,18 @@ export function PublicHeaderMenu({
           aria-label="Main navigation"
         >
           {logo && !logoError && (
-            <Image
-              src={logo.url}
-              alt="Site logo"
-              h={{ base: '32px', md: '40px' }}
-              w="auto"
-              objectFit="contain"
-              flexShrink={0}
-              onError={() => setLogoError(true)}
-            />
+            <Link href="/" aria-label="Go to homepage">
+              <Image
+                src={logo.url}
+                alt="Site logo"
+                h={{ base: '32px', md: '40px' }}
+                w="auto"
+                objectFit="contain"
+                flexShrink={0}
+                cursor="pointer"
+                onError={() => setLogoError(true)}
+              />
+            </Link>
           )}
           {menuItems.map((item) => (
             <Box key={item.id} color={{ base: 'black', _dark: 'white' }}>
