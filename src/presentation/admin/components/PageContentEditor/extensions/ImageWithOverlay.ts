@@ -11,22 +11,15 @@ import {
 } from '@/domain/pages/types/ImageOverlay';
 
 /**
- * Calculates luminance from a hex color to determine if it's light or dark
+ * Converts hex color and opacity percentage to rgba string
  */
-function getColorLuminance(hexColor: string): number {
-  const hex = hexColor.replace('#', '');
+function getOverlayBackground(bgColor: string, bgOpacity: number): string {
+  const hex = bgColor.replace('#', '');
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-}
-
-/**
- * Gets contrasting background color based on text color
- */
-function getContrastBackground(textColor: string): string {
-  const luminance = getColorLuminance(textColor);
-  return luminance > 0.5 ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+  const alpha = bgOpacity / 100;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export interface ImageWithOverlayOptions {
@@ -176,6 +169,27 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
           return { 'data-overlay-align': attributes.overlayAlign };
         },
       },
+      overlayBgColor: {
+        default: DEFAULT_OVERLAY_CONFIG.bgColor,
+        parseHTML: (element) =>
+          element.getAttribute('data-overlay-bg-color') ||
+          DEFAULT_OVERLAY_CONFIG.bgColor,
+        renderHTML: (attributes) => {
+          return { 'data-overlay-bg-color': attributes.overlayBgColor };
+        },
+      },
+      overlayBgOpacity: {
+        default: DEFAULT_OVERLAY_CONFIG.bgOpacity,
+        parseHTML: (element) => {
+          const value = element.getAttribute('data-overlay-bg-opacity');
+          return value ? parseInt(value, 10) : DEFAULT_OVERLAY_CONFIG.bgOpacity;
+        },
+        renderHTML: (attributes) => {
+          return {
+            'data-overlay-bg-opacity': String(attributes.overlayBgOpacity),
+          };
+        },
+      },
       fullWidth: {
         default: false,
         parseHTML: (element) =>
@@ -211,6 +225,8 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
       overlayFontSize,
       overlayPosition,
       overlayAlign,
+      overlayBgColor,
+      overlayBgOpacity,
       fullWidth,
     } = node.attrs;
 
@@ -255,6 +271,8 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
       'data-overlay-size': overlayFontSize,
       'data-overlay-position': overlayPosition,
       'data-overlay-align': overlayAlign,
+      'data-overlay-bg-color': overlayBgColor,
+      'data-overlay-bg-opacity': String(overlayBgOpacity),
     });
 
     // Remove null/undefined attributes
@@ -265,7 +283,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
     });
 
     const overlayStyle = overlayText
-      ? `color: ${overlayColor}; font-family: '${overlayFontFamily}', sans-serif; font-size: ${OVERLAY_FONT_SIZES[overlayFontSize as OverlayFontSize]}px; background: ${getContrastBackground(overlayColor)};`
+      ? `color: ${overlayColor}; font-family: '${overlayFontFamily}', sans-serif; font-size: ${OVERLAY_FONT_SIZES[overlayFontSize as OverlayFontSize]}px; background: ${getOverlayBackground(overlayBgColor as string, overlayBgOpacity as number)};`
       : '';
 
     if (overlayText) {
@@ -310,6 +328,8 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
               overlayFontSize: DEFAULT_OVERLAY_CONFIG.fontSize,
               overlayPosition: DEFAULT_OVERLAY_CONFIG.position,
               overlayAlign: DEFAULT_OVERLAY_CONFIG.align,
+              overlayBgColor: DEFAULT_OVERLAY_CONFIG.bgColor,
+              overlayBgOpacity: DEFAULT_OVERLAY_CONFIG.bgOpacity,
             });
 
             // Replace the image node with imageWithOverlay

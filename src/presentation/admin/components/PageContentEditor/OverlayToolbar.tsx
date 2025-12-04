@@ -9,6 +9,7 @@ import {
   Text,
   Button,
   Popover as ChakraPopover,
+  Slider,
 } from '@chakra-ui/react';
 import { FiType, FiTrash2 } from 'react-icons/fi';
 import {
@@ -84,6 +85,12 @@ export function OverlayToolbar({
   const [overlayAlign, setOverlayAlign] = useState<OverlayAlign>(
     DEFAULT_OVERLAY_CONFIG.align
   );
+  const [overlayBgColor, setOverlayBgColor] = useState(
+    DEFAULT_OVERLAY_CONFIG.bgColor
+  );
+  const [overlayBgOpacity, setOverlayBgOpacity] = useState(
+    DEFAULT_OVERLAY_CONFIG.bgOpacity
+  );
   const [isSizePickerOpen, setIsSizePickerOpen] = useState(false);
 
   // Get current overlay attributes from the selected node
@@ -117,6 +124,12 @@ export function OverlayToolbar({
       setOverlayAlign(
         (attrs.overlayAlign as OverlayAlign) || DEFAULT_OVERLAY_CONFIG.align
       );
+      setOverlayBgColor(
+        (attrs.overlayBgColor as string) || DEFAULT_OVERLAY_CONFIG.bgColor
+      );
+      setOverlayBgOpacity(
+        (attrs.overlayBgOpacity as number) ?? DEFAULT_OVERLAY_CONFIG.bgOpacity
+      );
     }
   }, [getNodeAttrs]);
 
@@ -129,6 +142,8 @@ export function OverlayToolbar({
         overlayFontSize: OverlayFontSize;
         overlayPosition: OverlayPosition;
         overlayAlign: OverlayAlign;
+        overlayBgColor: string;
+        overlayBgOpacity: number;
       }>
     ): void => {
       editor.commands.updateOverlay(attrs);
@@ -182,6 +197,23 @@ export function OverlayToolbar({
     (align: OverlayAlign): void => {
       setOverlayAlign(align);
       updateOverlay({ overlayAlign: align });
+    },
+    [updateOverlay]
+  );
+
+  const handleBgColorSelect = useCallback(
+    (color: string): void => {
+      setOverlayBgColor(color);
+      updateOverlay({ overlayBgColor: color });
+    },
+    [updateOverlay]
+  );
+
+  const handleBgOpacityChange = useCallback(
+    (details: { value: number[] }): void => {
+      const opacity = details.value[0];
+      setOverlayBgOpacity(opacity);
+      updateOverlay({ overlayBgOpacity: opacity });
     },
     [updateOverlay]
   );
@@ -337,6 +369,50 @@ export function OverlayToolbar({
             {ALIGN_ICONS[align]}
           </IconButton>
         ))}
+      </HStack>
+
+      {/* Background color picker */}
+      <ColorPickerPopover
+        selectedColor={overlayBgColor}
+        onColorSelect={handleBgColorSelect}
+        disabled={disabled}
+        title="Background Color"
+        trigger={
+          <IconButton aria-label="Background Color" size="sm" variant="ghost">
+            <Box
+              w="16px"
+              h="16px"
+              borderRadius="sm"
+              bg={overlayBgColor}
+              borderWidth="1px"
+              borderColor="border"
+              opacity={overlayBgOpacity / 100}
+            />
+          </IconButton>
+        }
+      />
+
+      {/* Background opacity slider */}
+      <HStack gap={2} minW="120px">
+        <Slider.Root
+          value={[overlayBgOpacity]}
+          min={0}
+          max={100}
+          step={1}
+          onValueChange={handleBgOpacityChange}
+          disabled={disabled}
+          size="sm"
+        >
+          <Slider.Control>
+            <Slider.Track>
+              <Slider.Range />
+            </Slider.Track>
+            <Slider.Thumbs />
+          </Slider.Control>
+        </Slider.Root>
+        <Text fontSize="xs" minW="32px" textAlign="right">
+          {overlayBgOpacity}%
+        </Text>
       </HStack>
 
       {/* Remove overlay button */}

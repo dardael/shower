@@ -29,6 +29,10 @@ export interface ImageTextOverlay {
   position: OverlayPosition;
   /** Horizontal text alignment */
   align: OverlayAlign;
+  /** Background color in hex format (e.g., "#000000") */
+  bgColor: string;
+  /** Background opacity as percentage (0-100) */
+  bgOpacity: number;
 }
 
 /**
@@ -40,6 +44,8 @@ export const DEFAULT_OVERLAY_CONFIG: Omit<ImageTextOverlay, 'text'> = {
   fontSize: 'medium',
   position: 'center',
   align: 'center',
+  bgColor: '#000000',
+  bgOpacity: 50,
 };
 
 /**
