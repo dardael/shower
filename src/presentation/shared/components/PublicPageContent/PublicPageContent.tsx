@@ -52,6 +52,7 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
       'rel',
       'class',
       'data-theme-color',
+      'data-text-align',
       'style',
     ],
     ALLOW_DATA_ATTR: false,
