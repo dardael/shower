@@ -6,7 +6,7 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
-import { TextStyle } from '@tiptap/extension-text-style';
+import { TextStyle, FontFamily } from '@tiptap/extension-text-style';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
@@ -30,6 +30,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
 import './tiptap-styles.css';
 import { ColorPicker } from './ColorPicker';
+import { FontPicker } from './FontPicker';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 
 const ResizableImage = Image.extend({
@@ -242,6 +243,7 @@ export default function TiptapEditor({
       }),
       TextStyle,
       Color,
+      FontFamily,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
         alignments: ['left', 'center', 'right', 'justify'],
@@ -427,6 +429,7 @@ export default function TiptapEditor({
           <FiItalic />
         </IconButton>
         <ColorPicker editor={editor} disabled={disabled} />
+        <FontPicker editor={editor} disabled={disabled} />
         <IconButton
           aria-label="Heading 1"
           size="sm"

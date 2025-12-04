@@ -372,6 +372,20 @@ jest.mock('@/presentation/shared/components/ui/color-mode', () => ({
   ColorModeProvider: ({ children }: ComponentProps) => children,
 }));
 
+// Mock react-icons to return simple icons
+jest.mock('react-icons/tb', () => ({
+  TbFont: () => React.createElement('svg', { 'data-icon': 'TbFont' }),
+}));
+
+jest.mock('react-icons/md', () => ({
+  MdTextFields: () =>
+    React.createElement('svg', { 'data-icon': 'MdTextFields' }),
+  MdFormatColorText: () =>
+    React.createElement('svg', { 'data-icon': 'MdFormatColorText' }),
+  MdFormatColorReset: () =>
+    React.createElement('svg', { 'data-icon': 'MdFormatColorReset' }),
+}));
+
 // Mock next/navigation
 
 jest.mock('next/navigation', () => ({
