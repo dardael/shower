@@ -5,6 +5,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
+import Color from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
@@ -24,11 +26,10 @@ import {
   LuHeading3,
   LuListOrdered,
 } from 'react-icons/lu';
-import { MdFormatColorText } from 'react-icons/md';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
 import './tiptap-styles.css';
-import { ThemeColorMark } from './ThemeColorMark';
+import { ColorPicker } from './ColorPicker';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 
 const ResizableImage = Image.extend({
@@ -239,7 +240,8 @@ export default function TiptapEditor({
           class: 'tiptap-link',
         },
       }),
-      ThemeColorMark,
+      TextStyle,
+      Color,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
         alignments: ['left', 'center', 'right', 'justify'],
@@ -424,16 +426,7 @@ export default function TiptapEditor({
         >
           <FiItalic />
         </IconButton>
-        <IconButton
-          aria-label="Theme Color"
-          size="sm"
-          variant={editor.isActive('themeColor') ? 'solid' : 'ghost'}
-          color={editor.isActive('themeColor') ? 'colorPalette.fg' : 'fg'}
-          onClick={() => editor.chain().focus().toggleThemeColor().run()}
-          disabled={disabled}
-        >
-          <MdFormatColorText />
-        </IconButton>
+        <ColorPicker editor={editor} disabled={disabled} />
         <IconButton
           aria-label="Heading 1"
           size="sm"

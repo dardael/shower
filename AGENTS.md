@@ -118,4 +118,4 @@ you must use docker compose to run all commands in order to have the same enviro
 - Browser localStorage
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop, BetterAuth, react-icons, Google Fonts CSS API
 - MongoDB via Mongoose
-- Tiptap (@tiptap/react, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link) for rich text editing
+- Tiptap (@tiptap/react, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link, @tiptap/extension-color, @tiptap/extension-text-style, @tiptap/core) for rich text editing

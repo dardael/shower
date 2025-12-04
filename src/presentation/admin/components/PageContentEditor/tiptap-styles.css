@@ -54,14 +54,12 @@
   margin: 0.5rem 0;
 }
 
+/* Legacy fallback - inherit color for old theme-color-text */
 .tiptap-editor-wrapper .tiptap .theme-color-text,
-.theme-color-text {
-  color: var(--chakra-colors-color-palette-solid);
-}
-
+.theme-color-text,
 .tiptap-editor-wrapper .tiptap span[data-theme-color],
 span[data-theme-color] {
-  color: var(--chakra-colors-color-palette-solid);
+  color: inherit;
 }
 
 /* Text alignment styles */

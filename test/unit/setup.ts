@@ -191,6 +191,35 @@ jest.mock('@chakra-ui/react', () => {
     SimpleGrid: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },
+    Popover: {
+      Root: ({ children, open }: ComponentProps & { open?: boolean }) =>
+        open
+          ? React.createElement(
+              'div',
+              { 'data-testid': 'popover-root' },
+              children
+            )
+          : children,
+      Trigger: ({ children }: ComponentProps) => children,
+      Positioner: ({ children }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'popover-positioner' },
+          children
+        ),
+      Content: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'popover-content', ...filterChakraProps(props) },
+          children
+        ),
+      Body: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'popover-body', ...filterChakraProps(props) },
+          children
+        ),
+    },
     Box: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterBoxProps(props), children);
     },
@@ -504,3 +533,16 @@ beforeAll(() => {
 afterAll(() => {
   container.clearInstances();
 });
+
+// Shared test utilities
+import { render } from '@testing-library/react';
+
+/**
+ * Renders a React element wrapped in ChakraProvider for testing.
+ * Use this utility for testing components that depend on Chakra UI.
+ */
+export const renderWithChakra = (ui: React.ReactElement) => {
+  // ChakraProvider is mocked in this file, so we just render the element
+  // The mock automatically wraps children properly
+  return render(ui);
+};
