@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { container } from '@/infrastructure/container';
-import { Logger } from '@/application/shared/Logger';
+import { inject, injectable } from 'tsyringe';
+import type { ILogger } from '@/application/shared/ILogger';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
 import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 
@@ -73,6 +73,7 @@ const PAGE_CONTENT_IMAGE_CONFIG: UploadConfig = {
   entityName: 'page content image',
 };
 
+@injectable()
 export class LocalFileStorageService implements IFileStorageService {
   private readonly baseUrl = getBaseUrl();
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
@@ -81,6 +82,8 @@ export class LocalFileStorageService implements IFileStorageService {
     'public',
     'page-content-images'
   );
+
+  constructor(@inject('ILogger') private readonly logger: ILogger) {}
 
   private async ensureDirectory(dir: string): Promise<void> {
     try {
@@ -118,8 +121,7 @@ export class LocalFileStorageService implements IFileStorageService {
     const buffer = Buffer.from(arrayBuffer);
 
     if (buffer.length !== file.size) {
-      const logger = container.resolve<Logger>('Logger');
-      logger.error('Buffer size mismatch', {
+      this.logger.logError('Buffer size mismatch', {
         originalSize: file.size,
         bufferSize: buffer.length,
         filename: file.name,
@@ -134,20 +136,21 @@ export class LocalFileStorageService implements IFileStorageService {
       await fs.writeFile(filePath, buffer);
 
       const stats = await fs.stat(filePath);
-      const logger = container.resolve<Logger>('Logger');
-      logger.debug(`${config.entityName} file saved successfully`, {
+      this.logger.logDebug(`${config.entityName} file saved successfully`, {
         filename,
         filePath,
         size: stats.size,
         originalSize: file.size,
       });
     } catch (writeError) {
-      const logger = container.resolve<Logger>('Logger');
-      logger.error(`Failed to write ${config.entityName} file to disk`, {
-        filename,
-        filePath,
-        error: writeError,
-      });
+      this.logger.logError(
+        `Failed to write ${config.entityName} file to disk`,
+        {
+          filename,
+          filePath,
+          error: writeError,
+        }
+      );
       throw new Error(
         `Failed to save ${config.entityName} file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
       );
@@ -178,8 +181,7 @@ export class LocalFileStorageService implements IFileStorageService {
       uploadedAt: new Date(),
     };
 
-    const logger = container.resolve<Logger>('Logger');
-    logger.debug(`Created ${config.entityName} metadata`, {
+    this.logger.logDebug(`Created ${config.entityName} metadata`, {
       filename,
       originalName: file.name,
       size: file.size,
@@ -202,14 +204,11 @@ export class LocalFileStorageService implements IFileStorageService {
     try {
       const filePath = path.join(directory, filename);
       await fs.unlink(filePath);
-      const logger = container.resolve<Logger>('Logger');
-      logger.info(`Deleted ${entityName} file: ${filename}`);
+      this.logger.logInfo(`Deleted ${entityName} file: ${filename}`);
     } catch (error) {
-      const logger = container.resolve<Logger>('Logger');
-      logger.logErrorWithObject(
-        error,
-        `Failed to delete ${entityName} file ${filename}`
-      );
+      this.logger.logError(`Failed to delete ${entityName} file ${filename}`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

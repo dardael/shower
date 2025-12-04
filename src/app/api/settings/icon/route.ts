@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LocalFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
+import type { IFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 import { SettingsServiceLocator } from '@/infrastructure/container';
 import { container } from '@/infrastructure/container';
@@ -79,7 +79,9 @@ export const POST = withApi(
       }
 
       // Upload file using storage service
-      const fileStorageService = new LocalFileStorageService();
+      const fileStorageService = container.resolve<IFileStorageService>(
+        'IFileStorageService'
+      );
       const { url, metadata } = await fileStorageService.uploadIcon(file);
 
       // Create WebsiteIcon value object
@@ -126,7 +128,9 @@ export const DELETE = withApi(
 
       if (currentIcon) {
         // Delete file from storage
-        const fileStorageService = new LocalFileStorageService();
+        const fileStorageService = container.resolve<IFileStorageService>(
+          'IFileStorageService'
+        );
         await fileStorageService.deleteIcon(currentIcon.filename);
       }
 

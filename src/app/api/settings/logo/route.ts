@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LocalFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
+import type { IFileStorageService } from '@/infrastructure/shared/services/FileStorageService';
 import { HeaderLogo } from '@/domain/settings/value-objects/HeaderLogo';
 import { SettingsServiceLocator } from '@/infrastructure/container';
 import { container } from '@/infrastructure/container';
@@ -76,11 +76,15 @@ export const POST = withApi(
       const currentLogo = await getHeaderLogo.execute();
 
       if (currentLogo) {
-        const fileStorageService = new LocalFileStorageService();
+        const fileStorageService = container.resolve<IFileStorageService>(
+          'IFileStorageService'
+        );
         await fileStorageService.deleteLogo(currentLogo.filename);
       }
 
-      const fileStorageService = new LocalFileStorageService();
+      const fileStorageService = container.resolve<IFileStorageService>(
+        'IFileStorageService'
+      );
       const { url, metadata } = await fileStorageService.uploadLogo(file);
 
       const logo = new HeaderLogo(url, metadata);
@@ -123,7 +127,9 @@ export const DELETE = withApi(
       const currentLogo = await getHeaderLogo.execute();
 
       if (currentLogo) {
-        const fileStorageService = new LocalFileStorageService();
+        const fileStorageService = container.resolve<IFileStorageService>(
+          'IFileStorageService'
+        );
         await fileStorageService.deleteLogo(currentLogo.filename);
       }
 
