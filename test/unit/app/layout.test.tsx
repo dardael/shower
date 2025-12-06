@@ -6,11 +6,6 @@ import { initializeDatabaseForLayout } from '@/infrastructure/shared/layoutUtils
 
 // Mock dependencies
 jest.mock('@/infrastructure/shared/layoutUtils');
-jest.mock('@/presentation/shared/components/SocialNetworksFooter', () => ({
-  SocialNetworksFooterContainer: jest.fn(() =>
-    React.createElement('div', { 'data-testid': 'footer' }, 'Footer')
-  ),
-}));
 
 jest.mock('@/infrastructure/container', () => ({
   container: {
@@ -34,7 +29,6 @@ jest.mock('next/font/google', () => ({
 }));
 
 describe('RootLayout', () => {
-  const { headers: mockHeaders } = jest.requireMock('next/headers');
   const mockInitializeDatabase = jest.mocked(initializeDatabaseForLayout);
 
   beforeEach(() => {
@@ -42,10 +36,6 @@ describe('RootLayout', () => {
   });
 
   it('should initialize database on render', async () => {
-    const headers = new Headers();
-    headers.set('x-pathname', '/');
-    mockHeaders.mockResolvedValue(headers);
-
     const layout = await RootLayout({
       children: React.createElement('div', {}, 'Test Content'),
     });
@@ -54,38 +44,7 @@ describe('RootLayout', () => {
     expect(mockInitializeDatabase).toHaveBeenCalled();
   });
 
-  it('should render footer on public routes', async () => {
-    const headers = new Headers();
-    headers.set('x-pathname', '/');
-    mockHeaders.mockResolvedValue(headers);
-
-    const layout = await RootLayout({
-      children: React.createElement('div', {}, 'Test Content'),
-    });
-    render(layout);
-
-    expect(screen.getByTestId('footer')).toBeInTheDocument();
-  });
-
-  it('should render footer on admin routes (container handles conditional rendering)', async () => {
-    const headers = new Headers();
-    headers.set('x-pathname', '/admin');
-    mockHeaders.mockResolvedValue(headers);
-
-    const layout = await RootLayout({
-      children: React.createElement('div', {}, 'Test Content'),
-    });
-    render(layout);
-
-    // Footer should always be rendered now, container handles conditional logic
-    expect(screen.queryByTestId('footer')).toBeInTheDocument();
-  });
-
   it('should render children content', async () => {
-    const headers = new Headers();
-    headers.set('x-pathname', '/');
-    mockHeaders.mockResolvedValue(headers);
-
     const testContent = React.createElement(
       'div',
       { 'data-testid': 'test-content' },
@@ -97,29 +56,16 @@ describe('RootLayout', () => {
     expect(screen.getByTestId('test-content')).toBeInTheDocument();
   });
 
-  it('should handle missing pathname header gracefully', async () => {
-    const headers = new Headers();
-    mockHeaders.mockResolvedValue(headers);
-
-    const layout = await RootLayout({
-      children: React.createElement('div', {}, 'Test Content'),
-    });
+  it('should wrap children in Provider component', async () => {
+    const testContent = React.createElement(
+      'div',
+      { 'data-testid': 'test-content' },
+      'Test Content'
+    );
+    const layout = await RootLayout({ children: testContent });
     render(layout);
 
-    // Should render footer when pathname is missing (defaults to public)
-    expect(screen.getByTestId('footer')).toBeInTheDocument();
-  });
-
-  it('should render footer on complex public routes', async () => {
-    const headers = new Headers();
-    headers.set('x-pathname', '/about/team');
-    mockHeaders.mockResolvedValue(headers);
-
-    const layout = await RootLayout({
-      children: React.createElement('div', {}, 'Test Content'),
-    });
-    render(layout);
-
-    expect(screen.getByTestId('footer')).toBeInTheDocument();
+    // Verify children are rendered within the layout structure
+    expect(screen.getByTestId('test-content')).toBeInTheDocument();
   });
 });

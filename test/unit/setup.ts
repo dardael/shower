@@ -182,6 +182,9 @@ jest.mock('@chakra-ui/react', () => {
     Stack: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },
+    Flex: ({ children, ...props }: ComponentProps) => {
+      return React.createElement('div', filterChakraProps(props), children);
+    },
     HStack: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },

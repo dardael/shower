@@ -113,9 +113,14 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+- TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
+- N/A (data fetched from existing APIs) (025-public-loading-page)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage
 - TypeScript 5.0+ with Next.js 15 App Router + Chakra UI v3, React 19, tsyringe for DI, @dnd-kit/core for drag-and-drop, BetterAuth, react-icons, Google Fonts CSS API
 - MongoDB via Mongoose
 - Tiptap (@tiptap/react, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link, @tiptap/extension-color, @tiptap/extension-text-style, @tiptap/core) for rich text editing
+
+## Recent Changes
+- 025-public-loading-page: Added TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities
