@@ -6,6 +6,8 @@ import {
   ThemeColorToken,
   getAvailableThemeColors,
 } from '@/domain/settings/constants/ThemeColorPalette';
+import { useColorMode } from '@/presentation/shared/components/ui/color-mode';
+import { BACKGROUND_COLOR_MAP } from '@/presentation/shared/components/ui/provider';
 
 interface BackgroundColorSelectorProps {
   selectedColor: ThemeColorToken;
@@ -72,8 +74,13 @@ ColorButton.displayName = 'BackgroundColorButton';
 const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
   ({ selectedColor, onColorChange, disabled = false, isLoading = false }) => {
     const availableColors = getAvailableThemeColors();
+    const { colorMode } = useColorMode();
     const textColor = 'fg.muted';
     const [announcement, setAnnouncement] = useState('');
+
+    // Get the actual background color hex value based on current color mode
+    const previewBackgroundColor =
+      BACKGROUND_COLOR_MAP[selectedColor][colorMode];
 
     // Announce background color changes for screen readers
     useEffect(() => {
@@ -138,6 +145,22 @@ const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
             );
           })}
         </HStack>
+
+        {/* Background Color Preview */}
+        <VStack gap={2} align="start" width="full">
+          <Text fontSize="sm" fontWeight="medium" color={textColor}>
+            Preview
+          </Text>
+          <Box
+            data-testid="background-color-preview"
+            width="full"
+            height="60px"
+            borderRadius="md"
+            style={{ backgroundColor: previewBackgroundColor }}
+            border="1px solid"
+            borderColor="border.subtle"
+          />
+        </VStack>
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
