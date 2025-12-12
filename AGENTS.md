@@ -115,6 +115,8 @@ you must use docker compose to run all commands in order to have the same enviro
 ## Active Technologies
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, next-themes (via useColorMode hook) (026-admin-bgcolor-preview)
+- N/A (uses existing settings infrastructure) (026-admin-bgcolor-preview)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage

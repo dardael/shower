@@ -21,7 +21,7 @@ import {
 } from '@/presentation/shared/contexts/BackgroundColorContext';
 
 // Background color hex mappings for light and dark modes
-const BACKGROUND_COLOR_MAP: Record<
+export const BACKGROUND_COLOR_MAP: Record<
   ThemeColorToken,
   { light: string; dark: string }
 > = {
