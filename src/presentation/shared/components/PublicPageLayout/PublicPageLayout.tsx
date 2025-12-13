@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Container, Box } from '@chakra-ui/react';
+import { Container, Box, Flex } from '@chakra-ui/react';
 import PublicPageContent from '@/presentation/shared/components/PublicPageContent/PublicPageContent';
 import { PublicHeaderMenu } from '@/presentation/shared/components/PublicHeaderMenu/PublicHeaderMenu';
 import { SocialNetworksFooter } from '@/presentation/shared/components/SocialNetworksFooter/SocialNetworksFooter';
@@ -39,18 +39,18 @@ export function PublicPageLayout({
   const contentString = data.pageContent.content;
 
   return (
-    <>
+    <Flex direction="column" minH="100vh">
       <PublicHeaderMenu
         menuItems={menuItems}
         logo={logo}
         colorPalette={themeColor}
       />
-      <Container maxW="container.lg" py={8}>
-        <Box>
+      <Box flex="1">
+        <Container maxW="container.lg" py={8}>
           <PublicPageContent content={contentString} />
-        </Box>
-      </Container>
+        </Container>
+      </Box>
       <SocialNetworksFooter socialNetworks={socialNetworks} />
-    </>
+    </Flex>
   );
 }
