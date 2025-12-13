@@ -19,6 +19,7 @@ import {
   BackgroundColorProvider,
   useBackgroundColorContext,
 } from '@/presentation/shared/contexts/BackgroundColorContext';
+import { ThemeModeProvider } from '@/presentation/shared/contexts/ThemeModeContext';
 
 // Background color hex mappings for light and dark modes
 export const BACKGROUND_COLOR_MAP: Record<
@@ -86,7 +87,9 @@ function ThemeProviderWithInitialColor({
   return (
     <ThemeColorProvider>
       <BackgroundColorProvider>
-        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+        <ThemeModeProvider>
+          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+        </ThemeModeProvider>
       </BackgroundColorProvider>
     </ThemeColorProvider>
   );

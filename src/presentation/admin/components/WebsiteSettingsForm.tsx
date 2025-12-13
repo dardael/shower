@@ -15,10 +15,12 @@ import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
+import { ThemeModeSelector } from '@/presentation/admin/components/ThemeModeSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
+import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
@@ -51,6 +53,11 @@ export default function WebsiteSettingsForm({
     updateWebsiteFont: updateWebsiteFontWithCache,
     isLoading: fontLoading,
   } = useWebsiteFontContext();
+  const {
+    themeMode,
+    updateThemeMode: updateThemeModeConfig,
+    isLoading: themeModeLoading,
+  } = useThemeModeConfig();
   const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
 
@@ -321,6 +328,19 @@ export default function WebsiteSettingsForm({
               formats.
             </Field.HelperText>
           </Field.Root>
+
+          <ThemeModeSelector
+            selectedMode={themeMode}
+            onModeChange={async (mode) => {
+              try {
+                await updateThemeModeConfig(mode);
+              } catch {
+                showToast('Failed to update theme mode', 'error');
+              }
+            }}
+            disabled={loading}
+            isLoading={themeModeLoading}
+          />
 
           <ThemeColorSelector
             selectedColor={themeColor}

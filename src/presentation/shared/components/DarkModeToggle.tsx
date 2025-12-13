@@ -2,8 +2,9 @@
 
 import { ClientOnly, IconButton, Skeleton } from '@chakra-ui/react';
 import { LuMoon, LuSun } from 'react-icons/lu';
+import { useEffect } from 'react';
 import { useColorMode } from '@/presentation/shared/components/ui/color-mode';
-import { ThemeMode } from '@/domain/settings/value-objects/ThemeMode';
+import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
 
 /**
  * Dark Mode Toggle Component Props
@@ -27,11 +28,6 @@ interface DarkModeToggleProps {
   'aria-label'?: string;
 
   /**
-   * Callback when theme changes
-   */
-  onThemeChange?: (theme: ThemeMode) => void;
-
-  /**
    * Additional CSS classes
    */
   className?: string;
@@ -41,17 +37,32 @@ interface DarkModeToggleProps {
  * Dark Mode Toggle Component
  *
  * Provides a toggle button for switching between light and dark modes.
- * Uses next-themes directly for reliable theme switching.
- * Follows Chakra UI v3 component patterns with accessibility support.
+ * Respects admin theme mode configuration:
+ * - 'user-choice': Shows toggle, allows user to switch
+ * - 'force-light': Hides toggle, applies light mode
+ * - 'force-dark': Hides toggle, applies dark mode
  */
 export default function DarkModeToggle({
   size = 'sm',
   variant = 'ghost',
   'aria-label': ariaLabel,
-  onThemeChange,
   className,
 }: DarkModeToggleProps) {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode, toggleColorMode, setColorMode } = useColorMode();
+  const { shouldShowToggle, isForced, forcedMode, isLoading } =
+    useThemeModeConfig();
+
+  // Apply forced mode whenever it changes (including cross-tab updates)
+  useEffect(() => {
+    if (!isLoading && isForced && forcedMode) {
+      setColorMode(forcedMode);
+    }
+  }, [isLoading, isForced, forcedMode, setColorMode]);
+
+  // While loading, render nothing to prevent flash
+  if (isLoading) {
+    return null;
+  }
 
   const isDark = colorMode === 'dark';
   const label =
@@ -60,10 +71,13 @@ export default function DarkModeToggle({
     size === 'xs' ? '6' : size === 'sm' ? '8' : size === 'md' ? '10' : '12';
 
   const handleToggle = () => {
-    const newTheme = isDark ? ThemeMode.LIGHT : ThemeMode.DARK;
     toggleColorMode();
-    onThemeChange?.(newTheme);
   };
+
+  // Don't render toggle when mode is forced (hide the button)
+  if (!shouldShowToggle) {
+    return null;
+  }
 
   return (
     <ClientOnly fallback={<Skeleton boxSize={buttonSize} />}>

@@ -5,6 +5,7 @@ import { Logger } from '@/application/shared/Logger';
 import { withApi } from '@/infrastructure/shared/apiWrapper';
 import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import { BackgroundColor } from '@/domain/settings/value-objects/BackgroundColor';
+import { ThemeModePreference } from '@/domain/settings/value-objects/ThemeModePreference';
 import {
   isValidThemeColor,
   getThemeColorErrorMessage,
@@ -34,17 +35,21 @@ export const GET = withApi(
       const getThemeColor = SettingsServiceLocator.getGetThemeColor();
       const getBackgroundColor = SettingsServiceLocator.getGetBackgroundColor();
       const getWebsiteName = SettingsServiceLocator.getWebsiteName();
+      const getThemeMode = SettingsServiceLocator.getGetThemeMode();
 
-      const [themeColor, backgroundColor, websiteName] = await Promise.all([
-        getThemeColor.execute(),
-        getBackgroundColor.execute(),
-        getWebsiteName.execute(),
-      ]);
+      const [themeColor, backgroundColor, websiteName, themeMode] =
+        await Promise.all([
+          getThemeColor.execute(),
+          getBackgroundColor.execute(),
+          getWebsiteName.execute(),
+          getThemeMode.execute(),
+        ]);
 
       logger.info('Website settings retrieved successfully', {
         websiteName: websiteName,
         themeColor: themeColor?.value,
         backgroundColor: backgroundColor?.value,
+        themeMode: themeMode.value,
       });
 
       const duration = Date.now() - startTime;
@@ -52,10 +57,12 @@ export const GET = withApi(
         websiteName: websiteName,
         themeColor: themeColor?.value,
         backgroundColor: backgroundColor?.value,
+        themeMode: themeMode.value,
       });
 
       const response: GetSettingsResponse = {
         name: websiteName,
+        themeMode: themeMode.value,
         ...(themeColor && { themeColor: themeColor.value }),
         ...(backgroundColor && { backgroundColor: backgroundColor.value }),
       };
@@ -93,7 +100,7 @@ export const POST = withApi(
 
       // Parse request body
       const body = (await request.json()) as UpdateSettingsRequest;
-      const { name, themeColor, backgroundColor } = body;
+      const { name, themeColor, backgroundColor, themeMode } = body;
 
       // Validate inputs
       if (name && typeof name !== 'string') {
@@ -137,6 +144,21 @@ export const POST = withApi(
         return NextResponse.json(errorResponse, { status: 400 });
       }
 
+      if (themeMode && !ThemeModePreference.isValid(themeMode)) {
+        logger.warn('Invalid theme mode provided', {
+          themeMode,
+        });
+
+        const duration = Date.now() - startTime;
+        logger.logApiResponse('POST', '/api/settings', 400, duration);
+
+        const errorResponse: SettingsErrorResponse = {
+          error:
+            'Invalid theme mode provided. Must be one of: force-light, force-dark, user-choice',
+        };
+        return NextResponse.json(errorResponse, { status: 400 });
+      }
+
       // Update name if provided
       if (name && typeof name === 'string') {
         const updateWebsiteName = SettingsServiceLocator.getUpdateWebsiteName();
@@ -165,11 +187,22 @@ export const POST = withApi(
         });
       }
 
+      // Update theme mode if provided
+      if (themeMode && typeof themeMode === 'string') {
+        const updateThemeMode = SettingsServiceLocator.getUpdateThemeMode();
+        const themeModeValue = ThemeModePreference.create(themeMode);
+        await updateThemeMode.execute(themeModeValue);
+        logger.info('Theme mode updated successfully', {
+          newThemeMode: themeModeValue.value,
+        });
+      }
+
       const duration = Date.now() - startTime;
       logger.logApiResponse('POST', '/api/settings', 200, duration, {
         name,
         themeColor,
         backgroundColor,
+        themeMode,
       });
 
       const response: UpdateSettingsResponse = {

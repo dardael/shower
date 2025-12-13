@@ -117,6 +117,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - N/A (data fetched from existing APIs) (025-public-loading-page)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, next-themes (via useColorMode hook) (026-admin-bgcolor-preview)
 - N/A (uses existing settings infrastructure) (026-admin-bgcolor-preview)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, next-themes (via useColorMode hook), tsyringe for DI (027-theme-mode-config)
+- MongoDB via Mongoose (existing settings infrastructure) (027-theme-mode-config)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage

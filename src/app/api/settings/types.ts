@@ -1,4 +1,5 @@
 import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
+import type { ThemeModeValue } from '@/domain/settings/value-objects/ThemeModePreference';
 
 /**
  * Response type for GET /api/settings
@@ -7,6 +8,7 @@ export interface GetSettingsResponse {
   name: string;
   themeColor?: ThemeColorToken;
   backgroundColor?: ThemeColorToken;
+  themeMode: ThemeModeValue;
 }
 
 /**
@@ -16,6 +18,7 @@ export interface UpdateSettingsRequest {
   name?: string;
   themeColor?: string;
   backgroundColor?: string;
+  themeMode?: string;
 }
 
 /**

@@ -5,6 +5,7 @@ export const VALID_SETTING_KEYS = {
   HEADER_LOGO: 'header-logo',
   WEBSITE_FONT: 'website-font',
   BACKGROUND_COLOR: 'background-color',
+  THEME_MODE: 'theme-mode',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(

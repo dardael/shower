@@ -39,6 +39,8 @@ import type { IUpdateHeaderLogo } from '@/application/settings/IUpdateHeaderLogo
 import type { IGetWebsiteFont } from '@/application/settings/IGetWebsiteFont';
 import type { IUpdateWebsiteFont } from '@/application/settings/IUpdateWebsiteFont';
 import type { IGetAvailableFonts } from '@/application/settings/IGetAvailableFonts';
+import type { IGetThemeMode } from '@/application/settings/IGetThemeMode';
+import type { IUpdateThemeMode } from '@/application/settings/IUpdateThemeMode';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -55,6 +57,8 @@ import { UpdateHeaderLogo } from '@/application/settings/UpdateHeaderLogo';
 import { GetWebsiteFont } from '@/application/settings/GetWebsiteFont';
 import { UpdateWebsiteFont } from '@/application/settings/UpdateWebsiteFont';
 import { GetAvailableFonts } from '@/application/settings/GetAvailableFonts';
+import { GetThemeMode } from '@/application/settings/GetThemeMode';
+import { UpdateThemeMode } from '@/application/settings/UpdateThemeMode';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -189,6 +193,14 @@ container.register<IUpdateWebsiteFont>('IUpdateWebsiteFont', {
 
 container.register<IGetAvailableFonts>('IGetAvailableFonts', {
   useClass: GetAvailableFonts,
+});
+
+container.register<IGetThemeMode>('IGetThemeMode', {
+  useClass: GetThemeMode,
+});
+
+container.register<IUpdateThemeMode>('IUpdateThemeMode', {
+  useClass: UpdateThemeMode,
 });
 
 // Register factory services
@@ -334,6 +346,14 @@ export class SettingsServiceLocator {
 
   static getGetAvailableFonts(): IGetAvailableFonts {
     return container.resolve('IGetAvailableFonts');
+  }
+
+  static getGetThemeMode(): IGetThemeMode {
+    return container.resolve('IGetThemeMode');
+  }
+
+  static getUpdateThemeMode(): IUpdateThemeMode {
+    return container.resolve('IUpdateThemeMode');
   }
 }
 
