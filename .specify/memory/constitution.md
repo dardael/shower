@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report:
-- Version change: 1.6.1 → 1.7.0 (added YAGNI, DRY, KISS principles for minimal code implementation)
+- Version change: 1.7.0 → 1.8.0 (added Configuration Portability principle)
 - Modified principles: None
-- Added sections: Principle VII (YAGNI), Principle VIII (DRY), Principle IX (KISS)
+- Added sections: Principle X (Configuration Portability)
 - Removed sections: None
 - Templates requiring updates: ✅ plan-template.md, ✅ spec-template.md, ✅ tasks-template.md
 - Follow-up TODOs: None
@@ -48,6 +48,10 @@ Code MUST avoid duplication by extracting common logic into reusable functions, 
 
 Code MUST be simple, readable, and clear with straightforward implementations. Complex solutions MUST be avoided in favor of simpler approaches that meet requirements. Code structure MUST be immediately understandable by other developers without extensive documentation. This ensures maintainability, reduces cognitive load, and minimizes the likelihood of introducing bugs through unnecessary complexity.
 
+### X. Configuration Portability
+
+Any modification to website configuration (adding, modifying, or deleting configuration fields) MUST be synchronized with the export/import system. When a new configuration field is added, it MUST be included in the export payload. When a configuration field is modified, the export format MUST reflect the change. When a configuration field is deleted, the import system MUST handle its absence gracefully. The export file version number MUST be incremented for any configuration schema change. Import logic MUST handle version migrations to maintain backward compatibility with older exports. This ensures configuration portability, prevents data loss during backup/restore operations, and maintains system consistency across environments.
+
 ## Development Standards
 
 ### Technology Stack Requirements
@@ -75,10 +79,10 @@ All development MUST follow established workflow: feature branch creation, focus
 
 ### Review and Compliance Requirements
 
-Every pull request MUST verify constitution compliance: architecture adherence, focused testing approach (unit/integration only when asked, avoid over-mocking), simplicity-first implementation (no performance monitoring in final code), accessibility-first design (proper contrast for light/dark modes, consistent theme color usage), YAGNI (minimal implementation for current requirements only), DRY (no code duplication), KISS (simple, readable code), logging implementation, security controls, and clean architecture principles. Code reviews MUST validate layer separation, dependency direction, proper use of dependency injection, absence of performance monitoring code, contrast compliance for theme support, consistent use of admin-configured theme colors, minimal feature implementation, absence of code duplication, and code simplicity. Security reviews MUST ensure authentication/authorization implementation and absence of sensitive data exposure. Architecture reviews MUST validate SOLID principles and proper separation of concerns.
+Every pull request MUST verify constitution compliance: architecture adherence, focused testing approach (unit/integration only when asked, avoid over-mocking), simplicity-first implementation (no performance monitoring in final code), accessibility-first design (proper contrast for light/dark modes, consistent theme color usage), YAGNI (minimal implementation for current requirements only), DRY (no code duplication), KISS (simple, readable code), configuration portability (export/import sync for config changes), logging implementation, security controls, and clean architecture principles. Code reviews MUST validate layer separation, dependency direction, proper use of dependency injection, absence of performance monitoring code, contrast compliance for theme support, consistent use of admin-configured theme colors, minimal feature implementation, absence of code duplication, code simplicity, and export/import system synchronization for configuration changes. Security reviews MUST ensure authentication/authorization implementation and absence of sensitive data exposure. Architecture reviews MUST validate SOLID principles and proper separation of concerns.
 
 ## Governance
 
-This constitution supersedes all other development practices and guidelines. Amendments require documentation update, team approval, and migration plan for existing code. All development MUST reference this constitution for architectural decisions, testing requirements, simplicity-first implementation, accessibility-first design, YAGNI, DRY, KISS principles, security implementation, and clean architecture standards. Complex deviations from constitution MUST be justified with technical rationale and approved by team consensus. Use AGENTS.md for runtime development guidance and specific implementation patterns.
+This constitution supersedes all other development practices and guidelines. Amendments require documentation update, team approval, and migration plan for existing code. All development MUST reference this constitution for architectural decisions, testing requirements, simplicity-first implementation, accessibility-first design, YAGNI, DRY, KISS principles, configuration portability, security implementation, and clean architecture standards. Complex deviations from constitution MUST be justified with technical rationale and approved by team consensus. Use AGENTS.md for runtime development guidance and specific implementation patterns.
 
-**Version**: 1.7.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-11-27
+**Version**: 1.8.0 | **Ratified**: 2025-01-17 | **Last Amended**: 2025-12-15

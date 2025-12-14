@@ -99,6 +99,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T020 [US1] Verify YAGNI compliance (minimal implementation for current requirements only)
 - [ ] T021 [US1] Verify DRY compliance (no code duplication)
 - [ ] T022 [US1] Verify KISS compliance (simple, readable code)
+- [ ] T023 [US1] Verify configuration portability (export/import sync if config changes)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -126,6 +127,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T026 [US2] Verify YAGNI compliance (minimal implementation for current requirements only)
 - [ ] T027 [US2] Verify DRY compliance (no code duplication)
 - [ ] T028 [US2] Verify KISS compliance (simple, readable code)
+- [ ] T029 [US2] Verify configuration portability (export/import sync if config changes)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -152,6 +154,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T031 [US3] Verify YAGNI compliance (minimal implementation for current requirements only)
 - [ ] T032 [US3] Verify DRY compliance (no code duplication)
 - [ ] T033 [US3] Verify KISS compliance (simple, readable code)
+- [ ] T034 [US3] Verify configuration portability (export/import sync if config changes)
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -170,7 +173,7 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Code optimization while maintaining simplicity (no performance monitoring)
 - [ ] TXXX [P] Additional unit and integration tests (if requested) covering common cases
 - [ ] TXXX Security hardening
-- [ ] TXXX [P] Code quality validation (YAGNI, DRY, KISS compliance, accessibility across all themes)
+- [ ] TXXX [P] Code quality validation (YAGNI, DRY, KISS compliance, accessibility across all themes, configuration portability)
 - [ ] TXXX Run quickstart.md validation
 
 ---

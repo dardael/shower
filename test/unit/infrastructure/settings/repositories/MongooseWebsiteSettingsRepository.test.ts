@@ -129,7 +129,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-name' },
-        { value: 'Updated Website' },
+        { $set: { key: 'website-name', value: 'Updated Website' } },
         { upsert: true }
       );
     });
@@ -145,7 +145,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'theme-color' },
-        { value: 'red' },
+        { $set: { key: 'theme-color', value: 'red' } },
         { upsert: true }
       );
     });
@@ -171,7 +171,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-icon' },
-        { value: iconValue },
+        { $set: { key: 'website-icon', value: iconValue } },
         { upsert: true }
       );
     });
@@ -185,7 +185,7 @@ describe('MongooseWebsiteSettingsRepository', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-icon' },
-        { value: null },
+        { $set: { key: 'website-icon', value: null } },
         { upsert: true }
       );
     });

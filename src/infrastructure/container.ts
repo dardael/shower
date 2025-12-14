@@ -284,6 +284,14 @@ export class AuthServiceLocator {
 }
 
 export class SettingsServiceLocator {
+  static getWebsiteSettingsRepository(): WebsiteSettingsRepository {
+    return container.resolve('WebsiteSettingsRepository');
+  }
+
+  static getSocialNetworkRepository(): SocialNetworkRepository {
+    return container.resolve('SocialNetworkRepository');
+  }
+
   static getUpdateWebsiteName(): IUpdateWebsiteName {
     return container.resolve('IUpdateWebsiteName');
   }
@@ -364,6 +372,54 @@ export class LoggerServiceLocator {
 
   static getBaseLogger(): ILogger {
     return container.resolve('ILogger');
+  }
+}
+
+export class MenuServiceLocator {
+  static getMenuItemRepository(): MenuItemRepository {
+    return container.resolve('MenuItemRepository');
+  }
+
+  static getGetMenuItems(): IGetMenuItems {
+    return container.resolve('IGetMenuItems');
+  }
+
+  static getAddMenuItem(): IAddMenuItem {
+    return container.resolve('IAddMenuItem');
+  }
+
+  static getRemoveMenuItem(): IRemoveMenuItem {
+    return container.resolve('IRemoveMenuItem');
+  }
+
+  static getReorderMenuItems(): IReorderMenuItems {
+    return container.resolve('IReorderMenuItems');
+  }
+
+  static getUpdateMenuItem(): IUpdateMenuItem {
+    return container.resolve('IUpdateMenuItem');
+  }
+}
+
+export class PagesServiceLocator {
+  static getPageContentRepository(): IPageContentRepository {
+    return container.resolve('PageContentRepository');
+  }
+
+  static getCreatePageContent(): ICreatePageContent {
+    return container.resolve('ICreatePageContent');
+  }
+
+  static getGetPageContent(): IGetPageContent {
+    return container.resolve('IGetPageContent');
+  }
+
+  static getUpdatePageContent(): IUpdatePageContent {
+    return container.resolve('IUpdatePageContent');
+  }
+
+  static getDeletePageContent(): IDeletePageContent {
+    return container.resolve('IDeletePageContent');
   }
 }
 

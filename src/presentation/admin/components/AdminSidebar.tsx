@@ -38,6 +38,11 @@ const menuItems = [
     label: 'Navigation Menu',
     description: 'Configure website navigation',
   },
+  {
+    href: '/admin/export-import',
+    label: 'Export / Import',
+    description: 'Backup and restore configuration',
+  },
 ];
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {

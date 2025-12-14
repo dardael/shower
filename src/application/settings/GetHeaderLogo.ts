@@ -22,7 +22,16 @@ export class GetHeaderLogo implements IGetHeaderLogo {
         return null;
       }
 
-      return new HeaderLogo(logoValue.url, logoValue.metadata);
+      // Ensure uploadedAt is a Date object (MongoDB may return it as a string)
+      const metadata = {
+        ...logoValue.metadata,
+        uploadedAt:
+          logoValue.metadata.uploadedAt instanceof Date
+            ? logoValue.metadata.uploadedAt
+            : new Date(logoValue.metadata.uploadedAt),
+      };
+
+      return new HeaderLogo(logoValue.url, metadata);
     } catch {
       return null;
     }
