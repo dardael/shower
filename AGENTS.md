@@ -126,6 +126,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, Tiptap (@tiptap/react, @tiptap/extension-color), tsyringe for DI (030-custom-color-palette)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3 (Box, VStack, HStack, IconButton), react-icons (FiMenu, FiX), existing FocusTrap utility (031-mobile-header-menu)
 - N/A (uses existing menu data from usePublicHeaderMenu hook) (031-mobile-header-menu)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, react-icons, existing SocialNetworksFooter component (032-mobile-footer)
+- N/A (uses existing social networks data from settings API) (032-mobile-footer)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage

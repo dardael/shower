@@ -74,11 +74,11 @@ export function SocialNetworksFooter({
           display="flex"
           justifyContent="center"
           alignItems="center"
-          gap={spacing}
+          gap={{ base: 4, md: spacing }}
           maxW="container.lg"
           mx="auto"
           width="full"
-          style={{ flexWrap: 'wrap' }}
+          flexWrap="wrap"
         >
           {displayNetworks.map((socialNetwork) => (
             <SocialNetworkItem

@@ -54,17 +54,23 @@ export function SocialNetworkItem({
       _hover={{ textDecoration: 'none' }}
       onClick={handleClick}
       data-testid={`social-network-item-${type}`}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      minW="44px"
+      minH="44px"
+      _focusVisible={{
+        outline: '2px solid',
+        outlineColor: 'colorPalette.solid',
+        outlineOffset: '2px',
+        borderRadius: 'md',
+      }}
     >
       <VStack
         gap={3}
         textAlign="center"
-        minW={{ base: '180px', md: '220px' }}
-        transition="none" // Explicitly disable transitions per project constraints
-        _focusVisible={{
-          ring: '2px',
-          ringColor: 'colorPalette.solid',
-          ringOffset: '2px',
-        }}
+        minW={{ base: '120px', md: '180px' }}
+        py={{ base: 2, md: 0 }}
       >
         <SocialNetworkIcon type={type} size={28} />
         <Text fontSize="sm" fontWeight="medium" color="fg" truncate maxW="full">
