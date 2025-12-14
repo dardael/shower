@@ -70,7 +70,7 @@ export function HomePageClient(): React.ReactElement {
   // Show complete page only when all data is loaded
   if (state.isComplete && data) {
     return (
-      <PublicPageLayout data={data} themeColor={themeColor} logo={undefined} />
+      <PublicPageLayout data={data} themeColor={themeColor} logo={data.logo} />
     );
   }
 

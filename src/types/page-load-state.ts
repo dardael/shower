@@ -11,6 +11,7 @@ export interface PageLoadState {
   menuLoaded: boolean;
   footerLoaded: boolean;
   contentLoaded: boolean;
+  logoLoaded: boolean;
   startTime: number;
 }
 
@@ -44,12 +45,22 @@ export interface MenuItemDTO {
 }
 
 /**
+ * DTO for public logo from API
+ */
+export interface PublicLogoDTO {
+  url: string;
+  filename: string;
+  format: string;
+}
+
+/**
  * Container for all successfully loaded data sources
  */
 export interface PublicPageData {
   menuData: MenuItemDTO[];
   footerData: WebsiteSettingsData;
   pageContent: PageContentDTO;
+  logo: PublicLogoDTO | null;
 }
 
 /**

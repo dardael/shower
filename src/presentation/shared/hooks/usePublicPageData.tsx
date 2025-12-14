@@ -10,6 +10,7 @@ import type {
   WebsiteSettingsData,
   MenuItemDTO,
   PageContentDTO,
+  PublicLogoDTO,
 } from '@/types/page-load-state';
 
 const TIMEOUT_MS = 10000; // 10 seconds
@@ -34,6 +35,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
     menuLoaded: false,
     footerLoaded: false,
     contentLoaded: false,
+    logoLoaded: false,
     startTime: Date.now(),
   });
 
@@ -51,6 +53,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
       menuLoaded: false,
       footerLoaded: false,
       contentLoaded: false,
+      logoLoaded: false,
       startTime,
     });
 
@@ -62,9 +65,10 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
       const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
       // Fetch all data sources in parallel using Promise.allSettled
-      const [menuResult, footerResult] = await Promise.allSettled([
+      const [menuResult, footerResult, logoResult] = await Promise.allSettled([
         fetchMenuData(controller.signal),
         fetchFooterData(controller.signal),
+        fetchLogoData(controller.signal),
       ]);
 
       // Get menu data to find the page content
@@ -157,6 +161,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
         menuLoaded: true,
         footerLoaded: true,
         contentLoaded: true,
+        logoLoaded: true,
         startTime,
       });
 
@@ -165,6 +170,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
         menuData: menuData || [],
         footerData,
         pageContent: pageContent!,
+        logo: logoResult.status === 'fulfilled' ? logoResult.value : null,
       });
     } catch {
       // Catch any unexpected errors during data fetching
@@ -336,4 +342,49 @@ async function fetchPageContentWithMenu(
   }
 
   return result;
+}
+
+/**
+ * Fetch logo data from public API and preload the image
+ */
+async function fetchLogoData(
+  signal: AbortSignal
+): Promise<PublicLogoDTO | null> {
+  const response = await fetch('/api/public/logo', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal,
+  });
+
+  if (!response.ok) {
+    // Logo is optional, return null on error
+    return null;
+  }
+
+  const result = await response.json();
+
+  if (!result.success || !result.data) {
+    return null;
+  }
+
+  const logoData: PublicLogoDTO = result.data;
+
+  // Preload the logo image to ensure it's cached before displaying
+  await preloadImage(logoData.url);
+
+  return logoData;
+}
+
+/**
+ * Preload an image by creating an Image element and waiting for it to load
+ */
+function preloadImage(url: string): Promise<void> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve(); // Resolve even on error to not block loading
+    img.src = url;
+  });
 }
