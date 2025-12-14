@@ -121,6 +121,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - MongoDB via Mongoose (existing settings infrastructure) (027-theme-mode-config)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, existing PublicPageLayout component (028-sticky-footer-layout)
 - N/A (CSS-only change, no data persistence) (028-sticky-footer-layout)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Tiptap (@tiptap/react, @tiptap/core, @tiptap/extension-image), Chakra UI v3, react-icons (029-image-full-bleed)
+- N/A (uses existing HTML string storage in MongoDB via PageContent entity) (029-image-full-bleed)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage

@@ -258,6 +258,7 @@ span[data-theme-color] {
 }
 
 /* Full-width image styles */
+/* Note: !important is required to override inline styles set by Tiptap resize extension */
 .tiptap-editor-wrapper .tiptap img[data-full-width='true'] {
   width: 100% !important;
   max-width: none;
@@ -272,6 +273,7 @@ span[data-theme-color] {
 }
 
 /* Override resize container for full-width images */
+/* Note: !important is required to override inline styles set by Tiptap resize extension */
 .tiptap-editor-wrapper
   .tiptap
   [data-resize-container]:has(img[data-full-width='true']) {
@@ -282,5 +284,41 @@ span[data-theme-color] {
 .tiptap-editor-wrapper
   .tiptap
   [data-resize-wrapper]:has(img[data-full-width='true']) {
+  width: 100% !important;
+}
+
+/* Full-bleed indicator styles */
+.tiptap-editor-wrapper .tiptap img[data-full-bleed='true'],
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-full-bleed='true'] {
+  outline: 2px dashed var(--chakra-colors-blue-400);
+  outline-offset: 4px;
+}
+
+/* Note: !important is required to override inline styles set by Tiptap resize extension */
+.tiptap-editor-wrapper .tiptap img[data-full-bleed='true'] {
+  width: 100% !important;
+  max-width: none;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-full-bleed='true'] {
+  width: 100%;
+}
+
+.tiptap-editor-wrapper .tiptap .image-with-overlay[data-full-bleed='true'] img {
+  width: 100%;
+}
+
+/* Override resize container for full-bleed images */
+/* Note: !important is required to override inline styles set by Tiptap resize extension */
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-container]:has(img[data-full-bleed='true']) {
+  width: 100% !important;
+  display: block;
+}
+
+.tiptap-editor-wrapper
+  .tiptap
+  [data-resize-wrapper]:has(img[data-full-bleed='true']) {
   width: 100% !important;
 }

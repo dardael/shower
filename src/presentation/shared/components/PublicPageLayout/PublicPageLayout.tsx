@@ -45,8 +45,8 @@ export function PublicPageLayout({
         logo={logo}
         colorPalette={themeColor}
       />
-      <Box flex="1">
-        <Container maxW="container.lg" py={8}>
+      <Box flex="1" overflow="clip">
+        <Container maxW="container.lg" py={8} overflow="visible">
           <PublicPageContent content={contentString} />
         </Container>
       </Box>

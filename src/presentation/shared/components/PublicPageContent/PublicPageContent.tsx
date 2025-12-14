@@ -66,16 +66,26 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
       'rel',
       'class',
       'style',
+      'data-full-width',
+      'data-full-bleed',
+      'data-overlay-text',
+      'data-overlay-color',
+      'data-overlay-font-family',
+      'data-overlay-font-size',
+      'data-overlay-position',
+      'data-overlay-align',
+      'data-overlay-bg-color',
+      'data-overlay-bg-opacity',
     ],
     ALLOW_DATA_ATTR: true,
     ADD_TAGS: [],
     ADD_ATTR: [],
-    SAFE_FOR_TEMPLATES: true,
   });
 
   return (
     <Box
       className="public-page-content"
+      overflow="visible"
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   );

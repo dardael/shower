@@ -201,6 +201,17 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
           return { 'data-full-width': 'true' };
         },
       },
+      fullBleed: {
+        default: false,
+        parseHTML: (element) =>
+          element.getAttribute('data-full-bleed') === 'true',
+        renderHTML: (attributes) => {
+          if (!attributes.fullBleed) {
+            return {};
+          }
+          return { 'data-full-bleed': 'true' };
+        },
+      },
     };
   },
 
@@ -228,6 +239,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
       overlayBgColor,
       overlayBgOpacity,
       fullWidth,
+      fullBleed,
     } = node.attrs;
 
     // When fullWidth is true, use width: 100%; otherwise use fixed width if set
@@ -246,11 +258,13 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
     if (textAlign) imgAttrs['data-text-align'] = textAlign;
 
     // Build wrapper style for alignment (inline styles survive DOMPurify)
+    // For fullBleed, we use width: 100% here, then CSS will override to 100vw with breakout
     // When fullWidth is true, use width: 100% instead of fit-content
-    let wrapperStyle = fullWidth
-      ? 'position: relative; display: block; width: 100%;'
-      : 'position: relative; display: block; width: fit-content;';
-    if (!fullWidth) {
+    let wrapperStyle =
+      fullBleed || fullWidth
+        ? 'position: relative; display: block; width: 100%;'
+        : 'position: relative; display: block; width: fit-content;';
+    if (!fullWidth && !fullBleed) {
       if (textAlign === 'center') {
         wrapperStyle += ' margin-left: auto; margin-right: auto;';
       } else if (textAlign === 'right') {
@@ -265,6 +279,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
       style: wrapperStyle,
       'data-text-align': textAlign,
       'data-full-width': fullWidth ? 'true' : null,
+      'data-full-bleed': fullBleed ? 'true' : null,
       'data-overlay-text': overlayText,
       'data-overlay-color': overlayColor,
       'data-overlay-font': overlayFontFamily,
@@ -322,6 +337,7 @@ export const ImageWithOverlay = Node.create<ImageWithOverlayOptions>({
               width: node.attrs.width,
               textAlign: node.attrs.textAlign,
               fullWidth: node.attrs.fullWidth || false,
+              fullBleed: node.attrs.fullBleed || false,
               overlayText: text,
               overlayColor: DEFAULT_OVERLAY_CONFIG.color,
               overlayFontFamily: DEFAULT_OVERLAY_CONFIG.fontFamily,

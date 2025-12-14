@@ -196,6 +196,30 @@
   width: 100%;
 }
 
+/* Full-bleed image styles - breaks out of container to viewport edges */
+.public-page-content img[data-full-bleed='true'] {
+  display: block !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+  border-radius: 0 !important;
+}
+
+.public-page-content .image-with-overlay[data-full-bleed='true'] {
+  display: block !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+  border-radius: 0 !important;
+}
+
+.public-page-content .image-with-overlay[data-full-bleed='true'] img {
+  width: 100% !important;
+  border-radius: 0 !important;
+}
+
 /* Responsive overlay scaling */
 @media (max-width: 768px) {
   .public-page-content .text-overlay {

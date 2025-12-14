@@ -26,6 +26,7 @@ import {
   LuHeading2,
   LuHeading3,
   LuListOrdered,
+  LuUnfoldHorizontal,
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
@@ -63,6 +64,17 @@ const ResizableImage = Image.extend({
             return {};
           }
           return { 'data-full-width': 'true' };
+        },
+      },
+      fullBleed: {
+        default: false,
+        parseHTML: (element) =>
+          element.getAttribute('data-full-bleed') === 'true',
+        renderHTML: (attributes) => {
+          if (!attributes.fullBleed) {
+            return {};
+          }
+          return { 'data-full-bleed': 'true' };
         },
       },
     };
@@ -168,6 +180,28 @@ const toggleFullWidth = (editor: Editor, imagePos: number): void => {
         fullWidth: newFullWidth,
         // When setting fullWidth, we don't need to clear the width
         // because fullWidth takes precedence in rendering
+      })
+    );
+  }
+};
+
+const isFullBleedActive = (editor: Editor, imagePos: number): boolean => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
+    return node.attrs.fullBleed === true;
+  }
+  return false;
+};
+
+const toggleFullBleed = (editor: Editor, imagePos: number): void => {
+  const node = editor.state.doc.nodeAt(imagePos);
+  if (node?.type.name === 'image' || node?.type.name === 'imageWithOverlay') {
+    const { tr } = editor.state;
+    const newFullBleed = !node.attrs.fullBleed;
+    editor.view.dispatch(
+      tr.setNodeMarkup(imagePos, undefined, {
+        ...node.attrs,
+        fullBleed: newFullBleed,
       })
     );
   }
@@ -763,6 +797,27 @@ export default function TiptapEditor({
               disabled={disabled}
             >
               <FiMaximize2 />
+            </IconButton>
+          </Tooltip>
+        )}
+        {/* Full Bleed button - visible when any image is selected */}
+        {selectedImagePos !== null && (
+          <Tooltip content="Toggle Full Bleed (edge-to-edge)">
+            <IconButton
+              aria-label="Toggle Full Bleed"
+              size="sm"
+              variant={
+                isFullBleedActive(editor, selectedImagePos) ? 'solid' : 'ghost'
+              }
+              color={
+                isFullBleedActive(editor, selectedImagePos)
+                  ? 'colorPalette.fg'
+                  : 'fg'
+              }
+              onClick={() => toggleFullBleed(editor, selectedImagePos)}
+              disabled={disabled}
+            >
+              <LuUnfoldHorizontal />
             </IconButton>
           </Tooltip>
         )}
