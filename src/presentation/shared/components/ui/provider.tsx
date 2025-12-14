@@ -34,6 +34,8 @@ export const BACKGROUND_COLOR_MAP: Record<
   teal: { light: '#f0fdfa', dark: '#134e4a' },
   pink: { light: '#fdf2f8', dark: '#500724' },
   cyan: { light: '#ecfeff', dark: '#164e63' },
+  beige: { light: '#cdb99d', dark: '#a89070' },
+  cream: { light: '#ede6dd', dark: '#3d3830' },
 };
 
 // Component that applies background color to the body element

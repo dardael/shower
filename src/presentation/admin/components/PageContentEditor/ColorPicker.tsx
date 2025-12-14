@@ -25,6 +25,7 @@ export const PRESET_COLORS: readonly string[] = [
   '#EC4899',
   '#6B7280',
   '#78716C',
+  '#642e2a',
 ] as const;
 
 const HEX_COLOR_REGEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;

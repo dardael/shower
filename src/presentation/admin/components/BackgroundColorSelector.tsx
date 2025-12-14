@@ -9,6 +9,26 @@ import {
 import { useColorMode } from '@/presentation/shared/components/ui/color-mode';
 import { BACKGROUND_COLOR_MAP } from '@/presentation/shared/components/ui/provider';
 
+// Custom colors need explicit hex values since they don't have Chakra's numbered scale
+const CUSTOM_COLOR_DISPLAY: Partial<Record<ThemeColorToken, string>> = {
+  beige: '#cdb99d',
+  cream: '#ede6dd',
+};
+
+function getColorDisplayValue(color: ThemeColorToken): string {
+  return CUSTOM_COLOR_DISPLAY[color] ?? `${color}.600`;
+}
+
+function getColorBorderValue(
+  color: ThemeColorToken,
+  variant: '300' | '400'
+): string {
+  if (CUSTOM_COLOR_DISPLAY[color]) {
+    return variant === '300' ? '#d4c4a8' : '#a89070';
+  }
+  return `${color}.${variant}`;
+}
+
 interface BackgroundColorSelectorProps {
   selectedColor: ThemeColorToken;
   onColorChange: (color: ThemeColorToken) => void;
@@ -47,9 +67,11 @@ const ColorButton = memo<ColorButtonProps>(
             width="24px"
             height="24px"
             borderRadius="md"
-            bg={`${color}.600`}
+            bg={getColorDisplayValue(color)}
             border={isSelected ? '2px solid' : '1px solid'}
-            borderColor={isSelected ? `${color}.300` : 'border.subtle'}
+            borderColor={
+              isSelected ? getColorBorderValue(color, '300') : 'border.subtle'
+            }
             _after={
               isSelected
                 ? {
@@ -57,7 +79,7 @@ const ColorButton = memo<ColorButtonProps>(
                     position: 'absolute',
                     inset: '-4px',
                     border: '2px solid',
-                    borderColor: `${color}.400`,
+                    borderColor: getColorBorderValue(color, '400'),
                     borderRadius: 'md',
                   }
                 : undefined

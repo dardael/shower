@@ -212,6 +212,52 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '{colors.cyan.200}', _dark: '#0e7490' },
             },
           },
+          beige: {
+            solid: {
+              value: { _light: '#cdb99d', _dark: '#a89070' },
+            },
+            muted: {
+              value: { _light: '#e8dfd3', _dark: '#4a4235' },
+            },
+            subtle: {
+              value: { _light: '#f5f0e8', _dark: '#3d3830' },
+            },
+            emphasized: {
+              value: { _light: '#b8a48a', _dark: '#8a7560' },
+            },
+            fg: {
+              value: { _light: '#3d3830', _dark: '#f5f0e8' },
+            },
+            contrast: {
+              value: { _light: '#ffffff', _dark: '#1a1815' },
+            },
+            border: {
+              value: { _light: '#d4c4a8', _dark: '#6b5d4a' },
+            },
+          },
+          cream: {
+            solid: {
+              value: { _light: '#ede6dd', _dark: '#3d3830' },
+            },
+            muted: {
+              value: { _light: '#f5f0e8', _dark: '#2d2a25' },
+            },
+            subtle: {
+              value: { _light: '#faf8f5', _dark: '#252320' },
+            },
+            emphasized: {
+              value: { _light: '#d9d0c3', _dark: '#4a4540' },
+            },
+            fg: {
+              value: { _light: '#3d3830', _dark: '#f5f0e8' },
+            },
+            contrast: {
+              value: { _light: '#1a1815', _dark: '#faf8f5' },
+            },
+            border: {
+              value: { _light: '#e0d6c8', _dark: '#4a4540' },
+            },
+          },
         },
       },
     },

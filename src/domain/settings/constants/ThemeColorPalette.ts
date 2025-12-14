@@ -11,6 +11,8 @@ export const THEME_COLOR_PALETTE = [
   'teal', // Modern/Calm colors
   'pink', // Soft/Friendly colors
   'cyan', // Tech/Professional colors
+  'beige', // Warm neutral colors
+  'cream', // Soft warm colors
 ] as const;
 
 export type ThemeColorToken = (typeof THEME_COLOR_PALETTE)[number];

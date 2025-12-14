@@ -22,7 +22,7 @@ describe('ThemeColorSelector', () => {
     );
 
     const colorButtons = screen.getAllByRole('button');
-    expect(colorButtons).toHaveLength(8); // 8 colors in palette
+    expect(colorButtons).toHaveLength(10); // 10 colors in palette (including beige and cream)
   });
 
   it('should highlight selected color', () => {

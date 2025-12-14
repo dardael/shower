@@ -123,6 +123,7 @@ you must use docker compose to run all commands in order to have the same enviro
 - N/A (CSS-only change, no data persistence) (028-sticky-footer-layout)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Tiptap (@tiptap/react, @tiptap/core, @tiptap/extension-image), Chakra UI v3, react-icons (029-image-full-bleed)
 - N/A (uses existing HTML string storage in MongoDB via PageContent entity) (029-image-full-bleed)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, Tiptap (@tiptap/react, @tiptap/extension-color), tsyringe for DI (030-custom-color-palette)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage
