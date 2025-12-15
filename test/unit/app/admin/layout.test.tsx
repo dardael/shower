@@ -19,6 +19,11 @@ jest.mock('@/infrastructure/container', () => ({
   },
 }));
 
+// Mock AdminProvider to avoid context dependency issues in tests
+jest.mock('@/presentation/admin/components/AdminProvider', () => ({
+  AdminProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 describe('AdminLayout', () => {
   const mockInitializeDatabase = jest.mocked(initializeDatabaseForLayout);
 

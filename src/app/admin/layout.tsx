@@ -8,6 +8,7 @@ import {
 } from '@/infrastructure/shared/layoutUtils';
 import { Provider } from '@/presentation/shared/components/ui/provider';
 import { Toaster } from '@/presentation/shared/components/ui/toaster';
+import { AdminProvider } from '@/presentation/admin/components/AdminProvider';
 
 // Force dynamic rendering to prevent static generation during build
 export const dynamic = 'force-dynamic';
@@ -50,7 +51,7 @@ export default async function AdminLayout({
     <html suppressHydrationWarning>
       <body>
         <Provider>
-          {children}
+          <AdminProvider>{children}</AdminProvider>
           <Toaster />
         </Provider>
       </body>
