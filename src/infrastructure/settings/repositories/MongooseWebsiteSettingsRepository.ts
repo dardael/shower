@@ -30,7 +30,11 @@ export class MongooseWebsiteSettingsRepository
   }
 
   async setByKey(key: string, value: SettingValue): Promise<void> {
-    await WebsiteSettingsModel.updateOne({ key }, { value }, { upsert: true });
+    await WebsiteSettingsModel.updateOne(
+      { key },
+      { $set: { key, value } },
+      { upsert: true }
+    );
   }
 
   private mapDocumentToEntity(doc: {

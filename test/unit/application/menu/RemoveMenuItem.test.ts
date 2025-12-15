@@ -18,6 +18,7 @@ const mockMenuItemRepository: jest.Mocked<MenuItemRepository> = {
 };
 
 const mockPageContentRepository: jest.Mocked<IPageContentRepository> = {
+  findAll: jest.fn(),
   findByMenuItemId: jest.fn(),
   save: jest.fn(),
   delete: jest.fn(),

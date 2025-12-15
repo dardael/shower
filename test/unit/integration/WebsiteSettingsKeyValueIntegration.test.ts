@@ -74,7 +74,7 @@ describe('WebsiteSettings Key-Value Integration Tests', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-name' },
-        { value: 'My Awesome Website' },
+        { $set: { key: 'website-name', value: 'My Awesome Website' } },
         { upsert: true }
       );
 
@@ -129,7 +129,7 @@ describe('WebsiteSettings Key-Value Integration Tests', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-icon' },
-        { value: expectedIconValue },
+        { $set: { key: 'website-icon', value: expectedIconValue } },
         { upsert: true }
       );
 
@@ -149,7 +149,7 @@ describe('WebsiteSettings Key-Value Integration Tests', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'website-icon' },
-        { value: null },
+        { $set: { key: 'website-icon', value: null } },
         { upsert: true }
       );
     });
@@ -177,7 +177,7 @@ describe('WebsiteSettings Key-Value Integration Tests', () => {
 
       expect(mockWebsiteSettingsModel.updateOne).toHaveBeenCalledWith(
         { key: 'theme-color' },
-        { value: 'red' },
+        { $set: { key: 'theme-color', value: 'red' } },
         { upsert: true }
       );
 

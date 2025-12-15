@@ -113,6 +113,7 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, next-themes (via useColorMode hook) (026-admin-bgcolor-preview)
@@ -128,6 +129,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - N/A (uses existing menu data from usePublicHeaderMenu hook) (031-mobile-header-menu)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, react-icons, existing SocialNetworksFooter component (032-mobile-footer)
 - N/A (uses existing social networks data from settings API) (032-mobile-footer)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), archiver/adm-zip (ZIP handling), Mongoose (033-config-export-import)
+- MongoDB via Mongoose, local filesystem (`public/page-content-images/`) (033-config-export-import)
 
 - Local file system (public/page-content-images/)
 - Browser localStorage
@@ -136,4 +139,5 @@ you must use docker compose to run all commands in order to have the same enviro
 - Tiptap (@tiptap/react, @tiptap/starter-kit, @tiptap/extension-image, @tiptap/extension-link, @tiptap/extension-color, @tiptap/extension-text-style, @tiptap/core) for rich text editing
 
 ## Recent Changes
+
 - 025-public-loading-page: Added TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities

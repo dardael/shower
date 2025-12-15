@@ -17,14 +17,21 @@ export class GetWebsiteIcon implements IGetWebsiteIcon {
         VALID_SETTING_KEYS.WEBSITE_ICON
       );
       const iconValue = setting.getValueAsIcon();
-
       if (!iconValue) {
-        return null; // No icon as default
+        return null;
       }
 
-      return new WebsiteIcon(iconValue.url, iconValue.metadata);
+      // Ensure uploadedAt is a Date object (MongoDB may return it as a string)
+      const metadata = {
+        ...iconValue.metadata,
+        uploadedAt:
+          iconValue.metadata.uploadedAt instanceof Date
+            ? iconValue.metadata.uploadedAt
+            : new Date(iconValue.metadata.uploadedAt),
+      };
+
+      return new WebsiteIcon(iconValue.url, metadata);
     } catch {
-      // If no website icon is set, return null as default
       return null;
     }
   }

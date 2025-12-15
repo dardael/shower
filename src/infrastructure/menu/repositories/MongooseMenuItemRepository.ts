@@ -38,6 +38,16 @@ export class MongooseMenuItemRepository implements MenuItemRepository {
         await existingDocument.save();
         return menuItem;
       }
+
+      // Document doesn't exist but entity has ID (import scenario)
+      // Create with the specified ID to preserve references
+      await MenuItemModel.create({
+        _id: menuItem.id,
+        text: menuItem.text.value,
+        url: menuItem.url.value,
+        position: menuItem.position,
+      });
+      return menuItem;
     }
 
     // Create new document - let MongoDB generate the _id

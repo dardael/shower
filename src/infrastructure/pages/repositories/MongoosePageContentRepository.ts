@@ -10,6 +10,11 @@ import { Logger } from '@/application/shared/Logger';
 export class MongoosePageContentRepository implements IPageContentRepository {
   constructor(@inject('Logger') private readonly logger: Logger) {}
 
+  async findAll(): Promise<PageContent[]> {
+    const documents = await PageContentModel.find();
+    return documents.map((doc) => this.mapToDomain(doc));
+  }
+
   async findByMenuItemId(menuItemId: string): Promise<PageContent | null> {
     if (!mongoose.Types.ObjectId.isValid(menuItemId)) {
       this.logger.warn('Invalid menuItemId format', { menuItemId });
@@ -42,12 +47,25 @@ export class MongoosePageContentRepository implements IPageContentRepository {
         : pageContent.withId(String(existingDocument._id));
     }
 
-    const createdDoc = await PageContentModel.create({
+    // Create new document, preserving ID if provided (import scenario)
+    const createData: {
+      _id?: string;
+      menuItemId: string;
+      content: string;
+    } = {
       menuItemId: pageContent.menuItemId,
       content: pageContent.content.value,
-    });
+    };
 
-    return pageContent.withId(String(createdDoc._id));
+    if (pageContent.hasId) {
+      createData._id = pageContent.id;
+    }
+
+    const createdDoc = await PageContentModel.create(createData);
+
+    return pageContent.hasId
+      ? pageContent
+      : pageContent.withId(String(createdDoc._id));
   }
 
   async delete(menuItemId: string): Promise<void> {

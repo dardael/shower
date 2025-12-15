@@ -5,6 +5,7 @@ import { PageContentBody } from '@/domain/pages/value-objects/PageContentBody';
 import type { IPageContentRepository } from '@/domain/pages/repositories/IPageContentRepository';
 
 const mockPageContentRepository: jest.Mocked<IPageContentRepository> = {
+  findAll: jest.fn(),
   findByMenuItemId: jest.fn(),
   save: jest.fn(),
   delete: jest.fn(),

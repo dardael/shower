@@ -25,20 +25,6 @@ export function SocialNetworkItem({
     }
   }, [url]);
 
-  // Handle click with security validation
-  const handleClick = React.useCallback(
-    (e: React.MouseEvent) => {
-      if (!isValidUrl) {
-        e.preventDefault();
-        return;
-      }
-
-      // Let default link behavior handle opening in new tab
-      // The Link component with isExternal handles this securely
-    },
-    [isValidUrl]
-  );
-
   // Don't render if URL is invalid
   if (!isValidUrl) {
     return null;
@@ -52,7 +38,6 @@ export function SocialNetworkItem({
       aria-label={`${label} ${type} link (opens in new tab)`}
       textDecoration="none"
       _hover={{ textDecoration: 'none' }}
-      onClick={handleClick}
       data-testid={`social-network-item-${type}`}
       display="flex"
       alignItems="center"

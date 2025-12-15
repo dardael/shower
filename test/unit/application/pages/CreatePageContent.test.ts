@@ -9,6 +9,7 @@ import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
 import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
 
 const mockPageContentRepository: jest.Mocked<IPageContentRepository> = {
+  findAll: jest.fn(),
   findByMenuItemId: jest.fn(),
   save: jest.fn(),
   delete: jest.fn(),
