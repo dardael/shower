@@ -1,4 +1,5 @@
 import type { IIconMetadata } from '@/domain/settings/types/IconMetadata';
+import type { ICustomLoaderMetadata } from '@/domain/settings/entities/WebsiteSetting';
 
 /**
  * Serialized representation of a menu item for export/import.
@@ -28,7 +29,10 @@ export interface SerializedPageContent {
  */
 export interface SerializedSetting {
   key: string;
-  value: string | { url: string; metadata?: IIconMetadata } | null;
+  value:
+    | string
+    | { url: string; metadata?: IIconMetadata | ICustomLoaderMetadata }
+    | null;
 }
 
 /**

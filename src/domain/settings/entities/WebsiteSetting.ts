@@ -9,9 +9,18 @@ import {
   VALID_SETTING_KEY_VALUES,
 } from '@/domain/settings/constants/SettingKeys';
 
+export interface ICustomLoaderMetadata {
+  type: 'gif' | 'video';
+  filename: string;
+  mimeType: string;
+  size: number;
+  uploadedAt: string;
+}
+
 export type SettingValue =
   | string
   | { url: string; metadata: IIconMetadata }
+  | { url: string; metadata: ICustomLoaderMetadata }
   | null;
 
 export class WebsiteSetting {
@@ -196,5 +205,45 @@ export class WebsiteSetting {
 
   static createDefaultBackgroundColor(): WebsiteSetting {
     return new WebsiteSetting(VALID_SETTING_KEYS.BACKGROUND_COLOR, 'blue');
+  }
+
+  static createCustomLoader(
+    url: string | null,
+    metadata: ICustomLoaderMetadata | null
+  ): WebsiteSetting {
+    if (!url || !metadata) {
+      return new WebsiteSetting(VALID_SETTING_KEYS.CUSTOM_LOADER, null);
+    }
+    return new WebsiteSetting(VALID_SETTING_KEYS.CUSTOM_LOADER, {
+      url,
+      metadata,
+    });
+  }
+
+  static createDefaultCustomLoader(): WebsiteSetting {
+    return new WebsiteSetting(VALID_SETTING_KEYS.CUSTOM_LOADER, null);
+  }
+
+  static isValidCustomLoaderKey(key: string): boolean {
+    return key === VALID_SETTING_KEYS.CUSTOM_LOADER;
+  }
+
+  getValueAsCustomLoader(): {
+    url: string;
+    metadata: ICustomLoaderMetadata;
+  } | null {
+    if (this._value === null) {
+      return null;
+    }
+    if (
+      typeof this._value === 'object' &&
+      'url' in this._value &&
+      'metadata' in this._value &&
+      typeof this._value.metadata === 'object' &&
+      'type' in this._value.metadata
+    ) {
+      return this._value as { url: string; metadata: ICustomLoaderMetadata };
+    }
+    throw new Error('Value is not a custom loader object');
   }
 }

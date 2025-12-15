@@ -1,18 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Flex, Spinner, Text, Button, VStack } from '@chakra-ui/react';
 import type { PageLoadError } from '@/types/page-load-state';
+
+export interface CustomLoaderData {
+  type: 'gif' | 'video';
+  url: string;
+}
 
 export interface PublicPageLoaderProps {
   isLoading: boolean;
   error: PageLoadError | null;
   onRetry?: () => void;
+  customLoader?: CustomLoaderData | null;
 }
 
 /**
  * PublicPageLoader component
  * Displays loading spinner, error messages, and retry functionality
+ * Supports custom GIF or video loaders with fallback on load error
  * Theme-aware with proper contrast for light/dark modes
  * Includes ARIA labels for accessibility
  */
@@ -20,7 +27,11 @@ export function PublicPageLoader({
   isLoading,
   error,
   onRetry,
+  customLoader,
 }: PublicPageLoaderProps): React.ReactElement {
+  // Track if custom loader failed to load - fallback to default spinner
+  const [loaderError, setLoaderError] = useState(false);
+
   // Show error state
   if (error) {
     return (
@@ -59,6 +70,8 @@ export function PublicPageLoader({
 
   // Show loading state
   if (isLoading) {
+    const showCustomLoader = customLoader && !loaderError;
+
     return (
       <Flex
         minH="100vh"
@@ -70,7 +83,34 @@ export function PublicPageLoader({
         aria-label="Loading page content"
         data-testid="page-loading-spinner"
       >
-        <Spinner size="xl" color="fg.emphasized" />
+        {showCustomLoader ? (
+          customLoader.type === 'gif' ? (
+            <img
+              src={customLoader.url}
+              alt="Loading"
+              data-testid="custom-loader-gif"
+              style={{ maxHeight: '150px', maxWidth: '150px' }}
+              onError={() => setLoaderError(true)}
+            />
+          ) : (
+            <video
+              src={customLoader.url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              data-testid="custom-loader-video"
+              style={{ maxHeight: '150px', maxWidth: '150px' }}
+              onError={() => setLoaderError(true)}
+            />
+          )
+        ) : (
+          <Spinner
+            size="xl"
+            color="fg.emphasized"
+            data-testid="chakra-spinner"
+          />
+        )}
       </Flex>
     );
   }

@@ -11,6 +11,7 @@ import type {
   MenuItemDTO,
   PageContentDTO,
   PublicLogoDTO,
+  CustomLoaderDTO,
 } from '@/types/page-load-state';
 
 const TIMEOUT_MS = 10000; // 10 seconds
@@ -26,7 +27,9 @@ interface SocialNetworkDTO {
  * Custom hook for managing loading state of public pages
  * Coordinates parallel fetching of menu, footer, and page content
  */
-export function usePublicPageData(slug: string): UsePublicPageDataReturn {
+export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
+  customLoader: CustomLoaderDTO | null;
+} {
   // Initialize loading state
   const [state, setState] = useState<PageLoadState>({
     isLoading: true,
@@ -40,6 +43,32 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
   });
 
   const [data, setData] = useState<PublicPageData | null>(null);
+
+  // Separate state for custom loader - fetched early and independently
+  const [customLoader, setCustomLoader] = useState<CustomLoaderDTO | null>(
+    null
+  );
+
+  // Fetch custom loader immediately on mount (before other data)
+  useEffect(() => {
+    const fetchLoader = async () => {
+      try {
+        const response = await fetch('/api/public/loader', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.ok) {
+          const result = await response.json();
+          if (result.loader) {
+            setCustomLoader(result.loader);
+          }
+        }
+      } catch {
+        // Loader is optional, ignore errors
+      }
+    };
+    fetchLoader();
+  }, []);
 
   // Fetch all data sources in parallel
   const fetchAllData = useCallback(async () => {
@@ -204,6 +233,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn {
     state,
     data,
     retry,
+    customLoader,
   };
 }
 

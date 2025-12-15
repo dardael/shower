@@ -54,6 +54,14 @@ export interface PublicLogoDTO {
 }
 
 /**
+ * DTO for custom loader from API
+ */
+export interface CustomLoaderDTO {
+  type: 'gif' | 'video';
+  url: string;
+}
+
+/**
  * Container for all successfully loaded data sources
  */
 export interface PublicPageData {

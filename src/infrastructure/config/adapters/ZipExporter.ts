@@ -26,6 +26,8 @@ const PAGE_CONTENT_IMAGES_PATH = path.join(
 
 const ICONS_PATH = path.join(process.cwd(), 'public', 'icons');
 
+const LOADERS_PATH = path.join(process.cwd(), 'public', 'loaders');
+
 interface CollectedData {
   menuItems: SerializedMenuItem[];
   pageContents: SerializedPageContent[];
@@ -33,6 +35,7 @@ interface CollectedData {
   socialNetworks: SerializedSocialNetwork[];
   imageFiles: string[];
   iconFiles: string[];
+  loaderFiles: string[];
 }
 
 /**
@@ -58,7 +61,10 @@ export class ZipExporter implements IConfigurationExporter {
       pageContentCount: data.pageContents.length,
       settingsCount: data.settings.length,
       socialNetworkCount: data.socialNetworks.length,
-      imageCount: data.imageFiles.length + data.iconFiles.length,
+      imageCount:
+        data.imageFiles.length +
+        data.iconFiles.length +
+        data.loaderFiles.length,
       totalSizeBytes: 0,
     };
 
@@ -82,10 +88,14 @@ export class ZipExporter implements IConfigurationExporter {
       pageContentCount: data.pageContents.length,
       settingsCount: data.settings.length,
       socialNetworkCount: data.socialNetworks.length,
-      imageCount: data.imageFiles.length + data.iconFiles.length,
+      imageCount:
+        data.imageFiles.length +
+        data.iconFiles.length +
+        data.loaderFiles.length,
       totalSizeBytes: await this.calculateTotalSize(
         data.imageFiles,
-        data.iconFiles
+        data.iconFiles,
+        data.loaderFiles
       ),
     };
 
@@ -100,6 +110,7 @@ export class ZipExporter implements IConfigurationExporter {
       socialNetworks,
       imageFiles,
       iconFiles,
+      loaderFiles,
     ] = await Promise.all([
       this.collectMenuItems(),
       this.collectPageContents(),
@@ -107,6 +118,7 @@ export class ZipExporter implements IConfigurationExporter {
       this.collectSocialNetworks(),
       this.collectImageFiles(),
       this.collectIconFiles(),
+      this.collectLoaderFiles(),
     ]);
 
     return {
@@ -116,6 +128,7 @@ export class ZipExporter implements IConfigurationExporter {
       socialNetworks,
       imageFiles,
       iconFiles,
+      loaderFiles,
     };
   }
 
@@ -203,9 +216,20 @@ export class ZipExporter implements IConfigurationExporter {
     }
   }
 
+  private async collectLoaderFiles(): Promise<string[]> {
+    try {
+      const files = await fs.readdir(LOADERS_PATH);
+      return files.filter((f: string) => /\.(gif|mp4|webm)$/i.test(f));
+    } catch {
+      // Directory doesn't exist
+      return [];
+    }
+  }
+
   private async calculateTotalSize(
     imageFiles: string[],
-    iconFiles: string[]
+    iconFiles: string[],
+    loaderFiles: string[]
   ): Promise<number> {
     let totalSize = 0;
 
@@ -217,6 +241,12 @@ export class ZipExporter implements IConfigurationExporter {
 
     for (const file of iconFiles) {
       const filePath = path.join(ICONS_PATH, file);
+      const stats = await fs.stat(filePath);
+      totalSize += stats.size;
+    }
+
+    for (const file of loaderFiles) {
+      const filePath = path.join(LOADERS_PATH, file);
       const stats = await fs.stat(filePath);
       totalSize += stats.size;
     }
@@ -277,6 +307,14 @@ export class ZipExporter implements IConfigurationExporter {
         const iconPath = path.join(ICONS_PATH, iconFile);
         archive.file(iconPath, {
           name: `images/icons/${iconFile}`,
+        });
+      }
+
+      // Add loader files (custom loading animations)
+      for (const loaderFile of data.loaderFiles) {
+        const loaderPath = path.join(LOADERS_PATH, loaderFile);
+        archive.file(loaderPath, {
+          name: `images/loaders/${loaderFile}`,
         });
       }
 

@@ -17,7 +17,7 @@ import { useThemeColor } from '@/presentation/shared/hooks/useThemeColor';
  */
 export function HomePageClient(): React.ReactElement {
   // Use special 'home' slug to signal home page loading
-  const { state, data, retry } = usePublicPageData('home');
+  const { state, data, retry, customLoader } = usePublicPageData('home');
   const { themeColor } = useThemeColor();
 
   // Show loading indicator while data is being fetched
@@ -27,6 +27,7 @@ export function HomePageClient(): React.ReactElement {
         isLoading={state.isLoading}
         error={state.error}
         onRetry={retry}
+        customLoader={customLoader}
       />
     );
   }
@@ -63,7 +64,12 @@ export function HomePageClient(): React.ReactElement {
 
     // Other errors - show error with retry
     return (
-      <PublicPageLoader isLoading={false} error={state.error} onRetry={retry} />
+      <PublicPageLoader
+        isLoading={false}
+        error={state.error}
+        onRetry={retry}
+        customLoader={customLoader}
+      />
     );
   }
 
@@ -75,5 +81,11 @@ export function HomePageClient(): React.ReactElement {
   }
 
   // Fallback (should not reach here in normal operation)
-  return <PublicPageLoader isLoading={true} error={null} />;
+  return (
+    <PublicPageLoader
+      isLoading={true}
+      error={null}
+      customLoader={customLoader}
+    />
+  );
 }

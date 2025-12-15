@@ -21,6 +21,7 @@ import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetwork
 import { PackageVersion } from '@/domain/config/value-objects/PackageVersion';
 import { ExportPackage } from '@/domain/config/entities/ExportPackage';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
+import { ICustomLoaderMetadata } from '@/domain/settings/entities/WebsiteSetting';
 import { VALID_SETTING_KEYS } from '@/domain/settings/constants/SettingKeys';
 import { getApiUrl } from '@/infrastructure/shared/utils/appUrl';
 import type {
@@ -32,6 +33,7 @@ import type {
 
 const IMAGES_DIR = path.join(process.cwd(), 'public', 'page-content-images');
 const ICONS_DIR = path.join(process.cwd(), 'public', 'icons');
+const LOADERS_DIR = path.join(process.cwd(), 'public', 'loaders');
 
 export class ZipImporter implements IConfigurationImporter {
   constructor(
@@ -177,6 +179,18 @@ export class ZipImporter implements IConfigurationImporter {
     } catch {
       // Directory doesn't exist, nothing to clear
     }
+
+    // Clear loaders directory
+    try {
+      const files = await fs.readdir(LOADERS_DIR);
+      for (const file of files) {
+        if (file !== '.gitkeep') {
+          await fs.unlink(path.join(LOADERS_DIR, file));
+        }
+      }
+    } catch {
+      // Directory doesn't exist, nothing to clear
+    }
   }
 
   private async importMenuItems(zip: AdmZip): Promise<number> {
@@ -247,12 +261,14 @@ export class ZipImporter implements IConfigurationImporter {
     for (const setting of settings) {
       const updatedValue = this.updateSettingValueUrls(
         setting.key,
-        setting.value as
-          | string
-          | { url: string; metadata: IIconMetadata }
-          | null
+        setting.value
       );
-      await this.websiteSettingsRepository.setByKey(setting.key, updatedValue);
+      await this.websiteSettingsRepository.setByKey(
+        setting.key,
+        updatedValue as Parameters<
+          typeof this.websiteSettingsRepository.setByKey
+        >[1]
+      );
     }
 
     return settings.length;
@@ -260,8 +276,8 @@ export class ZipImporter implements IConfigurationImporter {
 
   private updateSettingValueUrls(
     key: string,
-    value: string | { url: string; metadata: IIconMetadata } | null
-  ): string | { url: string; metadata: IIconMetadata } | null {
+    value: SerializedSetting['value']
+  ): SerializedSetting['value'] {
     // Only update URLs for icon/logo settings
     if (
       (key === VALID_SETTING_KEYS.WEBSITE_ICON ||
@@ -272,12 +288,30 @@ export class ZipImporter implements IConfigurationImporter {
       'metadata' in value
     ) {
       // Reconstruct the URL using the current environment's base URL
-      const newUrl = getApiUrl(`/api/icons/${value.metadata.filename}`);
+      const metadata = value.metadata as IIconMetadata;
+      const newUrl = getApiUrl(`/api/icons/${metadata.filename}`);
       return {
         url: newUrl,
         metadata: value.metadata,
       };
     }
+
+    // Update URLs for custom loader settings
+    if (
+      key === VALID_SETTING_KEYS.CUSTOM_LOADER &&
+      value !== null &&
+      typeof value === 'object' &&
+      'url' in value &&
+      'metadata' in value
+    ) {
+      const metadata = value.metadata as ICustomLoaderMetadata;
+      const newUrl = getApiUrl(`/api/loaders/${metadata.filename}`);
+      return {
+        url: newUrl,
+        metadata: value.metadata,
+      };
+    }
+
     return value;
   }
 
@@ -351,6 +385,26 @@ export class ZipImporter implements IConfigurationImporter {
       }
     }
 
-    return pageContentImageEntries.length + iconEntries.length;
+    // Import loader files (custom loading animations)
+    const loaderEntries = zip.getEntries().filter((entry) => {
+      return (
+        entry.entryName.startsWith('images/loaders/') && !entry.isDirectory
+      );
+    });
+
+    if (loaderEntries.length > 0) {
+      // Ensure loaders directory exists
+      await fs.mkdir(LOADERS_DIR, { recursive: true });
+
+      for (const entry of loaderEntries) {
+        const filename = path.basename(entry.entryName);
+        const targetPath = path.join(LOADERS_DIR, filename);
+        await fs.writeFile(targetPath, entry.getData());
+      }
+    }
+
+    return (
+      pageContentImageEntries.length + iconEntries.length + loaderEntries.length
+    );
   }
 }

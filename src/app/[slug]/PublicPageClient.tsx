@@ -10,14 +10,13 @@ import { useThemeColor } from '@/presentation/shared/hooks/useThemeColor';
 /**
  * Client-side public page component with loading state
  * Coordinates fetching of menu, footer, and page content
- * Displays loading indicator until all data is loaded
  */
 export function PublicPageClient(): React.ReactElement {
   const params = useParams();
   const slug = params?.slug as string;
 
   // Use custom hook to manage loading state and data fetching
-  const { state, data, retry } = usePublicPageData(slug);
+  const { state, data, retry, customLoader } = usePublicPageData(slug);
   const { themeColor } = useThemeColor();
 
   // Show loading indicator while data is being fetched
@@ -27,6 +26,7 @@ export function PublicPageClient(): React.ReactElement {
         isLoading={state.isLoading}
         error={state.error}
         onRetry={retry}
+        customLoader={customLoader}
       />
     );
   }
@@ -39,5 +39,11 @@ export function PublicPageClient(): React.ReactElement {
   }
 
   // Fallback (should not reach here in normal operation)
-  return <PublicPageLoader isLoading={true} error={null} />;
+  return (
+    <PublicPageLoader
+      isLoading={true}
+      error={null}
+      customLoader={customLoader}
+    />
+  );
 }

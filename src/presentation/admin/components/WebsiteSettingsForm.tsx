@@ -9,7 +9,11 @@ import {
   Text,
   Box,
   VStack,
+  HStack,
+  Button,
+  Spinner,
 } from '@chakra-ui/react';
+import { FiTrash2, FiUpload } from 'react-icons/fi';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
@@ -27,7 +31,20 @@ import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement'
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
 import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
+import { CUSTOM_LOADER_MAX_SIZE_BYTES } from '@/domain/settings/constants/SettingKeys';
+
 import type { ImageData } from '@/presentation/shared/components/ImageManager/types';
+
+interface CustomLoaderData {
+  url: string;
+  metadata: {
+    type: 'gif' | 'video';
+    filename: string;
+    mimeType: string;
+    size: number;
+    uploadedAt: string;
+  };
+}
 
 interface WebsiteSettingsFormProps {
   initialName: string;
@@ -60,6 +77,11 @@ export default function WebsiteSettingsForm({
   } = useThemeModeConfig();
   const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
+  const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
+    null
+  );
+  const [loaderLoading, setLoaderLoading] = useState(false);
+  const loaderInputRef = useRef<HTMLInputElement>(null);
 
   // Form state management for unsaved changes detection
   const {
@@ -82,10 +104,12 @@ export default function WebsiteSettingsForm({
   fetchWebsiteSettingsRef.current = async () => {
     try {
       // Fetch all settings in parallel for better performance
-      const [settingsResponse, iconResponse] = await Promise.all([
-        fetch('/api/settings'),
-        fetch('/api/settings/icon'),
-      ]);
+      const [settingsResponse, iconResponse, loaderResponse] =
+        await Promise.all([
+          fetch('/api/settings'),
+          fetch('/api/settings/icon'),
+          fetch('/api/settings/loader'),
+        ]);
 
       const newValues: Record<string, unknown> = {};
 
@@ -125,6 +149,18 @@ export default function WebsiteSettingsForm({
       } else {
         setCurrentIcon(null);
         newValues.icon = null;
+      }
+
+      // Handle custom loader data
+      if (loaderResponse.ok) {
+        const loaderData = await loaderResponse.json();
+        if (loaderData.loader) {
+          setCustomLoader(loaderData.loader);
+        } else {
+          setCustomLoader(null);
+        }
+      } else {
+        setCustomLoader(null);
       }
 
       // Update all values at once and mark as initialized
@@ -199,6 +235,77 @@ export default function WebsiteSettingsForm({
     onMessage: (message: string) => showToast(message, 'error'),
     onSuccess: (message: string) => showToast(message, 'success'),
   });
+
+  // Custom loader handlers
+  const handleLoaderUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/gif', 'video/mp4', 'video/webm'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast(
+        'Invalid file type. Only GIF, MP4, and WebM files are allowed.',
+        'error'
+      );
+      return;
+    }
+
+    const maxSize = CUSTOM_LOADER_MAX_SIZE_BYTES;
+    if (file.size > maxSize) {
+      showToast('File size must be less than 10MB.', 'error');
+      return;
+    }
+
+    setLoaderLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/settings/loader', {
+        method: 'PUT',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCustomLoader(data.loader);
+        showToast('Custom loader uploaded successfully!', 'success');
+      } else {
+        showToast(data.error || 'Failed to upload custom loader', 'error');
+      }
+    } catch {
+      showToast('An error occurred while uploading the custom loader', 'error');
+    } finally {
+      setLoaderLoading(false);
+      if (loaderInputRef.current) {
+        loaderInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleLoaderDelete = async () => {
+    setLoaderLoading(true);
+    try {
+      const response = await fetch('/api/settings/loader', {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setCustomLoader(null);
+        showToast('Custom loader removed successfully!', 'success');
+      } else {
+        const data = await response.json();
+        showToast(data.error || 'Failed to remove custom loader', 'error');
+      }
+    } catch {
+      showToast('An error occurred while removing the custom loader', 'error');
+    } finally {
+      setLoaderLoading(false);
+    }
+  };
 
   return (
     <Box
@@ -384,6 +491,125 @@ export default function WebsiteSettingsForm({
             disabled={loading}
             isLoading={fontLoading}
           />
+
+          <Field.Root>
+            <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
+              Loading Animation
+            </Field.Label>
+            <Box
+              bg="bg.canvas"
+              borderColor="border"
+              borderWidth="2px"
+              borderRadius="lg"
+              p={4}
+            >
+              {loaderLoading ? (
+                <HStack justify="center" py={4}>
+                  <Spinner size="md" />
+                  <Text color="fg.muted">Processing...</Text>
+                </HStack>
+              ) : customLoader ? (
+                <VStack align="stretch" gap={4}>
+                  <Box
+                    borderRadius="md"
+                    overflow="hidden"
+                    bg="bg.subtle"
+                    p={4}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minH="120px"
+                  >
+                    {customLoader.metadata.type === 'gif' ? (
+                      <img
+                        src={customLoader.url}
+                        alt="Custom loader preview"
+                        style={{
+                          maxHeight: '100px',
+                          maxWidth: '100%',
+                          objectFit: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <video
+                        src={customLoader.url}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        style={{
+                          maxHeight: '100px',
+                          maxWidth: '100%',
+                        }}
+                      />
+                    )}
+                  </Box>
+                  <HStack justify="space-between" align="center">
+                    <VStack align="start" gap={0}>
+                      <Text fontSize="sm" fontWeight="medium" color="fg">
+                        {customLoader.metadata.filename}
+                      </Text>
+                      <Text fontSize="xs" color="fg.muted">
+                        {customLoader.metadata.type.toUpperCase()} -{' '}
+                        {(customLoader.metadata.size / 1024).toFixed(1)} KB
+                      </Text>
+                    </VStack>
+                    <HStack gap={2}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => loaderInputRef.current?.click()}
+                        disabled={loaderLoading}
+                      >
+                        <FiUpload />
+                        Replace
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        colorPalette="red"
+                        onClick={handleLoaderDelete}
+                        disabled={loaderLoading}
+                      >
+                        <FiTrash2 />
+                        Remove
+                      </Button>
+                    </HStack>
+                  </HStack>
+                </VStack>
+              ) : (
+                <VStack gap={3} py={2}>
+                  <Text fontSize="sm" color="fg.muted" textAlign="center">
+                    No custom loader configured. Using default spinner.
+                  </Text>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => loaderInputRef.current?.click()}
+                    disabled={loaderLoading}
+                  >
+                    <FiUpload />
+                    Upload Custom Loader
+                  </Button>
+                </VStack>
+              )}
+              <input
+                ref={loaderInputRef}
+                type="file"
+                accept=".gif,.mp4,.webm,image/gif,video/mp4,video/webm"
+                onChange={handleLoaderUpload}
+                style={{ display: 'none' }}
+              />
+            </Box>
+            <Field.HelperText
+              fontSize={{ base: 'xs', md: 'sm' }}
+              color="fg.muted"
+              mt={2}
+            >
+              Upload a GIF or video (MP4, WebM) to replace the default loading
+              spinner. Maximum file size is 10MB.
+            </Field.HelperText>
+          </Field.Root>
 
           <Box w="full">
             <SaveButton

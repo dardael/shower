@@ -3,6 +3,8 @@ import path from 'path';
 import { inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/shared/ILogger';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
+import { ICustomLoaderMetadata } from '@/domain/settings/entities/WebsiteSetting';
+import { CUSTOM_LOADER_MAX_SIZE_BYTES } from '@/domain/settings/constants/SettingKeys';
 import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 
 export interface IFileStorageService {
@@ -14,6 +16,10 @@ export interface IFileStorageService {
     file: File
   ): Promise<{ url: string; metadata: IIconMetadata }>;
   deletePageContentImage(filename: string): Promise<void>;
+  uploadCustomLoader(
+    file: File
+  ): Promise<{ url: string; metadata: ICustomLoaderMetadata }>;
+  deleteCustomLoader(filename: string): Promise<void>;
 }
 
 interface UploadConfig {
@@ -73,6 +79,17 @@ const PAGE_CONTENT_IMAGE_CONFIG: UploadConfig = {
   entityName: 'page content image',
 };
 
+const CUSTOM_LOADER_CONFIG: UploadConfig = {
+  allowedTypes: ['image/gif', 'video/mp4', 'video/webm'],
+  maxSizeBytes: CUSTOM_LOADER_MAX_SIZE_BYTES,
+  filenamePrefix: 'loader',
+  defaultExtension: 'gif',
+  typeErrorMessage:
+    'Invalid file type. Only GIF, MP4, and WebM files are allowed.',
+  sizeErrorMessage: 'File size must be less than 10MB.',
+  entityName: 'custom loader',
+};
+
 @injectable()
 export class LocalFileStorageService implements IFileStorageService {
   private readonly baseUrl = getBaseUrl();
@@ -82,6 +99,7 @@ export class LocalFileStorageService implements IFileStorageService {
     'public',
     'page-content-images'
   );
+  private readonly loadersDir = path.join(process.cwd(), 'public', 'loaders');
 
   constructor(@inject('ILogger') private readonly logger: ILogger) {}
 
@@ -249,5 +267,73 @@ export class LocalFileStorageService implements IFileStorageService {
       'page content image',
       this.pageContentImagesDir
     );
+  }
+
+  async uploadCustomLoader(
+    file: File
+  ): Promise<{ url: string; metadata: ICustomLoaderMetadata }> {
+    await this.ensureDirectory(this.loadersDir);
+
+    if (!CUSTOM_LOADER_CONFIG.allowedTypes.includes(file.type)) {
+      throw new Error(CUSTOM_LOADER_CONFIG.typeErrorMessage);
+    }
+
+    if (file.size > CUSTOM_LOADER_CONFIG.maxSizeBytes) {
+      throw new Error(CUSTOM_LOADER_CONFIG.sizeErrorMessage);
+    }
+
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const extension =
+      file.name.split('.').pop() || CUSTOM_LOADER_CONFIG.defaultExtension;
+    const filename = `${CUSTOM_LOADER_CONFIG.filenamePrefix}-${timestamp}-${randomString}.${extension}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const filePath = path.join(this.loadersDir, filename);
+    try {
+      await fs.writeFile(filePath, buffer);
+      this.logger.logDebug('Custom loader file saved successfully', {
+        filename,
+        filePath,
+        size: file.size,
+      });
+    } catch (writeError) {
+      this.logger.logError('Failed to write custom loader file to disk', {
+        filename,
+        filePath,
+        error: writeError,
+      });
+      throw new Error(
+        `Failed to save custom loader file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
+      );
+    }
+
+    const url = `${this.baseUrl}/api/loaders/${filename}`;
+    const loaderType: 'gif' | 'video' =
+      file.type === 'image/gif' ? 'gif' : 'video';
+
+    const metadata: ICustomLoaderMetadata = {
+      type: loaderType,
+      filename,
+      mimeType: file.type,
+      size: file.size,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    this.logger.logDebug('Created custom loader metadata', {
+      filename,
+      type: loaderType,
+      mimeType: file.type,
+      size: file.size,
+      url,
+    });
+
+    return { url, metadata };
+  }
+
+  async deleteCustomLoader(filename: string): Promise<void> {
+    return this.deleteImage(filename, 'custom loader', this.loadersDir);
   }
 }
