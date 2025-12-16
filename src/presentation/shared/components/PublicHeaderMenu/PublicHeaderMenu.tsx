@@ -71,7 +71,7 @@ export function PublicHeaderMenu({
                   <Image
                     src={logo.url}
                     alt="Site logo"
-                    h={{ base: '32px', md: '40px' }}
+                    h={{ base: '64px', md: '80px' }}
                     w="auto"
                     objectFit="contain"
                     cursor="pointer"
@@ -136,7 +136,7 @@ export function PublicHeaderMenu({
                 <Image
                   src={logo.url}
                   alt="Site logo"
-                  h={{ base: '32px', md: '40px' }}
+                  h={{ base: '64px', md: '80px' }}
                   w="auto"
                   objectFit="contain"
                   flexShrink={0}

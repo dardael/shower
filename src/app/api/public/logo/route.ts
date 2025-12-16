@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { getClientIP } from '@/infrastructure/shared/utils/clientIP';
+import { toRelativeUrl } from '@/infrastructure/shared/utils/appUrl';
 import type { IGetHeaderLogo } from '@/application/settings/IGetHeaderLogo';
 
 /**
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const logoData = {
-      url: headerLogo.url,
+      url: toRelativeUrl(headerLogo.url),
       filename: headerLogo.filename,
       format: headerLogo.format,
     };

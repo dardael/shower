@@ -5,7 +5,6 @@ import type { ILogger } from '@/application/shared/ILogger';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
 import { ICustomLoaderMetadata } from '@/domain/settings/entities/WebsiteSetting';
 import { CUSTOM_LOADER_MAX_SIZE_BYTES } from '@/domain/settings/constants/SettingKeys';
-import { getBaseUrl } from '@/infrastructure/shared/utils/appUrl';
 
 export interface IFileStorageService {
   uploadIcon(file: File): Promise<{ url: string; metadata: IIconMetadata }>;
@@ -92,7 +91,6 @@ const CUSTOM_LOADER_CONFIG: UploadConfig = {
 
 @injectable()
 export class LocalFileStorageService implements IFileStorageService {
-  private readonly baseUrl = getBaseUrl();
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
   private readonly pageContentImagesDir = path.join(
     process.cwd(),
@@ -174,7 +172,7 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    const url = `${this.baseUrl}${apiRoute}/${filename}`;
+    const url = `${apiRoute}/${filename}`;
 
     const metadata: IIconMetadata = {
       filename,
@@ -310,7 +308,7 @@ export class LocalFileStorageService implements IFileStorageService {
       );
     }
 
-    const url = `${this.baseUrl}/api/loaders/${filename}`;
+    const url = `/api/loaders/${filename}`;
     const loaderType: 'gif' | 'video' =
       file.type === 'image/gif' ? 'gif' : 'video';
 

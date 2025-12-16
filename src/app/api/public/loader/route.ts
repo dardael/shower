@@ -3,6 +3,7 @@ import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import { VALID_SETTING_KEYS } from '@/domain/settings/constants/SettingKeys';
+import { toRelativeUrl } from '@/infrastructure/shared/utils/appUrl';
 
 interface PublicLoaderResponse {
   loader: {
@@ -38,7 +39,7 @@ export async function GET(): Promise<
     return NextResponse.json({
       loader: {
         type: loaderValue.metadata.type,
-        url: loaderValue.url,
+        url: toRelativeUrl(loaderValue.url),
       },
     });
   } catch (error) {
