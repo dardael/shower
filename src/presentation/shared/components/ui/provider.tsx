@@ -50,9 +50,11 @@ function BackgroundColorApplier({ children }: { children: React.ReactNode }) {
     if (!colorConfig) return;
 
     const bgColor = colorMode === 'dark' ? colorConfig.dark : colorConfig.light;
+    document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
 
     return () => {
+      document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
     };
   }, [backgroundColor, colorMode, isLoading]);
