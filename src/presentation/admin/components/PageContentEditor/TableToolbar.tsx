@@ -29,6 +29,7 @@ import {
   BORDER_THICKNESS_MAX,
   BORDER_THICKNESS_DEFAULT,
   VERTICAL_ALIGN_DEFAULT,
+  COLUMN_WIDTH_MIN,
   type VerticalAlignment,
 } from './tableFormatTypes';
 
@@ -88,6 +89,30 @@ function updateCellVerticalAlign(
     .run();
 }
 
+/**
+ * Gets the current column width of the selected cell.
+ * Returns empty string if no explicit width is set (auto-adapt mode).
+ */
+function getCurrentColumnWidth(editor: Editor): string {
+  const cellAttrs = editor.getAttributes('tableCell');
+  const headerAttrs = editor.getAttributes('tableHeader');
+  const width = cellAttrs.colwidth || headerAttrs.colwidth;
+  return width ? String(width) : '';
+}
+
+/**
+ * Updates the column width of the selected cell(s).
+ * Empty or null value means auto-adapt to table width.
+ */
+function updateCellColumnWidth(editor: Editor, width: number | null): void {
+  editor
+    .chain()
+    .focus()
+    .updateAttributes('tableCell', { colwidth: width })
+    .updateAttributes('tableHeader', { colwidth: width })
+    .run();
+}
+
 export function TableToolbar({
   editor,
   disabled = false,
@@ -102,6 +127,7 @@ export function TableToolbar({
   const [verticalAlign, setVerticalAlign] = useState<VerticalAlignment>(
     VERTICAL_ALIGN_DEFAULT
   );
+  const [columnWidth, setColumnWidth] = useState<string>('');
 
   const updateCanStates = useCallback((): void => {
     setCanDeleteRow(editor.can().deleteRow());
@@ -110,6 +136,7 @@ export function TableToolbar({
     setCanSplitCell(editor.can().splitCell());
     setBorderThickness(getCurrentBorderThickness(editor));
     setVerticalAlign(getCurrentVerticalAlign(editor));
+    setColumnWidth(getCurrentColumnWidth(editor));
   }, [editor]);
 
   useEffect(() => {
@@ -145,6 +172,22 @@ export function TableToolbar({
     (align: VerticalAlignment): void => {
       setVerticalAlign(align);
       updateCellVerticalAlign(editor, align);
+    },
+    [editor]
+  );
+
+  const handleColumnWidthChange = useCallback(
+    (value: string): void => {
+      setColumnWidth(value);
+      if (value === '') {
+        // Empty input: auto-adapt mode
+        updateCellColumnWidth(editor, null);
+      } else {
+        const numValue = parseInt(value, 10);
+        if (!isNaN(numValue) && numValue >= COLUMN_WIDTH_MIN) {
+          updateCellColumnWidth(editor, numValue);
+        }
+      }
     },
     [editor]
   );
@@ -341,6 +384,30 @@ export function TableToolbar({
         >
           <LuAlignVerticalJustifyEnd />
         </IconButton>
+      </Tooltip>
+
+      <Separator orientation="vertical" height="20px" />
+
+      {/* Column width control */}
+      <Tooltip content="Column Width (min 50px, empty for auto)">
+        <Box display="flex" alignItems="center" gap={1}>
+          <Text fontSize="xs" color="fg.muted">
+            Width:
+          </Text>
+          <Input
+            type="number"
+            size="xs"
+            width="60px"
+            min={COLUMN_WIDTH_MIN}
+            placeholder="auto"
+            value={columnWidth}
+            onChange={(e) => handleColumnWidthChange(e.target.value)}
+            disabled={disabled}
+          />
+          <Text fontSize="xs" color="fg.muted">
+            px
+          </Text>
+        </Box>
       </Tooltip>
 
       <Separator orientation="vertical" height="20px" />

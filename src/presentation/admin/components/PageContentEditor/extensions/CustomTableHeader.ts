@@ -1,8 +1,11 @@
 import { TableHeader } from '@tiptap/extension-table-header';
-import { createVerticalAlignAttribute } from '../tableFormatTypes';
+import {
+  createVerticalAlignAttribute,
+  createColumnWidthAttribute,
+} from '../tableFormatTypes';
 
 /**
- * Custom TableHeader extension that adds vertical alignment attribute
+ * Custom TableHeader extension that adds vertical alignment and column width attributes
  * Same as CustomTableCell for consistency
  */
 export const CustomTableHeader = TableHeader.extend({
@@ -10,6 +13,7 @@ export const CustomTableHeader = TableHeader.extend({
     return {
       ...this.parent?.(),
       verticalAlign: createVerticalAlignAttribute(),
+      colwidth: createColumnWidthAttribute(),
     };
   },
 });
