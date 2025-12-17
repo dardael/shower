@@ -538,6 +538,9 @@ export default function TiptapEditor({
       overflow="hidden"
       bg="bg.canvas"
       position="relative"
+      display="flex"
+      flexDirection="column"
+      maxH="70vh"
     >
       {/* Hidden file input for image upload */}
       <input
@@ -574,6 +577,7 @@ export default function TiptapEditor({
         bg="bg.subtle"
         flexWrap="wrap"
         gap={1}
+        flexShrink={0}
       >
         <IconButton
           aria-label="Bold"
@@ -895,7 +899,13 @@ export default function TiptapEditor({
         </HStack>
       )}
 
-      <Box p={4} minH="200px" className="tiptap-editor-wrapper">
+      <Box
+        p={4}
+        minH="200px"
+        className="tiptap-editor-wrapper"
+        overflow="auto"
+        flex="1"
+      >
         <EditorContent editor={editor} />
       </Box>
     </Box>

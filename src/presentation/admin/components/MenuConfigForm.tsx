@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Heading,
   Stack,
@@ -235,6 +235,7 @@ export default function MenuConfigForm() {
     id: string;
     text: string;
   } | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -302,6 +303,15 @@ export default function MenuConfigForm() {
     fetchMenuItems();
     fetchLogo();
   }, [fetchMenuItems, fetchLogo]);
+
+  useEffect(() => {
+    if (editingContentItem && editorContainerRef.current) {
+      editorContainerRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [editingContentItem]);
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -655,7 +665,7 @@ export default function MenuConfigForm() {
         </Box>
 
         {editingContentItem && (
-          <Box mt={6}>
+          <Box ref={editorContainerRef} mt={6}>
             <PageContentEditor
               menuItemId={editingContentItem.id}
               menuItemText={editingContentItem.text}

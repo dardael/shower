@@ -188,8 +188,14 @@ export default function PageContentEditor({
                 <Button
                   onClick={() => setDeleteDialogOpen(true)}
                   disabled={saving || deleting}
-                  colorPalette="red"
                   variant="outline"
+                  borderColor="red.500"
+                  color="red.500"
+                  _hover={{
+                    bg: 'red.50',
+                    borderColor: 'red.600',
+                    color: 'red.600',
+                  }}
                 >
                   <FiTrash2 />
                   Delete Content
@@ -229,7 +235,7 @@ export default function PageContentEditor({
               <Dialog.Footer>
                 <HStack gap={2} justify="flex-end">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setDeleteDialogOpen(false)}
                     disabled={deleting}
                   >
