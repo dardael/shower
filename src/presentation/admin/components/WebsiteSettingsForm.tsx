@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { FiTrash2, FiUpload } from 'react-icons/fi';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
+import Image from 'next/image';
 import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
@@ -521,14 +522,18 @@ export default function WebsiteSettingsForm({
                     minH="120px"
                   >
                     {customLoader.metadata.type === 'gif' ? (
-                      <img
+                      <Image
                         src={customLoader.url}
                         alt="Custom loader preview"
+                        width={100}
+                        height={100}
                         style={{
                           maxHeight: '100px',
                           maxWidth: '100%',
                           objectFit: 'contain',
                         }}
+                        unoptimized
+                        loader={({ src }) => src}
                       />
                     ) : (
                       <video

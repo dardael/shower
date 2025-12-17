@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Flex, Spinner, Text, Button, VStack } from '@chakra-ui/react';
+import Image from 'next/image';
 import type { PageLoadError } from '@/types/page-load-state';
 
 export interface CustomLoaderData {
@@ -85,11 +86,19 @@ export function PublicPageLoader({
       >
         {showCustomLoader ? (
           customLoader.type === 'gif' ? (
-            <img
+            <Image
               src={customLoader.url}
               alt="Loading"
               data-testid="custom-loader-gif"
-              style={{ maxHeight: '150px', maxWidth: '150px' }}
+              width={150}
+              height={150}
+              style={{
+                maxHeight: '150px',
+                maxWidth: '150px',
+                objectFit: 'contain',
+              }}
+              unoptimized
+              loader={({ src }) => src}
               onError={() => setLoaderError(true)}
             />
           ) : (
