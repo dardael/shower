@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Editor } from '@tiptap/react';
-import { HStack, IconButton, Separator, Text } from '@chakra-ui/react';
+import {
+  HStack,
+  IconButton,
+  Separator,
+  Text,
+  Box,
+  Input,
+} from '@chakra-ui/react';
 import {
   LuTableRowsSplit,
   LuTableColumnsSplit,
@@ -11,12 +18,74 @@ import {
   LuSplit,
   LuPlus,
   LuMinus,
+  LuAlignVerticalJustifyStart,
+  LuAlignVerticalJustifyCenter,
+  LuAlignVerticalJustifyEnd,
 } from 'react-icons/lu';
 import { Tooltip } from '@/presentation/shared/components/ui/tooltip';
+import { findParentNode } from '@tiptap/core';
+import {
+  BORDER_THICKNESS_MIN,
+  BORDER_THICKNESS_MAX,
+  BORDER_THICKNESS_DEFAULT,
+  VERTICAL_ALIGN_DEFAULT,
+  type VerticalAlignment,
+} from './tableFormatTypes';
 
 interface TableToolbarProps {
   editor: Editor;
   disabled?: boolean;
+}
+
+/**
+ * Gets the current border thickness of the table containing the cursor.
+ */
+function getCurrentBorderThickness(editor: Editor): number {
+  const { selection } = editor.state;
+  const tableNode = findParentNode((node) => node.type.name === 'table')(
+    selection
+  );
+  if (tableNode) {
+    return tableNode.node.attrs.borderThickness ?? BORDER_THICKNESS_DEFAULT;
+  }
+  return BORDER_THICKNESS_DEFAULT;
+}
+
+/**
+ * Updates the border thickness of the current table.
+ */
+function updateTableBorderThickness(
+  editor: Editor,
+  borderThickness: number
+): void {
+  editor.chain().focus().updateAttributes('table', { borderThickness }).run();
+}
+
+/**
+ * Gets the current vertical alignment of the selected cell.
+ */
+function getCurrentVerticalAlign(editor: Editor): VerticalAlignment {
+  const cellAttrs = editor.getAttributes('tableCell');
+  const headerAttrs = editor.getAttributes('tableHeader');
+  return (cellAttrs.verticalAlign ||
+    headerAttrs.verticalAlign ||
+    VERTICAL_ALIGN_DEFAULT) as VerticalAlignment;
+}
+
+/**
+ * Updates the vertical alignment of the selected cell(s).
+ */
+function updateCellVerticalAlign(
+  editor: Editor,
+  verticalAlign: VerticalAlignment
+): void {
+  // Update both tableCell and tableHeader to handle both types
+  editor
+    .chain()
+    .focus()
+    .updateAttributes('tableCell', { verticalAlign })
+    .updateAttributes('tableHeader', { verticalAlign })
+    .run();
 }
 
 export function TableToolbar({
@@ -27,12 +96,20 @@ export function TableToolbar({
   const [canDeleteColumn, setCanDeleteColumn] = useState(false);
   const [canMergeCells, setCanMergeCells] = useState(false);
   const [canSplitCell, setCanSplitCell] = useState(false);
+  const [borderThickness, setBorderThickness] = useState(
+    BORDER_THICKNESS_DEFAULT
+  );
+  const [verticalAlign, setVerticalAlign] = useState<VerticalAlignment>(
+    VERTICAL_ALIGN_DEFAULT
+  );
 
   const updateCanStates = useCallback((): void => {
     setCanDeleteRow(editor.can().deleteRow());
     setCanDeleteColumn(editor.can().deleteColumn());
     setCanMergeCells(editor.can().mergeCells());
     setCanSplitCell(editor.can().splitCell());
+    setBorderThickness(getCurrentBorderThickness(editor));
+    setVerticalAlign(getCurrentVerticalAlign(editor));
   }, [editor]);
 
   useEffect(() => {
@@ -48,6 +125,29 @@ export function TableToolbar({
       editor.off('transaction', updateCanStates);
     };
   }, [editor, updateCanStates]);
+
+  const handleBorderThicknessChange = useCallback(
+    (details: { value: string }): void => {
+      const value = parseInt(details.value, 10);
+      if (
+        !isNaN(value) &&
+        value >= BORDER_THICKNESS_MIN &&
+        value <= BORDER_THICKNESS_MAX
+      ) {
+        setBorderThickness(value);
+        updateTableBorderThickness(editor, value);
+      }
+    },
+    [editor]
+  );
+
+  const handleVerticalAlignChange = useCallback(
+    (align: VerticalAlignment): void => {
+      setVerticalAlign(align);
+      updateCellVerticalAlign(editor, align);
+    },
+    [editor]
+  );
 
   return (
     <HStack
@@ -174,6 +274,72 @@ export function TableToolbar({
           disabled={disabled || !canSplitCell}
         >
           <LuSplit />
+        </IconButton>
+      </Tooltip>
+
+      <Separator orientation="vertical" height="20px" />
+
+      {/* Border thickness control */}
+      <Tooltip content="Border Thickness (0-10px)">
+        <Box display="flex" alignItems="center" gap={1}>
+          <Text fontSize="xs" color="fg.muted">
+            Border:
+          </Text>
+          <Input
+            type="number"
+            size="xs"
+            width="50px"
+            min={BORDER_THICKNESS_MIN}
+            max={BORDER_THICKNESS_MAX}
+            value={borderThickness}
+            onChange={(e) =>
+              handleBorderThicknessChange({ value: e.target.value })
+            }
+            disabled={disabled}
+          />
+          <Text fontSize="xs" color="fg.muted">
+            px
+          </Text>
+        </Box>
+      </Tooltip>
+
+      <Separator orientation="vertical" height="20px" />
+
+      {/* Vertical alignment controls */}
+      <Text fontSize="xs" color="fg.muted" mr={1}>
+        Align:
+      </Text>
+      <Tooltip content="Align Top">
+        <IconButton
+          aria-label="Align Top"
+          size="xs"
+          variant={verticalAlign === 'top' ? 'solid' : 'ghost'}
+          onClick={() => handleVerticalAlignChange('top')}
+          disabled={disabled}
+        >
+          <LuAlignVerticalJustifyStart />
+        </IconButton>
+      </Tooltip>
+      <Tooltip content="Align Middle">
+        <IconButton
+          aria-label="Align Middle"
+          size="xs"
+          variant={verticalAlign === 'middle' ? 'solid' : 'ghost'}
+          onClick={() => handleVerticalAlignChange('middle')}
+          disabled={disabled}
+        >
+          <LuAlignVerticalJustifyCenter />
+        </IconButton>
+      </Tooltip>
+      <Tooltip content="Align Bottom">
+        <IconButton
+          aria-label="Align Bottom"
+          size="xs"
+          variant={verticalAlign === 'bottom' ? 'solid' : 'ghost'}
+          onClick={() => handleVerticalAlignChange('bottom')}
+          disabled={disabled}
+        >
+          <LuAlignVerticalJustifyEnd />
         </IconButton>
       </Tooltip>
 

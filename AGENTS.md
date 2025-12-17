@@ -117,6 +117,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - MongoDB via Mongoose (settings), local filesystem (`public/loaders/`) (034-custom-loader)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, existing PublicPageLoader component, existing settings context providers (ThemeColorContext, BackgroundColorContext, ThemeModeContext, FontProvider) (035-admin-loading-screen)
 - N/A (uses existing settings infrastructure - localStorage caching + API sync) (035-admin-loading-screen)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Tiptap (@tiptap/extension-table, @tiptap/extension-table-cell), Chakra UI v3, DOMPurify (037-sheet-cell-format)
+- HTML string in MongoDB via PageContent entity (existing infrastructure) (037-sheet-cell-format)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import DOMPurify from 'dompurify';
 import { extractFontsFromHtml } from '@/presentation/shared/utils/extractFontsFromHtml';
@@ -11,13 +11,58 @@ interface PublicPageContentProps {
   content: string;
 }
 
+/**
+ * Applies column widths from data-colwidth attributes to table cells
+ */
+function applyTableColumnWidths(container: HTMLElement): void {
+  const tables = container.querySelectorAll('table');
+
+  tables.forEach((table) => {
+    // Apply border thickness CSS variable
+    const borderThickness = table.getAttribute('data-border-thickness');
+    if (borderThickness) {
+      table.style.setProperty('--table-border-width', `${borderThickness}px`);
+    }
+
+    // Apply column widths from data-colwidth
+    const cells = table.querySelectorAll('td, th');
+    cells.forEach((cell) => {
+      const colwidth = cell.getAttribute('data-colwidth');
+      if (colwidth) {
+        try {
+          // data-colwidth can be a JSON array like "[150]" or a single number
+          const widths = JSON.parse(colwidth);
+          if (Array.isArray(widths) && widths.length > 0 && widths[0]) {
+            (cell as HTMLElement).style.width = `${widths[0]}px`;
+          }
+        } catch {
+          // JSON parse failed - colwidth may be a plain number string (e.g., "150")
+          // This is expected for some table formats, so we fall back to parseInt
+          const width = parseInt(colwidth, 10);
+          if (!isNaN(width) && width > 0) {
+            (cell as HTMLElement).style.width = `${width}px`;
+          }
+        }
+      }
+    });
+  });
+}
+
 export default function PublicPageContent({ content }: PublicPageContentProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (content) {
       const fonts = extractFontsFromHtml(content);
       fonts.forEach((font) => {
         loadGoogleFont(font);
       });
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      applyTableColumnWidths(contentRef.current);
     }
   }, [content]);
 
@@ -87,6 +132,8 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
       'colspan',
       'rowspan',
       'data-colwidth',
+      'data-border-thickness',
+      'data-vertical-align',
     ],
     ALLOW_DATA_ATTR: true,
     ADD_TAGS: [],
@@ -95,6 +142,7 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
 
   return (
     <Box
+      ref={contentRef}
       className="public-page-content"
       overflow="visible"
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}

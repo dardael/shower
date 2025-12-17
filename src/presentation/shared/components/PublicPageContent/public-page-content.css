@@ -266,14 +266,38 @@
   border-collapse: collapse;
   width: 100%;
   margin: 1rem 0;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .public-page-content table td,
 .public-page-content table th {
-  border: 1px solid var(--chakra-colors-border);
+  border-width: var(--table-border-width, 1px);
+  border-style: solid;
+  border-color: var(--chakra-colors-border);
   padding: 0.75rem;
   vertical-align: top;
+}
+
+/* Hide borders when border-width is 0 */
+.public-page-content table[data-border-thickness='0'] td,
+.public-page-content table[data-border-thickness='0'] th {
+  border-style: none;
+}
+
+/* Vertical alignment styles for cells */
+.public-page-content table td[data-vertical-align='top'],
+.public-page-content table th[data-vertical-align='top'] {
+  vertical-align: top;
+}
+
+.public-page-content table td[data-vertical-align='middle'],
+.public-page-content table th[data-vertical-align='middle'] {
+  vertical-align: middle;
+}
+
+.public-page-content table td[data-vertical-align='bottom'],
+.public-page-content table th[data-vertical-align='bottom'] {
+  vertical-align: bottom;
 }
 
 .public-page-content table th {

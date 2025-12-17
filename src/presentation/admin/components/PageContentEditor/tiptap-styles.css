@@ -324,21 +324,39 @@ span[data-theme-color] {
 }
 
 /* Table styles */
-.tiptap-editor-wrapper .tiptap table {
+.tiptap-editor-wrapper .tiptap table,
+.tiptap-editor-wrapper .tiptap .tiptap-table {
   border-collapse: collapse;
   width: 100%;
   margin: 1rem 0;
   table-layout: fixed;
-  border: 1px solid var(--chakra-colors-border);
 }
 
 .tiptap-editor-wrapper .tiptap table td,
-.tiptap-editor-wrapper .tiptap table th {
-  border: 1px solid var(--chakra-colors-border);
+.tiptap-editor-wrapper .tiptap table th,
+.tiptap-editor-wrapper .tiptap .tiptap-table td,
+.tiptap-editor-wrapper .tiptap .tiptap-table th {
+  border: var(--table-border-width, 1px) solid var(--chakra-colors-border);
   padding: 0.5rem;
   min-width: 50px;
   vertical-align: top;
   position: relative;
+}
+
+/* Vertical alignment styles for cells */
+.tiptap-editor-wrapper .tiptap table td[data-vertical-align='top'],
+.tiptap-editor-wrapper .tiptap table th[data-vertical-align='top'] {
+  vertical-align: top;
+}
+
+.tiptap-editor-wrapper .tiptap table td[data-vertical-align='middle'],
+.tiptap-editor-wrapper .tiptap table th[data-vertical-align='middle'] {
+  vertical-align: middle;
+}
+
+.tiptap-editor-wrapper .tiptap table td[data-vertical-align='bottom'],
+.tiptap-editor-wrapper .tiptap table th[data-vertical-align='bottom'] {
+  vertical-align: bottom;
 }
 
 .tiptap-editor-wrapper .tiptap table th {

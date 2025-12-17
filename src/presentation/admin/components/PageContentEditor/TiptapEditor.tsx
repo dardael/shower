@@ -7,10 +7,8 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import { TextStyle, FontFamily } from '@tiptap/extension-text-style';
-import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
-import { TableCell } from '@tiptap/extension-table-cell';
-import { TableHeader } from '@tiptap/extension-table-header';
+import { CustomTable, CustomTableCell, CustomTableHeader } from './extensions';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
@@ -34,6 +32,7 @@ import {
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
+import { findParentNode } from '@tiptap/core';
 import './tiptap-styles.css';
 import { ColorPicker } from './ColorPicker';
 import { FontPicker } from './FontPicker';
@@ -237,6 +236,7 @@ export default function TiptapEditor({
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImagePos, setSelectedImagePos] = useState<number | null>(null);
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
+  const [isInTable, setIsInTable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
 
@@ -334,15 +334,10 @@ export default function TiptapEditor({
         alignments: ['left', 'center', 'right', 'justify'],
         defaultAlignment: 'left',
       }),
-      Table.configure({
-        resizable: true,
-        HTMLAttributes: {
-          class: 'tiptap-table',
-        },
-      }),
+      CustomTable,
       TableRow,
-      TableCell,
-      TableHeader,
+      CustomTableCell,
+      CustomTableHeader,
     ],
     content,
     editable: !disabled,
@@ -356,6 +351,32 @@ export default function TiptapEditor({
       onChange(ed.getHTML());
       // Sync image alignments after content update
       syncAllImageAlignments(ed);
+      // Check if we're in a table
+      const tableNode = findParentNode((node) => node.type.name === 'table')(
+        ed.state.selection
+      );
+      setIsInTable(!!tableNode);
+    },
+    onSelectionUpdate: ({ editor: ed }) => {
+      // Check if we're in a table on selection change
+      const tableNode = findParentNode((node) => node.type.name === 'table')(
+        ed.state.selection
+      );
+      setIsInTable(!!tableNode);
+
+      // Track selected image position and type
+      const { selection } = ed.state;
+      if (
+        selection instanceof NodeSelection &&
+        (selection.node.type.name === 'image' ||
+          selection.node.type.name === 'imageWithOverlay')
+      ) {
+        setSelectedImagePos(selection.from);
+        setSelectedNodeType(selection.node.type.name);
+      } else {
+        setSelectedImagePos(null);
+        setSelectedNodeType(null);
+      }
     },
     onTransaction: ({ editor: ed, transaction }) => {
       // Detect resize operations and remove fullWidth when user resizes
@@ -399,21 +420,6 @@ export default function TiptapEditor({
           });
         });
       });
-    },
-    onSelectionUpdate: ({ editor: ed }) => {
-      // Track selected image position and type
-      const { selection } = ed.state;
-      if (
-        selection instanceof NodeSelection &&
-        (selection.node.type.name === 'image' ||
-          selection.node.type.name === 'imageWithOverlay')
-      ) {
-        setSelectedImagePos(selection.from);
-        setSelectedNodeType(selection.node.type.name);
-      } else {
-        setSelectedImagePos(null);
-        setSelectedNodeType(null);
-      }
     },
     editorProps: {
       handleDrop: (_view, event, _slice, moved) => {
@@ -855,9 +861,7 @@ export default function TiptapEditor({
       )}
 
       {/* Table toolbar - visible when cursor is in a table */}
-      {editor.isActive('table') && (
-        <TableToolbar editor={editor} disabled={disabled} />
-      )}
+      {isInTable && <TableToolbar editor={editor} disabled={disabled} />}
 
       {showLinkInput && (
         <HStack
