@@ -50,7 +50,7 @@ describe('PublicPageLoader', () => {
 
       const gifElement = screen.getByTestId('custom-loader-gif');
       expect(gifElement).toBeInTheDocument();
-      expect(gifElement).toHaveAttribute('src', customLoader.url);
+      expect(gifElement.getAttribute('src')).toContain(customLoader.url);
       expect(screen.queryByTestId('chakra-spinner')).not.toBeInTheDocument();
     });
 

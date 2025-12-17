@@ -121,6 +121,7 @@ you must use docker compose to run all commands in order to have the same enviro
 - HTML string in MongoDB via PageContent entity (existing infrastructure) (037-sheet-cell-format)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, Tiptap (@tiptap/react), react-icons (038-editor-ux-fixes)
 - N/A (UI-only changes, no data persistence modifications) (038-editor-ux-fixes)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Tiptap (@tiptap/extension-table, @tiptap/extension-table-cell), Chakra UI v3, existing TableToolbar component (039-sheet-column-width)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)
