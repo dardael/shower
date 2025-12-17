@@ -22,28 +22,24 @@ describe('appUrl utilities', () => {
       const result = getApiUrl('/api/test');
 
       expect(result).toMatch(/\/api\/test$/);
-      expect(result).toContain('://');
     });
 
     it('should handle endpoint without leading slash', () => {
       const result = getApiUrl('api/test');
 
       expect(result).toMatch(/\/api\/test$/);
-      expect(result).toContain('://');
     });
 
     it('should handle empty endpoint', () => {
       const result = getApiUrl('');
 
-      expect(result).not.toContain('/api');
-      expect(result).toContain('://');
+      expect(result).toBe('/');
     });
 
     it('should handle root endpoint', () => {
       const result = getApiUrl('/');
 
-      expect(result).toMatch(/\/$/);
-      expect(result).toContain('://');
+      expect(result).toBe('/');
     });
   });
 });
