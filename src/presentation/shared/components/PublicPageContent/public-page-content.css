@@ -260,3 +260,44 @@
     font-size: 11px !important;
   }
 }
+
+/* Table styles */
+.public-page-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  table-layout: fixed;
+}
+
+.public-page-content table td,
+.public-page-content table th {
+  border: 1px solid var(--chakra-colors-border);
+  padding: 0.75rem;
+  vertical-align: top;
+}
+
+.public-page-content table th {
+  background-color: var(--chakra-colors-bg-subtle);
+  font-weight: bold;
+  text-align: left;
+}
+
+.public-page-content table td p,
+.public-page-content table th p {
+  margin-bottom: 0;
+}
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+  .public-page-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .public-page-content table td,
+  .public-page-content table th {
+    padding: 0.5rem;
+    min-width: 100px;
+  }
+}

@@ -322,3 +322,54 @@ span[data-theme-color] {
   [data-resize-wrapper]:has(img[data-full-bleed='true']) {
   width: 100% !important;
 }
+
+/* Table styles */
+.tiptap-editor-wrapper .tiptap table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  table-layout: fixed;
+  border: 1px solid var(--chakra-colors-border);
+}
+
+.tiptap-editor-wrapper .tiptap table td,
+.tiptap-editor-wrapper .tiptap table th {
+  border: 1px solid var(--chakra-colors-border);
+  padding: 0.5rem;
+  min-width: 50px;
+  vertical-align: top;
+  position: relative;
+}
+
+.tiptap-editor-wrapper .tiptap table th {
+  background-color: var(--chakra-colors-bg-subtle);
+  font-weight: bold;
+  text-align: left;
+}
+
+.tiptap-editor-wrapper .tiptap table td p,
+.tiptap-editor-wrapper .tiptap table th p {
+  margin-bottom: 0;
+}
+
+/* Selected cell highlight */
+.tiptap-editor-wrapper .tiptap table .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--chakra-colors-color-palette-solid);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Resize handle for columns */
+.tiptap-editor-wrapper .tiptap table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--chakra-colors-color-palette-solid);
+  cursor: col-resize;
+  z-index: 10;
+}

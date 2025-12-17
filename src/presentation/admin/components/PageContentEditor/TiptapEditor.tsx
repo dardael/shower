@@ -7,6 +7,10 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import { TextStyle, FontFamily } from '@tiptap/extension-text-style';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
@@ -37,6 +41,8 @@ import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { Tooltip } from '@/presentation/shared/components/ui/tooltip';
 import { ImageWithOverlay } from './extensions/ImageWithOverlay';
 import { OverlayToolbar } from './OverlayToolbar';
+import { TableInsertDialog } from './TableInsertDialog';
+import { TableToolbar } from './TableToolbar';
 import { FiType } from 'react-icons/fi';
 import { DEFAULT_OVERLAY_TEXT } from '@/domain/pages/types/ImageOverlay';
 
@@ -328,6 +334,15 @@ export default function TiptapEditor({
         alignments: ['left', 'center', 'right', 'justify'],
         defaultAlignment: 'left',
       }),
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'tiptap-table',
+        },
+      }),
+      TableRow,
+      TableCell,
+      TableHeader,
     ],
     content,
     editable: !disabled,
@@ -450,12 +465,18 @@ export default function TiptapEditor({
             ) {
               // Check if this is the clicked image by comparing DOM nodes
               const domNode = view.nodeDOM(nodePos);
-              if (
-                domNode &&
-                (domNode === imageElement || domNode.contains(imageElement))
-              ) {
-                imagePos = nodePos;
-                nodeTypeName = node.type.name;
+              if (domNode) {
+                // Check if domNode is or contains the clicked image
+                // This handles images both at root level and inside table cells
+                const domElement = domNode as HTMLElement;
+                const imgInDom =
+                  domElement.tagName === 'IMG'
+                    ? domElement
+                    : domElement.querySelector?.('img');
+                if (imgInDom === imageElement) {
+                  imagePos = nodePos;
+                  nodeTypeName = node.type.name;
+                }
               }
             }
             return imagePos === null;
@@ -764,6 +785,7 @@ export default function TiptapEditor({
         >
           <FiImage />
         </IconButton>
+        <TableInsertDialog editor={editor} disabled={disabled} />
         {/* Add Text Overlay button - only visible when plain image is selected */}
         {selectedImagePos !== null && selectedNodeType === 'image' && (
           <Tooltip content="Add Text Overlay">
@@ -830,6 +852,11 @@ export default function TiptapEditor({
           disabled={disabled}
           imagePos={selectedImagePos}
         />
+      )}
+
+      {/* Table toolbar - visible when cursor is in a table */}
+      {editor.isActive('table') && (
+        <TableToolbar editor={editor} disabled={disabled} />
       )}
 
       {showLinkInput && (
