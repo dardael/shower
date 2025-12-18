@@ -7,6 +7,7 @@ export const VALID_SETTING_KEYS = {
   BACKGROUND_COLOR: 'background-color',
   THEME_MODE: 'theme-mode',
   CUSTOM_LOADER: 'custom-loader',
+  SCHEDULED_RESTART: 'scheduled-restart',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(
