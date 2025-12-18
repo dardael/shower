@@ -39,6 +39,11 @@ const menuItems = [
     description: 'Configure website navigation',
   },
   {
+    href: '/admin/maintenance',
+    label: 'Maintenance',
+    description: 'Configure scheduled restarts',
+  },
+  {
     href: '/admin/export-import',
     label: 'Export / Import',
     description: 'Backup and restore configuration',

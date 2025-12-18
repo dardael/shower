@@ -89,6 +89,14 @@ import { CreatePageContent } from '@/application/pages/use-cases/CreatePageConte
 import { GetPageContent } from '@/application/pages/use-cases/GetPageContent';
 import { UpdatePageContent } from '@/application/pages/use-cases/UpdatePageContent';
 import { DeletePageContent } from '@/application/pages/use-cases/DeletePageContent';
+import type { IScheduledRestartConfigRepository } from '@/domain/config/repositories/IScheduledRestartConfigRepository';
+import { MongooseScheduledRestartConfigRepository } from '@/infrastructure/config/repositories/MongooseScheduledRestartConfigRepository';
+import type { IGetScheduledRestartConfig } from '@/application/config/IGetScheduledRestartConfig';
+import type { IUpdateScheduledRestartConfig } from '@/application/config/IUpdateScheduledRestartConfig';
+import { GetScheduledRestartConfig } from '@/application/config/GetScheduledRestartConfig';
+import { UpdateScheduledRestartConfig } from '@/application/config/UpdateScheduledRestartConfig';
+import type { IRestartScheduler } from '@/domain/config/services/IRestartScheduler';
+import { NodeCronRestartScheduler } from '@/infrastructure/config/services/NodeCronRestartScheduler';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -276,6 +284,29 @@ container.register<IDeletePageContent>('IDeletePageContent', {
   useClass: DeletePageContent,
 });
 
+// Register scheduled restart config services
+container.register<IScheduledRestartConfigRepository>(
+  'IScheduledRestartConfigRepository',
+  {
+    useClass: MongooseScheduledRestartConfigRepository,
+  }
+);
+
+container.register<IGetScheduledRestartConfig>('IGetScheduledRestartConfig', {
+  useClass: GetScheduledRestartConfig,
+});
+
+container.register<IUpdateScheduledRestartConfig>(
+  'IUpdateScheduledRestartConfig',
+  {
+    useClass: UpdateScheduledRestartConfig,
+  }
+);
+
+container.register<IRestartScheduler>('IRestartScheduler', {
+  useClass: NodeCronRestartScheduler,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -420,6 +451,20 @@ export class PagesServiceLocator {
 
   static getDeletePageContent(): IDeletePageContent {
     return container.resolve('IDeletePageContent');
+  }
+}
+
+export class ConfigServiceLocator {
+  static getGetScheduledRestartConfig(): IGetScheduledRestartConfig {
+    return container.resolve('IGetScheduledRestartConfig');
+  }
+
+  static getUpdateScheduledRestartConfig(): IUpdateScheduledRestartConfig {
+    return container.resolve('IUpdateScheduledRestartConfig');
+  }
+
+  static getRestartScheduler(): IRestartScheduler {
+    return container.resolve('IRestartScheduler');
   }
 }
 
