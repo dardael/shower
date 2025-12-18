@@ -39,6 +39,11 @@ const menuItems = [
     description: 'Configure website navigation',
   },
   {
+    href: '/admin/products',
+    label: 'Products',
+    description: 'Manage products and categories',
+  },
+  {
     href: '/admin/maintenance',
     label: 'Maintenance',
     description: 'Configure scheduled restarts',

@@ -97,6 +97,30 @@ import { GetScheduledRestartConfig } from '@/application/config/GetScheduledRest
 import { UpdateScheduledRestartConfig } from '@/application/config/UpdateScheduledRestartConfig';
 import type { IRestartScheduler } from '@/domain/config/services/IRestartScheduler';
 import { NodeCronRestartScheduler } from '@/infrastructure/config/services/NodeCronRestartScheduler';
+import type { IProductRepository } from '@/domain/product/repositories/IProductRepository';
+import type { ICategoryRepository } from '@/domain/product/repositories/ICategoryRepository';
+import { MongooseProductRepository } from '@/infrastructure/product/repositories/MongooseProductRepository';
+import { MongooseCategoryRepository } from '@/infrastructure/product/repositories/MongooseCategoryRepository';
+import type { ICreateProduct } from '@/application/product/ICreateProduct';
+import type { IUpdateProduct } from '@/application/product/IUpdateProduct';
+import type { IDeleteProduct } from '@/application/product/IDeleteProduct';
+import type { IGetProducts } from '@/application/product/IGetProducts';
+import type { IReorderProducts } from '@/application/product/IReorderProducts';
+import type { ICreateCategory } from '@/application/product/ICreateCategory';
+import type { IUpdateCategory } from '@/application/product/IUpdateCategory';
+import type { IDeleteCategory } from '@/application/product/IDeleteCategory';
+import type { IGetCategories } from '@/application/product/IGetCategories';
+import type { IReorderCategories } from '@/application/product/IReorderCategories';
+import { CreateProduct } from '@/application/product/CreateProduct';
+import { UpdateProduct } from '@/application/product/UpdateProduct';
+import { DeleteProduct } from '@/application/product/DeleteProduct';
+import { GetProducts } from '@/application/product/GetProducts';
+import { ReorderProducts } from '@/application/product/ReorderProducts';
+import { CreateCategory } from '@/application/product/CreateCategory';
+import { UpdateCategory } from '@/application/product/UpdateCategory';
+import { DeleteCategory } from '@/application/product/DeleteCategory';
+import { GetCategories } from '@/application/product/GetCategories';
+import { ReorderCategories } from '@/application/product/ReorderCategories';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -307,6 +331,57 @@ container.register<IRestartScheduler>('IRestartScheduler', {
   useClass: NodeCronRestartScheduler,
 });
 
+// Register product services
+container.register<IProductRepository>('IProductRepository', {
+  useClass: MongooseProductRepository,
+});
+
+container.register<ICategoryRepository>('ICategoryRepository', {
+  useClass: MongooseCategoryRepository,
+});
+
+// Register product use cases
+container.register<ICreateProduct>('ICreateProduct', {
+  useClass: CreateProduct,
+});
+
+container.register<IUpdateProduct>('IUpdateProduct', {
+  useClass: UpdateProduct,
+});
+
+container.register<IDeleteProduct>('IDeleteProduct', {
+  useClass: DeleteProduct,
+});
+
+container.register<IGetProducts>('IGetProducts', {
+  useClass: GetProducts,
+});
+
+container.register<IReorderProducts>('IReorderProducts', {
+  useClass: ReorderProducts,
+});
+
+// Register category use cases
+container.register<ICreateCategory>('ICreateCategory', {
+  useClass: CreateCategory,
+});
+
+container.register<IUpdateCategory>('IUpdateCategory', {
+  useClass: UpdateCategory,
+});
+
+container.register<IDeleteCategory>('IDeleteCategory', {
+  useClass: DeleteCategory,
+});
+
+container.register<IGetCategories>('IGetCategories', {
+  useClass: GetCategories,
+});
+
+container.register<IReorderCategories>('IReorderCategories', {
+  useClass: ReorderCategories,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -465,6 +540,56 @@ export class ConfigServiceLocator {
 
   static getRestartScheduler(): IRestartScheduler {
     return container.resolve('IRestartScheduler');
+  }
+}
+
+export class ProductServiceLocator {
+  static getProductRepository(): IProductRepository {
+    return container.resolve('IProductRepository');
+  }
+
+  static getCategoryRepository(): ICategoryRepository {
+    return container.resolve('ICategoryRepository');
+  }
+
+  static getCreateProduct(): ICreateProduct {
+    return container.resolve('ICreateProduct');
+  }
+
+  static getUpdateProduct(): IUpdateProduct {
+    return container.resolve('IUpdateProduct');
+  }
+
+  static getDeleteProduct(): IDeleteProduct {
+    return container.resolve('IDeleteProduct');
+  }
+
+  static getGetProducts(): IGetProducts {
+    return container.resolve('IGetProducts');
+  }
+
+  static getReorderProducts(): IReorderProducts {
+    return container.resolve('IReorderProducts');
+  }
+
+  static getCreateCategory(): ICreateCategory {
+    return container.resolve('ICreateCategory');
+  }
+
+  static getUpdateCategory(): IUpdateCategory {
+    return container.resolve('IUpdateCategory');
+  }
+
+  static getDeleteCategory(): IDeleteCategory {
+    return container.resolve('IDeleteCategory');
+  }
+
+  static getGetCategories(): IGetCategories {
+    return container.resolve('IGetCategories');
+  }
+
+  static getReorderCategories(): IReorderCategories {
+    return container.resolve('IReorderCategories');
   }
 }
 

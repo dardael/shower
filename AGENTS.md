@@ -123,6 +123,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - N/A (UI-only changes, no data persistence modifications) (038-editor-ux-fixes)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Tiptap (@tiptap/extension-table, @tiptap/extension-table-cell), Chakra UI v3, existing TableToolbar component (039-sheet-column-width)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, node-cron (for scheduling) (001-scheduled-restart-config)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, @dnd-kit/core (drag-and-drop), react-icons (041-product-category-management)
+- MongoDB via Mongoose, local filesystem (`public/page-content-images/`) for product images (041-product-category-management)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)
