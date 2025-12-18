@@ -10,12 +10,19 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { memo, useState, useEffect, useCallback } from 'react';
-import { LuClock, LuPower, LuPowerOff } from 'react-icons/lu';
+import { LuClock, LuPower, LuPowerOff, LuHistory } from 'react-icons/lu';
 import { useScheduledRestart } from '@/presentation/admin/hooks/useScheduledRestart';
 
 const ScheduledRestartForm = memo(() => {
-  const { enabled, restartHour, isLoading, isSaving, error, updateConfig } =
-    useScheduledRestart();
+  const {
+    enabled,
+    restartHour,
+    lastRestartAt,
+    isLoading,
+    isSaving,
+    error,
+    updateConfig,
+  } = useScheduledRestart();
 
   const [announcement, setAnnouncement] = useState('');
   const [localHour, setLocalHour] = useState(restartHour);
@@ -64,6 +71,12 @@ const ScheduledRestartForm = memo(() => {
     return () => clearTimeout(timer);
   }, [enabled, restartHour]);
 
+  const formatLastRestart = (isoDate: string | null): string => {
+    if (!isoDate) return 'Never';
+    const date = new Date(isoDate);
+    return date.toLocaleString();
+  };
+
   return (
     <VStack
       gap={6}
@@ -87,6 +100,24 @@ const ScheduledRestartForm = memo(() => {
       >
         {announcement}
       </Box>
+
+      {/* Last Restart Info */}
+      <VStack gap={2} align="start" width="full">
+        <HStack gap={2} align="center">
+          <LuHistory />
+          <Text
+            fontSize="md"
+            fontWeight="medium"
+            color={textColor}
+            data-testid="last-restart-label"
+          >
+            Last Scheduled Restart
+          </Text>
+        </HStack>
+        <Text fontSize="sm" color={textColor} data-testid="last-restart-value">
+          {formatLastRestart(lastRestartAt)}
+        </Text>
+      </VStack>
 
       {/* Enable/Disable Toggle */}
       <VStack gap={3} align="start" width="full">
@@ -168,7 +199,7 @@ const ScheduledRestartForm = memo(() => {
             <Text as="span" fontWeight="bold">
               {restartHour.toString().padStart(2, '0')}:00
             </Text>{' '}
-            server time
+            your local time
           </Text>
         </VStack>
       )}

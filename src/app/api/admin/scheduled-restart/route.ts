@@ -34,6 +34,7 @@ export const GET = withApi(
       logger.info('Scheduled restart config retrieved successfully', {
         enabled: config.enabled,
         restartHour: config.restartHour,
+        timezone: config.timezone,
       });
 
       const duration = Date.now() - startTime;
@@ -45,12 +46,15 @@ export const GET = withApi(
         {
           enabled: config.enabled,
           restartHour: config.restartHour,
+          timezone: config.timezone,
         }
       );
 
       const response: ScheduledRestartConfigResponse = {
         enabled: config.enabled,
         restartHour: config.restartHour,
+        timezone: config.timezone,
+        lastRestartAt: config.lastRestartAt?.toISOString() ?? null,
       };
       return NextResponse.json(response);
     } catch (error) {
@@ -124,7 +128,7 @@ export const POST = withApi(
         return NextResponse.json(errorResponse, { status: 400 });
       }
 
-      const { enabled, restartHour } = body;
+      const { enabled, restartHour, timezone } = body;
 
       // Validate enabled is a boolean
       if (typeof enabled !== 'boolean') {
@@ -173,9 +177,39 @@ export const POST = withApi(
         return NextResponse.json(errorResponse, { status: 400 });
       }
 
+      // Validate timezone is a valid IANA timezone
+      if (
+        typeof timezone !== 'string' ||
+        timezone.trim() === '' ||
+        !ScheduledRestartConfig.isValidTimezone(timezone)
+      ) {
+        logger.warn('Invalid timezone provided', {
+          timezone,
+          timezoneType: typeof timezone,
+        });
+
+        const duration = Date.now() - startTime;
+        logger.logApiResponse(
+          'POST',
+          '/api/admin/scheduled-restart',
+          400,
+          duration
+        );
+
+        const errorResponse: ScheduledRestartErrorResponse = {
+          error:
+            'Invalid timezone. Must be a valid IANA timezone (e.g., Europe/Paris, America/New_York).',
+        };
+        return NextResponse.json(errorResponse, { status: 400 });
+      }
+
       const updateScheduledRestartConfig =
         ConfigServiceLocator.getUpdateScheduledRestartConfig();
-      const config = ScheduledRestartConfig.create({ enabled, restartHour });
+      const config = ScheduledRestartConfig.create({
+        enabled,
+        restartHour,
+        timezone,
+      });
 
       await updateScheduledRestartConfig.execute(config);
 
@@ -186,6 +220,7 @@ export const POST = withApi(
       logger.info('Scheduled restart config updated successfully', {
         enabled: config.enabled,
         restartHour: config.restartHour,
+        timezone: config.timezone,
       });
 
       const duration = Date.now() - startTime;
@@ -197,6 +232,7 @@ export const POST = withApi(
         {
           enabled: config.enabled,
           restartHour: config.restartHour,
+          timezone: config.timezone,
         }
       );
 
@@ -204,6 +240,7 @@ export const POST = withApi(
         message: 'Scheduled restart configuration updated successfully',
         enabled: config.enabled,
         restartHour: config.restartHour,
+        timezone: config.timezone,
       };
       return NextResponse.json(response);
     } catch (error) {

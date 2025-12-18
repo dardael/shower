@@ -34,8 +34,16 @@ export class NodeCronRestartScheduler implements IRestartScheduler {
 
     try {
       const config = await this.repository.get();
+      this.logger.info('Restart scheduler config loaded', {
+        enabled: config.enabled,
+        restartHour: config.restartHour,
+        timezone: config.timezone,
+      });
       this.schedule(config);
-      this.logger.info('Restart scheduler started successfully');
+      this.logger.info('Restart scheduler started successfully', {
+        enabled: config.enabled,
+        restartHour: config.restartHour,
+      });
     } catch (error) {
       this.logger.error('Failed to start restart scheduler', error);
     }
@@ -54,11 +62,22 @@ export class NodeCronRestartScheduler implements IRestartScheduler {
     // Cron expression: "0 {hour} * * *" means at minute 0 of the specified hour, every day
     const cronExpression = `0 ${hour} * * *`;
 
-    sharedState.scheduledTask = cron.schedule(cronExpression, () => {
-      this.executeRestart();
-    });
+    // Use the user's configured timezone (stored when they saved the config)
+    const timezone = config.timezone;
 
-    this.logger.info(`Restart scheduled for ${hour}:00 daily`);
+    sharedState.scheduledTask = cron.schedule(
+      cronExpression,
+      () => {
+        this.executeRestart();
+      },
+      {
+        timezone,
+      }
+    );
+
+    this.logger.info(
+      `Restart scheduled for ${hour}:00 daily (timezone: ${timezone})`
+    );
   }
 
   stop(): void {
@@ -73,8 +92,18 @@ export class NodeCronRestartScheduler implements IRestartScheduler {
     return sharedState.scheduledTask !== null;
   }
 
-  private executeRestart(): void {
+  private async executeRestart(): Promise<void> {
     this.logger.info('Executing scheduled server restart...');
+
+    // Record the restart time before exiting
+    try {
+      const config = await this.repository.get();
+      const updatedConfig = config.withLastRestartAt(new Date());
+      await this.repository.save(updatedConfig);
+      this.logger.info('Last restart timestamp saved');
+    } catch (error) {
+      this.logger.error('Failed to save restart timestamp', error);
+    }
 
     // Graceful shutdown - allow a small delay for logging
     setTimeout(() => {

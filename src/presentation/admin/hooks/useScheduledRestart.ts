@@ -5,11 +5,16 @@ import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import type {
   ScheduledRestartConfigResponse,
   UpdateScheduledRestartRequest,
+  UpdateScheduledRestartResponse,
 } from '@/app/api/admin/scheduled-restart/types';
+
+const DEFAULT_RESTART_HOUR = 3;
 
 export interface IScheduledRestartManager {
   enabled: boolean;
   restartHour: number;
+  timezone: string;
+  lastRestartAt: string | null;
   isLoading: boolean;
   isSaving: boolean;
   error: string | null;
@@ -19,7 +24,11 @@ export interface IScheduledRestartManager {
 
 export function useScheduledRestart(): IScheduledRestartManager {
   const [enabled, setEnabled] = useState(false);
-  const [restartHour, setRestartHour] = useState(3);
+  const [restartHour, setRestartHour] = useState(DEFAULT_RESTART_HOUR);
+  const [timezone, setTimezone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
+  const [lastRestartAt, setLastRestartAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +48,8 @@ export function useScheduledRestart(): IScheduledRestartManager {
       const data: ScheduledRestartConfigResponse = await response.json();
       setEnabled(data.enabled);
       setRestartHour(data.restartHour);
+      setTimezone(data.timezone);
+      setLastRestartAt(data.lastRestartAt);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Unknown error occurred';
@@ -58,6 +69,7 @@ export function useScheduledRestart(): IScheduledRestartManager {
         const body: UpdateScheduledRestartRequest = {
           enabled: newEnabled,
           restartHour: newRestartHour,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         };
 
         const response = await fetch('/api/admin/scheduled-restart', {
@@ -73,13 +85,15 @@ export function useScheduledRestart(): IScheduledRestartManager {
           throw new Error(errorData.error || 'Failed to update configuration');
         }
 
-        const data: ScheduledRestartConfigResponse = await response.json();
+        const data: UpdateScheduledRestartResponse = await response.json();
         setEnabled(data.enabled);
         setRestartHour(data.restartHour);
+        setTimezone(data.timezone);
 
         logger.info('Scheduled restart config updated', {
           enabled: data.enabled,
           restartHour: data.restartHour,
+          timezone: data.timezone,
         });
 
         return true;
@@ -107,6 +121,8 @@ export function useScheduledRestart(): IScheduledRestartManager {
   return {
     enabled,
     restartHour,
+    timezone,
+    lastRestartAt,
     isLoading,
     isSaving,
     error,

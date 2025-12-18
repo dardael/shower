@@ -43,6 +43,7 @@ export class MongooseScheduledRestartConfigRepository
       this.logger.info('Scheduled restart config saved', {
         enabled: config.enabled,
         restartHour: config.restartHour,
+        timezone: config.timezone,
       });
     } catch (error) {
       this.logger.error('Failed to save scheduled restart config', { error });
