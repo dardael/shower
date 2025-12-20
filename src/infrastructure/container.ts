@@ -121,6 +121,8 @@ import { UpdateCategory } from '@/application/product/UpdateCategory';
 import { DeleteCategory } from '@/application/product/DeleteCategory';
 import { GetCategories } from '@/application/product/GetCategories';
 import { ReorderCategories } from '@/application/product/ReorderCategories';
+import type { IGetPublicProducts } from '@/application/product/IGetPublicProducts';
+import { GetPublicProducts } from '@/application/product/GetPublicProducts';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -382,6 +384,11 @@ container.register<IReorderCategories>('IReorderCategories', {
   useClass: ReorderCategories,
 });
 
+// Register public product use case
+container.register<IGetPublicProducts>('IGetPublicProducts', {
+  useClass: GetPublicProducts,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -590,6 +597,10 @@ export class ProductServiceLocator {
 
   static getReorderCategories(): IReorderCategories {
     return container.resolve('IReorderCategories');
+  }
+
+  static getGetPublicProducts(): IGetPublicProducts {
+    return container.resolve('IGetPublicProducts');
   }
 }
 

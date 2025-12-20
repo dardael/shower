@@ -332,6 +332,25 @@ jest.mock('@chakra-ui/react', () => {
           ...filterChakraProps(props),
         }),
     },
+    Tooltip: {
+      Root: ({ children }: ComponentProps) =>
+        React.createElement('div', { 'data-testid': 'tooltip-root' }, children),
+      Trigger: ({ children }: ComponentProps) => children,
+      Positioner: ({ children }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'tooltip-positioner' },
+          children
+        ),
+      Content: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'div',
+          { 'data-testid': 'tooltip-content', ...filterChakraProps(props) },
+          children
+        ),
+      Arrow: () =>
+        React.createElement('div', { 'data-testid': 'tooltip-arrow' }),
+    },
     useBreakpointValue: jest.fn(),
   };
 

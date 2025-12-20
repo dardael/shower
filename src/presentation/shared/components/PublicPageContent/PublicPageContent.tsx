@@ -1,14 +1,102 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import DOMPurify from 'dompurify';
 import { extractFontsFromHtml } from '@/presentation/shared/utils/extractFontsFromHtml';
 import { loadGoogleFont } from '@/presentation/shared/utils/loadGoogleFont';
+import { ProductListRenderer } from './ProductListRenderer';
 import '@/presentation/shared/components/PublicPageContent/public-page-content.css';
 
 interface PublicPageContentProps {
   content: string;
+}
+
+interface ContentSegment {
+  type: 'html' | 'productList';
+  content?: string;
+  config?: {
+    categoryIds: string[] | null;
+    layout: 'grid' | 'list';
+    sortBy: string;
+    showName: boolean;
+    showDescription: boolean;
+    showPrice: boolean;
+    showImage: boolean;
+  };
+}
+
+/**
+ * Parses HTML content and extracts product-list divs as separate segments
+ */
+function parseContentSegments(html: string): ContentSegment[] {
+  const segments: ContentSegment[] = [];
+
+  // Regex to match product-list divs with their attributes
+  const productListRegex =
+    /<div[^>]*class="product-list"[^>]*>[\s\S]*?<\/div>/gi;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = productListRegex.exec(html)) !== null) {
+    // Add HTML before this product list
+    if (match.index > lastIndex) {
+      const htmlContent = html.substring(lastIndex, match.index);
+      if (htmlContent.trim()) {
+        segments.push({ type: 'html', content: htmlContent });
+      }
+    }
+
+    // Parse the product list attributes
+    const divHtml = match[0];
+    const categoryIdsMatch = divHtml.match(/data-category-ids="([^"]*)"/);
+    const layoutMatch = divHtml.match(/data-layout="([^"]*)"/);
+    const sortByMatch = divHtml.match(/data-sort-by="([^"]*)"/);
+    const showNameMatch = divHtml.match(/data-show-name="([^"]*)"/);
+    const showDescriptionMatch = divHtml.match(
+      /data-show-description="([^"]*)"/
+    );
+    const showPriceMatch = divHtml.match(/data-show-price="([^"]*)"/);
+    const showImageMatch = divHtml.match(/data-show-image="([^"]*)"/);
+
+    const categoryIdsStr = categoryIdsMatch ? categoryIdsMatch[1] : '';
+    const categoryIds = categoryIdsStr
+      ? categoryIdsStr.split(',').filter((id) => id.trim() !== '')
+      : null;
+
+    segments.push({
+      type: 'productList',
+      config: {
+        categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : null,
+        layout: (layoutMatch ? layoutMatch[1] : 'grid') as 'grid' | 'list',
+        sortBy: sortByMatch ? sortByMatch[1] : 'displayOrder',
+        showName: showNameMatch ? showNameMatch[1] !== 'false' : true,
+        showDescription: showDescriptionMatch
+          ? showDescriptionMatch[1] !== 'false'
+          : true,
+        showPrice: showPriceMatch ? showPriceMatch[1] !== 'false' : true,
+        showImage: showImageMatch ? showImageMatch[1] !== 'false' : true,
+      },
+    });
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining HTML after last product list
+  if (lastIndex < html.length) {
+    const htmlContent = html.substring(lastIndex);
+    if (htmlContent.trim()) {
+      segments.push({ type: 'html', content: htmlContent });
+    }
+  }
+
+  // If no product lists found, return the whole content as HTML
+  if (segments.length === 0 && html.trim()) {
+    segments.push({ type: 'html', content: html });
+  }
+
+  return segments;
 }
 
 /**
@@ -48,9 +136,95 @@ function applyTableColumnWidths(container: HTMLElement): void {
   });
 }
 
-export default function PublicPageContent({ content }: PublicPageContentProps) {
-  const contentRef = useRef<HTMLDivElement>(null);
+// Sanitize configuration for DOMPurify
+const SANITIZE_CONFIG = {
+  ALLOWED_TAGS: [
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'p',
+    'br',
+    'strong',
+    'em',
+    'u',
+    's',
+    'ul',
+    'ol',
+    'li',
+    'a',
+    'img',
+    'blockquote',
+    'code',
+    'pre',
+    'span',
+    'div',
+    'table',
+    'thead',
+    'tbody',
+    'tr',
+    'td',
+    'th',
+    'colgroup',
+    'col',
+  ],
+  ALLOWED_ATTR: [
+    'href',
+    'src',
+    'alt',
+    'title',
+    'target',
+    'rel',
+    'class',
+    'style',
+    'data-full-width',
+    'data-full-bleed',
+    'data-overlay-text',
+    'data-overlay-color',
+    'data-overlay-font-family',
+    'data-overlay-font-size',
+    'data-overlay-position',
+    'data-overlay-align',
+    'data-overlay-bg-color',
+    'data-overlay-bg-opacity',
+    'colspan',
+    'rowspan',
+    'data-colwidth',
+    'data-border-thickness',
+    'data-vertical-align',
+  ],
+  ALLOW_DATA_ATTR: true,
+  ADD_TAGS: [] as string[],
+  ADD_ATTR: [] as string[],
+};
 
+function HtmlSegment({ content }: { content: string }): React.ReactElement {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      applyTableColumnWidths(ref.current);
+    }
+  }, [content]);
+
+  const sanitizedContent = useMemo(
+    () => DOMPurify.sanitize(content, SANITIZE_CONFIG),
+    [content]
+  );
+
+  return (
+    <Box
+      ref={ref}
+      className="public-page-content"
+      overflow="visible"
+      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+    />
+  );
+}
+
+export default function PublicPageContent({ content }: PublicPageContentProps) {
   useEffect(() => {
     if (content) {
       const fonts = extractFontsFromHtml(content);
@@ -60,11 +234,10 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
     }
   }, [content]);
 
-  useEffect(() => {
-    if (contentRef.current) {
-      applyTableColumnWidths(contentRef.current);
-    }
-  }, [content]);
+  const segments = useMemo(
+    () => parseContentSegments(content || ''),
+    [content]
+  );
 
   if (!content) {
     return (
@@ -76,76 +249,29 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
     );
   }
 
-  // Configure DOMPurify to preserve font-family and color in style attributes
-  const sanitizedContent = DOMPurify.sanitize(content, {
-    ALLOWED_TAGS: [
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'p',
-      'br',
-      'strong',
-      'em',
-      'u',
-      's',
-      'ul',
-      'ol',
-      'li',
-      'a',
-      'img',
-      'blockquote',
-      'code',
-      'pre',
-      'span',
-      'div',
-      'table',
-      'thead',
-      'tbody',
-      'tr',
-      'td',
-      'th',
-      'colgroup',
-      'col',
-    ],
-    ALLOWED_ATTR: [
-      'href',
-      'src',
-      'alt',
-      'title',
-      'target',
-      'rel',
-      'class',
-      'style',
-      'data-full-width',
-      'data-full-bleed',
-      'data-overlay-text',
-      'data-overlay-color',
-      'data-overlay-font-family',
-      'data-overlay-font-size',
-      'data-overlay-position',
-      'data-overlay-align',
-      'data-overlay-bg-color',
-      'data-overlay-bg-opacity',
-      'colspan',
-      'rowspan',
-      'data-colwidth',
-      'data-border-thickness',
-      'data-vertical-align',
-    ],
-    ALLOW_DATA_ATTR: true,
-    ADD_TAGS: [],
-    ADD_ATTR: [],
-  });
-
   return (
-    <Box
-      ref={contentRef}
-      className="public-page-content"
-      overflow="visible"
-      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-    />
+    <>
+      {segments.map((segment, index) => {
+        if (segment.type === 'html' && segment.content) {
+          return <HtmlSegment key={index} content={segment.content} />;
+        }
+        if (segment.type === 'productList' && segment.config) {
+          return (
+            <Box key={index} className="public-page-content" my={4}>
+              <ProductListRenderer
+                categoryIds={segment.config.categoryIds}
+                layout={segment.config.layout}
+                sortBy={segment.config.sortBy}
+                showName={segment.config.showName}
+                showDescription={segment.config.showDescription}
+                showPrice={segment.config.showPrice}
+                showImage={segment.config.showImage}
+              />
+            </Box>
+          );
+        }
+        return null;
+      })}
+    </>
   );
 }

@@ -125,6 +125,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, node-cron (for scheduling) (001-scheduled-restart-config)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, @dnd-kit/core (drag-and-drop), react-icons (041-product-category-management)
 - MongoDB via Mongoose, local filesystem (`public/page-content-images/`) for product images (041-product-category-management)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19, Tiptap (@tiptap/core, @tiptap/react), Chakra UI v3, tsyringe (DI), react-icons (042-products-list-page)
+- MongoDB via Mongoose (existing Product/Category entities), HTML string in PageContent entity (042-products-list-page)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

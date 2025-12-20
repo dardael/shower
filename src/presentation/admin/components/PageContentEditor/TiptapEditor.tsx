@@ -8,7 +8,12 @@ import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import { TextStyle, FontFamily } from '@tiptap/extension-text-style';
 import { TableRow } from '@tiptap/extension-table-row';
-import { CustomTable, CustomTableCell, CustomTableHeader } from './extensions';
+import {
+  CustomTable,
+  CustomTableCell,
+  CustomTableHeader,
+  ProductList,
+} from './extensions';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
 import {
@@ -29,6 +34,7 @@ import {
   LuHeading3,
   LuListOrdered,
   LuUnfoldHorizontal,
+  LuShoppingBag,
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
@@ -40,6 +46,7 @@ import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { Tooltip } from '@/presentation/shared/components/ui/tooltip';
 import { ImageWithOverlay } from './extensions/ImageWithOverlay';
 import { OverlayToolbar } from './OverlayToolbar';
+import { ProductListToolbar } from './ProductListToolbar';
 import { TableInsertDialog } from './TableInsertDialog';
 import { TableToolbar } from './TableToolbar';
 import { FiType } from 'react-icons/fi';
@@ -236,6 +243,9 @@ export default function TiptapEditor({
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImagePos, setSelectedImagePos] = useState<number | null>(null);
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
+  const [selectedProductListPos, setSelectedProductListPos] = useState<
+    number | null
+  >(null);
   const [isInTable, setIsInTable] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -338,6 +348,7 @@ export default function TiptapEditor({
       TableRow,
       CustomTableCell,
       CustomTableHeader,
+      ProductList,
     ],
     content,
     editable: !disabled,
@@ -373,9 +384,18 @@ export default function TiptapEditor({
       ) {
         setSelectedImagePos(selection.from);
         setSelectedNodeType(selection.node.type.name);
+        setSelectedProductListPos(null);
+      } else if (
+        selection instanceof NodeSelection &&
+        selection.node.type.name === 'productList'
+      ) {
+        setSelectedImagePos(null);
+        setSelectedNodeType(selection.node.type.name);
+        setSelectedProductListPos(selection.from);
       } else {
         setSelectedImagePos(null);
         setSelectedNodeType(null);
+        setSelectedProductListPos(null);
       }
     },
     onTransaction: ({ editor: ed, transaction }) => {
@@ -796,6 +816,18 @@ export default function TiptapEditor({
           <FiImage />
         </IconButton>
         <TableInsertDialog editor={editor} disabled={disabled} />
+        <Tooltip content="Insert Products List">
+          <IconButton
+            aria-label="Insert Products List"
+            size="sm"
+            variant="ghost"
+            color="fg"
+            onClick={() => editor?.chain().focus().insertProductList().run()}
+            disabled={disabled}
+          >
+            <LuShoppingBag />
+          </IconButton>
+        </Tooltip>
         {/* Add Text Overlay button - only visible when plain image is selected */}
         {selectedImagePos !== null && selectedNodeType === 'image' && (
           <Tooltip content="Add Text Overlay">
@@ -866,6 +898,16 @@ export default function TiptapEditor({
 
       {/* Table toolbar - visible when cursor is in a table */}
       {isInTable && <TableToolbar editor={editor} disabled={disabled} />}
+
+      {/* Product list toolbar - visible when productList is selected */}
+      {selectedProductListPos !== null &&
+        selectedNodeType === 'productList' && (
+          <ProductListToolbar
+            editor={editor}
+            disabled={disabled}
+            productListPos={selectedProductListPos}
+          />
+        )}
 
       {showLinkInput && (
         <HStack

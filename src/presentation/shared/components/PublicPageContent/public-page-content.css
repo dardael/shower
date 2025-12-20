@@ -222,10 +222,30 @@
 
 /* Responsive overlay scaling */
 @media (max-width: 768px) {
-  .public-page-content .text-overlay {
+  .public-page-content table td,
+  .public-page-content table th {
     padding: 0.5rem;
+    min-width: 100px;
   }
+}
 
+/* Product List Styles */
+.public-page-content .product-list {
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+.public-page-content .product-list-placeholder {
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--chakra-colors-bg-subtle);
+  border: 2px dashed var(--chakra-colors-border);
+  border-radius: 0.5rem;
+  color: var(--chakra-colors-fg-muted);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
   /* Scale down font sizes for tablet */
   .public-page-content .text-overlay[style*='font-size: 32px'] {
     font-size: 24px !important;
