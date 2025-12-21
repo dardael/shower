@@ -20,6 +20,8 @@ import {
   useBackgroundColorContext,
 } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { ThemeModeProvider } from '@/presentation/shared/contexts/ThemeModeContext';
+import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
+import { CartProvider } from '@/presentation/shared/contexts/CartContext';
 
 // Background color hex mappings for light and dark modes
 export const BACKGROUND_COLOR_MAP: Record<
@@ -158,7 +160,11 @@ function ProviderWithLogger(props: ColorModeProviderProps) {
   return (
     <ThemeProviderWithInitialColor>
       <ColorModeProvider {...props}>
-        <BackgroundColorApplier>{props.children}</BackgroundColorApplier>
+        <SellingConfigProvider>
+          <CartProvider>
+            <BackgroundColorApplier>{props.children}</BackgroundColorApplier>
+          </CartProvider>
+        </SellingConfigProvider>
       </ColorModeProvider>
       <Toaster />
     </ThemeProviderWithInitialColor>

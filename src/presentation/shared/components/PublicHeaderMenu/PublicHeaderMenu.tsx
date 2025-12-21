@@ -7,6 +7,7 @@ import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import { PublicHeaderMenuItem } from './PublicHeaderMenuItem';
 import { MobileMenuToggle } from './MobileMenuToggle';
 import { MobileMenuDrawer } from './MobileMenuDrawer';
+import { CartIcon, CartDrawer } from '@/presentation/shared/components/Cart';
 import type { PublicHeaderMenuProps } from './types';
 
 /**
@@ -24,6 +25,7 @@ export function PublicHeaderMenu({
 }: PublicHeaderMenuProps): React.ReactElement {
   const [logoError, setLogoError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Detect mobile viewport (< 768px)
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -41,6 +43,14 @@ export function PublicHeaderMenu({
 
   const handleCloseMenu = (): void => {
     setIsMenuOpen(false);
+  };
+
+  const handleOpenCart = (): void => {
+    setIsCartOpen(true);
+  };
+
+  const handleCloseCart = (): void => {
+    setIsCartOpen(false);
   };
 
   // Empty menu state - show hamburger on mobile, message on desktop
@@ -166,6 +176,9 @@ export function PublicHeaderMenu({
           </Flex>
 
           <Flex align="center" gap={2}>
+            {/* Cart Icon - visible on all viewports */}
+            <CartIcon onClick={handleOpenCart} />
+
             {/* Desktop: Dark mode toggle in header */}
             {!isMobile && (
               <Box color={{ base: 'black', _dark: 'white' }}>
@@ -191,6 +204,9 @@ export function PublicHeaderMenu({
         menuItems={menuItems}
         colorPalette={colorPalette}
       />
+
+      {/* Cart drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={handleCloseCart} />
     </>
   );
 }

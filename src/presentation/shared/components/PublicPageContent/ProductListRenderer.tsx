@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Text, VStack, HStack } from '@chakra-ui/react';
 import NextImage from 'next/image';
+import { AddToCartButton } from '@/presentation/shared/components/Cart/AddToCartButton';
 
 interface Product {
   id: string;
@@ -162,11 +163,14 @@ export function ProductListRenderer({
                   {product.description}
                 </Text>
               )}
-              {showPrice && (
-                <Text fontWeight="bold" color="fg" fontSize="lg">
-                  {formatPrice(product.price)}
-                </Text>
-              )}
+              <HStack justify="space-between" align="center">
+                {showPrice && (
+                  <Text fontWeight="bold" color="fg" fontSize="lg">
+                    {formatPrice(product.price)}
+                  </Text>
+                )}
+                <AddToCartButton productId={product.id} size="sm" />
+              </HStack>
             </VStack>
           </HStack>
         ))}
@@ -240,11 +244,14 @@ export function ProductListRenderer({
                 {product.description}
               </Text>
             )}
-            {showPrice && (
-              <Text fontWeight="bold" color="fg" fontSize="lg">
-                {formatPrice(product.price)}
-              </Text>
-            )}
+            <HStack justify="space-between" align="center">
+              {showPrice && (
+                <Text fontWeight="bold" color="fg" fontSize="lg">
+                  {formatPrice(product.price)}
+                </Text>
+              )}
+              <AddToCartButton productId={product.id} size="sm" />
+            </HStack>
           </VStack>
         </Box>
       ))}
