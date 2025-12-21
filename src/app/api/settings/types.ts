@@ -9,6 +9,7 @@ export interface GetSettingsResponse {
   themeColor?: ThemeColorToken;
   backgroundColor?: ThemeColorToken;
   themeMode: ThemeModeValue;
+  sellingEnabled: boolean;
 }
 
 /**
@@ -19,6 +20,7 @@ export interface UpdateSettingsRequest {
   themeColor?: string;
   backgroundColor?: string;
   themeMode?: string;
+  sellingEnabled?: boolean;
 }
 
 /**

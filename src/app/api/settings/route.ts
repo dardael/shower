@@ -6,6 +6,7 @@ import { withApi } from '@/infrastructure/shared/apiWrapper';
 import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import { BackgroundColor } from '@/domain/settings/value-objects/BackgroundColor';
 import { ThemeModePreference } from '@/domain/settings/value-objects/ThemeModePreference';
+import { SellingEnabled } from '@/domain/settings/value-objects/SellingEnabled';
 import {
   isValidThemeColor,
   getThemeColorErrorMessage,
@@ -36,20 +37,28 @@ export const GET = withApi(
       const getBackgroundColor = SettingsServiceLocator.getGetBackgroundColor();
       const getWebsiteName = SettingsServiceLocator.getWebsiteName();
       const getThemeMode = SettingsServiceLocator.getGetThemeMode();
+      const getSellingEnabled = SettingsServiceLocator.getGetSellingEnabled();
 
-      const [themeColor, backgroundColor, websiteName, themeMode] =
-        await Promise.all([
-          getThemeColor.execute(),
-          getBackgroundColor.execute(),
-          getWebsiteName.execute(),
-          getThemeMode.execute(),
-        ]);
+      const [
+        themeColor,
+        backgroundColor,
+        websiteName,
+        themeMode,
+        sellingEnabled,
+      ] = await Promise.all([
+        getThemeColor.execute(),
+        getBackgroundColor.execute(),
+        getWebsiteName.execute(),
+        getThemeMode.execute(),
+        getSellingEnabled.execute(),
+      ]);
 
       logger.info('Website settings retrieved successfully', {
         websiteName: websiteName,
         themeColor: themeColor?.value,
         backgroundColor: backgroundColor?.value,
         themeMode: themeMode.value,
+        sellingEnabled: sellingEnabled.value,
       });
 
       const duration = Date.now() - startTime;
@@ -58,11 +67,13 @@ export const GET = withApi(
         themeColor: themeColor?.value,
         backgroundColor: backgroundColor?.value,
         themeMode: themeMode.value,
+        sellingEnabled: sellingEnabled.value,
       });
 
       const response: GetSettingsResponse = {
         name: websiteName,
         themeMode: themeMode.value,
+        sellingEnabled: sellingEnabled.value,
         ...(themeColor && { themeColor: themeColor.value }),
         ...(backgroundColor && { backgroundColor: backgroundColor.value }),
       };
@@ -100,7 +111,8 @@ export const POST = withApi(
 
       // Parse request body
       const body = (await request.json()) as UpdateSettingsRequest;
-      const { name, themeColor, backgroundColor, themeMode } = body;
+      const { name, themeColor, backgroundColor, themeMode, sellingEnabled } =
+        body;
 
       // Validate inputs
       if (name && typeof name !== 'string') {
@@ -197,12 +209,24 @@ export const POST = withApi(
         });
       }
 
+      // Update selling enabled if provided
+      if (typeof sellingEnabled === 'boolean') {
+        const updateSellingEnabled =
+          SettingsServiceLocator.getUpdateSellingEnabled();
+        const sellingEnabledValue = SellingEnabled.create(sellingEnabled);
+        await updateSellingEnabled.execute(sellingEnabledValue);
+        logger.info('Selling enabled updated successfully', {
+          newSellingEnabled: sellingEnabledValue.value,
+        });
+      }
+
       const duration = Date.now() - startTime;
       logger.logApiResponse('POST', '/api/settings', 200, duration, {
         name,
         themeColor,
         backgroundColor,
         themeMode,
+        sellingEnabled,
       });
 
       const response: UpdateSettingsResponse = {

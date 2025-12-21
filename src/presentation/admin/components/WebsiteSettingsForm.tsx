@@ -21,11 +21,13 @@ import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSe
 import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { ThemeModeSelector } from '@/presentation/admin/components/ThemeModeSelector';
+import { SellingToggleSelector } from '@/presentation/admin/components/SellingToggleSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
+import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
 import { useFormState } from '@/presentation/admin/hooks/useFormState';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
@@ -76,6 +78,11 @@ export default function WebsiteSettingsForm({
     updateThemeMode: updateThemeModeConfig,
     isLoading: themeModeLoading,
   } = useThemeModeConfig();
+  const {
+    sellingEnabled,
+    updateSellingEnabled: updateSellingEnabledConfig,
+    isLoading: sellingLoading,
+  } = useSellingConfig();
   const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
@@ -491,6 +498,19 @@ export default function WebsiteSettingsForm({
             }}
             disabled={loading}
             isLoading={fontLoading}
+          />
+
+          <SellingToggleSelector
+            sellingEnabled={sellingEnabled}
+            onToggle={async (enabled) => {
+              try {
+                await updateSellingEnabledConfig(enabled);
+              } catch {
+                showToast('Failed to update selling mode', 'error');
+              }
+            }}
+            disabled={loading}
+            isLoading={sellingLoading}
           />
 
           <Field.Root>

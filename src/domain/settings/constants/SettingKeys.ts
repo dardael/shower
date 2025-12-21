@@ -8,6 +8,7 @@ export const VALID_SETTING_KEYS = {
   THEME_MODE: 'theme-mode',
   CUSTOM_LOADER: 'custom-loader',
   SCHEDULED_RESTART: 'scheduled-restart',
+  SELLING_ENABLED: 'selling-enabled',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(

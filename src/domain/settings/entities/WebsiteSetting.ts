@@ -4,6 +4,7 @@ import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import { BackgroundColor } from '@/domain/settings/value-objects/BackgroundColor';
 import { WebsiteFont } from '@/domain/settings/value-objects/WebsiteFont';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
+import { SellingEnabled } from '@/domain/settings/value-objects/SellingEnabled';
 import {
   VALID_SETTING_KEYS,
   VALID_SETTING_KEY_VALUES,
@@ -226,6 +227,28 @@ export class WebsiteSetting {
 
   static isValidCustomLoaderKey(key: string): boolean {
     return key === VALID_SETTING_KEYS.CUSTOM_LOADER;
+  }
+
+  static createSellingEnabled(sellingEnabled: SellingEnabled): WebsiteSetting {
+    return new WebsiteSetting(
+      VALID_SETTING_KEYS.SELLING_ENABLED,
+      sellingEnabled.value ? 'true' : 'false'
+    );
+  }
+
+  static createDefaultSellingEnabled(): WebsiteSetting {
+    return new WebsiteSetting(VALID_SETTING_KEYS.SELLING_ENABLED, 'false');
+  }
+
+  static isValidSellingEnabledKey(key: string): boolean {
+    return key === VALID_SETTING_KEYS.SELLING_ENABLED;
+  }
+
+  getValueAsSellingEnabled(): boolean {
+    if (typeof this._value === 'string') {
+      return this._value === 'true';
+    }
+    return false;
   }
 
   getValueAsCustomLoader(): {

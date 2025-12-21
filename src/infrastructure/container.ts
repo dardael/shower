@@ -41,6 +41,8 @@ import type { IUpdateWebsiteFont } from '@/application/settings/IUpdateWebsiteFo
 import type { IGetAvailableFonts } from '@/application/settings/IGetAvailableFonts';
 import type { IGetThemeMode } from '@/application/settings/IGetThemeMode';
 import type { IUpdateThemeMode } from '@/application/settings/IUpdateThemeMode';
+import type { IGetSellingEnabled } from '@/application/settings/IGetSellingEnabled';
+import type { IUpdateSellingEnabled } from '@/application/settings/IUpdateSellingEnabled';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -59,6 +61,8 @@ import { UpdateWebsiteFont } from '@/application/settings/UpdateWebsiteFont';
 import { GetAvailableFonts } from '@/application/settings/GetAvailableFonts';
 import { GetThemeMode } from '@/application/settings/GetThemeMode';
 import { UpdateThemeMode } from '@/application/settings/UpdateThemeMode';
+import { GetSellingEnabled } from '@/application/settings/GetSellingEnabled';
+import { UpdateSellingEnabled } from '@/application/settings/UpdateSellingEnabled';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -235,6 +239,14 @@ container.register<IGetThemeMode>('IGetThemeMode', {
 
 container.register<IUpdateThemeMode>('IUpdateThemeMode', {
   useClass: UpdateThemeMode,
+});
+
+container.register<IGetSellingEnabled>('IGetSellingEnabled', {
+  useClass: GetSellingEnabled,
+});
+
+container.register<IUpdateSellingEnabled>('IUpdateSellingEnabled', {
+  useClass: UpdateSellingEnabled,
 });
 
 // Register factory services
@@ -475,6 +487,14 @@ export class SettingsServiceLocator {
 
   static getUpdateThemeMode(): IUpdateThemeMode {
     return container.resolve('IUpdateThemeMode');
+  }
+
+  static getGetSellingEnabled(): IGetSellingEnabled {
+    return container.resolve('IGetSellingEnabled');
+  }
+
+  static getUpdateSellingEnabled(): IUpdateSellingEnabled {
+    return container.resolve('IUpdateSellingEnabled');
   }
 }
 

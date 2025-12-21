@@ -48,6 +48,7 @@ import { ImageWithOverlay } from './extensions/ImageWithOverlay';
 import { OverlayToolbar } from './OverlayToolbar';
 import { ProductListToolbar } from './ProductListToolbar';
 import { TableInsertDialog } from './TableInsertDialog';
+import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
 import { TableToolbar } from './TableToolbar';
 import { FiType } from 'react-icons/fi';
 import { DEFAULT_OVERLAY_TEXT } from '@/domain/pages/types/ImageOverlay';
@@ -247,6 +248,7 @@ export default function TiptapEditor({
     number | null
   >(null);
   const [isInTable, setIsInTable] = useState(false);
+  const { sellingEnabled } = useSellingConfig();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
 
@@ -816,18 +818,20 @@ export default function TiptapEditor({
           <FiImage />
         </IconButton>
         <TableInsertDialog editor={editor} disabled={disabled} />
-        <Tooltip content="Insert Products List">
-          <IconButton
-            aria-label="Insert Products List"
-            size="sm"
-            variant="ghost"
-            color="fg"
-            onClick={() => editor?.chain().focus().insertProductList().run()}
-            disabled={disabled}
-          >
-            <LuShoppingBag />
-          </IconButton>
-        </Tooltip>
+        {sellingEnabled && (
+          <Tooltip content="Insert Products List">
+            <IconButton
+              aria-label="Insert Products List"
+              size="sm"
+              variant="ghost"
+              color="fg"
+              onClick={() => editor?.chain().focus().insertProductList().run()}
+              disabled={disabled}
+            >
+              <LuShoppingBag />
+            </IconButton>
+          </Tooltip>
+        )}
         {/* Add Text Overlay button - only visible when plain image is selected */}
         {selectedImagePos !== null && selectedNodeType === 'image' && (
           <Tooltip content="Add Text Overlay">

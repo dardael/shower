@@ -14,6 +14,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { AdminMenuItem } from '@/presentation/admin/components/AdminMenuItem';
 import { FocusTrap } from '@/presentation/shared/utils/focusTrap';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
+import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 
@@ -57,7 +58,16 @@ const menuItems = [
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const logger = useLogger();
+  const { sellingEnabled } = useSellingConfig();
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  // Filter menu items based on selling enabled state
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (item.href === '/admin/products') {
+      return sellingEnabled;
+    }
+    return true;
+  });
 
   const handleClose = () => {
     if (isMobile) {
@@ -161,7 +171,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         role="navigation"
         aria-label="Admin sections"
       >
-        {menuItems.map((item) => (
+        {visibleMenuItems.map((item) => (
           <AdminMenuItem
             key={item.href}
             href={item.href}

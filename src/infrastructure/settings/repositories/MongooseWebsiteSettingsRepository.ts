@@ -54,6 +54,8 @@ export class MongooseWebsiteSettingsRepository
         return WebsiteSetting.createDefaultThemeColor().value;
       case VALID_SETTING_KEYS.WEBSITE_FONT:
         return WebsiteSetting.createDefaultWebsiteFont().value;
+      case VALID_SETTING_KEYS.SELLING_ENABLED:
+        return WebsiteSetting.createDefaultSellingEnabled().value;
       default:
         // Log warning for unknown setting keys but return null as safe default
         this.logger.warn(

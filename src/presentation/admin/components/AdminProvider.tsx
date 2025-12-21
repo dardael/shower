@@ -2,6 +2,7 @@
 
 import { type ReactNode } from 'react';
 import { AdminLoadingScreen } from '@/presentation/admin/components/AdminLoadingScreen';
+import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
 
 export interface AdminProviderProps {
   children: ReactNode;
@@ -12,5 +13,9 @@ export interface AdminProviderProps {
  * This should wrap admin content inside the main Provider to have access to all contexts.
  */
 export function AdminProvider({ children }: AdminProviderProps): ReactNode {
-  return <AdminLoadingScreen>{children}</AdminLoadingScreen>;
+  return (
+    <SellingConfigProvider>
+      <AdminLoadingScreen>{children}</AdminLoadingScreen>
+    </SellingConfigProvider>
+  );
 }

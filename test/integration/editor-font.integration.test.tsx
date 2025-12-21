@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TiptapEditor from '@/presentation/admin/components/PageContentEditor/TiptapEditor';
 import PublicPageContent from '@/presentation/shared/components/PublicPageContent/PublicPageContent';
+import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
 
 // Mock fetch for API calls
 const mockFetch = jest.fn();
@@ -30,7 +31,7 @@ afterAll(() => {
 
 // Simple wrapper component for tests
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+  return <SellingConfigProvider>{children}</SellingConfigProvider>;
 };
 
 describe('Editor Font Integration Tests', () => {
