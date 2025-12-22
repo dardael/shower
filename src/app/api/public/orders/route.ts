@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Order } from '@/domain/order/entities/Order';
-import { OrderServiceLocator } from '@/infrastructure/container';
+import { OrderServiceLocator, EmailServiceLocator } from '@/infrastructure/container';
+import { SendOrderNotificationEmails } from '@/application/email/SendOrderNotificationEmails';
 import crypto from 'crypto';
 
 interface CreateOrderItemRequest {
@@ -69,6 +70,25 @@ export async function POST(
     // Persist order
     const repository = OrderServiceLocator.getOrderRepository();
     const savedOrder = await repository.create(order);
+
+    // Send notification emails (fire and forget - don't block order creation)
+    try {
+      const emailRepository = EmailServiceLocator.getEmailSettingsRepository();
+      const emailService = EmailServiceLocator.getEmailService();
+      const placeholderReplacer = EmailServiceLocator.getPlaceholderReplacer();
+      const sendNotifications = new SendOrderNotificationEmails(
+        emailRepository,
+        emailService,
+        placeholderReplacer
+      );
+      // Don't await - let it run in background
+      sendNotifications.execute(savedOrder).catch((emailError) => {
+        console.error('Failed to send order notification emails:', emailError);
+      });
+    } catch (emailSetupError) {
+      // Log but don't fail the order
+      console.error('Failed to initialize email service:', emailSetupError);
+    }
 
     return NextResponse.json({ id: savedOrder.id }, { status: 201 });
   } catch (error) {

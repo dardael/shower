@@ -129,6 +129,11 @@ import type { IGetPublicProducts } from '@/application/product/IGetPublicProduct
 import { GetPublicProducts } from '@/application/product/GetPublicProducts';
 import type { IOrderRepository } from '@/domain/order/repositories/IOrderRepository';
 import { MongooseOrderRepository } from '@/infrastructure/order/repositories/MongooseOrderRepository';
+import type { IEmailSettingsRepository } from '@/domain/email/repositories/IEmailSettingsRepository';
+import type { IEmailService } from '@/domain/email/services/IEmailService';
+import { MongooseEmailSettingsRepository } from '@/infrastructure/email/repositories/MongooseEmailSettingsRepository';
+import { NodemailerEmailService } from '@/infrastructure/email/services/NodemailerEmailService';
+import { PlaceholderReplacer } from '@/infrastructure/email/services/PlaceholderReplacer';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -408,6 +413,19 @@ container.register<IOrderRepository>('IOrderRepository', {
   useClass: MongooseOrderRepository,
 });
 
+// Register email services
+container.register<IEmailSettingsRepository>('IEmailSettingsRepository', {
+  useClass: MongooseEmailSettingsRepository,
+});
+
+container.register<IEmailService>('IEmailService', {
+  useClass: NodemailerEmailService,
+});
+
+container.register<PlaceholderReplacer>('PlaceholderReplacer', {
+  useClass: PlaceholderReplacer,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -634,6 +652,20 @@ export class ProductServiceLocator {
 export class OrderServiceLocator {
   static getOrderRepository(): IOrderRepository {
     return container.resolve('IOrderRepository');
+  }
+}
+
+export class EmailServiceLocator {
+  static getEmailSettingsRepository(): IEmailSettingsRepository {
+    return container.resolve('IEmailSettingsRepository');
+  }
+
+  static getEmailService(): IEmailService {
+    return container.resolve('IEmailService');
+  }
+
+  static getPlaceholderReplacer(): PlaceholderReplacer {
+    return container.resolve('PlaceholderReplacer');
   }
 }
 

@@ -131,6 +131,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - Browser localStorage (key: `shower-cart`) with BroadcastChannel for cross-tab sync (044-shopping-cart)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, existing CartContext, existing BetterAuth authentication (045-order-management)
 - MongoDB via Mongoose (Order entity), localStorage (`shower-cart`) for cart (045-order-management)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Nodemailer (SMTP), existing Order entity from 045-order-management (046-order-email-notifications)
+- MongoDB via Mongoose (email settings, SMTP config, templates) (046-order-email-notifications)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

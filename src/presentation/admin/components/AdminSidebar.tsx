@@ -45,6 +45,11 @@ const menuItems = [
     description: 'Manage products and categories',
   },
   {
+    href: '/admin/email',
+    label: 'Email Notifications',
+    description: 'Configure email settings and templates',
+  },
+  {
     href: '/admin/maintenance',
     label: 'Maintenance',
     description: 'Configure scheduled restarts',
