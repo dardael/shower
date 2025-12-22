@@ -127,6 +127,8 @@ import { GetCategories } from '@/application/product/GetCategories';
 import { ReorderCategories } from '@/application/product/ReorderCategories';
 import type { IGetPublicProducts } from '@/application/product/IGetPublicProducts';
 import { GetPublicProducts } from '@/application/product/GetPublicProducts';
+import type { IOrderRepository } from '@/domain/order/repositories/IOrderRepository';
+import { MongooseOrderRepository } from '@/infrastructure/order/repositories/MongooseOrderRepository';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -401,6 +403,11 @@ container.register<IGetPublicProducts>('IGetPublicProducts', {
   useClass: GetPublicProducts,
 });
 
+// Register order services
+container.register<IOrderRepository>('IOrderRepository', {
+  useClass: MongooseOrderRepository,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -621,6 +628,12 @@ export class ProductServiceLocator {
 
   static getGetPublicProducts(): IGetPublicProducts {
     return container.resolve('IGetPublicProducts');
+  }
+}
+
+export class OrderServiceLocator {
+  static getOrderRepository(): IOrderRepository {
+    return container.resolve('IOrderRepository');
   }
 }
 

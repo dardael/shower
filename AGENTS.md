@@ -129,6 +129,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - MongoDB via Mongoose (existing Product/Category entities), HTML string in PageContent entity (042-products-list-page)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, react-icons, existing SellingConfigContext, existing Product entity (044-shopping-cart)
 - Browser localStorage (key: `shower-cart`) with BroadcastChannel for cross-tab sync (044-shopping-cart)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), Mongoose, existing CartContext, existing BetterAuth authentication (045-order-management)
+- MongoDB via Mongoose (Order entity), localStorage (`shower-cart`) for cart (045-order-management)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

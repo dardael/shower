@@ -6,7 +6,6 @@
  */
 
 import { CartItem, CartItemData } from '@/domain/cart/entities/CartItem';
-import { MAX_CART_ITEM_QUANTITY } from '@/domain/cart/constants';
 
 const STORAGE_KEY = 'shower-cart';
 const UPDATE_EVENT = 'cart-updated';

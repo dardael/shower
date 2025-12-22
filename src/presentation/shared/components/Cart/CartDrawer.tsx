@@ -8,8 +8,10 @@ import {
   Text,
   IconButton,
   Spinner,
+  Button,
 } from '@chakra-ui/react';
-import { FiX, FiShoppingCart } from 'react-icons/fi';
+import { FiX, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/presentation/shared/contexts/CartContext';
 import { CartItemRow } from './CartItemRow';
 import { formatPrice } from '@/presentation/shared/utils/formatPrice';
@@ -33,6 +35,7 @@ export function CartDrawer({
 }: CartDrawerProps): React.JSX.Element | null {
   const { items, itemCount, clearCart } = useCart();
   const logger = useLogger();
+  const router = useRouter();
   const [products, setProducts] = useState<Map<string, ProductDetails>>(
     new Map()
   );
@@ -187,14 +190,25 @@ export function CartDrawer({
                 </Text>
               </HStack>
               <HStack gap={2}>
+                <Button
+                  variant="solid"
+                  colorPalette="green"
+                  flex={2}
+                  onClick={() => {
+                    onClose();
+                    router.push('/commander');
+                  }}
+                >
+                  Valider le panier
+                </Button>
                 <IconButton
                   aria-label="Vider le panier"
                   variant="solid"
                   colorPalette="red"
-                  flex={1}
+                  color="white"
                   onClick={clearCart}
                 >
-                  Vider le panier
+                  <FiTrash2 />
                 </IconButton>
               </HStack>
             </VStack>
