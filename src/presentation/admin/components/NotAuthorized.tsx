@@ -27,7 +27,7 @@ export default function NotAuthorized() {
       <Stack gap={6}>
         <HStack justify="space-between" align="center">
           <Heading as="h1" size="xl" color="fg" fontWeight="bold">
-            Access Restricted
+            Accès restreint
           </Heading>
           <DarkModeToggle />
         </HStack>
@@ -76,7 +76,7 @@ export default function NotAuthorized() {
                 color="fg"
                 letterSpacing="tight"
               >
-                Access Restricted
+                Accès restreint
               </Heading>
               <Text
                 fontSize={{ base: 'md', md: 'lg' }}
@@ -84,9 +84,10 @@ export default function NotAuthorized() {
                 lineHeight="relaxed"
                 maxW="md"
               >
-                You don&apos;t have the necessary permissions to access this
-                admin area. Please contact your administrator if you believe
-                this is an error.
+                Vous n&apos;avez pas les autorisations nécessaires pour accéder
+                à cette zone d&apos;administration. Veuillez contacter votre
+                administrateur si vous pensez qu&apos;il s&apos;agit d&apos;une
+                erreur.
               </Text>
             </VStack>
 

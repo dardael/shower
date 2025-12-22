@@ -84,7 +84,9 @@ export function CategorySelectPopover({
           disabled={disabled}
         >
           <FiFilter />
-          {selectedCount > 0 ? `${selectedCount} Categories` : 'All Categories'}
+          {selectedCount > 0
+            ? `${selectedCount} catégories`
+            : 'Toutes les catégories'}
         </Button>
       </ChakraPopover.Trigger>
       <ChakraPopover.Positioner>
@@ -93,22 +95,22 @@ export function CategorySelectPopover({
             <VStack align="stretch" gap={2}>
               <HStack justify="space-between">
                 <Text fontSize="sm" fontWeight="medium">
-                  Filter by Category
+                  Filtrer par catégorie
                 </Text>
                 {selectedCount > 0 && (
                   <Button size="xs" variant="ghost" onClick={clearAll}>
-                    Clear
+                    Effacer
                   </Button>
                 )}
               </HStack>
 
               {isLoading ? (
                 <Text fontSize="sm" color="fg.muted">
-                  Loading...
+                  Chargement...
                 </Text>
               ) : categories.length === 0 ? (
                 <Text fontSize="sm" color="fg.muted">
-                  No categories found
+                  Aucune catégorie trouvée
                 </Text>
               ) : (
                 <VStack align="stretch" gap={1} maxH="200px" overflowY="auto">

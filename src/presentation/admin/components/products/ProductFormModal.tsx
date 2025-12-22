@@ -138,21 +138,21 @@ export function ProductFormModal({
           <Dialog.Content>
             <Dialog.Header>
               <Dialog.Title>
-                {product ? 'Edit Product' : 'Add Product'}
+                {product ? 'Modifier le produit' : 'Ajouter un produit'}
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <VStack gap={4} align="stretch">
                 <Box>
                   <Text fontWeight="medium" mb={1}>
-                    Name *
+                    Nom *
                   </Text>
                   <Input
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Product name"
+                    placeholder="Nom du produit"
                   />
                 </Box>
 
@@ -165,13 +165,13 @@ export function ProductFormModal({
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Product description"
+                    placeholder="Description du produit"
                   />
                 </Box>
 
                 <Box>
                   <Text fontWeight="medium" mb={1}>
-                    Price *
+                    Prix *
                   </Text>
                   <Input
                     type="number"
@@ -242,10 +242,10 @@ export function ProductFormModal({
                               <FiUpload />
                             </Icon>
                             <Text fontSize="sm" color="gray.500">
-                              Click to upload an image
+                              Cliquez pour télécharger une image
                             </Text>
                             <Text fontSize="xs" color="gray.400">
-                              PNG, JPG, GIF up to 5MB
+                              PNG, JPG, GIF jusqu&apos;à 5 Mo
                             </Text>
                           </VStack>
                         </Box>
@@ -270,7 +270,7 @@ export function ProductFormModal({
                           maxW="200px"
                         >
                           <FiUpload />
-                          Change image
+                          Changer l&apos;image
                         </Button>
                       </label>
                     )}
@@ -279,7 +279,7 @@ export function ProductFormModal({
 
                 <Box>
                   <Text fontWeight="medium" mb={1}>
-                    Categories
+                    Catégories
                   </Text>
                   <HStack wrap="wrap" gap={2}>
                     {categories.map((category) => (
@@ -303,7 +303,7 @@ export function ProductFormModal({
                     ))}
                     {categories.length === 0 && (
                       <Text color="gray.500" fontSize="sm">
-                        No categories available
+                        Aucune catégorie disponible
                       </Text>
                     )}
                   </HStack>
@@ -313,7 +313,7 @@ export function ProductFormModal({
             <Dialog.Footer>
               <HStack gap={2}>
                 <Button variant="ghost" onClick={onClose}>
-                  Cancel
+                  Annuler
                 </Button>
                 <Button
                   colorPalette={themeColor}
@@ -321,7 +321,7 @@ export function ProductFormModal({
                   loading={isSubmitting}
                   disabled={!formData.name || formData.price <= 0}
                 >
-                  {product ? 'Update' : 'Create'}
+                  {product ? 'Modifier' : 'Créer'}
                 </Button>
               </HStack>
             </Dialog.Footer>

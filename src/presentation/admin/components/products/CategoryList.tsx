@@ -84,12 +84,12 @@ function SortableCategoryItem({
         <VStack align="start" flex={1} gap={1}>
           <Text fontWeight="bold">{category.name}</Text>
           <Text fontSize="sm" color="gray.500" lineClamp={2}>
-            {category.description || 'No description'}
+            {category.description || 'Aucune description'}
           </Text>
         </VStack>
         <HStack>
           <IconButton
-            aria-label="Edit category"
+            aria-label="Modifier la catégorie"
             variant="ghost"
             size="sm"
             onClick={() => onEdit(category)}
@@ -97,7 +97,7 @@ function SortableCategoryItem({
             <FiEdit2 />
           </IconButton>
           <IconButton
-            aria-label="Delete category"
+            aria-label="Supprimer la catégorie"
             variant="ghost"
             size="sm"
             color="red.500"
@@ -141,7 +141,7 @@ export function CategoryList(): React.ReactElement {
         setCategories(data.categories);
       }
     } catch {
-      toaster.error({ title: 'Failed to load categories' });
+      toaster.error({ title: 'Échec du chargement des catégories' });
     } finally {
       setLoading(false);
     }
@@ -172,7 +172,7 @@ export function CategoryList(): React.ReactElement {
           throw new Error('Failed to save order');
         }
       } catch {
-        toaster.error({ title: 'Failed to save order' });
+        toaster.error({ title: "Échec de l'enregistrement de l'ordre" });
         fetchCategories();
       }
     }
@@ -181,7 +181,7 @@ export function CategoryList(): React.ReactElement {
   const handleDelete = async (id: string): Promise<void> => {
     if (
       !confirm(
-        'Are you sure you want to delete this category? Products will be unassigned.'
+        'Êtes-vous sûr de vouloir supprimer cette catégorie ? Les produits seront désassignés.'
       )
     )
       return;
@@ -191,13 +191,13 @@ export function CategoryList(): React.ReactElement {
         method: 'DELETE',
       });
       if (response.ok) {
-        toaster.success({ title: 'Category deleted' });
+        toaster.success({ title: 'Catégorie supprimée' });
         fetchCategories();
       } else {
-        toaster.error({ title: 'Failed to delete category' });
+        toaster.error({ title: 'Échec de la suppression de la catégorie' });
       }
     } catch {
-      toaster.error({ title: 'Failed to delete category' });
+      toaster.error({ title: 'Échec de la suppression de la catégorie' });
     }
   };
 
@@ -233,7 +233,7 @@ export function CategoryList(): React.ReactElement {
         if (!response.ok) {
           throw new Error('Failed to update category');
         }
-        toaster.success({ title: 'Category updated successfully' });
+        toaster.success({ title: 'Catégorie mise à jour avec succès' });
       } else {
         const response = await fetch('/api/admin/categories', {
           method: 'POST',
@@ -243,7 +243,7 @@ export function CategoryList(): React.ReactElement {
         if (!response.ok) {
           throw new Error('Failed to create category');
         }
-        toaster.success({ title: 'Category created successfully' });
+        toaster.success({ title: 'Catégorie créée avec succès' });
       }
       setIsModalOpen(false);
       setEditingCategory(null);
@@ -251,8 +251,8 @@ export function CategoryList(): React.ReactElement {
     } catch {
       toaster.error({
         title: editingCategory
-          ? 'Failed to update category'
-          : 'Failed to create category',
+          ? 'Échec de la mise à jour de la catégorie'
+          : 'Échec de la création de la catégorie',
       });
     }
   };
@@ -270,7 +270,7 @@ export function CategoryList(): React.ReactElement {
       <HStack>
         <Box position="relative" flex={1}>
           <Input
-            placeholder="Search categories..."
+            placeholder="Rechercher des catégories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             pl={10}
@@ -286,13 +286,15 @@ export function CategoryList(): React.ReactElement {
         </Box>
         <Button colorPalette={themeColor} onClick={handleCreate}>
           <FiPlus />
-          Add Category
+          Ajouter une catégorie
         </Button>
       </HStack>
 
       {categories.length === 0 ? (
         <Box textAlign="center" py={10} color="gray.500">
-          <Text>No categories found. Create your first category!</Text>
+          <Text>
+            Aucune catégorie trouvée. Créez votre première catégorie !
+          </Text>
         </Box>
       ) : (
         <DndContext

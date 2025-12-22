@@ -134,7 +134,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 data-testid="mobile-header"
               >
                 <Box fontSize="lg" fontWeight="semibold" color="fg">
-                  Admin Panel
+                  Panneau Admin
                 </Box>
                 <AdminSidebarToggle onClick={toggleSidebar} />
               </HStack>

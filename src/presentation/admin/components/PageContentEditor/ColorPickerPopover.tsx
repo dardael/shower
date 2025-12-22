@@ -38,7 +38,7 @@ export function ColorPickerPopover({
   selectedColor,
   onColorSelect,
   disabled = false,
-  title = 'Color',
+  title = 'Couleur',
   trigger,
 }: ColorPickerPopoverProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,7 +91,7 @@ export function ColorPickerPopover({
                 {PRESET_COLORS.map((color) => (
                   <IconButton
                     key={color}
-                    aria-label={`Select color ${color}`}
+                    aria-label={`Sélectionner la couleur ${color}`}
                     size="sm"
                     variant={selectedColor === color ? 'solid' : 'ghost'}
                     onClick={() => handleColorSelect(color)}
@@ -112,7 +112,7 @@ export function ColorPickerPopover({
               </HStack>
               <Input
                 size="sm"
-                placeholder="Hex color (#FF0000)"
+                placeholder="Couleur hex (#FF0000)"
                 value={hexInput}
                 onChange={handleHexInputChange}
                 onKeyDown={handleHexInputKeyDown}

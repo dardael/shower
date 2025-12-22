@@ -169,7 +169,7 @@ describe('BackgroundColorSelector', () => {
     it('should display preview label text', () => {
       render(<BackgroundColorSelector {...defaultProps} />);
 
-      const label = screen.getByText('Preview');
+      const label = screen.getByText('Aperçu');
       expect(label).toBeInTheDocument();
     });
   });

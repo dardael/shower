@@ -34,7 +34,7 @@ describe('ThemeColorSelector', () => {
     );
 
     const selectedButton = screen.getByRole('button', {
-      name: /Select red theme color/i,
+      name: /Sélectionner la couleur de thème red/i,
     });
     expect(selectedButton).toHaveAttribute('data-selected', 'true');
   });
@@ -82,7 +82,7 @@ describe('ThemeColorSelector', () => {
       />
     );
 
-    expect(screen.getByText('Theme Color')).toBeInTheDocument();
+    expect(screen.getByText('Couleur du thème')).toBeInTheDocument();
   });
 
   it('should display helper text', () => {
@@ -94,7 +94,9 @@ describe('ThemeColorSelector', () => {
     );
 
     expect(
-      screen.getByText('Select a color to customize your website theme')
+      screen.getByText(
+        'Sélectionnez une couleur pour personnaliser le thème de votre site'
+      )
     ).toBeInTheDocument();
   });
 });

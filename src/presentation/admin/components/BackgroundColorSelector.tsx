@@ -56,7 +56,7 @@ const ColorButton = memo<ColorButtonProps>(
         width="60px"
         height="40px"
         position="relative"
-        aria-label={`Select ${color} background color`}
+        aria-label={`Sélectionner la couleur de fond ${color}`}
         data-selected={isSelected}
         opacity={isLoading ? 0.7 : 1}
       >
@@ -107,7 +107,7 @@ const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
     // Announce background color changes for screen readers
     useEffect(() => {
       if (selectedColor) {
-        setAnnouncement(`Background color changed to ${selectedColor}`);
+        setAnnouncement(`Couleur de fond changée en ${selectedColor}`);
         // Clear announcement after it's read
         const timer = setTimeout(() => setAnnouncement(''), 1000);
         return () => clearTimeout(timer);
@@ -140,13 +140,13 @@ const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
             color={textColor}
             data-testid="background-color-label"
           >
-            Background Color
+            Couleur de fond
           </Text>
           {isLoading && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating background color"
+              aria-label="Mise à jour de la couleur de fond"
             />
           )}
         </HStack>
@@ -171,7 +171,7 @@ const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
         {/* Background Color Preview */}
         <VStack gap={2} align="start" width="full">
           <Text fontSize="sm" fontWeight="medium" color={textColor}>
-            Preview
+            Aperçu
           </Text>
           <Box
             data-testid="background-color-preview"
@@ -186,8 +186,8 @@ const BackgroundColorSelector = memo<BackgroundColorSelectorProps>(
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
-            ? 'Updating background color...'
-            : 'Select a color to customize your website background'}
+            ? 'Mise à jour de la couleur de fond...'
+            : 'Sélectionnez une couleur pour personnaliser le fond de votre site'}
         </Text>
       </VStack>
     );

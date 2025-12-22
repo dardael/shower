@@ -54,7 +54,7 @@ const ColorButton = memo<ColorButtonProps>(
         width="60px"
         height="40px"
         position="relative"
-        aria-label={`Select ${color} theme color`}
+        aria-label={`Sélectionner la couleur de thème ${color}`}
         data-selected={isSelected}
         opacity={isLoading ? 0.7 : 1}
       >
@@ -100,7 +100,7 @@ const ThemeColorSelector = memo<ThemeColorSelectorProps>(
     // Announce theme color changes for screen readers
     useEffect(() => {
       if (selectedColor) {
-        setAnnouncement(`Theme color changed to ${selectedColor}`);
+        setAnnouncement(`Couleur de thème changée en ${selectedColor}`);
         // Clear announcement after it's read
         const timer = setTimeout(() => setAnnouncement(''), 1000);
         return () => clearTimeout(timer);
@@ -133,13 +133,13 @@ const ThemeColorSelector = memo<ThemeColorSelectorProps>(
             color={textColor}
             data-testid="theme-color-label"
           >
-            Theme Color
+            Couleur du thème
           </Text>
           {isLoading && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating theme color"
+              aria-label="Mise à jour de la couleur du thème"
             />
           )}
         </HStack>
@@ -163,8 +163,8 @@ const ThemeColorSelector = memo<ThemeColorSelectorProps>(
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
-            ? 'Updating theme color...'
-            : 'Select a color to customize your website theme'}
+            ? 'Mise à jour de la couleur du thème...'
+            : 'Sélectionnez une couleur pour personnaliser le thème de votre site'}
         </Text>
       </VStack>
     );

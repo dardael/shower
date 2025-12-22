@@ -124,18 +124,24 @@ export default async function AdminPage() {
         >
           <VStack gap={4} maxW="500px" textAlign="center" p={8}>
             <Heading size="lg" color="fg">
-              Database Connection Required
+              Connexion à la base de données requise
             </Heading>
             <Text color="fg.muted">
-              The admin panel requires a database connection. Please ensure:
+              Le panneau d&apos;administration nécessite une connexion à la base
+              de données. Veuillez vérifier :
             </Text>
             <VStack gap={2} align="start" color="fg.muted">
-              <Text>• MongoDB is running and accessible</Text>
-              <Text>• MONGODB_URI environment variable is set</Text>
-              <Text>• Database permissions are configured correctly</Text>
+              <Text>• MongoDB est en cours d&apos;exécution et accessible</Text>
+              <Text>
+                • La variable d&apos;environnement MONGODB_URI est définie
+              </Text>
+              <Text>
+                • Les permissions de la base de données sont configurées
+                correctement
+              </Text>
             </VStack>
             <Text fontSize="sm" color="fg.muted">
-              Error: {dbError.message}
+              Erreur : {dbError.message}
             </Text>
           </VStack>
         </Box>

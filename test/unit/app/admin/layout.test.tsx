@@ -80,7 +80,9 @@ describe('AdminLayout', () => {
       const metadata = await adminLayoutModule.generateMetadata();
 
       expect(metadata.title).toBe('Shower');
-      expect(metadata.description).toBe('Admin panel for Shower website');
+      expect(metadata.description).toBe(
+        "Panneau d'administration du site Shower"
+      );
     } finally {
       // Restore original environment
       if (originalNextPhase) {

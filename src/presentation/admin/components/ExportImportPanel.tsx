@@ -59,20 +59,21 @@ export function ExportImportPanel(): React.ReactElement {
         borderColor="border"
       >
         <Heading size="md" mb={2}>
-          Export Configuration
+          Exporter la configuration
         </Heading>
         <Text color="fg.muted" mb={4}>
-          Download a backup of your website configuration including menu items,
-          page contents, settings, and images.
+          Téléchargez une sauvegarde de la configuration de votre site incluant
+          les éléments de menu, le contenu des pages, les paramètres et les
+          images.
         </Text>
         <Button
           colorPalette={themeColor}
           onClick={exportConfiguration}
           loading={isExporting}
-          loadingText="Exporting..."
+          loadingText="Exportation..."
         >
           <FiDownload />
-          Export Configuration
+          Exporter la configuration
         </Button>
       </Box>
 
@@ -85,11 +86,12 @@ export function ExportImportPanel(): React.ReactElement {
         borderColor="border"
       >
         <Heading size="md" mb={2}>
-          Import Configuration
+          Importer la configuration
         </Heading>
         <Text color="fg.muted" mb={4}>
-          Restore your website configuration from a previously exported backup.
-          This will replace all current data.
+          Restaurez la configuration de votre site à partir d&apos;une
+          sauvegarde précédemment exportée. Cela remplacera toutes les données
+          actuelles.
         </Text>
 
         <input
@@ -105,10 +107,10 @@ export function ExportImportPanel(): React.ReactElement {
             colorPalette={themeColor}
             onClick={handleImportClick}
             loading={isPreviewing}
-            loadingText="Analyzing..."
+            loadingText="Analyse..."
           >
             <FiUpload />
-            Select File to Import
+            Sélectionner un fichier
           </Button>
         )}
 
@@ -121,37 +123,37 @@ export function ExportImportPanel(): React.ReactElement {
             borderColor="border.emphasized"
           >
             <Heading size="sm" mb={3}>
-              Package Preview
+              Aperçu du package
             </Heading>
             <VStack align="stretch" gap={2} mb={4}>
               <Text fontSize="sm">
-                <strong>Export Date:</strong>{' '}
+                <strong>Date d&apos;export :</strong>{' '}
                 {new Date(previewResult.package.exportDate).toLocaleString()}
               </Text>
               <Text fontSize="sm">
-                <strong>Version:</strong> {previewResult.package.schemaVersion}
+                <strong>Version :</strong> {previewResult.package.schemaVersion}
               </Text>
               <Text fontSize="sm">
-                <strong>Contents:</strong>{' '}
-                {previewResult.package.summary.menuItems} menu items,{' '}
+                <strong>Contenu :</strong>{' '}
+                {previewResult.package.summary.menuItems} éléments de menu,{' '}
                 {previewResult.package.summary.pageContents} pages,{' '}
-                {previewResult.package.summary.settings} settings,{' '}
-                {previewResult.package.summary.socialNetworks} social networks,{' '}
+                {previewResult.package.summary.settings} paramètres,{' '}
+                {previewResult.package.summary.socialNetworks} réseaux sociaux,{' '}
                 {previewResult.package.summary.images} images
               </Text>
             </VStack>
             <Text color="fg.warning" fontSize="sm" mb={4}>
-              Warning: Importing will replace all current configuration data.
-              This action cannot be undone.
+              Attention : L&apos;importation remplacera toutes les données de
+              configuration actuelles. Cette action est irréversible.
             </Text>
             <HStack gap={3}>
               <Button
                 colorPalette={themeColor}
                 onClick={handleConfirmImport}
                 loading={isImporting}
-                loadingText="Importing..."
+                loadingText="Importation..."
               >
-                Confirm Import
+                Confirmer l&apos;import
               </Button>
               <Button
                 colorPalette={themeColor}
@@ -159,7 +161,7 @@ export function ExportImportPanel(): React.ReactElement {
                 onClick={handleCancelImport}
                 disabled={isImporting}
               >
-                Cancel
+                Annuler
               </Button>
             </HStack>
           </Box>
@@ -174,14 +176,14 @@ export function ExportImportPanel(): React.ReactElement {
             borderColor="border.error"
           >
             <Text color="fg.error" mb={3}>
-              {previewResult.error ?? 'Invalid package'}
+              {previewResult.error ?? 'Package invalide'}
             </Text>
             <Button
               colorPalette={themeColor}
               variant="outline"
               onClick={handleCancelImport}
             >
-              Try Another File
+              Essayer un autre fichier
             </Button>
           </Box>
         )}

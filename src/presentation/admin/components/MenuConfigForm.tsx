@@ -131,7 +131,7 @@ function SortableMenuItem({
         cursor="grab"
         color="fg.muted"
         _hover={{ color: 'fg' }}
-        aria-label="Drag to reorder"
+        aria-label="Glisser pour réordonner"
       >
         <FiMenu size={18} />
       </Box>
@@ -141,7 +141,7 @@ function SortableMenuItem({
             value={editText}
             onChange={(e) => setEditText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Menu item text"
+            placeholder="Texte de l'élément"
             autoFocus
             maxLength={100}
             size="sm"
@@ -159,7 +159,7 @@ function SortableMenuItem({
             onChange={(e) => setEditUrl(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
-            placeholder="URL (e.g., /about)"
+            placeholder="URL (ex: /a-propos)"
             maxLength={2048}
             size="sm"
             bg="bg.canvas"
@@ -195,7 +195,7 @@ function SortableMenuItem({
         </VStack>
       )}
       <IconButton
-        aria-label="Edit page content"
+        aria-label="Modifier le contenu de la page"
         variant="ghost"
         size="sm"
         color="fg.muted"
@@ -206,7 +206,7 @@ function SortableMenuItem({
         <FiEdit size={16} />
       </IconButton>
       <IconButton
-        aria-label="Delete menu item"
+        aria-label="Supprimer l'élément"
         variant="ghost"
         size="sm"
         color="fg.muted"
@@ -268,11 +268,11 @@ export default function MenuConfigForm() {
         const data = await response.json();
         setItems(data.items || []);
       } else {
-        showToast('Failed to load menu items', 'error');
+        showToast('Échec du chargement des éléments de menu', 'error');
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error fetching menu items');
-      showToast('Failed to load menu items', 'error');
+      showToast('Échec du chargement des éléments de menu', 'error');
     } finally {
       setLoading(false);
     }
@@ -333,14 +333,14 @@ export default function MenuConfigForm() {
         setItems((prev) => [...prev, data.item]);
         setNewItemText('');
         setNewItemUrl('');
-        showToast('Menu item added successfully', 'success');
+        showToast('Élément de menu ajouté avec succès', 'success');
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to add menu item', 'error');
+        showToast(data.error || "Échec de l'ajout de l'élément", 'error');
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error adding menu item');
-      showToast('Failed to add menu item', 'error');
+      showToast("Échec de l'ajout de l'élément", 'error');
     } finally {
       setAddingItem(false);
     }
@@ -355,14 +355,17 @@ export default function MenuConfigForm() {
 
       if (response.ok) {
         setItems((prev) => prev.filter((item) => item.id !== id));
-        showToast('Menu item removed successfully', 'success');
+        showToast('Élément de menu supprimé avec succès', 'success');
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to remove menu item', 'error');
+        showToast(
+          data.error || "Échec de la suppression de l'élément",
+          'error'
+        );
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error removing menu item');
-      showToast('Failed to remove menu item', 'error');
+      showToast("Échec de la suppression de l'élément", 'error');
     } finally {
       setDeletingItemId(null);
     }
@@ -386,14 +389,17 @@ export default function MenuConfigForm() {
         setItems((prev) =>
           prev.map((item) => (item.id === id ? data.item : item))
         );
-        showToast('Menu item updated successfully', 'success');
+        showToast('Élément de menu mis à jour avec succès', 'success');
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to update menu item', 'error');
+        showToast(
+          data.error || "Échec de la mise à jour de l'élément",
+          'error'
+        );
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error updating menu item');
-      showToast('Failed to update menu item', 'error');
+      showToast("Échec de la mise à jour de l'élément", 'error');
     } finally {
       setUpdatingItemId(null);
     }
@@ -420,16 +426,19 @@ export default function MenuConfigForm() {
       });
 
       if (response.ok) {
-        showToast('Menu items reordered successfully', 'success');
+        showToast('Éléments de menu réordonnés avec succès', 'success');
       } else {
         setItems(items);
         const data = await response.json();
-        showToast(data.error || 'Failed to reorder menu items', 'error');
+        showToast(
+          data.error || 'Échec du réordonnancement des éléments',
+          'error'
+        );
       }
     } catch (error) {
       setItems(items);
       logger.logErrorWithObject(error, 'Error reordering menu items');
-      showToast('Failed to reorder menu items', 'error');
+      showToast('Échec du réordonnancement des éléments', 'error');
     }
   };
 
@@ -464,22 +473,22 @@ export default function MenuConfigForm() {
           gap={3}
         >
           <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
-          Navigation Menu Configuration
+          Configuration du menu de navigation
         </Heading>
         <Text
           fontSize={{ base: 'sm', md: 'md' }}
           color="fg.muted"
           lineHeight="relaxed"
         >
-          Configure your website&apos;s navigation menu items. Drag items to
-          reorder.
+          Configurez les éléments du menu de navigation de votre site. Glissez
+          les éléments pour les réordonner.
         </Text>
       </VStack>
 
       <Stack gap={{ base: 4, md: 6 }}>
         <Field.Root>
           <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
-            Header Logo
+            Logo de l&apos;en-tête
           </Field.Label>
           <Box
             bg="bg.canvas"
@@ -510,8 +519,8 @@ export default function MenuConfigForm() {
             color="fg.muted"
             mt={2}
           >
-            Upload a logo that appears at the left of your header navigation.
-            Recommended size is 120x60 pixels or similar aspect ratio.
+            Téléchargez un logo qui apparaît à gauche de votre navigation.
+            Taille recommandée : 120x60 pixels ou ratio similaire.
           </Field.HelperText>
         </Field.Root>
 
@@ -524,7 +533,7 @@ export default function MenuConfigForm() {
               color="fg"
               mb={2}
             >
-              Add New Menu Item
+              Ajouter un élément de menu
             </Field.Label>
             <VStack gap={2} align="stretch">
               <HStack gap={2}>
@@ -533,7 +542,7 @@ export default function MenuConfigForm() {
                   data-testid="new-menu-item-input"
                   value={newItemText}
                   onChange={(e) => setNewItemText(e.target.value)}
-                  placeholder="Enter menu item text"
+                  placeholder="Entrez le texte de l'élément"
                   maxLength={100}
                   flex={1}
                   minW="150px"
@@ -560,7 +569,7 @@ export default function MenuConfigForm() {
                   data-testid="new-menu-item-url-input"
                   value={newItemUrl}
                   onChange={(e) => setNewItemUrl(e.target.value)}
-                  placeholder="URL (e.g., /about)"
+                  placeholder="URL (ex: /a-propos)"
                   maxLength={2048}
                   flex={1}
                   minW="150px"
@@ -585,7 +594,7 @@ export default function MenuConfigForm() {
                 <IconButton
                   type="submit"
                   data-testid="add-menu-item-button"
-                  aria-label="Add menu item"
+                  aria-label="Ajouter un élément"
                   disabled={
                     !newItemText.trim() || !newItemUrl.trim() || addingItem
                   }
@@ -607,19 +616,19 @@ export default function MenuConfigForm() {
               color="fg.muted"
               mt={2}
             >
-              Enter the display text and URL for the menu item. URL must be a
-              relative path (e.g., /about, contact).
+              Entrez le texte et l&apos;URL de l&apos;élément de menu.
+              L&apos;URL doit être un chemin relatif (ex: /a-propos, contact).
             </Field.HelperText>
           </Field.Root>
         </form>
 
         <Box>
           <Text fontSize="sm" fontWeight="semibold" color="fg" mb={3}>
-            Menu Items
+            Éléments du menu
           </Text>
           {loading ? (
             <Text color="fg.muted" fontSize="sm">
-              Loading menu items...
+              Chargement des éléments de menu...
             </Text>
           ) : items.length === 0 ? (
             <Box
@@ -631,7 +640,7 @@ export default function MenuConfigForm() {
               textAlign="center"
             >
               <Text color="fg.muted" fontSize="sm">
-                No menu items yet. Add your first menu item above.
+                Aucun élément de menu. Ajoutez votre premier élément ci-dessus.
               </Text>
             </Box>
           ) : (

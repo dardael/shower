@@ -202,13 +202,13 @@ export function TableToolbar({
       gap={1}
     >
       <Text fontSize="xs" fontWeight="medium" color="fg.muted" mr={2}>
-        Table:
+        Tableau :
       </Text>
 
       {/* Row operations */}
-      <Tooltip content="Add Row Above">
+      <Tooltip content="Ajouter une ligne au-dessus">
         <IconButton
-          aria-label="Add Row Above"
+          aria-label="Ajouter une ligne au-dessus"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().addRowBefore().run()}
@@ -217,9 +217,9 @@ export function TableToolbar({
           <LuPlus />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Add Row Below">
+      <Tooltip content="Ajouter une ligne en-dessous">
         <IconButton
-          aria-label="Add Row Below"
+          aria-label="Ajouter une ligne en-dessous"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().addRowAfter().run()}
@@ -228,9 +228,9 @@ export function TableToolbar({
           <LuTableRowsSplit />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Delete Row">
+      <Tooltip content="Supprimer la ligne">
         <IconButton
-          aria-label="Delete Row"
+          aria-label="Supprimer la ligne"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().deleteRow().run()}
@@ -243,9 +243,9 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Column operations */}
-      <Tooltip content="Add Column Before">
+      <Tooltip content="Ajouter une colonne avant">
         <IconButton
-          aria-label="Add Column Before"
+          aria-label="Ajouter une colonne avant"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().addColumnBefore().run()}
@@ -254,9 +254,9 @@ export function TableToolbar({
           <LuPlus />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Add Column After">
+      <Tooltip content="Ajouter une colonne après">
         <IconButton
-          aria-label="Add Column After"
+          aria-label="Ajouter une colonne après"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().addColumnAfter().run()}
@@ -265,9 +265,9 @@ export function TableToolbar({
           <LuTableColumnsSplit />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Delete Column">
+      <Tooltip content="Supprimer la colonne">
         <IconButton
-          aria-label="Delete Column"
+          aria-label="Supprimer la colonne"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().deleteColumn().run()}
@@ -280,9 +280,9 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Header toggle */}
-      <Tooltip content="Toggle Header Cell">
+      <Tooltip content="Activer/désactiver cellule d'en-tête">
         <IconButton
-          aria-label="Toggle Header Cell"
+          aria-label="Activer/désactiver cellule d'en-tête"
           size="xs"
           variant={editor.isActive('tableHeader') ? 'solid' : 'ghost'}
           onClick={() => editor.chain().focus().toggleHeaderCell().run()}
@@ -297,9 +297,9 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Merge/Split */}
-      <Tooltip content="Merge Cells">
+      <Tooltip content="Fusionner les cellules">
         <IconButton
-          aria-label="Merge Cells"
+          aria-label="Fusionner les cellules"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().mergeCells().run()}
@@ -308,9 +308,9 @@ export function TableToolbar({
           <LuMerge />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Split Cell">
+      <Tooltip content="Diviser la cellule">
         <IconButton
-          aria-label="Split Cell"
+          aria-label="Diviser la cellule"
           size="xs"
           variant="ghost"
           onClick={() => editor.chain().focus().splitCell().run()}
@@ -323,10 +323,10 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Border thickness control */}
-      <Tooltip content="Border Thickness (0-10px)">
+      <Tooltip content="Épaisseur de bordure (0-10px)">
         <Box display="flex" alignItems="center" gap={1}>
           <Text fontSize="xs" color="fg.muted">
-            Border:
+            Bordure :
           </Text>
           <Input
             type="number"
@@ -350,11 +350,11 @@ export function TableToolbar({
 
       {/* Vertical alignment controls */}
       <Text fontSize="xs" color="fg.muted" mr={1}>
-        Align:
+        Alignement :
       </Text>
-      <Tooltip content="Align Top">
+      <Tooltip content="Aligner en haut">
         <IconButton
-          aria-label="Align Top"
+          aria-label="Aligner en haut"
           size="xs"
           variant={verticalAlign === 'top' ? 'solid' : 'ghost'}
           onClick={() => handleVerticalAlignChange('top')}
@@ -363,9 +363,9 @@ export function TableToolbar({
           <LuAlignVerticalJustifyStart />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Align Middle">
+      <Tooltip content="Aligner au milieu">
         <IconButton
-          aria-label="Align Middle"
+          aria-label="Aligner au milieu"
           size="xs"
           variant={verticalAlign === 'middle' ? 'solid' : 'ghost'}
           onClick={() => handleVerticalAlignChange('middle')}
@@ -374,9 +374,9 @@ export function TableToolbar({
           <LuAlignVerticalJustifyCenter />
         </IconButton>
       </Tooltip>
-      <Tooltip content="Align Bottom">
+      <Tooltip content="Aligner en bas">
         <IconButton
-          aria-label="Align Bottom"
+          aria-label="Aligner en bas"
           size="xs"
           variant={verticalAlign === 'bottom' ? 'solid' : 'ghost'}
           onClick={() => handleVerticalAlignChange('bottom')}
@@ -389,10 +389,10 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Column width control */}
-      <Tooltip content="Column Width (min 50px, empty for auto)">
+      <Tooltip content="Largeur de colonne (min 50px, vide pour auto)">
         <Box display="flex" alignItems="center" gap={1}>
           <Text fontSize="xs" color="fg.muted">
-            Width:
+            Largeur :
           </Text>
           <Input
             type="number"
@@ -413,9 +413,9 @@ export function TableToolbar({
       <Separator orientation="vertical" height="20px" />
 
       {/* Delete table */}
-      <Tooltip content="Delete Table">
+      <Tooltip content="Supprimer le tableau">
         <IconButton
-          aria-label="Delete Table"
+          aria-label="Supprimer le tableau"
           size="xs"
           variant="ghost"
           colorPalette="red"

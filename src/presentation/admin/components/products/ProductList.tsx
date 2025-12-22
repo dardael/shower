@@ -76,7 +76,7 @@ function SortableProductItem({
     >
       <HStack gap={4}>
         <IconButton
-          aria-label="Drag to reorder"
+          aria-label="Glisser pour réordonner"
           variant="ghost"
           size="sm"
           cursor="grab"
@@ -107,7 +107,7 @@ function SortableProductItem({
         </VStack>
         <HStack>
           <IconButton
-            aria-label="Edit product"
+            aria-label="Modifier le produit"
             variant="ghost"
             size="sm"
             onClick={() => onEdit(product)}
@@ -115,7 +115,7 @@ function SortableProductItem({
             <FiEdit2 />
           </IconButton>
           <IconButton
-            aria-label="Delete product"
+            aria-label="Supprimer le produit"
             variant="ghost"
             size="sm"
             color="red.500"
@@ -158,7 +158,7 @@ export function ProductList(): React.ReactElement {
         setProducts(data.products);
       }
     } catch {
-      toaster.error({ title: 'Failed to load products' });
+      toaster.error({ title: 'Échec du chargement des produits' });
     } finally {
       setLoading(false);
     }
@@ -203,29 +203,29 @@ export function ProductList(): React.ReactElement {
         if (!response.ok) {
           throw new Error('Failed to save order');
         }
-        toaster.success({ title: 'Order saved' });
+        toaster.success({ title: 'Ordre enregistré' });
       } catch {
-        toaster.error({ title: 'Failed to save order' });
+        toaster.error({ title: "Échec de l'enregistrement de l'ordre" });
         fetchProducts(); // Revert on error
       }
     }
   };
 
   const handleDelete = async (id: string): Promise<void> => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return;
 
     try {
       const response = await fetch(`/api/admin/products/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
-        toaster.success({ title: 'Product deleted' });
+        toaster.success({ title: 'Produit supprimé' });
         fetchProducts();
       } else {
-        toaster.error({ title: 'Failed to delete product' });
+        toaster.error({ title: 'Échec de la suppression du produit' });
       }
     } catch {
-      toaster.error({ title: 'Failed to delete product' });
+      toaster.error({ title: 'Échec de la suppression du produit' });
     }
   };
 
@@ -266,7 +266,7 @@ export function ProductList(): React.ReactElement {
         if (!response.ok) {
           throw new Error('Failed to update product');
         }
-        toaster.success({ title: 'Product updated successfully' });
+        toaster.success({ title: 'Produit mis à jour avec succès' });
       } else {
         const response = await fetch('/api/admin/products', {
           method: 'POST',
@@ -276,7 +276,7 @@ export function ProductList(): React.ReactElement {
         if (!response.ok) {
           throw new Error('Failed to create product');
         }
-        toaster.success({ title: 'Product created successfully' });
+        toaster.success({ title: 'Produit créé avec succès' });
       }
       setIsModalOpen(false);
       setEditingProduct(null);
@@ -284,8 +284,8 @@ export function ProductList(): React.ReactElement {
     } catch {
       toaster.error({
         title: editingProduct
-          ? 'Failed to update product'
-          : 'Failed to create product',
+          ? 'Échec de la mise à jour du produit'
+          : 'Échec de la création du produit',
       });
     }
   };
@@ -295,7 +295,7 @@ export function ProductList(): React.ReactElement {
       categoryIds
         .map((id) => categories.find((c) => c.id === id)?.name)
         .filter(Boolean)
-        .join(', ') || 'No categories'
+        .join(', ') || 'Aucune catégorie'
     );
   };
 
@@ -312,7 +312,7 @@ export function ProductList(): React.ReactElement {
       <HStack>
         <Box position="relative" flex={1}>
           <Input
-            placeholder="Search products..."
+            placeholder="Rechercher des produits..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             pl={10}
@@ -328,13 +328,13 @@ export function ProductList(): React.ReactElement {
         </Box>
         <Button colorPalette={themeColor} onClick={handleCreate}>
           <FiPlus />
-          Add Product
+          Ajouter un produit
         </Button>
       </HStack>
 
       {products.length === 0 ? (
         <Box textAlign="center" py={10} color="gray.500">
-          <Text>No products found. Create your first product!</Text>
+          <Text>Aucun produit trouvé. Créez votre premier produit !</Text>
         </Box>
       ) : (
         <DndContext

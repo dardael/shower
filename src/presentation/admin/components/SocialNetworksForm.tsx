@@ -61,7 +61,7 @@ export default function SocialNetworksForm() {
       >
         <VStack align="center" gap={4} py={8}>
           <Spinner size="lg" />
-          <Text color="fg.muted">Loading social networks...</Text>
+          <Text color="fg.muted">Chargement des réseaux sociaux...</Text>
         </VStack>
       </Box>
     );
@@ -83,11 +83,11 @@ export default function SocialNetworksForm() {
             color="fg"
             fontWeight="semibold"
           >
-            Social Networks
+            Réseaux sociaux
           </Heading>
 
           <Text color="fg.muted" fontSize={{ base: 'sm', md: 'md' }}>
-            Configure your social network links
+            Configurez vos liens vers les réseaux sociaux
           </Text>
 
           <VStack align="start" gap={4} w="full">
@@ -113,7 +113,7 @@ export default function SocialNetworksForm() {
                           data-testid={`checkbox-input-${socialNetwork.type.toLowerCase()}`}
                         />
                         <Checkbox.Control />
-                        <Checkbox.Label>Enable</Checkbox.Label>
+                        <Checkbox.Label>Activer</Checkbox.Label>
                       </Checkbox.Root>
                     </HStack>
 
@@ -139,7 +139,7 @@ export default function SocialNetworksForm() {
                       </Field.Root>
 
                       <Field.Root w={{ base: 'full', md: '1/2' }}>
-                        <Field.Label>Label</Field.Label>
+                        <Field.Label>Libellé</Field.Label>
                         <Input
                           value={socialNetwork.label}
                           onChange={(e) =>
@@ -170,7 +170,7 @@ export default function SocialNetworksForm() {
               onClick={handleSubmit}
               width="full"
             >
-              Save Changes
+              Enregistrer les modifications
             </SaveButton>
           </Box>
         </VStack>

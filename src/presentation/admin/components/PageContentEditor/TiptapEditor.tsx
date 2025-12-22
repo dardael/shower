@@ -254,10 +254,10 @@ export default function TiptapEditor({
 
   const validateFile = useCallback((file: File): string | null => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      return 'Invalid file type. Only PNG, JPG, GIF, and WebP files are allowed.';
+      return 'Type de fichier invalide. Seuls les fichiers PNG, JPG, GIF et WebP sont autorisés.';
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return 'File size must be less than 5MB.';
+      return 'La taille du fichier doit être inférieure à 5 Mo.';
     }
     return null;
   }, []);
@@ -267,7 +267,7 @@ export default function TiptapEditor({
       const validationError = validateFile(file);
       if (validationError) {
         toaster.create({
-          title: 'Upload failed',
+          title: 'Échec du téléchargement',
           description: validationError,
           type: 'error',
         });
@@ -287,7 +287,8 @@ export default function TiptapEditor({
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(
-            errorData.error || 'Failed to upload image. Please try again.'
+            errorData.error ||
+              "Échec du téléchargement de l'image. Veuillez réessayer."
           );
         }
 
@@ -295,11 +296,11 @@ export default function TiptapEditor({
         editorRef.current?.chain().focus().setImage({ src: image.url }).run();
       } catch (error) {
         toaster.create({
-          title: 'Upload failed',
+          title: 'Échec du téléchargement',
           description:
             error instanceof Error
               ? error.message
-              : 'Failed to upload image. Please try again.',
+              : "Échec du téléchargement de l'image. Veuillez réessayer.",
           type: 'error',
         });
       } finally {
@@ -602,7 +603,7 @@ export default function TiptapEditor({
         flexShrink={0}
       >
         <IconButton
-          aria-label="Bold"
+          aria-label="Gras"
           size="sm"
           variant={editor.isActive('bold') ? 'solid' : 'ghost'}
           color={editor.isActive('bold') ? 'colorPalette.fg' : 'fg'}
@@ -612,7 +613,7 @@ export default function TiptapEditor({
           <FiBold />
         </IconButton>
         <IconButton
-          aria-label="Italic"
+          aria-label="Italique"
           size="sm"
           variant={editor.isActive('italic') ? 'solid' : 'ghost'}
           color={editor.isActive('italic') ? 'colorPalette.fg' : 'fg'}
@@ -624,7 +625,7 @@ export default function TiptapEditor({
         <ColorPicker editor={editor} disabled={disabled} />
         <FontPicker editor={editor} disabled={disabled} />
         <IconButton
-          aria-label="Heading 1"
+          aria-label="Titre 1"
           size="sm"
           variant={editor.isActive('heading', { level: 1 }) ? 'solid' : 'ghost'}
           color={
@@ -638,7 +639,7 @@ export default function TiptapEditor({
           <LuHeading1 />
         </IconButton>
         <IconButton
-          aria-label="Heading 2"
+          aria-label="Titre 2"
           size="sm"
           variant={editor.isActive('heading', { level: 2 }) ? 'solid' : 'ghost'}
           color={
@@ -652,7 +653,7 @@ export default function TiptapEditor({
           <LuHeading2 />
         </IconButton>
         <IconButton
-          aria-label="Heading 3"
+          aria-label="Titre 3"
           size="sm"
           variant={editor.isActive('heading', { level: 3 }) ? 'solid' : 'ghost'}
           color={
@@ -666,7 +667,7 @@ export default function TiptapEditor({
           <LuHeading3 />
         </IconButton>
         <IconButton
-          aria-label="Bullet List"
+          aria-label="Liste à puces"
           size="sm"
           variant={editor.isActive('bulletList') ? 'solid' : 'ghost'}
           color={editor.isActive('bulletList') ? 'colorPalette.fg' : 'fg'}
@@ -676,7 +677,7 @@ export default function TiptapEditor({
           <FiList />
         </IconButton>
         <IconButton
-          aria-label="Ordered List"
+          aria-label="Liste numérotée"
           size="sm"
           variant={editor.isActive('orderedList') ? 'solid' : 'ghost'}
           color={editor.isActive('orderedList') ? 'colorPalette.fg' : 'fg'}
@@ -686,7 +687,7 @@ export default function TiptapEditor({
           <LuListOrdered />
         </IconButton>
         <IconButton
-          aria-label="Align Left"
+          aria-label="Aligner à gauche"
           size="sm"
           variant={
             selectedImagePos !== null
@@ -718,7 +719,7 @@ export default function TiptapEditor({
           <FiAlignLeft />
         </IconButton>
         <IconButton
-          aria-label="Align Center"
+          aria-label="Centrer"
           size="sm"
           variant={
             selectedImagePos !== null
@@ -750,7 +751,7 @@ export default function TiptapEditor({
           <FiAlignCenter />
         </IconButton>
         <IconButton
-          aria-label="Align Right"
+          aria-label="Aligner à droite"
           size="sm"
           variant={
             selectedImagePos !== null
@@ -782,7 +783,7 @@ export default function TiptapEditor({
           <FiAlignRight />
         </IconButton>
         <IconButton
-          aria-label="Justify"
+          aria-label="Justifier"
           size="sm"
           variant={
             editor.isActive({ textAlign: 'justify' }) ? 'solid' : 'ghost'
@@ -796,7 +797,7 @@ export default function TiptapEditor({
           <FiAlignJustify />
         </IconButton>
         <IconButton
-          aria-label="Add Link"
+          aria-label="Ajouter un lien"
           size="sm"
           variant={showLinkInput ? 'solid' : 'ghost'}
           color={showLinkInput ? 'colorPalette.fg' : 'fg'}
@@ -808,7 +809,7 @@ export default function TiptapEditor({
           <FiLink />
         </IconButton>
         <IconButton
-          aria-label="Upload Image"
+          aria-label="Télécharger une image"
           size="sm"
           variant="ghost"
           color="fg"
@@ -819,9 +820,9 @@ export default function TiptapEditor({
         </IconButton>
         <TableInsertDialog editor={editor} disabled={disabled} />
         {sellingEnabled && (
-          <Tooltip content="Insert Products List">
+          <Tooltip content="Insérer une liste de produits">
             <IconButton
-              aria-label="Insert Products List"
+              aria-label="Insérer une liste de produits"
               size="sm"
               variant="ghost"
               color="fg"
@@ -834,9 +835,9 @@ export default function TiptapEditor({
         )}
         {/* Add Text Overlay button - only visible when plain image is selected */}
         {selectedImagePos !== null && selectedNodeType === 'image' && (
-          <Tooltip content="Add Text Overlay">
+          <Tooltip content="Ajouter un texte superposé">
             <IconButton
-              aria-label="Add Text Overlay"
+              aria-label="Ajouter un texte superposé"
               size="sm"
               variant="ghost"
               color="fg"
@@ -849,9 +850,9 @@ export default function TiptapEditor({
         )}
         {/* Full Width button - visible when any image is selected */}
         {selectedImagePos !== null && (
-          <Tooltip content="Toggle Full Width">
+          <Tooltip content="Activer/désactiver pleine largeur">
             <IconButton
-              aria-label="Toggle Full Width"
+              aria-label="Activer/désactiver pleine largeur"
               size="sm"
               variant={
                 isFullWidthActive(editor, selectedImagePos) ? 'solid' : 'ghost'
@@ -870,9 +871,9 @@ export default function TiptapEditor({
         )}
         {/* Full Bleed button - visible when any image is selected */}
         {selectedImagePos !== null && (
-          <Tooltip content="Toggle Full Bleed (edge-to-edge)">
+          <Tooltip content="Activer/désactiver bord à bord">
             <IconButton
-              aria-label="Toggle Full Bleed"
+              aria-label="Activer/désactiver bord à bord"
               size="sm"
               variant={
                 isFullBleedActive(editor, selectedImagePos) ? 'solid' : 'ghost'
@@ -921,7 +922,7 @@ export default function TiptapEditor({
           bg="bg.subtle"
         >
           <Input
-            placeholder="Enter URL"
+            placeholder="Entrez l'URL"
             size="sm"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}
@@ -933,7 +934,7 @@ export default function TiptapEditor({
             }}
           />
           <IconButton
-            aria-label="Apply Link"
+            aria-label="Appliquer le lien"
             size="sm"
             variant="solid"
             color="colorPalette.fg"

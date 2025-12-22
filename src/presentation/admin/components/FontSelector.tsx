@@ -83,7 +83,7 @@ const FontPreview = memo<FontPreviewProps>(
         <VStack gap={3} align="start" width="full">
           <HStack gap={2} align="center">
             <Text fontSize="xs" color="fg.subtle" fontWeight="medium">
-              {isPreview ? 'Preview:' : 'Current:'}
+              {isPreview ? 'Aperçu :' : 'Actuel :'}
             </Text>
             <Text
               fontSize="xs"
@@ -152,7 +152,7 @@ const FontButton = memo<FontButtonProps>(
         borderColor={isSelected ? 'colorPalette.solid' : 'border'}
         bg={isSelected ? 'colorPalette.subtle' : 'bg.canvas'}
         opacity={disabled || isLoading ? 0.6 : 1}
-        aria-label={`Select ${font.name} font`}
+        aria-label={`Sélectionner la police ${font.name}`}
         aria-pressed={isSelected}
         data-selected={isSelected}
       >
@@ -207,7 +207,7 @@ const FontSelector = memo<FontSelectorProps>(
     // Announce font changes for screen readers
     useEffect(() => {
       if (selectedFont) {
-        setAnnouncement(`Website font changed to ${selectedFont}`);
+        setAnnouncement(`Police du site changée en ${selectedFont}`);
         // Clear announcement after it's read
         const timer = setTimeout(() => setAnnouncement(''), 1000);
         return () => clearTimeout(timer);
@@ -240,13 +240,13 @@ const FontSelector = memo<FontSelectorProps>(
             color={textColor}
             data-testid="website-font-label"
           >
-            Website Font
+            Police du site
           </Text>
           {isLoading && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating website font"
+              aria-label="Mise à jour de la police"
             />
           )}
         </HStack>
@@ -291,8 +291,8 @@ const FontSelector = memo<FontSelectorProps>(
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
-            ? 'Updating website font...'
-            : 'Select a font to customize your website typography. Hover over fonts to preview.'}
+            ? 'Mise à jour de la police...'
+            : 'Sélectionnez une police pour personnaliser la typographie de votre site. Survolez les polices pour un aperçu.'}
         </Text>
       </VStack>
     );

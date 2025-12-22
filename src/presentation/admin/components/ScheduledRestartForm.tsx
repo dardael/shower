@@ -72,7 +72,7 @@ const ScheduledRestartForm = memo(() => {
   }, [enabled, restartHour]);
 
   const formatLastRestart = (isoDate: string | null): string => {
-    if (!isoDate) return 'Never';
+    if (!isoDate) return 'Jamais';
     const date = new Date(isoDate);
     return date.toLocaleString();
   };
@@ -111,7 +111,7 @@ const ScheduledRestartForm = memo(() => {
             color={textColor}
             data-testid="last-restart-label"
           >
-            Last Scheduled Restart
+            Dernier redémarrage programmé
           </Text>
         </HStack>
         <Text fontSize="sm" color={textColor} data-testid="last-restart-value">
@@ -128,13 +128,13 @@ const ScheduledRestartForm = memo(() => {
             color={textColor}
             data-testid="scheduled-restart-label"
           >
-            Scheduled Restart
+            Redémarrage programmé
           </Text>
           {isUpdating && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating scheduled restart settings"
+              aria-label="Mise à jour des paramètres de redémarrage"
             />
           )}
         </HStack>
@@ -147,22 +147,24 @@ const ScheduledRestartForm = memo(() => {
             colorPalette={enabled ? 'green' : 'gray'}
             size="md"
             aria-label={
-              enabled ? 'Disable scheduled restart' : 'Enable scheduled restart'
+              enabled
+                ? 'Désactiver le redémarrage programmé'
+                : 'Activer le redémarrage programmé'
             }
             aria-pressed={enabled}
             data-testid="toggle-enabled-button"
           >
             <HStack gap={2}>
               {enabled ? <LuPower /> : <LuPowerOff />}
-              <Text>{enabled ? 'Enabled' : 'Disabled'}</Text>
+              <Text>{enabled ? 'Activé' : 'Désactivé'}</Text>
             </HStack>
           </Button>
         </HStack>
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {enabled
-            ? 'The server will automatically restart at the configured hour daily'
-            : 'Enable to schedule automatic daily server restarts'}
+            ? "Le serveur redémarrera automatiquement à l'heure configurée chaque jour"
+            : 'Activez pour programmer des redémarrages automatiques quotidiens'}
         </Text>
       </VStack>
 
@@ -177,7 +179,7 @@ const ScheduledRestartForm = memo(() => {
               color={textColor}
               data-testid="restart-hour-label"
             >
-              Restart Hour (0-23)
+              Heure de redémarrage (0-23)
             </Text>
           </HStack>
 
@@ -190,16 +192,16 @@ const ScheduledRestartForm = memo(() => {
             onBlur={handleHourBlur}
             disabled={isUpdating}
             width="100px"
-            aria-label="Select restart hour (0-23)"
+            aria-label="Sélectionnez l'heure de redémarrage (0-23)"
             data-testid="restart-hour-input"
           />
 
           <Text fontSize="sm" color={textColor} opacity={0.7}>
-            Currently set to restart at{' '}
+            Actuellement programmé pour redémarrer à{' '}
             <Text as="span" fontWeight="bold">
               {restartHour.toString().padStart(2, '0')}:00
             </Text>{' '}
-            your local time
+            heure locale
           </Text>
         </VStack>
       )}

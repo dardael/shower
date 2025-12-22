@@ -240,7 +240,7 @@ export function OverlayToolbar({
       {/* Text input */}
       <Input
         size="sm"
-        placeholder="Overlay text..."
+        placeholder="Texte superposé..."
         value={overlayText}
         onChange={handleTextChange}
         disabled={disabled}
@@ -252,9 +252,9 @@ export function OverlayToolbar({
         selectedColor={overlayColor}
         onColorSelect={handleColorSelect}
         disabled={disabled}
-        title="Overlay Color"
+        title="Couleur du texte"
         trigger={
-          <IconButton aria-label="Text Color" size="sm" variant="ghost">
+          <IconButton aria-label="Couleur du texte" size="sm" variant="ghost">
             <Box
               w="16px"
               h="16px"
@@ -272,10 +272,10 @@ export function OverlayToolbar({
         selectedFont={overlayFontFamily}
         onFontSelect={handleFontSelect}
         disabled={disabled}
-        title="Overlay Font"
+        title="Police du texte"
         trigger={
           <Button
-            aria-label="Font Family"
+            aria-label="Famille de police"
             size="sm"
             variant="ghost"
             color="fg"
@@ -298,7 +298,7 @@ export function OverlayToolbar({
       >
         <ChakraPopover.Trigger asChild>
           <Button
-            aria-label="Font Size"
+            aria-label="Taille de police"
             size="sm"
             variant="ghost"
             color="fg"
@@ -314,7 +314,7 @@ export function OverlayToolbar({
             <ChakraPopover.Body>
               <Box p={2}>
                 <Text fontSize="sm" fontWeight="medium" mb={2} color="fg">
-                  Font Size
+                  Taille de police
                 </Text>
                 {FONT_SIZES.map((size) => (
                   <Button
@@ -376,9 +376,9 @@ export function OverlayToolbar({
         selectedColor={overlayBgColor}
         onColorSelect={handleBgColorSelect}
         disabled={disabled}
-        title="Background Color"
+        title="Couleur de fond"
         trigger={
-          <IconButton aria-label="Background Color" size="sm" variant="ghost">
+          <IconButton aria-label="Couleur de fond" size="sm" variant="ghost">
             <Box
               w="16px"
               h="16px"
@@ -417,7 +417,7 @@ export function OverlayToolbar({
 
       {/* Remove overlay button */}
       <IconButton
-        aria-label="Remove Overlay"
+        aria-label="Supprimer le texte superposé"
         size="sm"
         variant="ghost"
         colorPalette="red"

@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: websiteName,
-    description: 'Admin panel for Shower website',
+    description: "Panneau d'administration du site Shower",
     icons: websiteIcon
       ? {
           icon: websiteIcon,

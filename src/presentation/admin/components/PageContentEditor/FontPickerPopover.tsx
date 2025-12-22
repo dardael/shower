@@ -38,7 +38,7 @@ export function FontPickerPopover({
   selectedFont,
   onFontSelect,
   disabled = false,
-  title = 'Font',
+  title = 'Police',
   trigger,
 }: FontPickerPopoverProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);

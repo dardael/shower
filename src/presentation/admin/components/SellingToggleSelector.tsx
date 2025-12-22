@@ -21,14 +21,16 @@ interface ToggleOption {
 const TOGGLE_OPTIONS: ToggleOption[] = [
   {
     value: false,
-    label: 'Disabled',
-    description: 'Product features are hidden from admin interface',
+    label: 'Désactivé',
+    description:
+      "Les fonctionnalités produits sont masquées de l'interface admin",
     icon: <LuShoppingCart size={20} />,
   },
   {
     value: true,
-    label: 'Enabled',
-    description: 'Product management and display features are available',
+    label: 'Activé',
+    description:
+      "Les fonctionnalités de gestion et d'affichage des produits sont disponibles",
     icon: <LuShoppingBag size={20} />,
   },
 ];
@@ -56,7 +58,7 @@ const ToggleButton = memo<ToggleButtonProps>(
         gap={1}
         minWidth="120px"
         position="relative"
-        aria-label={`${option.label} selling mode`}
+        aria-label={`Mode vente ${option.label}`}
         aria-pressed={isSelected}
         data-selected={isSelected}
         opacity={isLoading ? 0.7 : 1}
@@ -100,7 +102,7 @@ const SellingToggleSelector = memo<SellingToggleSelectorProps>(
         return;
       }
       if (selectedOption) {
-        setAnnouncement(`Selling mode changed to ${selectedOption.label}`);
+        setAnnouncement(`Mode vente changé en ${selectedOption.label}`);
         const timer = setTimeout(() => setAnnouncement(''), 1000);
         return () => clearTimeout(timer);
       }
@@ -131,13 +133,13 @@ const SellingToggleSelector = memo<SellingToggleSelectorProps>(
             color={textColor}
             data-testid="selling-toggle-label"
           >
-            Selling Mode
+            Mode vente
           </Text>
           {isLoading && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating selling mode"
+              aria-label="Mise à jour du mode vente"
             />
           )}
         </HStack>
@@ -157,9 +159,9 @@ const SellingToggleSelector = memo<SellingToggleSelectorProps>(
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
-            ? 'Updating selling mode...'
+            ? 'Mise à jour du mode vente...'
             : (selectedOption?.description ??
-              'Configure whether product features are available')}
+              'Configurez si les fonctionnalités produits sont disponibles')}
         </Text>
       </VStack>
     );

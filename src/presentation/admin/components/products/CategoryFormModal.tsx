@@ -69,21 +69,21 @@ export function CategoryFormModal({
           <Dialog.Content>
             <Dialog.Header>
               <Dialog.Title>
-                {category ? 'Edit Category' : 'Add Category'}
+                {category ? 'Modifier la catégorie' : 'Ajouter une catégorie'}
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <VStack gap={4} align="stretch">
                 <Box>
                   <Text fontWeight="medium" mb={1}>
-                    Name *
+                    Nom *
                   </Text>
                   <Input
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Category name"
+                    placeholder="Nom de la catégorie"
                   />
                 </Box>
 
@@ -96,7 +96,7 @@ export function CategoryFormModal({
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Category description"
+                    placeholder="Description de la catégorie"
                   />
                 </Box>
               </VStack>
@@ -104,7 +104,7 @@ export function CategoryFormModal({
             <Dialog.Footer>
               <HStack gap={2}>
                 <Button variant="ghost" onClick={onClose}>
-                  Cancel
+                  Annuler
                 </Button>
                 <Button
                   colorPalette={themeColor}
@@ -112,7 +112,7 @@ export function CategoryFormModal({
                   loading={isSubmitting}
                   disabled={!formData.name}
                 >
-                  {category ? 'Update' : 'Create'}
+                  {category ? 'Modifier' : 'Créer'}
                 </Button>
               </HStack>
             </Dialog.Footer>

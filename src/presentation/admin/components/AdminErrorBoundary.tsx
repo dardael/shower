@@ -26,13 +26,13 @@ function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
           color="fg"
           fontWeight="semibold"
         >
-          Admin Panel Error
+          Erreur du panneau admin
         </Heading>
 
         <Text color="fg.muted" fontSize={{ base: 'sm', md: 'md' }}>
           {process.env.NODE_ENV === 'development'
-            ? `Admin error: ${error?.message || 'An unexpected error occurred in the admin panel'}`
-            : 'An error occurred in the admin panel. Please try again or contact support.'}
+            ? `Erreur admin : ${error?.message || "Une erreur inattendue s'est produite dans le panneau admin"}`
+            : "Une erreur s'est produite dans le panneau admin. Veuillez réessayer ou contacter le support."}
         </Text>
 
         {process.env.NODE_ENV === 'development' && error?.stack && (
@@ -59,7 +59,7 @@ function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
 
         <VStack gap={3} w="full" maxW="sm">
           <Button onClick={reset} size="md" w="full">
-            Try Again
+            Réessayer
           </Button>
           <Button
             onClick={() => (window.location.href = '/')}
@@ -67,7 +67,7 @@ function AdminErrorFallback({ error, reset }: AdminErrorFallbackProps) {
             size="md"
             w="full"
           >
-            Go to Homepage
+            Aller à l&apos;accueil
           </Button>
         </VStack>
       </VStack>

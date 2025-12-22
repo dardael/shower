@@ -96,11 +96,12 @@
 - **FR-010**: Code MUST avoid duplication through reusable functions and components (DRY principle)
 - **FR-011**: Code MUST be simple, readable, and clear with straightforward implementations (KISS principle)
 - **FR-012**: Configuration changes MUST be synchronized with export/import system and increment export file version (Configuration Portability principle)
+- **FR-013**: All visible text displayed on screen MUST be in French (French Localization principle)
 
 _Example of marking unclear requirements:_
 
-- **FR-013**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-014**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-014**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-015**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities _(include if feature involves data)_
 

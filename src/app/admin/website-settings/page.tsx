@@ -12,7 +12,7 @@ async function getWebsiteName(): Promise<string> {
     return await fetchWebsiteName();
   } catch {
     // Return default name if fetch fails
-    return 'Website Settings';
+    return 'Paramètres du site';
   }
 }
 

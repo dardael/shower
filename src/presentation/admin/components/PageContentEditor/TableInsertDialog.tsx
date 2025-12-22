@@ -61,12 +61,12 @@ export function TableInsertDialog({
     >
       <ChakraPopover.Trigger asChild>
         <IconButton
-          aria-label="Insert Table"
+          aria-label="Insérer un tableau"
           size="sm"
           variant="ghost"
           color="fg"
           disabled={disabled}
-          title="Insert Table"
+          title="Insérer un tableau"
         >
           <LuTable />
         </IconButton>
@@ -76,13 +76,13 @@ export function TableInsertDialog({
           <ChakraPopover.Body>
             <Box display="flex" flexDirection="column" gap={3} p={2}>
               <Text fontWeight="medium" fontSize="sm">
-                Insert Table
+                Insérer un tableau
               </Text>
               <HStack justify="space-between">
-                <Text fontSize="sm">Rows:</Text>
+                <Text fontSize="sm">Lignes :</Text>
                 <HStack>
                   <IconButton
-                    aria-label="Decrease rows"
+                    aria-label="Diminuer les lignes"
                     size="xs"
                     variant="ghost"
                     onClick={() => adjustValue(rows, -1, setRows)}
@@ -94,7 +94,7 @@ export function TableInsertDialog({
                     {rows}
                   </Text>
                   <IconButton
-                    aria-label="Increase rows"
+                    aria-label="Augmenter les lignes"
                     size="xs"
                     variant="ghost"
                     onClick={() => adjustValue(rows, 1, setRows)}
@@ -105,10 +105,10 @@ export function TableInsertDialog({
                 </HStack>
               </HStack>
               <HStack justify="space-between">
-                <Text fontSize="sm">Columns:</Text>
+                <Text fontSize="sm">Colonnes :</Text>
                 <HStack>
                   <IconButton
-                    aria-label="Decrease columns"
+                    aria-label="Diminuer les colonnes"
                     size="xs"
                     variant="ghost"
                     onClick={() => adjustValue(cols, -1, setCols)}
@@ -120,7 +120,7 @@ export function TableInsertDialog({
                     {cols}
                   </Text>
                   <IconButton
-                    aria-label="Increase columns"
+                    aria-label="Augmenter les colonnes"
                     size="xs"
                     variant="ghost"
                     onClick={() => adjustValue(cols, 1, setCols)}
@@ -131,14 +131,14 @@ export function TableInsertDialog({
                 </HStack>
               </HStack>
               <IconButton
-                aria-label="Insert"
+                aria-label="Insérer"
                 size="sm"
                 variant="solid"
                 colorPalette="blue"
                 onClick={handleInsertTable}
                 width="100%"
               >
-                Insert {rows}x{cols} Table
+                Insérer tableau {rows}x{cols}
               </IconButton>
             </Box>
           </ChakraPopover.Body>

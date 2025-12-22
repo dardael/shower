@@ -8,13 +8,13 @@ export function ProductsManagement(): React.ReactElement {
   return (
     <Box>
       <Heading size="lg" mb={6}>
-        Products & Categories
+        Produits & Catégories
       </Heading>
 
       <Tabs.Root defaultValue="products" variant="enclosed">
         <Tabs.List>
-          <Tabs.Trigger value="products">Products</Tabs.Trigger>
-          <Tabs.Trigger value="categories">Categories</Tabs.Trigger>
+          <Tabs.Trigger value="products">Produits</Tabs.Trigger>
+          <Tabs.Trigger value="categories">Catégories</Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="products">

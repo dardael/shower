@@ -26,38 +26,38 @@ export interface AdminSidebarProps {
 const menuItems = [
   {
     href: '/admin/website-settings',
-    label: 'Website Settings',
-    description: 'Manage website name, icon, and theme',
+    label: 'Paramètres du site',
+    description: "Gérer le nom, l'icône et le thème du site",
   },
   {
     href: '/admin/social-networks',
-    label: 'Social Networks',
-    description: 'Configure social media links',
+    label: 'Réseaux sociaux',
+    description: 'Configurer les liens vers les réseaux sociaux',
   },
   {
     href: '/admin/menu',
-    label: 'Navigation Menu',
-    description: 'Configure website navigation',
+    label: 'Menu de navigation',
+    description: 'Configurer la navigation du site',
   },
   {
     href: '/admin/products',
-    label: 'Products',
-    description: 'Manage products and categories',
+    label: 'Produits',
+    description: 'Gérer les produits et catégories',
   },
   {
     href: '/admin/email',
-    label: 'Email Notifications',
-    description: 'Configure email settings and templates',
+    label: 'Notifications email',
+    description: "Configurer les paramètres et modèles d'email",
   },
   {
     href: '/admin/maintenance',
     label: 'Maintenance',
-    description: 'Configure scheduled restarts',
+    description: 'Configurer les redémarrages programmés',
   },
   {
     href: '/admin/export-import',
     label: 'Export / Import',
-    description: 'Backup and restore configuration',
+    description: 'Sauvegarder et restaurer la configuration',
   },
 ];
 
@@ -146,14 +146,14 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           fontWeight="semibold"
           color="fg"
         >
-          Admin Panel
+          Panneau Admin
         </Text>
         <HStack gap={2}>
           <LogoutButton />
           <DarkModeToggle size="sm" />
           {isMobile && (
             <IconButton
-              aria-label="Close sidebar"
+              aria-label="Fermer le menu"
               variant="ghost"
               size="sm"
               onClick={handleClose}
@@ -256,7 +256,7 @@ export function AdminSidebarToggle(props: IconButtonProps) {
 
   return (
     <IconButton
-      aria-label="Toggle sidebar"
+      aria-label="Afficher/masquer le menu"
       variant="ghost"
       size="sm"
       onClick={handleClick}

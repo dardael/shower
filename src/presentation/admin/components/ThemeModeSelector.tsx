@@ -22,20 +22,20 @@ interface ModeOption {
 const MODE_OPTIONS: ModeOption[] = [
   {
     value: 'user-choice',
-    label: 'User Choice',
-    description: 'Visitors can toggle between light and dark mode',
+    label: 'Choix utilisateur',
+    description: 'Les visiteurs peuvent basculer entre le mode clair et sombre',
     icon: <LuMonitor size={20} />,
   },
   {
     value: 'force-light',
-    label: 'Force Light',
-    description: 'Always display light mode, hide toggle',
+    label: 'Forcer clair',
+    description: 'Toujours afficher le mode clair, masquer le bouton',
     icon: <LuSun size={20} />,
   },
   {
     value: 'force-dark',
-    label: 'Force Dark',
-    description: 'Always display dark mode, hide toggle',
+    label: 'Forcer sombre',
+    description: 'Toujours afficher le mode sombre, masquer le bouton',
     icon: <LuMoon size={20} />,
   },
 ];
@@ -63,7 +63,7 @@ const ModeButton = memo<ModeButtonProps>(
         gap={1}
         minWidth="120px"
         position="relative"
-        aria-label={`Select ${option.label} theme mode`}
+        aria-label={`Sélectionner le mode ${option.label}`}
         aria-pressed={isSelected}
         data-selected={isSelected}
         opacity={isLoading ? 0.7 : 1}
@@ -102,7 +102,7 @@ const ThemeModeSelector = memo<ThemeModeSelectorProps>(
 
     useEffect(() => {
       if (selectedOption) {
-        setAnnouncement(`Theme mode changed to ${selectedOption.label}`);
+        setAnnouncement(`Mode de thème changé en ${selectedOption.label}`);
         const timer = setTimeout(() => setAnnouncement(''), 1000);
         return () => clearTimeout(timer);
       }
@@ -133,13 +133,13 @@ const ThemeModeSelector = memo<ThemeModeSelectorProps>(
             color={textColor}
             data-testid="theme-mode-label"
           >
-            Theme Mode
+            Mode du thème
           </Text>
           {isLoading && (
             <Spinner
               size="sm"
               color="fg.muted"
-              aria-label="Updating theme mode"
+              aria-label="Mise à jour du mode de thème"
             />
           )}
         </HStack>
@@ -159,9 +159,9 @@ const ThemeModeSelector = memo<ThemeModeSelectorProps>(
 
         <Text fontSize="sm" color={textColor} opacity={0.7}>
           {isLoading
-            ? 'Updating theme mode...'
+            ? 'Mise à jour du mode de thème...'
             : (selectedOption?.description ??
-              'Select how visitors experience light/dark mode')}
+              'Sélectionnez comment les visiteurs voient le mode clair/sombre')}
         </Text>
       </VStack>
     );

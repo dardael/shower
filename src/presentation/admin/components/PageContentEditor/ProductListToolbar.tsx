@@ -169,7 +169,7 @@ export function ProductListToolbar({
         {/* Layout selector */}
         <HStack gap={1}>
           <Text fontSize="xs" color="fg.muted">
-            Layout:
+            Disposition :
           </Text>
           {LAYOUTS.map((l) => (
             <Tooltip key={l} content={PRODUCT_LIST_LAYOUT_LABELS[l]}>
@@ -189,7 +189,7 @@ export function ProductListToolbar({
         {/* Sort selector */}
         <HStack gap={1}>
           <Text fontSize="xs" color="fg.muted">
-            Sort:
+            Tri :
           </Text>
           {SORT_OPTIONS.map((s) => (
             <Button
@@ -214,7 +214,7 @@ export function ProductListToolbar({
         {/* Display options */}
         <HStack gap={1}>
           <Text fontSize="xs" color="fg.muted">
-            Show:
+            Afficher :
           </Text>
           <Button
             size="xs"
@@ -222,7 +222,7 @@ export function ProductListToolbar({
             onClick={handleToggleShowName}
             disabled={disabled}
           >
-            Name
+            Nom
           </Button>
           <Button
             size="xs"
@@ -238,7 +238,7 @@ export function ProductListToolbar({
             onClick={handleToggleShowPrice}
             disabled={disabled}
           >
-            Price
+            Prix
           </Button>
           <Button
             size="xs"
@@ -251,9 +251,9 @@ export function ProductListToolbar({
         </HStack>
 
         {/* Remove button */}
-        <Tooltip content="Remove Products List">
+        <Tooltip content="Supprimer la liste de produits">
           <IconButton
-            aria-label="Remove Products List"
+            aria-label="Supprimer la liste de produits"
             size="xs"
             variant="ghost"
             colorPalette="red"

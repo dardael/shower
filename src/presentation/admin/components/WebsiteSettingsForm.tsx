@@ -179,7 +179,7 @@ export default function WebsiteSettingsForm({
       markAsInitialized();
     } catch {
       showToast(
-        'Failed to load website settings. Please try again later.',
+        'Échec du chargement des paramètres du site. Veuillez réessayer plus tard.',
         'error'
       );
       setCurrentIcon(null);
@@ -210,17 +210,23 @@ export default function WebsiteSettingsForm({
       const data = await response.json();
 
       if (response.ok) {
-        showToast('Website settings updated successfully!', 'success');
+        showToast('Paramètres du site mis à jour avec succès !', 'success');
         markAsClean();
         // Refresh theme color and background color to invalidate cache
         await updateThemeColorWithCache(themeColor);
         await updateBackgroundColorWithCache(backgroundColor);
         await fetchWebsiteSettings();
       } else {
-        showToast(data.error || 'Failed to update website name', 'error');
+        showToast(
+          data.error || 'Échec de la mise à jour du nom du site',
+          'error'
+        );
       }
     } catch {
-      showToast('An error occurred while updating the website name', 'error');
+      showToast(
+        'Une erreur est survenue lors de la mise à jour du nom du site',
+        'error'
+      );
     } finally {
       setLoading(false);
     }
@@ -254,7 +260,7 @@ export default function WebsiteSettingsForm({
     const allowedTypes = ['image/gif', 'video/mp4', 'video/webm'];
     if (!allowedTypes.includes(file.type)) {
       showToast(
-        'Invalid file type. Only GIF, MP4, and WebM files are allowed.',
+        'Type de fichier invalide. Seuls les fichiers GIF, MP4 et WebM sont autorisés.',
         'error'
       );
       return;
@@ -262,7 +268,7 @@ export default function WebsiteSettingsForm({
 
     const maxSize = CUSTOM_LOADER_MAX_SIZE_BYTES;
     if (file.size > maxSize) {
-      showToast('File size must be less than 10MB.', 'error');
+      showToast('La taille du fichier doit être inférieure à 10 Mo.', 'error');
       return;
     }
 
@@ -280,12 +286,21 @@ export default function WebsiteSettingsForm({
 
       if (response.ok) {
         setCustomLoader(data.loader);
-        showToast('Custom loader uploaded successfully!', 'success');
+        showToast(
+          'Animation de chargement personnalisée téléchargée avec succès !',
+          'success'
+        );
       } else {
-        showToast(data.error || 'Failed to upload custom loader', 'error');
+        showToast(
+          data.error || "Échec du téléchargement de l'animation personnalisée",
+          'error'
+        );
       }
     } catch {
-      showToast('An error occurred while uploading the custom loader', 'error');
+      showToast(
+        "Une erreur est survenue lors du téléchargement de l'animation personnalisée",
+        'error'
+      );
     } finally {
       setLoaderLoading(false);
       if (loaderInputRef.current) {
@@ -303,13 +318,22 @@ export default function WebsiteSettingsForm({
 
       if (response.ok) {
         setCustomLoader(null);
-        showToast('Custom loader removed successfully!', 'success');
+        showToast(
+          'Animation de chargement personnalisée supprimée avec succès !',
+          'success'
+        );
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to remove custom loader', 'error');
+        showToast(
+          data.error || "Échec de la suppression de l'animation personnalisée",
+          'error'
+        );
       }
     } catch {
-      showToast('An error occurred while removing the custom loader', 'error');
+      showToast(
+        "Une erreur est survenue lors de la suppression de l'animation personnalisée",
+        'error'
+      );
     } finally {
       setLoaderLoading(false);
     }
@@ -346,14 +370,14 @@ export default function WebsiteSettingsForm({
           gap={3}
         >
           <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
-          Website Settings
+          Paramètres du site
         </Heading>
         <Text
           fontSize={{ base: 'sm', md: 'md' }}
           color="fg.muted"
           lineHeight="relaxed"
         >
-          Configure your website&apos;s basic information and appearance
+          Configurez les informations de base et l&apos;apparence de votre site
         </Text>
       </VStack>
 
@@ -367,7 +391,7 @@ export default function WebsiteSettingsForm({
               color="fg"
               mb={2}
             >
-              Website Name
+              Nom du site
             </Field.Label>
             <Input
               id="name"
@@ -377,7 +401,7 @@ export default function WebsiteSettingsForm({
                 setName(e.target.value);
                 updateFieldValue('name', e.target.value);
               }}
-              placeholder="Enter your website name"
+              placeholder="Entrez le nom de votre site"
               maxLength={50}
               required
               bg="bg.canvas"
@@ -400,14 +424,14 @@ export default function WebsiteSettingsForm({
               color="fg.muted"
               mt={2}
             >
-              This name appears in browser tabs and search results. Maximum 50
-              characters.
+              Ce nom apparaît dans les onglets du navigateur et les résultats de
+              recherche. Maximum 50 caractères.
             </Field.HelperText>
           </Field.Root>
 
           <Field.Root>
             <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
-              Website Icon
+              Icône du site
             </Field.Label>
             <Box
               bg="bg.canvas"
@@ -438,9 +462,9 @@ export default function WebsiteSettingsForm({
               color="fg.muted"
               mt={2}
             >
-              Upload a favicon that appears in browser tabs. Recommended size is
-              32x32 pixels for ICO format or 16x16 to 32x32 pixels for other
-              formats.
+              Téléchargez un favicon qui apparaît dans les onglets du
+              navigateur. Taille recommandée : 32x32 pixels pour le format ICO
+              ou 16x16 à 32x32 pixels pour les autres formats.
             </Field.HelperText>
           </Field.Root>
 
@@ -450,7 +474,7 @@ export default function WebsiteSettingsForm({
               try {
                 await updateThemeModeConfig(mode);
               } catch {
-                showToast('Failed to update theme mode', 'error');
+                showToast('Échec de la mise à jour du mode de thème', 'error');
               }
             }}
             disabled={loading}
@@ -493,7 +517,7 @@ export default function WebsiteSettingsForm({
                 await updateWebsiteFontWithCache(font);
                 updateFieldValue('websiteFont', font);
               } catch {
-                showToast('Failed to update website font', 'error');
+                showToast('Échec de la mise à jour de la police', 'error');
               }
             }}
             disabled={loading}
@@ -506,7 +530,7 @@ export default function WebsiteSettingsForm({
               try {
                 await updateSellingEnabledConfig(enabled);
               } catch {
-                showToast('Failed to update selling mode', 'error');
+                showToast('Échec de la mise à jour du mode vente', 'error');
               }
             }}
             disabled={loading}
@@ -515,7 +539,7 @@ export default function WebsiteSettingsForm({
 
           <Field.Root>
             <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
-              Loading Animation
+              Animation de chargement
             </Field.Label>
             <Box
               bg="bg.canvas"
@@ -527,7 +551,7 @@ export default function WebsiteSettingsForm({
               {loaderLoading ? (
                 <HStack justify="center" py={4}>
                   <Spinner size="md" />
-                  <Text color="fg.muted">Processing...</Text>
+                  <Text color="fg.muted">Traitement en cours...</Text>
                 </HStack>
               ) : customLoader ? (
                 <VStack align="stretch" gap={4}>
@@ -587,7 +611,7 @@ export default function WebsiteSettingsForm({
                         disabled={loaderLoading}
                       >
                         <FiUpload />
-                        Replace
+                        Remplacer
                       </Button>
                       <Button
                         size="sm"
@@ -597,7 +621,7 @@ export default function WebsiteSettingsForm({
                         disabled={loaderLoading}
                       >
                         <FiTrash2 />
-                        Remove
+                        Supprimer
                       </Button>
                     </HStack>
                   </HStack>
@@ -605,7 +629,8 @@ export default function WebsiteSettingsForm({
               ) : (
                 <VStack gap={3} py={2}>
                   <Text fontSize="sm" color="fg.muted" textAlign="center">
-                    No custom loader configured. Using default spinner.
+                    Aucune animation personnalisée configurée. Utilisation du
+                    spinner par défaut.
                   </Text>
                   <Button
                     size="sm"
@@ -614,7 +639,7 @@ export default function WebsiteSettingsForm({
                     disabled={loaderLoading}
                   >
                     <FiUpload />
-                    Upload Custom Loader
+                    Télécharger une animation
                   </Button>
                 </VStack>
               )}
@@ -631,8 +656,8 @@ export default function WebsiteSettingsForm({
               color="fg.muted"
               mt={2}
             >
-              Upload a GIF or video (MP4, WebM) to replace the default loading
-              spinner. Maximum file size is 10MB.
+              Téléchargez un GIF ou une vidéo (MP4, WebM) pour remplacer le
+              spinner de chargement par défaut. Taille maximale : 10 Mo.
             </Field.HelperText>
           </Field.Root>
 
@@ -641,10 +666,10 @@ export default function WebsiteSettingsForm({
               type="submit"
               data-testid="save-website-button"
               isLoading={loading}
-              loadingText="Updating..."
+              loadingText="Mise à jour..."
               width="full"
             >
-              Update Website
+              Mettre à jour le site
             </SaveButton>
           </Box>
         </Stack>

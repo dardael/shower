@@ -50,11 +50,11 @@ export default function PageContentEditor({
         setOriginalContent('');
         setHasExistingContent(false);
       } else {
-        showToast('Failed to load page content', 'error');
+        showToast('Échec du chargement du contenu de la page', 'error');
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error fetching page content');
-      showToast('Failed to load page content', 'error');
+      showToast('Échec du chargement du contenu de la page', 'error');
     } finally {
       setLoading(false);
     }
@@ -66,7 +66,7 @@ export default function PageContentEditor({
 
   const handleSave = async () => {
     if (!content.trim()) {
-      showToast('Content cannot be empty', 'error');
+      showToast('Le contenu ne peut pas être vide', 'error');
       return;
     }
 
@@ -90,14 +90,17 @@ export default function PageContentEditor({
         const data = await response.json();
         setOriginalContent(data.content);
         setHasExistingContent(true);
-        showToast('Page content saved successfully', 'success');
+        showToast('Contenu de la page enregistré avec succès', 'success');
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to save page content', 'error');
+        showToast(
+          data.error || "Échec de l'enregistrement du contenu",
+          'error'
+        );
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error saving page content');
-      showToast('Failed to save page content', 'error');
+      showToast("Échec de l'enregistrement du contenu de la page", 'error');
     } finally {
       setSaving(false);
     }
@@ -116,14 +119,14 @@ export default function PageContentEditor({
         setOriginalContent('');
         setHasExistingContent(false);
         setDeleteDialogOpen(false);
-        showToast('Page content deleted successfully', 'success');
+        showToast('Contenu de la page supprimé avec succès', 'success');
       } else {
         const data = await response.json();
-        showToast(data.error || 'Failed to delete page content', 'error');
+        showToast(data.error || 'Échec de la suppression du contenu', 'error');
       }
     } catch (error) {
       logger.logErrorWithObject(error, 'Error deleting page content');
-      showToast('Failed to delete page content', 'error');
+      showToast('Échec de la suppression du contenu de la page', 'error');
     } finally {
       setDeleting(false);
     }
@@ -162,20 +165,21 @@ export default function PageContentEditor({
           gap={3}
         >
           <Box w="8px" h="8px" borderRadius="full" bg="colorPalette.solid" />
-          Page Content: {menuItemText}
+          Contenu de la page : {menuItemText}
         </Heading>
         <Text
           fontSize={{ base: 'sm', md: 'md' }}
           color="fg.muted"
           lineHeight="relaxed"
         >
-          Edit the content that will be displayed when users visit this page.
+          Modifiez le contenu qui sera affiché lorsque les utilisateurs
+          visiteront cette page.
         </Text>
       </VStack>
 
       <VStack gap={4} align="stretch">
         {loading ? (
-          <Text color="fg.muted">Loading content...</Text>
+          <Text color="fg.muted">Chargement du contenu...</Text>
         ) : (
           <>
             <TiptapEditor
@@ -198,7 +202,7 @@ export default function PageContentEditor({
                   }}
                 >
                   <FiTrash2 />
-                  Delete Content
+                  Supprimer le contenu
                 </Button>
               )}
               <Button
@@ -207,7 +211,7 @@ export default function PageContentEditor({
                 loading={saving}
               >
                 <FiSave />
-                {hasExistingContent ? 'Update Content' : 'Save Content'}
+                {hasExistingContent ? 'Mettre à jour' : 'Enregistrer'}
               </Button>
             </HStack>
           </>
@@ -224,12 +228,13 @@ export default function PageContentEditor({
           <Dialog.Positioner>
             <Dialog.Content>
               <Dialog.Header>
-                <Dialog.Title>Delete Page Content</Dialog.Title>
+                <Dialog.Title>Supprimer le contenu de la page</Dialog.Title>
               </Dialog.Header>
               <Dialog.Body>
                 <Text>
-                  Are you sure you want to delete the content for{' '}
-                  <strong>{menuItemText}</strong>? This action cannot be undone.
+                  Êtes-vous sûr de vouloir supprimer le contenu de{' '}
+                  <strong>{menuItemText}</strong> ? Cette action est
+                  irréversible.
                 </Text>
               </Dialog.Body>
               <Dialog.Footer>
@@ -239,14 +244,14 @@ export default function PageContentEditor({
                     onClick={() => setDeleteDialogOpen(false)}
                     disabled={deleting}
                   >
-                    Cancel
+                    Annuler
                   </Button>
                   <Button
                     colorPalette="red"
                     onClick={handleDelete}
                     loading={deleting}
                   >
-                    Delete
+                    Supprimer
                   </Button>
                 </HStack>
               </Dialog.Footer>
