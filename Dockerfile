@@ -1,8 +1,12 @@
 # Use Node.js 20 as base image
 FROM node:24
 
-# Install git
-RUN apt-get update && apt-get install -y git
+# Install git and mongodb-database-tools (for mongodump/mongorestore)
+RUN apt-get update && apt-get install -y git gnupg curl && \
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/mongodb-archive-keyring.gpg] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/7.0 main" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
+    apt-get update && apt-get install -y mongodb-database-tools && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 # Set working directory
 WORKDIR /app
 

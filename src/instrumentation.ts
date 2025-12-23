@@ -4,7 +4,9 @@ export async function register(): Promise<void> {
   // Only run on the server (Node.js runtime)
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     // Dynamically import to avoid issues during build
-    const { ConfigServiceLocator } = await import('@/infrastructure/container');
+    const { ConfigServiceLocator, BackupServiceLocator } = await import(
+      '@/infrastructure/container'
+    );
     const { Logger } = await import('@/application/shared/Logger');
     const { initializeDatabase } = await import(
       '@/infrastructure/shared/databaseInitialization'
@@ -16,15 +18,21 @@ export async function register(): Promise<void> {
     });
 
     try {
-      // Initialize database connection first - required for scheduler to fetch config
+      // Initialize database connection first - required for schedulers to fetch config
       await initializeDatabase();
       logger.info('Database initialized successfully');
 
-      const scheduler = ConfigServiceLocator.getRestartScheduler();
-      await scheduler.start();
+      // Initialize restart scheduler
+      const restartScheduler = ConfigServiceLocator.getRestartScheduler();
+      await restartScheduler.start();
       logger.info('Restart scheduler initialized successfully');
+
+      // Initialize backup scheduler
+      const backupScheduler = BackupServiceLocator.getBackupScheduler();
+      await backupScheduler.start();
+      logger.info('Backup scheduler initialized successfully');
     } catch (error) {
-      logger.error('Failed to initialize scheduler', error);
+      logger.error('Failed to initialize schedulers', error);
     }
   }
 }

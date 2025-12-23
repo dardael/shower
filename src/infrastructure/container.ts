@@ -134,6 +134,12 @@ import type { IEmailService } from '@/domain/email/services/IEmailService';
 import { MongooseEmailSettingsRepository } from '@/infrastructure/email/repositories/MongooseEmailSettingsRepository';
 import { NodemailerEmailService } from '@/infrastructure/email/services/NodemailerEmailService';
 import { PlaceholderReplacer } from '@/infrastructure/email/services/PlaceholderReplacer';
+import type { IBackupConfigurationRepository } from '@/domain/backup/ports/IBackupConfigurationRepository';
+import type { IDatabaseBackupService } from '@/domain/backup/ports/IDatabaseBackupService';
+import { MongoBackupConfigurationRepository } from '@/infrastructure/backup/adapters/MongoBackupConfigurationRepository';
+import { MongoDumpBackupService } from '@/infrastructure/backup/adapters/MongoDumpBackupService';
+import type { IBackupScheduler } from '@/domain/backup/ports/IBackupScheduler';
+import { BackupSchedulerService } from '@/application/backup/services/BackupSchedulerService';
 
 // Register unified logger
 container.register<Logger>('Logger', {
@@ -426,6 +432,22 @@ container.register<PlaceholderReplacer>('PlaceholderReplacer', {
   useClass: PlaceholderReplacer,
 });
 
+// Register backup services
+container.register<IBackupConfigurationRepository>(
+  'IBackupConfigurationRepository',
+  {
+    useClass: MongoBackupConfigurationRepository,
+  }
+);
+
+container.register<IDatabaseBackupService>('IDatabaseBackupService', {
+  useClass: MongoDumpBackupService,
+});
+
+container.register<IBackupScheduler>('IBackupScheduler', {
+  useClass: BackupSchedulerService,
+});
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -666,6 +688,20 @@ export class EmailServiceLocator {
 
   static getPlaceholderReplacer(): PlaceholderReplacer {
     return container.resolve('PlaceholderReplacer');
+  }
+}
+
+export class BackupServiceLocator {
+  static getBackupConfigurationRepository(): IBackupConfigurationRepository {
+    return container.resolve('IBackupConfigurationRepository');
+  }
+
+  static getDatabaseBackupService(): IDatabaseBackupService {
+    return container.resolve('IDatabaseBackupService');
+  }
+
+  static getBackupScheduler(): IBackupScheduler {
+    return container.resolve('IBackupScheduler');
   }
 }
 
