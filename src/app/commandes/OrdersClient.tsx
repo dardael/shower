@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Box,
   Container,
@@ -22,6 +22,8 @@ import {
   OrderStatus,
   getOrderStatusLabel,
 } from '@/domain/order/value-objects/OrderStatus';
+import { useOrdersFilterSort } from '@/presentation/admin/hooks/useOrdersFilterSort';
+import OrderFilterPanel from '@/presentation/admin/components/OrderFilterPanel';
 
 interface OrderItem {
   productId: string;
@@ -41,6 +43,17 @@ interface Order {
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  categoryIds: string[];
+}
+
+interface Category {
+  id: string;
+  name: string;
 }
 
 interface StatusConfig {
@@ -106,23 +119,80 @@ function StatusButton({
 
 export default function OrdersClient(): React.JSX.Element {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Use filter/sort hook
+  const {
+    filterState,
+    sortState,
+    setStatusFilter,
+    setCustomerNameFilter,
+    setProductFilter,
+    setCategoryFilter,
+    setSortField,
+    resetAll,
+    getFilteredAndSortedOrders,
+  } = useOrdersFilterSort();
+
+  // Build product category map for filtering
+  const productCategoryMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    products.forEach((product) => {
+      map.set(product.id, product.categoryIds);
+    });
+    return map;
+  }, [products]);
+
+  // Derive filtered and sorted orders
+  // Apply filters and sorting to orders
+  const filteredOrders = useMemo((): Order[] => {
+    // Type assertion needed because hook uses domain Order type while component uses API response type
+    // Both have compatible shapes for filtering/sorting purposes
+    return getFilteredAndSortedOrders(
+      orders as unknown as Parameters<typeof getFilteredAndSortedOrders>[0],
+      productCategoryMap
+    ) as unknown as Order[];
+  }, [orders, productCategoryMap, getFilteredAndSortedOrders]);
+
   useEffect(() => {
-    async function fetchOrders(): Promise<void> {
+    async function fetchData(): Promise<void> {
       try {
-        const response = await fetch('/api/orders');
-        if (response.status === 401) {
+        const [ordersResponse, productsResponse, categoriesResponse] =
+          await Promise.all([
+            fetch('/api/orders'),
+            fetch('/api/admin/products'),
+            fetch('/api/admin/categories'),
+          ]);
+
+        if (ordersResponse.status === 401) {
           router.push('/admin');
           return;
         }
-        if (!response.ok) {
+
+        if (!ordersResponse.ok) {
           throw new Error('Erreur lors du chargement des commandes');
         }
-        const data = (await response.json()) as Order[];
-        setOrders(data);
+
+        const ordersData = (await ordersResponse.json()) as Order[];
+        setOrders(ordersData);
+
+        if (productsResponse.ok) {
+          const productsData = (await productsResponse.json()) as {
+            products: Product[];
+          };
+          setProducts(productsData.products || []);
+        }
+
+        if (categoriesResponse.ok) {
+          const categoriesData = (await categoriesResponse.json()) as {
+            categories: Category[];
+          };
+          setCategories(categoriesData.categories || []);
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err.message : 'Une erreur est survenue'
@@ -132,7 +202,7 @@ export default function OrdersClient(): React.JSX.Element {
       }
     }
 
-    fetchOrders();
+    fetchData();
   }, [router]);
 
   const handleStatusChange = async (
@@ -159,6 +229,26 @@ export default function OrdersClient(): React.JSX.Element {
       setError(
         err instanceof Error ? err.message : 'Erreur de mise à jour du statut'
       );
+    }
+  };
+
+  const handleSortChange = (
+    field: 'date' | 'customerName' | 'status'
+  ): void => {
+    setSortField(field);
+    // Direction is toggled automatically by the hook when field changes
+  };
+
+  const handleReset = (): void => {
+    resetAll();
+  };
+
+  const handleStatusToggle = (status: OrderStatus): void => {
+    const currentStatuses = filterState.statuses;
+    if (currentStatuses.includes(status)) {
+      setStatusFilter(currentStatuses.filter((s) => s !== status));
+    } else {
+      setStatusFilter([...currentStatuses, status]);
     }
   };
 
@@ -191,15 +281,33 @@ export default function OrdersClient(): React.JSX.Element {
       <VStack gap={6} align="stretch">
         <Heading size="xl">Gestion des commandes</Heading>
 
-        {orders.length === 0 ? (
+        {/* Filter Panel */}
+        <OrderFilterPanel
+          filterState={filterState}
+          sortState={sortState}
+          onStatusToggle={handleStatusToggle}
+          onCustomerNameChange={setCustomerNameFilter}
+          onProductChange={setProductFilter}
+          onCategoryChange={setCategoryFilter}
+          onSortChange={handleSortChange}
+          onReset={handleReset}
+          filteredCount={filteredOrders.length}
+          totalCount={orders.length}
+          products={products}
+          categories={categories}
+        />
+
+        {filteredOrders.length === 0 ? (
           <Card.Root p={6}>
             <Text textAlign="center" color="gray.500">
-              Aucune commande pour le moment
+              {orders.length === 0
+                ? 'Aucune commande pour le moment'
+                : 'Aucune commande ne correspond aux filtres sélectionnés'}
             </Text>
           </Card.Root>
         ) : (
           <Accordion.Root multiple>
-            {orders.map((order, index) => {
+            {filteredOrders.map((order, index) => {
               const statusConfig = STATUS_CONFIG[order.status];
               return (
                 <Accordion.Item key={order.id} value={order.id}>
