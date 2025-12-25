@@ -13,6 +13,10 @@ export const THEME_COLOR_PALETTE = [
   'cyan', // Tech/Professional colors
   'beige', // Warm neutral colors
   'cream', // Soft warm colors
+  'gold', // Warm golden colors (#eeb252)
+  'sand', // Soft sand colors (#f2e8de)
+  'taupe', // Warm taupe colors (#e2cbac)
+  'white', // Pure white background (#ffffff)
 ] as const;
 
 export type ThemeColorToken = (typeof THEME_COLOR_PALETTE)[number];

@@ -38,6 +38,10 @@ export const BACKGROUND_COLOR_MAP: Record<
   cyan: { light: '#ecfeff', dark: '#164e63' },
   beige: { light: '#cdb99d', dark: '#a89070' },
   cream: { light: '#ede6dd', dark: '#3d3830' },
+  gold: { light: '#eeb252', dark: '#8b6914' },
+  sand: { light: '#f2e8de', dark: '#4a4238' },
+  taupe: { light: '#e2cbac', dark: '#5c4d3a' },
+  white: { light: '#ffffff', dark: '#1a1a1a' },
 };
 
 // Component that applies background color to the body element

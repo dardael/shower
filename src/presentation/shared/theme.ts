@@ -258,6 +258,98 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '#e0d6c8', _dark: '#4a4540' },
             },
           },
+          gold: {
+            solid: {
+              value: { _light: '#eeb252', _dark: '#8b6914' },
+            },
+            muted: {
+              value: { _light: '#f9e4b8', _dark: '#4a3810' },
+            },
+            subtle: {
+              value: { _light: '#fdf3dc', _dark: '#3d2f0d' },
+            },
+            emphasized: {
+              value: { _light: '#d9a043', _dark: '#a87d1a' },
+            },
+            fg: {
+              value: { _light: '#3d2f0d', _dark: '#fdf3dc' },
+            },
+            contrast: {
+              value: { _light: '#1a1408', _dark: '#fdf3dc' },
+            },
+            border: {
+              value: { _light: '#e6c57a', _dark: '#6b5212' },
+            },
+          },
+          sand: {
+            solid: {
+              value: { _light: '#f2e8de', _dark: '#4a4238' },
+            },
+            muted: {
+              value: { _light: '#f8f3ec', _dark: '#3a342c' },
+            },
+            subtle: {
+              value: { _light: '#fcf9f5', _dark: '#2d2924' },
+            },
+            emphasized: {
+              value: { _light: '#e5d8c8', _dark: '#5c5245' },
+            },
+            fg: {
+              value: { _light: '#3d3830', _dark: '#f8f3ec' },
+            },
+            contrast: {
+              value: { _light: '#1a1815', _dark: '#fcf9f5' },
+            },
+            border: {
+              value: { _light: '#e8dcd0', _dark: '#4f463a' },
+            },
+          },
+          taupe: {
+            solid: {
+              value: { _light: '#e2cbac', _dark: '#5c4d3a' },
+            },
+            muted: {
+              value: { _light: '#f0e4d4', _dark: '#4a3f30' },
+            },
+            subtle: {
+              value: { _light: '#f7f1e8', _dark: '#3a3228' },
+            },
+            emphasized: {
+              value: { _light: '#d4bc98', _dark: '#6e5c45' },
+            },
+            fg: {
+              value: { _light: '#3a3228', _dark: '#f7f1e8' },
+            },
+            contrast: {
+              value: { _light: '#1a1612', _dark: '#f7f1e8' },
+            },
+            border: {
+              value: { _light: '#ddd0b8', _dark: '#5a4c3c' },
+            },
+          },
+          white: {
+            solid: {
+              value: { _light: '#ffffff', _dark: '#1a1a1a' },
+            },
+            muted: {
+              value: { _light: '#fafafa', _dark: '#262626' },
+            },
+            subtle: {
+              value: { _light: '#f5f5f5', _dark: '#2d2d2d' },
+            },
+            emphasized: {
+              value: { _light: '#e8e8e8', _dark: '#404040' },
+            },
+            fg: {
+              value: { _light: '#1a1a1a', _dark: '#fafafa' },
+            },
+            contrast: {
+              value: { _light: '#000000', _dark: '#ffffff' },
+            },
+            border: {
+              value: { _light: '#e0e0e0', _dark: '#383838' },
+            },
+          },
         },
       },
     },

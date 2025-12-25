@@ -11,6 +11,10 @@ import {
 const CUSTOM_COLOR_DISPLAY: Partial<Record<ThemeColorToken, string>> = {
   beige: '#cdb99d',
   cream: '#ede6dd',
+  gold: '#eeb252',
+  sand: '#f2e8de',
+  taupe: '#e2cbac',
+  white: '#ffffff',
 };
 
 function getColorDisplayValue(color: ThemeColorToken): string {
