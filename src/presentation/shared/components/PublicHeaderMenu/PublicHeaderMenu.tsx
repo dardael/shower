@@ -8,6 +8,7 @@ import { PublicHeaderMenuItem } from './PublicHeaderMenuItem';
 import { MobileMenuToggle } from './MobileMenuToggle';
 import { MobileMenuDrawer } from './MobileMenuDrawer';
 import { CartIcon, CartDrawer } from '@/presentation/shared/components/Cart';
+import { useHeaderMenuTextColorContext } from '@/presentation/shared/contexts/HeaderMenuTextColorContext';
 import type { PublicHeaderMenuProps } from './types';
 
 /**
@@ -26,6 +27,7 @@ export function PublicHeaderMenu({
   const [logoError, setLogoError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { headerMenuTextColor } = useHeaderMenuTextColorContext();
 
   // Detect mobile viewport (< 768px)
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -167,9 +169,12 @@ export function PublicHeaderMenu({
                 aria-label="Main navigation"
               >
                 {menuItems.map((item) => (
-                  <Box key={item.id} color={{ base: 'black', _dark: 'white' }}>
-                    <PublicHeaderMenuItem text={item.text} url={item.url} />
-                  </Box>
+                  <PublicHeaderMenuItem
+                    key={item.id}
+                    text={item.text}
+                    url={item.url}
+                    textColor={headerMenuTextColor}
+                  />
                 ))}
               </Flex>
             )}
@@ -181,7 +186,7 @@ export function PublicHeaderMenu({
 
             {/* Desktop: Dark mode toggle in header */}
             {!isMobile && (
-              <Box color={{ base: 'black', _dark: 'white' }}>
+              <Box color={headerMenuTextColor}>
                 <DarkModeToggle size="sm" variant="ghost" />
               </Box>
             )}

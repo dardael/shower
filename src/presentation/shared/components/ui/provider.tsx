@@ -22,6 +22,7 @@ import {
 import { ThemeModeProvider } from '@/presentation/shared/contexts/ThemeModeContext';
 import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
 import { CartProvider } from '@/presentation/shared/contexts/CartContext';
+import { HeaderMenuTextColorProvider } from '@/presentation/shared/contexts/HeaderMenuTextColorContext';
 
 // Background color hex mappings for light and dark modes
 export const BACKGROUND_COLOR_MAP: Record<
@@ -97,9 +98,11 @@ function ThemeProviderWithInitialColor({
   return (
     <ThemeColorProvider>
       <BackgroundColorProvider>
-        <ThemeModeProvider>
-          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
-        </ThemeModeProvider>
+        <HeaderMenuTextColorProvider>
+          <ThemeModeProvider>
+            <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+          </ThemeModeProvider>
+        </HeaderMenuTextColorProvider>
       </BackgroundColorProvider>
     </ThemeColorProvider>
   );

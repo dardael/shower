@@ -138,6 +138,7 @@ you must use docker compose to run all commands in order to have the same enviro
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, react-icons, existing Order/Product/Category entities (048-order-filter-sort)
 - N/A (client-side filtering on existing MongoDB data via existing APIs) (048-order-filter-sort)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, React Context (ThemeColorContext, BackgroundColorContext) (049-header-menu-bgcolor)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, React Context, tsyringe (DI) (050-header-menu-text-color)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

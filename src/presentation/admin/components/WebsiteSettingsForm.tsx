@@ -18,11 +18,13 @@ import ImageManager from '@/presentation/shared/components/ImageManager/ImageMan
 import Image from 'next/image';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
+import { HeaderMenuTextColorSelector } from '@/presentation/admin/components/HeaderMenuTextColorSelector';
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { ThemeModeSelector } from '@/presentation/admin/components/ThemeModeSelector';
 import { SellingToggleSelector } from '@/presentation/admin/components/SellingToggleSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
+import { useHeaderMenuTextColorContext } from '@/presentation/shared/contexts/HeaderMenuTextColorContext';
 import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
@@ -65,6 +67,11 @@ export default function WebsiteSettingsForm({
     setBackgroundColor,
     isLoading: backgroundColorLoading,
   } = useBackgroundColorContext();
+  const {
+    headerMenuTextColor,
+    updateHeaderMenuTextColor: updateHeaderMenuTextColorWithCache,
+    isLoading: headerMenuTextColorLoading,
+  } = useHeaderMenuTextColorContext();
   const {
     websiteFont,
     updateWebsiteFont: updateWebsiteFontWithCache,
@@ -479,6 +486,22 @@ export default function WebsiteSettingsForm({
           }}
           disabled={false}
           isLoading={backgroundColorLoading}
+        />
+
+        <HeaderMenuTextColorSelector
+          selectedColor={headerMenuTextColor}
+          onColorChange={async (color) => {
+            try {
+              await updateHeaderMenuTextColorWithCache(color);
+            } catch {
+              showToast(
+                'Échec de la mise à jour de la couleur du texte du menu',
+                'error'
+              );
+            }
+          }}
+          disabled={false}
+          isLoading={headerMenuTextColorLoading}
         />
 
         <FontSelector

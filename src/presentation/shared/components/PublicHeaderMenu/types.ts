@@ -25,6 +25,7 @@ export interface PublicLogo {
 export interface PublicHeaderMenuItemProps {
   text: string;
   url: string;
+  textColor?: string;
 }
 
 /**

@@ -13,13 +13,16 @@ import type { PublicHeaderMenuItemProps } from './types';
 export function PublicHeaderMenuItem({
   text,
   url,
+  textColor,
 }: PublicHeaderMenuItemProps): React.ReactElement {
+  const colorStyle = textColor || 'inherit';
+
   if (!url) {
     return (
       <Text
         fontSize="md"
         fontWeight="medium"
-        color="inherit"
+        color={colorStyle}
         cursor="default"
         px={3}
         py={2}
@@ -30,12 +33,25 @@ export function PublicHeaderMenuItem({
   }
 
   return (
-    <ChakraLink asChild px={3} py={2}>
+    <ChakraLink
+      asChild
+      px={3}
+      py={2}
+      outline="none"
+      boxShadow="none"
+      _focus={{ outline: 'none', boxShadow: 'none' }}
+      _focusVisible={{ outline: 'none', boxShadow: 'none' }}
+      _active={{ outline: 'none', boxShadow: 'none' }}
+      css={{
+        '&:focus': { outline: 'none' },
+        '&:focus-visible': { outline: 'none' },
+      }}
+    >
       <Link href={url}>
         <Text
           fontSize="md"
           fontWeight="medium"
-          color="inherit"
+          color={colorStyle}
           _hover={{ textDecoration: 'underline' }}
         >
           {text}
