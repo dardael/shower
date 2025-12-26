@@ -22,7 +22,8 @@ const WebsiteSettingSchema = new Schema<IWebsiteSetting>(
     },
     value: {
       type: Schema.Types.Mixed,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   {

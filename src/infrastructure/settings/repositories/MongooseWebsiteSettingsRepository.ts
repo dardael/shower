@@ -54,6 +54,10 @@ export class MongooseWebsiteSettingsRepository
         return WebsiteSetting.createDefaultThemeColor().value;
       case VALID_SETTING_KEYS.WEBSITE_FONT:
         return WebsiteSetting.createDefaultWebsiteFont().value;
+      case VALID_SETTING_KEYS.BACKGROUND_COLOR:
+        return WebsiteSetting.createDefaultBackgroundColor().value;
+      case VALID_SETTING_KEYS.CUSTOM_LOADER:
+        return WebsiteSetting.createDefaultCustomLoader().value;
       case VALID_SETTING_KEYS.SELLING_ENABLED:
         return WebsiteSetting.createDefaultSellingEnabled().value;
       default:

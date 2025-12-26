@@ -40,10 +40,15 @@ export abstract class BaseImage {
 
     const trimmedUrl = url.trim();
 
-    try {
-      new URL(trimmedUrl);
-    } catch {
-      throw new Error(`${constraints.entityName} URL must be a valid URL`);
+    // Allow relative paths starting with / (e.g., /api/icons/filename.png)
+    const isRelativePath = trimmedUrl.startsWith('/');
+
+    if (!isRelativePath) {
+      try {
+        new URL(trimmedUrl);
+      } catch {
+        throw new Error(`${constraints.entityName} URL must be a valid URL`);
+      }
     }
 
     const hasValidExtension = constraints.validExtensions.some((ext) =>
