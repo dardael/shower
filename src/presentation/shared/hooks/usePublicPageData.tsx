@@ -151,13 +151,14 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
         return;
       }
 
-      // Check for failures
+      // Check for critical failures (menu is required)
       const failures: Array<'menu' | 'footer' | 'content'> = [];
       if (menuResult.status === 'rejected') failures.push('menu');
       if (footerResult.status === 'rejected') failures.push('footer');
       if (contentResult.status === 'rejected') failures.push('content');
 
-      if (failures.length > 0) {
+      // Only treat menu failure as critical - content and footer can fail gracefully
+      if (menuResult.status === 'rejected') {
         const error: PageLoadError = {
           message:
             'Unable to load page content. Please check your connection and try again.',
@@ -194,11 +195,11 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
         startTime,
       });
 
-      // Set data
+      // Set data - provide empty content if content fetch failed
       setData({
         menuData: menuData || [],
         footerData,
-        pageContent: pageContent!,
+        pageContent: pageContent || { id: '', content: '', menuItemId: '' },
         logo: logoResult.status === 'fulfilled' ? logoResult.value : null,
       });
     } catch {

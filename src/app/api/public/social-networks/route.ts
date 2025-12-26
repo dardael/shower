@@ -1,15 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { container } from '@/infrastructure/container';
 import { Logger } from '@/application/shared/Logger';
 import { getClientIP } from '@/infrastructure/shared/utils/clientIP';
-import { getApiUrl } from '@/infrastructure/shared/utils/appUrl';
+import type { IGetSocialNetworks } from '@/application/settings/IGetSocialNetworks';
+
+interface PublicSocialNetwork {
+  type: string;
+  url: string;
+  label: string;
+  icon: string;
+}
 
 /**
  * Public API endpoint for social networks
  * Returns only configured social networks for footer display
  * No authentication required - public endpoint
  */
-export async function GET(request: NextRequest) {
+
+async function fetchSocialNetworks(): Promise<PublicSocialNetwork[]> {
+  const getSocialNetworks =
+    container.resolve<IGetSocialNetworks>('IGetSocialNetworks');
+  const socialNetworks = await getSocialNetworks.execute();
+
+  // Filter only enabled social networks and transform to public DTO
+  return socialNetworks
+    .filter((network) => network.enabled)
+    .map((network) => ({
+      type: network.type.value,
+      url: network.url.value,
+      label: network.label.value,
+      icon: network.type.value,
+    }));
+}
+
+const getCachedSocialNetworks = unstable_cache(
+  fetchSocialNetworks,
+  ['social-networks'],
+  {
+    tags: ['social-networks'],
+    revalidate: 3600,
+  }
+);
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
   const logger = container.resolve<Logger>('Logger');
 
@@ -21,54 +55,23 @@ export async function GET(request: NextRequest) {
   });
 
   try {
-    // Use fetch with cache tags to enable Next.js Data Cache invalidation
-    const response = await fetch(getApiUrl('/api/settings/social-networks'), {
-      next: {
-        tags: ['social-networks']
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch social networks: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch social networks');
-    }
-
-    const socialNetworks = data.data || [];
-
-    // Transform to public DTO with only necessary data
-    const publicSocialNetworks = socialNetworks.map((network: {
-      type: string;
-      url: string;
-      label: string;
-      enabled: boolean;
-    }) => ({
-      type: network.type,
-      url: network.url,
-      label: network.label,
-      icon: network.type, // Will be resolved by frontend
-    }));
+    const publicSocialNetworks = await getCachedSocialNetworks();
 
     const duration = Date.now() - startTime;
 
     logger.logApiResponse('GET', '/api/public/social-networks', 200, duration, {
       count: publicSocialNetworks.length,
-      types: publicSocialNetworks.map((sn: { type: string }) => sn.type),
+      types: publicSocialNetworks.map((sn) => sn.type),
       cacheTag: 'social-networks',
     });
 
-    // Return response without HTTP cache headers - relying on Next.js Data Cache only
     return NextResponse.json({
       success: true,
       data: publicSocialNetworks,
     });
   } catch (error) {
     const duration = Date.now() - startTime;
-    
+
     logger.logErrorWithObject(error, 'Failed to fetch social networks', {
       endpoint: '/api/public/social-networks',
       duration,
@@ -76,7 +79,6 @@ export async function GET(request: NextRequest) {
 
     logger.logApiResponse('GET', '/api/public/social-networks', 500, duration);
 
-    // Don't expose internal errors in public endpoint
     return NextResponse.json(
       {
         success: false,

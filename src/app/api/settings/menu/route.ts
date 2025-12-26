@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { container } from '@/infrastructure/container';
 import type { GetMenuItems } from '@/application/menu/GetMenuItems';
 import type { AddMenuItem } from '@/application/menu/AddMenuItem';
@@ -76,6 +77,10 @@ export const POST = withApi(
 
       logger.info('Menu item added successfully', { id: menuItem.id });
 
+      // Invalidate cache for menu items to ensure immediate visibility on public side
+      revalidateTag('menu-items');
+      logger.info('Cache invalidated for menu-items tag');
+
       return NextResponse.json(response, { status: 201 });
     } catch (error) {
       logger.logErrorWithObject(error, 'Error adding menu item');
@@ -124,6 +129,10 @@ export const PUT = withApi(
       logger.info('Menu items reordered successfully', {
         count: body.orderedIds.length,
       });
+
+      // Invalidate cache for menu items to ensure immediate visibility on public side
+      revalidateTag('menu-items');
+      logger.info('Cache invalidated for menu-items tag');
 
       return NextResponse.json(response);
     } catch (error) {

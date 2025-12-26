@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { container } from '@/infrastructure/container';
 import type { RemoveMenuItem } from '@/application/menu/RemoveMenuItem';
 import type { UpdateMenuItem } from '@/application/menu/UpdateMenuItem';
@@ -37,6 +38,10 @@ export const DELETE = withApiParams<MenuItemParams, NextResponse>(
       };
 
       logger.info('Menu item removed successfully', { id });
+
+      // Invalidate cache for menu items to ensure immediate visibility on public side
+      revalidateTag('menu-items');
+      logger.info('Cache invalidated for menu-items tag');
 
       return NextResponse.json(response);
     } catch (error) {
@@ -100,6 +105,10 @@ export const PATCH = withApiParams<MenuItemParams, NextResponse>(
       };
 
       logger.info('Menu item updated successfully', { id });
+
+      // Invalidate cache for menu items to ensure immediate visibility on public side
+      revalidateTag('menu-items');
+      logger.info('Cache invalidated for menu-items tag');
 
       return NextResponse.json(response);
     } catch (error) {
