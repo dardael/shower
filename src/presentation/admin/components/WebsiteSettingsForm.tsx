@@ -16,7 +16,6 @@ import {
 import { FiTrash2, FiUpload } from 'react-icons/fi';
 import ImageManager from '@/presentation/shared/components/ImageManager/ImageManager';
 import Image from 'next/image';
-import SaveButton from '@/presentation/shared/components/SaveButton';
 import { ThemeColorSelector } from '@/presentation/admin/components/ThemeColorSelector';
 import { BackgroundColorSelector } from '@/presentation/admin/components/BackgroundColorSelector';
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
@@ -28,11 +27,8 @@ import { useBackgroundColorContext } from '@/presentation/shared/contexts/Backgr
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
 import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
-import { useFormState } from '@/presentation/admin/hooks/useFormState';
-import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
-import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPalette';
 
 import { CUSTOM_LOADER_MAX_SIZE_BYTES } from '@/domain/settings/constants/SettingKeys';
 
@@ -56,9 +52,10 @@ interface WebsiteSettingsFormProps {
 export default function WebsiteSettingsForm({
   initialName,
 }: WebsiteSettingsFormProps) {
-  const logger = useLogger();
   const { showToast } = useToastNotifications();
   const [name, setName] = useState(initialName);
+  const [nameSaving, setNameSaving] = useState(false);
+  const initialNameRef = useRef(initialName);
   const { themeColor, setThemeColor } = useDynamicTheme();
   const { updateThemeColor: updateThemeColorWithCache } =
     useThemeColorContext();
@@ -83,29 +80,12 @@ export default function WebsiteSettingsForm({
     updateSellingEnabled: updateSellingEnabledConfig,
     isLoading: sellingLoading,
   } = useSellingConfig();
-  const [loading, setLoading] = useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
     null
   );
   const [loaderLoading, setLoaderLoading] = useState(false);
   const loaderInputRef = useRef<HTMLInputElement>(null);
-
-  // Form state management for unsaved changes detection
-  const {
-    updateFieldValue,
-    updateInitialValues,
-    markAsClean,
-    markAsInitialized,
-  } = useFormState({
-    initialValues: {
-      websiteName: initialName || '',
-      themeColor: themeColor || '#3182ce',
-    },
-    onBeforeUnload: (hasChanges: boolean) => {
-      logger.debug('Form before unload check', { hasChanges });
-    },
-  });
 
   const fetchWebsiteSettingsRef = useRef(async () => {});
 
@@ -119,22 +99,18 @@ export default function WebsiteSettingsForm({
           fetch('/api/settings/loader'),
         ]);
 
-      const newValues: Record<string, unknown> = {};
-
       // Handle website settings (name and theme color)
       if (settingsResponse.ok) {
         const settingsData = await settingsResponse.json();
         if (settingsData.name) {
           setName(settingsData.name);
-          newValues.name = settingsData.name;
+          initialNameRef.current = settingsData.name;
         }
         if (settingsData.themeColor) {
           setThemeColor(settingsData.themeColor);
-          newValues.themeColor = settingsData.themeColor;
         }
         if (settingsData.backgroundColor) {
           setBackgroundColor(settingsData.backgroundColor);
-          newValues.backgroundColor = settingsData.backgroundColor;
         }
       }
 
@@ -149,14 +125,11 @@ export default function WebsiteSettingsForm({
             format: iconData.icon.format,
           };
           setCurrentIcon(iconDataFormatted);
-          newValues.icon = iconDataFormatted;
         } else {
           setCurrentIcon(null);
-          newValues.icon = null;
         }
       } else {
         setCurrentIcon(null);
-        newValues.icon = null;
       }
 
       // Handle custom loader data
@@ -170,13 +143,6 @@ export default function WebsiteSettingsForm({
       } else {
         setCustomLoader(null);
       }
-
-      // Update all values at once and mark as initialized
-      updateInitialValues({
-        websiteName: (newValues.name as string) || '',
-        themeColor: (newValues.themeColor as ThemeColorToken) || 'blue',
-      });
-      markAsInitialized();
     } catch {
       showToast(
         'Échec du chargement des paramètres du site. Veuillez réessayer plus tard.',
@@ -194,42 +160,52 @@ export default function WebsiteSettingsForm({
     fetchWebsiteSettings();
   }, [fetchWebsiteSettings]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const saveWebsiteName = async (newName: string) => {
+    if (newName === initialNameRef.current) {
+      return;
+    }
 
+    if (!newName.trim()) {
+      showToast('Le nom du site ne peut pas être vide', 'error');
+      setName(initialNameRef.current);
+      return;
+    }
+
+    setNameSaving(true);
     try {
-      const response = await fetch('/api/settings', {
+      const response = await fetch('/api/settings/name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, themeColor, backgroundColor }),
+        body: JSON.stringify({ name: newName }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        showToast('Paramètres du site mis à jour avec succès !', 'success');
-        markAsClean();
-        // Refresh theme color and background color to invalidate cache
-        await updateThemeColorWithCache(themeColor);
-        await updateBackgroundColorWithCache(backgroundColor);
-        await fetchWebsiteSettings();
+        initialNameRef.current = newName;
+        showToast('Nom du site mis à jour avec succès !', 'success');
       } else {
         showToast(
           data.error || 'Échec de la mise à jour du nom du site',
           'error'
         );
+        setName(initialNameRef.current);
       }
     } catch {
       showToast(
         'Une erreur est survenue lors de la mise à jour du nom du site',
         'error'
       );
+      setName(initialNameRef.current);
     } finally {
-      setLoading(false);
+      setNameSaving(false);
     }
+  };
+
+  const handleNameBlur = () => {
+    saveWebsiteName(name);
   };
 
   // Icon management using custom hook
@@ -244,7 +220,6 @@ export default function WebsiteSettingsForm({
   } = useIconManagement({
     onIconChange: (iconData) => {
       setCurrentIcon(iconData);
-      updateFieldValue('icon', iconData);
     },
     onMessage: (message: string) => showToast(message, 'error'),
     onSuccess: (message: string) => showToast(message, 'success'),
@@ -381,299 +356,281 @@ export default function WebsiteSettingsForm({
         </Text>
       </VStack>
 
-      <form onSubmit={handleSubmit}>
-        <Stack gap={{ base: 4, md: 6 }}>
-          <Field.Root>
-            <Field.Label
-              htmlFor="name"
-              fontSize="sm"
-              fontWeight="semibold"
-              color="fg"
-              mb={2}
-            >
-              Nom du site
-            </Field.Label>
-            <Input
-              id="name"
-              data-testid="website-name-input"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                updateFieldValue('name', e.target.value);
-              }}
-              placeholder="Entrez le nom de votre site"
-              maxLength={50}
-              required
-              bg="bg.canvas"
-              borderColor="border"
-              borderWidth="2px"
-              borderRadius="lg"
-              fontSize={{ base: 'sm', md: 'md' }}
-              color="fg"
-              _placeholder={{ color: 'fg.muted' }}
-              _focus={{
-                borderColor: 'colorPalette.solid',
-                boxShadow: '0 0 0 3px colorPalette.subtle',
-              }}
-              _hover={{
-                borderColor: 'border.emphasized',
-              }}
+      <Stack gap={{ base: 4, md: 6 }}>
+        <Field.Root>
+          <Field.Label
+            htmlFor="name"
+            fontSize="sm"
+            fontWeight="semibold"
+            color="fg"
+            mb={2}
+          >
+            Nom du site
+          </Field.Label>
+          <Input
+            id="name"
+            data-testid="website-name-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleNameBlur}
+            placeholder="Entrez le nom de votre site"
+            maxLength={50}
+            required
+            disabled={nameSaving}
+            bg="bg.canvas"
+            borderColor="border"
+            borderWidth="2px"
+            borderRadius="lg"
+            fontSize={{ base: 'sm', md: 'md' }}
+            color="fg"
+            _placeholder={{ color: 'fg.muted' }}
+            _focus={{
+              borderColor: 'colorPalette.solid',
+              boxShadow: '0 0 0 3px colorPalette.subtle',
+            }}
+            _hover={{
+              borderColor: 'border.emphasized',
+            }}
+          />
+          <Field.HelperText
+            fontSize={{ base: 'xs', md: 'sm' }}
+            color="fg.muted"
+            mt={2}
+          >
+            Ce nom apparaît dans les onglets du navigateur et les résultats de
+            recherche. Maximum 50 caractères.
+          </Field.HelperText>
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
+            Icône du site
+          </Field.Label>
+          <Box
+            bg="bg.canvas"
+            borderColor="border"
+            borderWidth="2px"
+            borderRadius="lg"
+            p={4}
+          >
+            <ImageManager
+              currentImage={currentIcon}
+              config={iconConfig}
+              labels={iconLabels}
+              onImageUpload={handleIconUpload}
+              onImageDelete={handleIconDelete}
+              onImageReplace={handleIconReplace}
+              onValidationError={handleIconValidationError}
+              disabled={iconManagementLoading}
+              loading={iconManagementLoading}
+              showFileSize={true}
+              showFormatInfo={true}
+              allowDelete={true}
+              allowReplace={true}
+              disableSuccessToast={true}
             />
-            <Field.HelperText
-              fontSize={{ base: 'xs', md: 'sm' }}
-              color="fg.muted"
-              mt={2}
-            >
-              Ce nom apparaît dans les onglets du navigateur et les résultats de
-              recherche. Maximum 50 caractères.
-            </Field.HelperText>
-          </Field.Root>
-
-          <Field.Root>
-            <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
-              Icône du site
-            </Field.Label>
-            <Box
-              bg="bg.canvas"
-              borderColor="border"
-              borderWidth="2px"
-              borderRadius="lg"
-              p={4}
-            >
-              <ImageManager
-                currentImage={currentIcon}
-                config={iconConfig}
-                labels={iconLabels}
-                onImageUpload={handleIconUpload}
-                onImageDelete={handleIconDelete}
-                onImageReplace={handleIconReplace}
-                onValidationError={handleIconValidationError}
-                disabled={iconManagementLoading}
-                loading={iconManagementLoading}
-                showFileSize={true}
-                showFormatInfo={true}
-                allowDelete={true}
-                allowReplace={true}
-                disableSuccessToast={true}
-              />
-            </Box>
-            <Field.HelperText
-              fontSize={{ base: 'xs', md: 'sm' }}
-              color="fg.muted"
-              mt={2}
-            >
-              Téléchargez un favicon qui apparaît dans les onglets du
-              navigateur. Taille recommandée : 32x32 pixels pour le format ICO
-              ou 16x16 à 32x32 pixels pour les autres formats.
-            </Field.HelperText>
-          </Field.Root>
-
-          <ThemeModeSelector
-            selectedMode={themeMode}
-            onModeChange={async (mode) => {
-              try {
-                await updateThemeModeConfig(mode);
-              } catch {
-                showToast('Échec de la mise à jour du mode de thème', 'error');
-              }
-            }}
-            disabled={loading}
-            isLoading={themeModeLoading}
-          />
-
-          <ThemeColorSelector
-            selectedColor={themeColor}
-            onColorChange={async (color) => {
-              try {
-                await updateThemeColorWithCache(color);
-                setThemeColor(color);
-                updateFieldValue('themeColor', color);
-              } catch {
-                // Error is already handled by the hook
-              }
-            }}
-            disabled={loading}
-          />
-
-          <BackgroundColorSelector
-            selectedColor={backgroundColor}
-            onColorChange={async (color) => {
-              try {
-                await updateBackgroundColorWithCache(color);
-                setBackgroundColor(color);
-                updateFieldValue('backgroundColor', color);
-              } catch {
-                // Error is already handled by the hook
-              }
-            }}
-            disabled={loading}
-            isLoading={backgroundColorLoading}
-          />
-
-          <FontSelector
-            selectedFont={websiteFont}
-            onFontChange={async (font) => {
-              try {
-                await updateWebsiteFontWithCache(font);
-                updateFieldValue('websiteFont', font);
-              } catch {
-                showToast('Échec de la mise à jour de la police', 'error');
-              }
-            }}
-            disabled={loading}
-            isLoading={fontLoading}
-          />
-
-          <SellingToggleSelector
-            sellingEnabled={sellingEnabled}
-            onToggle={async (enabled) => {
-              try {
-                await updateSellingEnabledConfig(enabled);
-              } catch {
-                showToast('Échec de la mise à jour du mode vente', 'error');
-              }
-            }}
-            disabled={loading}
-            isLoading={sellingLoading}
-          />
-
-          <Field.Root>
-            <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
-              Animation de chargement
-            </Field.Label>
-            <Box
-              bg="bg.canvas"
-              borderColor="border"
-              borderWidth="2px"
-              borderRadius="lg"
-              p={4}
-            >
-              {loaderLoading ? (
-                <HStack justify="center" py={4}>
-                  <Spinner size="md" />
-                  <Text color="fg.muted">Traitement en cours...</Text>
-                </HStack>
-              ) : customLoader ? (
-                <VStack align="stretch" gap={4}>
-                  <Box
-                    borderRadius="md"
-                    overflow="hidden"
-                    bg="bg.subtle"
-                    p={4}
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    minH="120px"
-                  >
-                    {customLoader.metadata.type === 'gif' ? (
-                      <Image
-                        src={customLoader.url}
-                        alt="Custom loader preview"
-                        width={100}
-                        height={100}
-                        style={{
-                          maxHeight: '100px',
-                          maxWidth: '100%',
-                          objectFit: 'contain',
-                        }}
-                        unoptimized
-                        loader={({ src }) => src}
-                      />
-                    ) : (
-                      <video
-                        src={customLoader.url}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        style={{
-                          maxHeight: '100px',
-                          maxWidth: '100%',
-                        }}
-                      />
-                    )}
-                  </Box>
-                  <HStack justify="space-between" align="center">
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="sm" fontWeight="medium" color="fg">
-                        {customLoader.metadata.filename}
-                      </Text>
-                      <Text fontSize="xs" color="fg.muted">
-                        {customLoader.metadata.type.toUpperCase()} -{' '}
-                        {(customLoader.metadata.size / 1024).toFixed(1)} KB
-                      </Text>
-                    </VStack>
-                    <HStack gap={2}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => loaderInputRef.current?.click()}
-                        disabled={loaderLoading}
-                      >
-                        <FiUpload />
-                        Remplacer
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        colorPalette="red"
-                        onClick={handleLoaderDelete}
-                        disabled={loaderLoading}
-                      >
-                        <FiTrash2 />
-                        Supprimer
-                      </Button>
-                    </HStack>
-                  </HStack>
-                </VStack>
-              ) : (
-                <VStack gap={3} py={2}>
-                  <Text fontSize="sm" color="fg.muted" textAlign="center">
-                    Aucune animation personnalisée configurée. Utilisation du
-                    spinner par défaut.
-                  </Text>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => loaderInputRef.current?.click()}
-                    disabled={loaderLoading}
-                  >
-                    <FiUpload />
-                    Télécharger une animation
-                  </Button>
-                </VStack>
-              )}
-              <input
-                ref={loaderInputRef}
-                type="file"
-                accept=".gif,.mp4,.webm,image/gif,video/mp4,video/webm"
-                onChange={handleLoaderUpload}
-                style={{ display: 'none' }}
-              />
-            </Box>
-            <Field.HelperText
-              fontSize={{ base: 'xs', md: 'sm' }}
-              color="fg.muted"
-              mt={2}
-            >
-              Téléchargez un GIF ou une vidéo (MP4, WebM) pour remplacer le
-              spinner de chargement par défaut. Taille maximale : 10 Mo.
-            </Field.HelperText>
-          </Field.Root>
-
-          <Box w="full">
-            <SaveButton
-              type="submit"
-              data-testid="save-website-button"
-              isLoading={loading}
-              loadingText="Mise à jour..."
-              width="full"
-            >
-              Mettre à jour le site
-            </SaveButton>
           </Box>
-        </Stack>
-      </form>
+          <Field.HelperText
+            fontSize={{ base: 'xs', md: 'sm' }}
+            color="fg.muted"
+            mt={2}
+          >
+            Téléchargez un favicon qui apparaît dans les onglets du navigateur.
+            Taille recommandée : 32x32 pixels pour le format ICO ou 16x16 à
+            32x32 pixels pour les autres formats.
+          </Field.HelperText>
+        </Field.Root>
+
+        <ThemeModeSelector
+          selectedMode={themeMode}
+          onModeChange={async (mode) => {
+            try {
+              await updateThemeModeConfig(mode);
+            } catch {
+              showToast('Échec de la mise à jour du mode de thème', 'error');
+            }
+          }}
+          disabled={false}
+          isLoading={themeModeLoading}
+        />
+
+        <ThemeColorSelector
+          selectedColor={themeColor}
+          onColorChange={async (color) => {
+            try {
+              await updateThemeColorWithCache(color);
+              setThemeColor(color);
+            } catch {
+              // Error is already handled by the hook
+            }
+          }}
+          disabled={false}
+        />
+
+        <BackgroundColorSelector
+          selectedColor={backgroundColor}
+          onColorChange={async (color) => {
+            try {
+              await updateBackgroundColorWithCache(color);
+              setBackgroundColor(color);
+            } catch {
+              // Error is already handled by the hook
+            }
+          }}
+          disabled={false}
+          isLoading={backgroundColorLoading}
+        />
+
+        <FontSelector
+          selectedFont={websiteFont}
+          onFontChange={async (font) => {
+            try {
+              await updateWebsiteFontWithCache(font);
+            } catch {
+              showToast('Échec de la mise à jour de la police', 'error');
+            }
+          }}
+          disabled={false}
+          isLoading={fontLoading}
+        />
+
+        <SellingToggleSelector
+          sellingEnabled={sellingEnabled}
+          onToggle={async (enabled) => {
+            try {
+              await updateSellingEnabledConfig(enabled);
+            } catch {
+              showToast('Échec de la mise à jour du mode vente', 'error');
+            }
+          }}
+          disabled={false}
+          isLoading={sellingLoading}
+        />
+
+        <Field.Root>
+          <Field.Label fontSize="sm" fontWeight="semibold" color="fg" mb={2}>
+            Animation de chargement
+          </Field.Label>
+          <Box
+            bg="bg.canvas"
+            borderColor="border"
+            borderWidth="2px"
+            borderRadius="lg"
+            p={4}
+          >
+            {loaderLoading ? (
+              <HStack justify="center" py={4}>
+                <Spinner size="md" />
+                <Text color="fg.muted">Traitement en cours...</Text>
+              </HStack>
+            ) : customLoader ? (
+              <VStack align="stretch" gap={4}>
+                <Box
+                  borderRadius="md"
+                  overflow="hidden"
+                  bg="bg.subtle"
+                  p={4}
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  minH="120px"
+                >
+                  {customLoader.metadata.type === 'gif' ? (
+                    <Image
+                      src={customLoader.url}
+                      alt="Custom loader preview"
+                      width={100}
+                      height={100}
+                      style={{
+                        maxHeight: '100px',
+                        maxWidth: '100%',
+                        objectFit: 'contain',
+                      }}
+                      unoptimized
+                      loader={({ src }) => src}
+                    />
+                  ) : (
+                    <video
+                      src={customLoader.url}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      style={{
+                        maxHeight: '100px',
+                        maxWidth: '100%',
+                      }}
+                    />
+                  )}
+                </Box>
+                <HStack justify="space-between" align="center">
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="sm" fontWeight="medium" color="fg">
+                      {customLoader.metadata.filename}
+                    </Text>
+                    <Text fontSize="xs" color="fg.muted">
+                      {customLoader.metadata.type.toUpperCase()} -{' '}
+                      {(customLoader.metadata.size / 1024).toFixed(1)} KB
+                    </Text>
+                  </VStack>
+                  <HStack gap={2}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => loaderInputRef.current?.click()}
+                      disabled={loaderLoading}
+                    >
+                      <FiUpload />
+                      Remplacer
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorPalette="red"
+                      onClick={handleLoaderDelete}
+                      disabled={loaderLoading}
+                    >
+                      <FiTrash2 />
+                      Supprimer
+                    </Button>
+                  </HStack>
+                </HStack>
+              </VStack>
+            ) : (
+              <VStack gap={3} py={2}>
+                <Text fontSize="sm" color="fg.muted" textAlign="center">
+                  Aucune animation personnalisée configurée. Utilisation du
+                  spinner par défaut.
+                </Text>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => loaderInputRef.current?.click()}
+                  disabled={loaderLoading}
+                >
+                  <FiUpload />
+                  Télécharger une animation
+                </Button>
+              </VStack>
+            )}
+            <input
+              ref={loaderInputRef}
+              type="file"
+              accept=".gif,.mp4,.webm,image/gif,video/mp4,video/webm"
+              onChange={handleLoaderUpload}
+              style={{ display: 'none' }}
+            />
+          </Box>
+          <Field.HelperText
+            fontSize={{ base: 'xs', md: 'sm' }}
+            color="fg.muted"
+            mt={2}
+          >
+            Téléchargez un GIF ou une vidéo (MP4, WebM) pour remplacer le
+            spinner de chargement par défaut. Taille maximale : 10 Mo.
+          </Field.HelperText>
+        </Field.Root>
+      </Stack>
     </Box>
   );
 }
