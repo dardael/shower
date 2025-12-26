@@ -435,7 +435,7 @@ const BackupConfigurationForm = memo((): React.ReactElement => {
                             <Button
                               size="xs"
                               variant="outline"
-                              onClick={handleRestoreCancel}
+                              onClick={handleDeleteCancel}
                             >
                               Annuler
                             </Button>
