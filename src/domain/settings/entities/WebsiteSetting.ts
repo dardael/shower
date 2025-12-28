@@ -2,6 +2,7 @@ import { WebsiteName } from '@/domain/settings/value-objects/WebsiteName';
 import { WebsiteIcon } from '@/domain/settings/value-objects/WebsiteIcon';
 import { ThemeColor } from '@/domain/settings/value-objects/ThemeColor';
 import { BackgroundColor } from '@/domain/settings/value-objects/BackgroundColor';
+import { LoaderBackgroundColor } from '@/domain/settings/value-objects/LoaderBackgroundColor';
 import { WebsiteFont } from '@/domain/settings/value-objects/WebsiteFont';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
 import { SellingEnabled } from '@/domain/settings/value-objects/SellingEnabled';
@@ -268,5 +269,33 @@ export class WebsiteSetting {
       return this._value as { url: string; metadata: ICustomLoaderMetadata };
     }
     throw new Error('Value is not a custom loader object');
+  }
+
+  // Loader Background Color methods
+  static createLoaderBackgroundColor(
+    loaderBackgroundColor: LoaderBackgroundColor
+  ): WebsiteSetting {
+    return new WebsiteSetting(
+      VALID_SETTING_KEYS.LOADER_BACKGROUND_COLOR,
+      loaderBackgroundColor.value
+    );
+  }
+
+  static createDefaultLoaderBackgroundColor(): WebsiteSetting {
+    return new WebsiteSetting(VALID_SETTING_KEYS.LOADER_BACKGROUND_COLOR, null);
+  }
+
+  static isValidLoaderBackgroundColorKey(key: string): boolean {
+    return key === VALID_SETTING_KEYS.LOADER_BACKGROUND_COLOR;
+  }
+
+  getValueAsLoaderBackgroundColor(): string | null {
+    if (this._value === null) {
+      return null;
+    }
+    if (typeof this._value === 'string') {
+      return this._value;
+    }
+    throw new Error('Value is not a loader background color string');
   }
 }

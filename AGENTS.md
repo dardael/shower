@@ -139,6 +139,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - N/A (client-side filtering on existing MongoDB data via existing APIs) (048-order-filter-sort)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, React Context (ThemeColorContext, BackgroundColorContext) (049-header-menu-bgcolor)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, React Context, tsyringe (DI) (050-header-menu-text-color)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), existing BackgroundColorSelector component pattern, existing settings infrastructure (051-loader-bgcolor-config)
+- MongoDB via Mongoose (WebsiteSetting collection with key-value pattern) (051-loader-bgcolor-config)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

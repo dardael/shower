@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 import { AdminLoadingScreen } from '@/presentation/admin/components/AdminLoadingScreen';
 import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
 import { HeaderMenuTextColorProvider } from '@/presentation/shared/contexts/HeaderMenuTextColorContext';
+import { LoaderBackgroundColorProvider } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
 export interface AdminProviderProps {
   children: ReactNode;
@@ -17,7 +18,9 @@ export function AdminProvider({ children }: AdminProviderProps): ReactNode {
   return (
     <SellingConfigProvider>
       <HeaderMenuTextColorProvider>
-        <AdminLoadingScreen>{children}</AdminLoadingScreen>
+        <LoaderBackgroundColorProvider>
+          <AdminLoadingScreen>{children}</AdminLoadingScreen>
+        </LoaderBackgroundColorProvider>
       </HeaderMenuTextColorProvider>
     </SellingConfigProvider>
   );

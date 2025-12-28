@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Loader Background Color API
+  description: API endpoints for managing loader background color configuration
+  version: 1.0.0
+
+paths:
+  /api/settings/loader-background-color:
+    get:
+      summary: Get current loader background color
+      description: Retrieves the configured loader background color. Returns null if no custom color is set.
+      tags:
+        - Admin Settings
+      security:
+        - BetterAuth: []
+      responses:
+        '200':
+          description: Current loader background color configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoaderBackgroundColorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update loader background color
+      description: Sets a new loader background color. Send null to reset to default.
+      tags:
+        - Admin Settings
+      security:
+        - BetterAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLoaderBackgroundColorRequest'
+      responses:
+        '200':
+          description: Loader background color updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoaderBackgroundColorResponse'
+        '400':
+          description: Invalid color format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Reset loader background color to default
+      description: Removes the custom loader background color, reverting to theme-based default.
+      tags:
+        - Admin Settings
+      security:
+        - BetterAuth: []
+      responses:
+        '200':
+          description: Loader background color reset to default
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoaderBackgroundColorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/public/loader-background-color:
+    get:
+      summary: Get loader background color (public)
+      description: Public endpoint to retrieve the loader background color. No authentication required.
+      tags:
+        - Public Settings
+      responses:
+        '200':
+          description: Current loader background color for public display
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicLoaderBackgroundColorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BetterAuth:
+      type: http
+      scheme: bearer
+      description: BetterAuth session token
+
+  schemas:
+    LoaderBackgroundColorResponse:
+      type: object
+      required:
+        - loaderBackgroundColor
+      properties:
+        loaderBackgroundColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          example: '#4A90D9'
+          description: Hex color value or null if using default
+
+    PublicLoaderBackgroundColorResponse:
+      type: object
+      required:
+        - loaderBackgroundColor
+      properties:
+        loaderBackgroundColor:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          example: '#4A90D9'
+          description: Hex color value or null if using default
+
+    UpdateLoaderBackgroundColorRequest:
+      type: object
+      required:
+        - color
+      properties:
+        color:
+          type: string
+          nullable: true
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          example: '#4A90D9'
+          description: Hex color value to set, or null to reset to default
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: 'Invalid color format'
+          description: Error message describing what went wrong

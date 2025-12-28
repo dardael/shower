@@ -7,6 +7,7 @@ import { useThemeModeConfig } from '@/presentation/shared/contexts/ThemeModeCont
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import type { PageLoadError } from '@/types/page-load-state';
 import type { CustomLoaderData } from '@/presentation/shared/components/PublicPageLoader';
+import { useLoaderBackgroundColorContext } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
 // Timeout duration for loading - consistent with public side (PublicPageLoader)
 const TIMEOUT_MS = 10000;
@@ -18,6 +19,7 @@ export interface UseAdminLoadStateReturn {
   isError: boolean;
   error: PageLoadError | null;
   customLoader: CustomLoaderData | null;
+  loaderBackgroundColor: string | null;
   retry: () => void;
 }
 
@@ -34,6 +36,11 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     useThemeModeConfig();
   const { isLoading: fontLoading, refreshWebsiteFont } =
     useWebsiteFontContext();
+  const {
+    value: loaderBackgroundColor,
+    isLoading: loaderBackgroundColorLoading,
+    refreshValue: refreshLoaderBackgroundColor,
+  } = useLoaderBackgroundColorContext();
 
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
     null
@@ -82,7 +89,8 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     themeColorLoading ||
     backgroundColorLoading ||
     themeModeLoading ||
-    fontLoading;
+    fontLoading ||
+    loaderBackgroundColorLoading;
 
   // Show loading screen until:
   // 1. Custom loader is fetched
@@ -121,12 +129,14 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     refreshBackgroundColor();
     refreshThemeMode();
     refreshWebsiteFont();
+    refreshLoaderBackgroundColor();
     fetchCustomLoader();
   }, [
     refreshThemeColor,
     refreshBackgroundColor,
     refreshThemeMode,
     refreshWebsiteFont,
+    refreshLoaderBackgroundColor,
     fetchCustomLoader,
   ]);
 
@@ -135,6 +145,7 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     isError: timedOut,
     error,
     customLoader,
+    loaderBackgroundColor,
     retry,
   };
 }

@@ -1,15 +1,8 @@
 'use client';
 
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Button,
-  Spinner,
-  Input,
-} from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Spinner, Input } from '@chakra-ui/react';
 import { memo, useState, useEffect, useCallback } from 'react';
+import { ColorButton } from './ColorButton';
 
 // Predefined color options with hex values
 const HEADER_TEXT_COLOR_OPTIONS: {
@@ -33,73 +26,6 @@ interface HeaderMenuTextColorSelectorProps {
   disabled?: boolean;
   isLoading?: boolean;
 }
-
-interface ColorButtonProps {
-  color: string;
-  label: string;
-  isSelected: boolean;
-  onClick: () => void;
-  disabled: boolean;
-  isLoading?: boolean;
-}
-
-// Memoized color button to prevent unnecessary re-renders
-const ColorButton = memo<ColorButtonProps>(
-  ({ color, label, isSelected, onClick, disabled, isLoading = false }) => {
-    // Determine if the color is light to show a border for visibility
-    const isLightColor =
-      color.toUpperCase() === '#FFFFFF' || color.toUpperCase() === '#FFF';
-
-    return (
-      <Button
-        onClick={onClick}
-        disabled={disabled || isLoading}
-        variant={isSelected ? 'solid' : 'outline'}
-        size="sm"
-        width="60px"
-        height="40px"
-        position="relative"
-        aria-label={`Sélectionner la couleur ${label}`}
-        data-selected={isSelected}
-        opacity={isLoading ? 0.7 : 1}
-        title={label}
-      >
-        {isLoading ? (
-          <Spinner size="sm" color="fg.muted" />
-        ) : (
-          <Box
-            width="24px"
-            height="24px"
-            borderRadius="md"
-            bg={color}
-            border={isSelected ? '2px solid' : '1px solid'}
-            borderColor={
-              isLightColor
-                ? 'gray.400'
-                : isSelected
-                  ? 'blue.400'
-                  : 'border.subtle'
-            }
-            _after={
-              isSelected
-                ? {
-                    content: '""',
-                    position: 'absolute',
-                    inset: '-4px',
-                    border: '2px solid',
-                    borderColor: 'blue.400',
-                    borderRadius: 'md',
-                  }
-                : undefined
-            }
-          />
-        )}
-      </Button>
-    );
-  }
-);
-
-ColorButton.displayName = 'HeaderMenuTextColorButton';
 
 const HeaderMenuTextColorSelector = memo<HeaderMenuTextColorSelectorProps>(
   ({ selectedColor, onColorChange, disabled = false, isLoading = false }) => {

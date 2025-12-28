@@ -15,6 +15,7 @@ export interface PublicPageLoaderProps {
   error: PageLoadError | null;
   onRetry?: () => void;
   customLoader?: CustomLoaderData | null;
+  backgroundColor?: string | null;
 }
 
 /**
@@ -29,6 +30,7 @@ export function PublicPageLoader({
   error,
   onRetry,
   customLoader,
+  backgroundColor,
 }: PublicPageLoaderProps): React.ReactElement {
   // Track if custom loader failed to load - fallback to default spinner
   const [loaderError, setLoaderError] = useState(false);
@@ -83,6 +85,7 @@ export function PublicPageLoader({
         aria-live="polite"
         aria-label="Loading page content"
         data-testid="page-loading-spinner"
+        style={backgroundColor ? { backgroundColor } : undefined}
       >
         {showCustomLoader ? (
           customLoader.type === 'gif' ? (

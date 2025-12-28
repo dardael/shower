@@ -22,6 +22,7 @@ import { HeaderMenuTextColorSelector } from '@/presentation/admin/components/Hea
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { ThemeModeSelector } from '@/presentation/admin/components/ThemeModeSelector';
 import { SellingToggleSelector } from '@/presentation/admin/components/SellingToggleSelector';
+import { LoaderBackgroundColorSelector } from '@/presentation/admin/components/LoaderBackgroundColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { useHeaderMenuTextColorContext } from '@/presentation/shared/contexts/HeaderMenuTextColorContext';
@@ -87,6 +88,11 @@ export default function WebsiteSettingsForm({
     updateSellingEnabled: updateSellingEnabledConfig,
     isLoading: sellingLoading,
   } = useSellingConfig();
+  const [loaderBackgroundColor, setLoaderBackgroundColor] = useState<
+    string | null
+  >(null);
+  const [loaderBackgroundColorSaving, setLoaderBackgroundColorSaving] =
+    useState(false);
   const [currentIcon, setCurrentIcon] = useState<ImageData | null>(null);
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
     null
@@ -99,12 +105,17 @@ export default function WebsiteSettingsForm({
   fetchWebsiteSettingsRef.current = async () => {
     try {
       // Fetch all settings in parallel for better performance
-      const [settingsResponse, iconResponse, loaderResponse] =
-        await Promise.all([
-          fetch('/api/settings'),
-          fetch('/api/settings/icon'),
-          fetch('/api/settings/loader'),
-        ]);
+      const [
+        settingsResponse,
+        iconResponse,
+        loaderResponse,
+        loaderBgColorResponse,
+      ] = await Promise.all([
+        fetch('/api/settings'),
+        fetch('/api/settings/icon'),
+        fetch('/api/settings/loader'),
+        fetch('/api/settings/loader-background-color'),
+      ]);
 
       // Handle website settings (name and theme color)
       if (settingsResponse.ok) {
@@ -149,6 +160,12 @@ export default function WebsiteSettingsForm({
         }
       } else {
         setCustomLoader(null);
+      }
+
+      // Handle loader background color
+      if (loaderBgColorResponse.ok) {
+        const loaderBgColorData = await loaderBgColorResponse.json();
+        setLoaderBackgroundColor(loaderBgColorData.value || null);
       }
     } catch {
       showToast(
@@ -653,6 +670,44 @@ export default function WebsiteSettingsForm({
             spinner de chargement par défaut. Taille maximale : 10 Mo.
           </Field.HelperText>
         </Field.Root>
+
+        <LoaderBackgroundColorSelector
+          selectedColor={loaderBackgroundColor}
+          onColorChange={async (color) => {
+            setLoaderBackgroundColorSaving(true);
+            try {
+              const response = await fetch(
+                '/api/settings/loader-background-color',
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ value: color }),
+                }
+              );
+              if (response.ok) {
+                setLoaderBackgroundColor(color);
+                showToast(
+                  'Couleur de fond du loader mise à jour avec succès !',
+                  'success'
+                );
+              } else {
+                showToast(
+                  'Échec de la mise à jour de la couleur de fond du loader',
+                  'error'
+                );
+              }
+            } catch {
+              showToast(
+                'Échec de la mise à jour de la couleur de fond du loader',
+                'error'
+              );
+            } finally {
+              setLoaderBackgroundColorSaving(false);
+            }
+          }}
+          disabled={false}
+          isLoading={loaderBackgroundColorSaving}
+        />
       </Stack>
     </Box>
   );

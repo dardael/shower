@@ -45,6 +45,8 @@ import type { IGetSellingEnabled } from '@/application/settings/IGetSellingEnabl
 import type { IUpdateSellingEnabled } from '@/application/settings/IUpdateSellingEnabled';
 import type { IGetHeaderMenuTextColor } from '@/application/settings/interfaces/IGetHeaderMenuTextColor';
 import type { IUpdateHeaderMenuTextColor } from '@/application/settings/interfaces/IUpdateHeaderMenuTextColor';
+import type { IGetLoaderBackgroundColor } from '@/application/settings/interfaces/IGetLoaderBackgroundColor';
+import type { ISetLoaderBackgroundColor } from '@/application/settings/interfaces/ISetLoaderBackgroundColor';
 import { UpdateWebsiteName } from '@/application/settings/UpdateWebsiteName';
 import { GetWebsiteName } from '@/application/settings/GetWebsiteName';
 import { UpdateWebsiteIcon } from '@/application/settings/UpdateWebsiteIcon';
@@ -67,6 +69,8 @@ import { GetSellingEnabled } from '@/application/settings/GetSellingEnabled';
 import { UpdateSellingEnabled } from '@/application/settings/UpdateSellingEnabled';
 import { GetHeaderMenuTextColor } from '@/application/settings/use-cases/GetHeaderMenuTextColor';
 import { UpdateHeaderMenuTextColor } from '@/application/settings/use-cases/UpdateHeaderMenuTextColor';
+import { GetLoaderBackgroundColor } from '@/application/settings/use-cases/GetLoaderBackgroundColor';
+import { SetLoaderBackgroundColor } from '@/application/settings/use-cases/SetLoaderBackgroundColor';
 import { MongooseWebsiteSettingsRepository } from '@/infrastructure/settings/repositories/MongooseWebsiteSettingsRepository';
 import { MongooseSocialNetworkRepository } from '@/infrastructure/settings/repositories/MongooseSocialNetworkRepository';
 import { SocialNetworkFactory } from '@/application/settings/SocialNetworkFactory';
@@ -272,6 +276,14 @@ container.register<IGetHeaderMenuTextColor>('IGetHeaderMenuTextColor', {
 
 container.register<IUpdateHeaderMenuTextColor>('IUpdateHeaderMenuTextColor', {
   useClass: UpdateHeaderMenuTextColor,
+});
+
+container.register<IGetLoaderBackgroundColor>('IGetLoaderBackgroundColor', {
+  useClass: GetLoaderBackgroundColor,
+});
+
+container.register<ISetLoaderBackgroundColor>('ISetLoaderBackgroundColor', {
+  useClass: SetLoaderBackgroundColor,
 });
 
 // Register factory services
@@ -562,6 +574,14 @@ export class SettingsServiceLocator {
 
   static getUpdateHeaderMenuTextColor(): IUpdateHeaderMenuTextColor {
     return container.resolve('IUpdateHeaderMenuTextColor');
+  }
+
+  static getGetLoaderBackgroundColor(): IGetLoaderBackgroundColor {
+    return container.resolve('IGetLoaderBackgroundColor');
+  }
+
+  static getSetLoaderBackgroundColor(): ISetLoaderBackgroundColor {
+    return container.resolve('ISetLoaderBackgroundColor');
   }
 }
 

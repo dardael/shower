@@ -16,8 +16,14 @@ export interface AdminLoadingScreenProps {
 export function AdminLoadingScreen({
   children,
 }: AdminLoadingScreenProps): ReactNode {
-  const { isLoading, isError, error, customLoader, retry } =
-    useAdminLoadState();
+  const {
+    isLoading,
+    isError,
+    error,
+    customLoader,
+    loaderBackgroundColor,
+    retry,
+  } = useAdminLoadState();
 
   if (isLoading || isError) {
     return (
@@ -26,6 +32,7 @@ export function AdminLoadingScreen({
         error={error}
         onRetry={retry}
         customLoader={customLoader}
+        backgroundColor={loaderBackgroundColor}
       />
     );
   }

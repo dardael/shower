@@ -10,6 +10,7 @@ export const VALID_SETTING_KEYS = {
   SCHEDULED_RESTART: 'scheduled-restart',
   SELLING_ENABLED: 'selling-enabled',
   HEADER_MENU_TEXT_COLOR: 'header-menu-text-color',
+  LOADER_BACKGROUND_COLOR: 'loader-background-color',
   // SMTP Configuration
   EMAIL_SMTP_HOST: 'email-smtp-host',
   EMAIL_SMTP_PORT: 'email-smtp-port',
