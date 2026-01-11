@@ -1,0 +1,29 @@
+export const THEME_COLORS = {
+  SUCCESS: 'green.500',
+  ERROR: 'red.500',
+  INFO: 'blue.500',
+  WARNING: 'yellow.500',
+} as const;
+
+export const CALENDAR_COLORS = {
+  AVAILABILITY_BACKGROUND: '#10b981',
+} as const;
+
+export const ACTIVITY_DEFAULTS = {
+  DURATION_MINUTES: 60,
+  MINIMUM_BOOKING_NOTICE_HOURS: 0,
+  REMINDER_HOURS_BEFORE: 24,
+} as const;
+
+export const DIMENSIONS = {
+  CALENDAR_HEIGHT: 700,
+  POPOVER_WIDTH: 400,
+  POPOVER_HEIGHT: 400,
+  POPOVER_MARGIN: 16,
+} as const;
+
+export const TIME_CONSTANTS = {
+  DEFAULT_MIN_TIME: '07:00:00',
+  DEFAULT_MAX_TIME: '21:00:00',
+  SLOT_DURATION_MINUTES: 30,
+} as const;

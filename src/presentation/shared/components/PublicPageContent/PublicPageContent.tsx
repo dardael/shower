@@ -6,6 +6,7 @@ import DOMPurify from 'dompurify';
 import { extractFontsFromHtml } from '@/presentation/shared/utils/extractFontsFromHtml';
 import { loadGoogleFont } from '@/presentation/shared/utils/loadGoogleFont';
 import { ProductListRenderer } from './ProductListRenderer';
+import { AppointmentBookingRenderer } from './AppointmentBookingRenderer';
 import '@/presentation/shared/components/PublicPageContent/public-page-content.css';
 
 interface PublicPageContentProps {
@@ -13,7 +14,7 @@ interface PublicPageContentProps {
 }
 
 interface ContentSegment {
-  type: 'html' | 'productList';
+  type: 'html' | 'productList' | 'appointmentBooking';
   content?: string;
   config?: {
     categoryIds: string[] | null;
@@ -24,66 +25,116 @@ interface ContentSegment {
     showPrice: boolean;
     showImage: boolean;
   };
+  appointmentConfig?: {
+    title: string;
+  };
 }
 
 /**
- * Parses HTML content and extracts product-list divs as separate segments
+ * Parses HTML content and extracts product-list and appointment-booking divs as separate segments
  */
 function parseContentSegments(html: string): ContentSegment[] {
   const segments: ContentSegment[] = [];
 
-  // Regex to match product-list divs with their attributes
+  // Regex to match product-list and appointment-booking divs
   const productListRegex =
     /<div[^>]*class="product-list"[^>]*>[\s\S]*?<\/div>/gi;
+  const appointmentBookingRegex =
+    /<div[^>]*class="appointment-booking"[^>]*>[\s\S]*?<\/div>/gi;
+
+  // Find all special divs and their positions
+  interface DivMatch {
+    type: 'productList' | 'appointmentBooking';
+    index: number;
+    length: number;
+    html: string;
+  }
+
+  const matches: DivMatch[] = [];
+
+  let match;
+  while ((match = productListRegex.exec(html)) !== null) {
+    matches.push({
+      type: 'productList',
+      index: match.index,
+      length: match[0].length,
+      html: match[0],
+    });
+  }
+
+  while ((match = appointmentBookingRegex.exec(html)) !== null) {
+    matches.push({
+      type: 'appointmentBooking',
+      index: match.index,
+      length: match[0].length,
+      html: match[0],
+    });
+  }
+
+  // Sort matches by index
+  matches.sort((a, b) => a.index - b.index);
 
   let lastIndex = 0;
-  let match;
 
-  while ((match = productListRegex.exec(html)) !== null) {
-    // Add HTML before this product list
-    if (match.index > lastIndex) {
-      const htmlContent = html.substring(lastIndex, match.index);
+  for (const divMatch of matches) {
+    // Add HTML before this div
+    if (divMatch.index > lastIndex) {
+      const htmlContent = html.substring(lastIndex, divMatch.index);
       if (htmlContent.trim()) {
         segments.push({ type: 'html', content: htmlContent });
       }
     }
 
-    // Parse the product list attributes
-    const divHtml = match[0];
-    const categoryIdsMatch = divHtml.match(/data-category-ids="([^"]*)"/);
-    const layoutMatch = divHtml.match(/data-layout="([^"]*)"/);
-    const sortByMatch = divHtml.match(/data-sort-by="([^"]*)"/);
-    const showNameMatch = divHtml.match(/data-show-name="([^"]*)"/);
-    const showDescriptionMatch = divHtml.match(
-      /data-show-description="([^"]*)"/
-    );
-    const showPriceMatch = divHtml.match(/data-show-price="([^"]*)"/);
-    const showImageMatch = divHtml.match(/data-show-image="([^"]*)"/);
+    if (divMatch.type === 'productList') {
+      // Parse the product list attributes
+      const divHtml = divMatch.html;
+      const categoryIdsMatch = divHtml.match(/data-category-ids="([^"]*)"/);
+      const layoutMatch = divHtml.match(/data-layout="([^"]*)"/);
+      const sortByMatch = divHtml.match(/data-sort-by="([^"]*)"/);
+      const showNameMatch = divHtml.match(/data-show-name="([^"]*)"/);
+      const showDescriptionMatch = divHtml.match(
+        /data-show-description="([^"]*)"/
+      );
+      const showPriceMatch = divHtml.match(/data-show-price="([^"]*)"/);
+      const showImageMatch = divHtml.match(/data-show-image="([^"]*)"/);
 
-    const categoryIdsStr = categoryIdsMatch ? categoryIdsMatch[1] : '';
-    const categoryIds = categoryIdsStr
-      ? categoryIdsStr.split(',').filter((id) => id.trim() !== '')
-      : null;
+      const categoryIdsStr = categoryIdsMatch ? categoryIdsMatch[1] : '';
+      const categoryIds = categoryIdsStr
+        ? categoryIdsStr.split(',').filter((id) => id.trim() !== '')
+        : null;
 
-    segments.push({
-      type: 'productList',
-      config: {
-        categoryIds: categoryIds && categoryIds.length > 0 ? categoryIds : null,
-        layout: (layoutMatch ? layoutMatch[1] : 'grid') as 'grid' | 'list',
-        sortBy: sortByMatch ? sortByMatch[1] : 'displayOrder',
-        showName: showNameMatch ? showNameMatch[1] !== 'false' : true,
-        showDescription: showDescriptionMatch
-          ? showDescriptionMatch[1] !== 'false'
-          : true,
-        showPrice: showPriceMatch ? showPriceMatch[1] !== 'false' : true,
-        showImage: showImageMatch ? showImageMatch[1] !== 'false' : true,
-      },
-    });
+      segments.push({
+        type: 'productList',
+        config: {
+          categoryIds:
+            categoryIds && categoryIds.length > 0 ? categoryIds : null,
+          layout: (layoutMatch ? layoutMatch[1] : 'grid') as 'grid' | 'list',
+          sortBy: sortByMatch ? sortByMatch[1] : 'displayOrder',
+          showName: showNameMatch ? showNameMatch[1] !== 'false' : true,
+          showDescription: showDescriptionMatch
+            ? showDescriptionMatch[1] !== 'false'
+            : true,
+          showPrice: showPriceMatch ? showPriceMatch[1] !== 'false' : true,
+          showImage: showImageMatch ? showImageMatch[1] !== 'false' : true,
+        },
+      });
+    } else if (divMatch.type === 'appointmentBooking') {
+      // Parse appointment booking attributes
+      const divHtml = divMatch.html;
+      const titleMatch = divHtml.match(/data-title="([^"]*)"/);
 
-    lastIndex = match.index + match[0].length;
+      segments.push({
+        type: 'appointmentBooking',
+        appointmentConfig: {
+          title: titleMatch ? titleMatch[1] : 'Prendre rendez-vous',
+        },
+      });
+    }
+
+    lastIndex = divMatch.index + divMatch.length;
   }
 
-  // Add remaining HTML after last product list
+  // Add remaining HTML after last special div
   if (lastIndex < html.length) {
     const htmlContent = html.substring(lastIndex);
     if (htmlContent.trim()) {
@@ -91,7 +142,7 @@ function parseContentSegments(html: string): ContentSegment[] {
     }
   }
 
-  // If no product lists found, return the whole content as HTML
+  // If no special divs found, return the whole content as HTML
   if (segments.length === 0 && html.trim()) {
     segments.push({ type: 'html', content: html });
   }
@@ -243,7 +294,7 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
     return (
       <Box textAlign="center" py={12} px={4} bg="bg.subtle" borderRadius="lg">
         <Text color="fg.muted" fontSize="lg">
-          This page has no content yet.
+          Cette page n&apos;a pas encore de contenu.
         </Text>
       </Box>
     );
@@ -266,6 +317,18 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
                 showDescription={segment.config.showDescription}
                 showPrice={segment.config.showPrice}
                 showImage={segment.config.showImage}
+              />
+            </Box>
+          );
+        }
+        if (
+          segment.type === 'appointmentBooking' &&
+          segment.appointmentConfig
+        ) {
+          return (
+            <Box key={index} className="public-page-content" my={4}>
+              <AppointmentBookingRenderer
+                title={segment.appointmentConfig.title}
               />
             </Box>
           );

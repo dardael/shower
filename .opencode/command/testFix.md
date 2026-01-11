@@ -1,7 +1,6 @@
 ---
 description: fix unit tests
 agent: build
-model: zai-coding-plan/glm-4.6
 ---
 
 # Goal

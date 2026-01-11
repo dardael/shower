@@ -214,22 +214,22 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
           },
           beige: {
             solid: {
-              value: { _light: '#cdb99d', _dark: '#a89070' },
+              value: { _light: '#cbbca5', _dark: '#a89070' },
             },
             muted: {
-              value: { _light: '#e8dfd3', _dark: '#4a4235' },
+              value: { _light: '#e4dccf', _dark: '#4a4235' },
             },
             subtle: {
-              value: { _light: '#f5f0e8', _dark: '#3d3830' },
+              value: { _light: '#f3ede3', _dark: '#3d3830' },
             },
             emphasized: {
-              value: { _light: '#b8a48a', _dark: '#8a7560' },
+              value: { _light: '#b4a48a', _dark: '#8a7560' },
             },
             fg: {
               value: { _light: '#3d3830', _dark: '#f5f0e8' },
             },
             contrast: {
-              value: { _light: '#ffffff', _dark: '#1a1815' },
+              value: { _light: '#1a1815', _dark: '#ffffff' },
             },
             border: {
               value: { _light: '#d4c4a8', _dark: '#6b5d4a' },
@@ -237,108 +237,108 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
           },
           cream: {
             solid: {
-              value: { _light: '#ede6dd', _dark: '#3d3830' },
+              value: { _light: '#d9d0c3', _dark: '#5a5045' },
             },
             muted: {
-              value: { _light: '#f5f0e8', _dark: '#2d2a25' },
+              value: { _light: '#ece4d8', _dark: '#4a4540' },
             },
             subtle: {
-              value: { _light: '#faf8f5', _dark: '#252320' },
+              value: { _light: '#f6f1ea', _dark: '#3d3833' },
             },
             emphasized: {
-              value: { _light: '#d9d0c3', _dark: '#4a4540' },
+              value: { _light: '#c9bba8', _dark: '#726b60' },
             },
             fg: {
               value: { _light: '#3d3830', _dark: '#f5f0e8' },
             },
             contrast: {
-              value: { _light: '#1a1815', _dark: '#faf8f5' },
+              value: { _light: '#1a1815', _dark: '#ffffff' },
             },
             border: {
-              value: { _light: '#e0d6c8', _dark: '#4a4540' },
+              value: { _light: '#dfd5c8', _dark: '#5a5045' },
             },
           },
           gold: {
             solid: {
-              value: { _light: '#eeb252', _dark: '#8b6914' },
+              value: { _light: '#d9a043', _dark: '#a87d1a' },
             },
             muted: {
-              value: { _light: '#f9e4b8', _dark: '#4a3810' },
+              value: { _light: '#f2deb0', _dark: '#6b5212' },
             },
             subtle: {
-              value: { _light: '#fdf3dc', _dark: '#3d2f0d' },
+              value: { _light: '#faedd4', _dark: '#4a3810' },
             },
             emphasized: {
-              value: { _light: '#d9a043', _dark: '#a87d1a' },
+              value: { _light: '#c48f32', _dark: '#c48f32' },
             },
             fg: {
               value: { _light: '#3d2f0d', _dark: '#fdf3dc' },
             },
             contrast: {
-              value: { _light: '#1a1408', _dark: '#fdf3dc' },
+              value: { _light: '#1a1408', _dark: '#ffffff' },
             },
             border: {
-              value: { _light: '#e6c57a', _dark: '#6b5212' },
+              value: { _light: '#e6c57a', _dark: '#8b6914' },
             },
           },
           sand: {
             solid: {
-              value: { _light: '#f2e8de', _dark: '#4a4238' },
+              value: { _light: '#d0c0a8', _dark: '#5c5245' },
             },
             muted: {
-              value: { _light: '#f8f3ec', _dark: '#3a342c' },
+              value: { _light: '#e6dcc8', _dark: '#4a4238' },
             },
             subtle: {
-              value: { _light: '#fcf9f5', _dark: '#2d2924' },
+              value: { _light: '#f3ece0', _dark: '#3d3833' },
             },
             emphasized: {
-              value: { _light: '#e5d8c8', _dark: '#5c5245' },
+              value: { _light: '#b8a890', _dark: '#6e6458' },
             },
             fg: {
               value: { _light: '#3d3830', _dark: '#f8f3ec' },
             },
             contrast: {
-              value: { _light: '#1a1815', _dark: '#fcf9f5' },
+              value: { _light: '#1a1815', _dark: '#ffffff' },
             },
             border: {
-              value: { _light: '#e8dcd0', _dark: '#4f463a' },
+              value: { _light: '#dcd0b8', _dark: '#5c5245' },
             },
           },
           taupe: {
             solid: {
-              value: { _light: '#e2cbac', _dark: '#5c4d3a' },
+              value: { _light: '#c8b898', _dark: '#6e5c45' },
             },
             muted: {
-              value: { _light: '#f0e4d4', _dark: '#4a3f30' },
+              value: { _light: '#e3d6c8', _dark: '#5c4d3a' },
             },
             subtle: {
-              value: { _light: '#f7f1e8', _dark: '#3a3228' },
+              value: { _light: '#f4ebe3', _dark: '#4a3f30' },
             },
             emphasized: {
-              value: { _light: '#d4bc98', _dark: '#6e5c45' },
+              value: { _light: '#b0a078', _dark: '#8a7858' },
             },
             fg: {
               value: { _light: '#3a3228', _dark: '#f7f1e8' },
             },
             contrast: {
-              value: { _light: '#1a1612', _dark: '#f7f1e8' },
+              value: { _light: '#1a1612', _dark: '#ffffff' },
             },
             border: {
-              value: { _light: '#ddd0b8', _dark: '#5a4c3c' },
+              value: { _light: '#d4c8a8', _dark: '#6e5c45' },
             },
           },
           white: {
             solid: {
-              value: { _light: '#ffffff', _dark: '#1a1a1a' },
+              value: { _light: '#e8e8e8', _dark: '#404040' },
             },
             muted: {
-              value: { _light: '#fafafa', _dark: '#262626' },
+              value: { _light: '#f2f2f2', _dark: '#4a4a4a' },
             },
             subtle: {
-              value: { _light: '#f5f5f5', _dark: '#2d2d2d' },
+              value: { _light: '#fafafa', _dark: '#3d3d3d' },
             },
             emphasized: {
-              value: { _light: '#e8e8e8', _dark: '#404040' },
+              value: { _light: '#d0d0d0', _dark: '#5a5a5a' },
             },
             fg: {
               value: { _light: '#1a1a1a', _dark: '#fafafa' },
@@ -347,7 +347,7 @@ function createDynamicThemeConfig(themeColor: ThemeColorToken) {
               value: { _light: '#000000', _dark: '#ffffff' },
             },
             border: {
-              value: { _light: '#e0e0e0', _dark: '#383838' },
+              value: { _light: '#dcdcdc', _dark: '#4a4a4a' },
             },
           },
         },

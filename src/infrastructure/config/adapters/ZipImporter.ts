@@ -11,6 +11,10 @@ import { MenuItemRepository } from '@/domain/menu/repositories/MenuItemRepositor
 import { IPageContentRepository } from '@/domain/pages/repositories/IPageContentRepository';
 import { WebsiteSettingsRepository } from '@/domain/settings/repositories/WebsiteSettingsRepository';
 import { SocialNetworkRepository } from '@/domain/settings/repositories/SocialNetworkRepository';
+import { IProductRepository } from '@/domain/product/repositories/IProductRepository';
+import { ICategoryRepository } from '@/domain/product/repositories/ICategoryRepository';
+import { IActivityRepository } from '@/domain/appointment/repositories/IActivityRepository';
+import { IAvailabilityRepository } from '@/domain/appointment/repositories/IAvailabilityRepository';
 import { MenuItem } from '@/domain/menu/entities/MenuItem';
 import { MenuItemText } from '@/domain/menu/value-objects/MenuItemText';
 import { MenuItemUrl } from '@/domain/menu/value-objects/MenuItemUrl';
@@ -18,6 +22,14 @@ import { PageContent } from '@/domain/pages/entities/PageContent';
 import { PageContentBody } from '@/domain/pages/value-objects/PageContentBody';
 import { SocialNetwork } from '@/domain/settings/entities/SocialNetwork';
 import { SocialNetworkType } from '@/domain/settings/value-objects/SocialNetworkType';
+import { Product } from '@/domain/product/entities/Product';
+import { Category } from '@/domain/product/entities/Category';
+import { Activity } from '@/domain/appointment/entities/Activity';
+import { Availability } from '@/domain/appointment/entities/Availability';
+import { WeeklySlot } from '@/domain/appointment/value-objects/WeeklySlot';
+import { AvailabilityException } from '@/domain/appointment/value-objects/AvailabilityException';
+import { RequiredFieldsConfig } from '@/domain/appointment/value-objects/RequiredFieldsConfig';
+import { ReminderSettings } from '@/domain/appointment/value-objects/ReminderSettings';
 import { PackageVersion } from '@/domain/config/value-objects/PackageVersion';
 import { ExportPackage } from '@/domain/config/entities/ExportPackage';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
@@ -29,11 +41,16 @@ import type {
   SerializedPageContent,
   SerializedSetting,
   SerializedSocialNetwork,
+  SerializedProduct,
+  SerializedCategory,
+  SerializedActivity,
+  SerializedAvailability,
 } from '@/infrastructure/config/types/SerializedTypes';
 
 const IMAGES_DIR = path.join(process.cwd(), 'public', 'page-content-images');
 const ICONS_DIR = path.join(process.cwd(), 'public', 'icons');
 const LOADERS_DIR = path.join(process.cwd(), 'public', 'loaders');
+const PRODUCT_IMAGES_DIR = path.join(process.cwd(), 'public', 'product-images');
 
 export class ZipImporter implements IConfigurationImporter {
   constructor(
@@ -41,6 +58,10 @@ export class ZipImporter implements IConfigurationImporter {
     private readonly pageContentRepository: IPageContentRepository,
     private readonly websiteSettingsRepository: WebsiteSettingsRepository,
     private readonly socialNetworkRepository: SocialNetworkRepository,
+    private readonly productRepository: IProductRepository,
+    private readonly categoryRepository: ICategoryRepository,
+    private readonly activityRepository: IActivityRepository,
+    private readonly availabilityRepository: IAvailabilityRepository,
     private readonly logger: ILogger
   ) {}
 
@@ -52,7 +73,7 @@ export class ZipImporter implements IConfigurationImporter {
       if (!manifestEntry) {
         return {
           valid: false,
-          error: 'Invalid package: missing manifest.json',
+          error: 'Package invalide : manifest.json manquant',
         };
       }
 
@@ -65,7 +86,7 @@ export class ZipImporter implements IConfigurationImporter {
       if (!packageVersion.isCompatibleWith(currentVersion)) {
         return {
           valid: false,
-          error: `Incompatible package version: ${packageVersion.toString()}. Current version: ${currentVersion.toString()}`,
+          error: `Version de package incompatible : ${packageVersion.toString()}. Version actuelle : ${currentVersion.toString()}`,
         };
       }
 
@@ -77,7 +98,7 @@ export class ZipImporter implements IConfigurationImporter {
       };
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Invalid package format';
+        error instanceof Error ? error.message : 'Format de package invalide';
       return { valid: false, error: errorMessage };
     }
   }
@@ -93,7 +114,7 @@ export class ZipImporter implements IConfigurationImporter {
       if (!validation.valid || !validation.package) {
         return {
           success: false,
-          error: validation.error ?? 'Invalid package',
+          error: validation.error ?? 'Package invalide',
         };
       }
 
@@ -116,27 +137,41 @@ export class ZipImporter implements IConfigurationImporter {
       // Import social networks
       const socialNetworksCount = await this.importSocialNetworks(zip);
 
+      // Import products and categories
+      const categoriesCount = await this.importCategories(zip);
+      const productsCount = await this.importProducts(zip);
+
+      // Import activities and availability
+      const activitiesCount = await this.importActivities(zip);
+      const hasAvailability = await this.importAvailability(zip);
+
       // Import images
       const imagesCount = await this.importImages(zip);
 
       this.logger.logInfo(
-        `Import complete: ${menuItemsCount} menu items, ${pageContentsCount} pages, ${settingsCount} settings, ${socialNetworksCount} social networks, ${imagesCount} images`
+        `Import complete: ${menuItemsCount} menu items, ${pageContentsCount} pages, ${settingsCount} settings, ${socialNetworksCount} social networks, ${productsCount} products, ${categoriesCount} categories, ${activitiesCount} activities, ${imagesCount} images`
       );
 
       return {
         success: true,
-        message: 'Configuration imported successfully',
+        message: 'Configuration importée avec succès',
         imported: {
           menuItems: menuItemsCount,
           pageContents: pageContentsCount,
           settings: settingsCount,
           socialNetworks: socialNetworksCount,
+          products: productsCount,
+          categories: categoriesCount,
+          activities: activitiesCount,
+          hasAvailability,
           images: imagesCount,
         },
       };
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error during import';
+        error instanceof Error
+          ? error.message
+          : "Erreur inconnue lors de l'import";
       this.logger.logError(`Import failed: ${errorMessage}`);
       return {
         success: false,
@@ -158,6 +193,26 @@ export class ZipImporter implements IConfigurationImporter {
     const existingMenuItems = await this.menuItemRepository.findAll();
     for (const item of existingMenuItems) {
       await this.menuItemRepository.delete(item.id);
+    }
+
+    // Clear products
+    const existingProducts = await this.productRepository.getAll();
+    for (const product of existingProducts) {
+      await this.productRepository.delete(product.id);
+    }
+
+    // Clear categories
+    const existingCategories = await this.categoryRepository.getAll();
+    for (const category of existingCategories) {
+      await this.categoryRepository.delete(category.id);
+    }
+
+    // Clear activities
+    const existingActivities = await this.activityRepository.findAll();
+    for (const activity of existingActivities) {
+      if (activity.id) {
+        await this.activityRepository.delete(activity.id);
+      }
     }
 
     // Clear page content images directory
@@ -186,6 +241,18 @@ export class ZipImporter implements IConfigurationImporter {
       for (const file of files) {
         if (file !== '.gitkeep') {
           await fs.unlink(path.join(LOADERS_DIR, file));
+        }
+      }
+    } catch {
+      // Directory doesn't exist, nothing to clear
+    }
+
+    // Clear product images directory
+    try {
+      const files = await fs.readdir(PRODUCT_IMAGES_DIR);
+      for (const file of files) {
+        if (file !== '.gitkeep') {
+          await fs.unlink(path.join(PRODUCT_IMAGES_DIR, file));
         }
       }
     } catch {
@@ -349,6 +416,133 @@ export class ZipImporter implements IConfigurationImporter {
     return networks.length;
   }
 
+  private async importProducts(zip: AdmZip): Promise<number> {
+    const entry = zip.getEntry('data/products.json');
+    if (!entry) return 0;
+
+    const products: SerializedProduct[] = JSON.parse(
+      entry.getData().toString('utf8')
+    );
+
+    for (const productData of products) {
+      const product = Product.fromJSON({
+        id: productData.id,
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        imageUrl: productData.imageUrl,
+        displayOrder: productData.displayOrder,
+        categoryIds: productData.categoryIds,
+        createdAt: new Date(productData.createdAt),
+        updatedAt: new Date(productData.updatedAt),
+      });
+      await this.productRepository.create(product);
+    }
+
+    return products.length;
+  }
+
+  private async importCategories(zip: AdmZip): Promise<number> {
+    const entry = zip.getEntry('data/categories.json');
+    if (!entry) return 0;
+
+    const categories: SerializedCategory[] = JSON.parse(
+      entry.getData().toString('utf8')
+    );
+
+    for (const categoryData of categories) {
+      const category = Category.fromJSON({
+        id: categoryData.id,
+        name: categoryData.name,
+        description: categoryData.description,
+        displayOrder: categoryData.displayOrder,
+        createdAt: new Date(categoryData.createdAt),
+        updatedAt: new Date(categoryData.updatedAt),
+      });
+      await this.categoryRepository.create(category);
+    }
+
+    return categories.length;
+  }
+
+  private async importActivities(zip: AdmZip): Promise<number> {
+    const entry = zip.getEntry('data/activities.json');
+    if (!entry) return 0;
+
+    const activities: SerializedActivity[] = JSON.parse(
+      entry.getData().toString('utf8')
+    );
+
+    for (const activityData of activities) {
+      const requiredFields = RequiredFieldsConfig.create({
+        fields: activityData.requiredFields.fields as (
+          | 'name'
+          | 'email'
+          | 'phone'
+          | 'address'
+          | 'custom'
+        )[],
+        customFieldLabel: activityData.requiredFields.customFieldLabel,
+      });
+      const reminderSettings = ReminderSettings.create({
+        enabled: activityData.reminderSettings.enabled,
+        hoursBefore: activityData.reminderSettings.hoursBefore,
+      });
+
+      const activity = Activity.create({
+        id: activityData.id,
+        name: activityData.name,
+        description: activityData.description,
+        durationMinutes: activityData.durationMinutes,
+        color: activityData.color,
+        price: activityData.price,
+        requiredFields,
+        reminderSettings,
+        minimumBookingNoticeHours: activityData.minimumBookingNoticeHours,
+        createdAt: new Date(activityData.createdAt),
+        updatedAt: new Date(activityData.updatedAt),
+      });
+      await this.activityRepository.save(activity);
+    }
+
+    return activities.length;
+  }
+
+  private async importAvailability(zip: AdmZip): Promise<boolean> {
+    const entry = zip.getEntry('data/availability.json');
+    if (!entry) return false;
+
+    const availabilityData: SerializedAvailability = JSON.parse(
+      entry.getData().toString('utf8')
+    );
+
+    const weeklySlots = availabilityData.weeklySlots.map((slot) =>
+      WeeklySlot.create({
+        dayOfWeek: slot.dayOfWeek,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      })
+    );
+
+    const exceptions = availabilityData.exceptions.map((exc) =>
+      AvailabilityException.create({
+        date: new Date(exc.date),
+        reason: exc.reason,
+      })
+    );
+
+    const availability = Availability.create({
+      id: availabilityData.id,
+      weeklySlots,
+      exceptions,
+      updatedAt: new Date(availabilityData.updatedAt),
+    });
+
+    await this.availabilityRepository.save(availability);
+
+    return true;
+  }
+
   private async importImages(zip: AdmZip): Promise<number> {
     // Import page content images
     const pageContentImageEntries = zip.getEntries().filter((entry) => {
@@ -403,8 +597,30 @@ export class ZipImporter implements IConfigurationImporter {
       }
     }
 
+    // Import product images
+    const productImageEntries = zip.getEntries().filter((entry) => {
+      return (
+        entry.entryName.startsWith('images/product-images/') &&
+        !entry.isDirectory
+      );
+    });
+
+    if (productImageEntries.length > 0) {
+      // Ensure product images directory exists
+      await fs.mkdir(PRODUCT_IMAGES_DIR, { recursive: true });
+
+      for (const entry of productImageEntries) {
+        const filename = path.basename(entry.entryName);
+        const targetPath = path.join(PRODUCT_IMAGES_DIR, filename);
+        await fs.writeFile(targetPath, entry.getData());
+      }
+    }
+
     return (
-      pageContentImageEntries.length + iconEntries.length + loaderEntries.length
+      pageContentImageEntries.length +
+      iconEntries.length +
+      loaderEntries.length +
+      productImageEntries.length
     );
   }
 }

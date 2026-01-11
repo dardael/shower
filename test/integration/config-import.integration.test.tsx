@@ -26,6 +26,29 @@ const mockSocialNetworkRepository = {
   updateSocialNetworks: jest.fn(),
 };
 
+const mockProductRepository = {
+  getAll: jest.fn(),
+  create: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockCategoryRepository = {
+  getAll: jest.fn(),
+  create: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockActivityRepository = {
+  findAll: jest.fn(),
+  save: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockAvailabilityRepository = {
+  find: jest.fn(),
+  save: jest.fn(),
+};
+
 const mockLogger = {
   logInfo: jest.fn(),
   logError: jest.fn(),
@@ -146,6 +169,19 @@ describe('Config Import Integration', () => {
       undefined
     );
 
+    // Mock product/category/activity/availability repositories
+    mockProductRepository.getAll.mockResolvedValue([]);
+    mockProductRepository.create.mockResolvedValue(undefined);
+    mockProductRepository.delete.mockResolvedValue(undefined);
+    mockCategoryRepository.getAll.mockResolvedValue([]);
+    mockCategoryRepository.create.mockResolvedValue(undefined);
+    mockCategoryRepository.delete.mockResolvedValue(undefined);
+    mockActivityRepository.findAll.mockResolvedValue([]);
+    mockActivityRepository.save.mockResolvedValue(undefined);
+    mockActivityRepository.delete.mockResolvedValue(undefined);
+    mockAvailabilityRepository.find.mockResolvedValue(null);
+    mockAvailabilityRepository.save.mockResolvedValue(undefined);
+
     // Mock fs functions - readdir returns empty array by default (no files to clear)
     (fs.readdir as jest.Mock).mockResolvedValue([]);
   });
@@ -157,6 +193,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -174,6 +214,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -184,7 +228,7 @@ describe('Config Import Integration', () => {
       const result = await importer.validatePackage(zipBuffer);
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('missing manifest.json');
+      expect(result.error).toContain('manifest.json manquant');
     });
 
     it('should reject package with incompatible version', async () => {
@@ -193,6 +237,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -200,7 +248,7 @@ describe('Config Import Integration', () => {
       const result = await importer.validatePackage(zipBuffer);
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('Incompatible package version');
+      expect(result.error).toContain('Version de package incompatible');
     });
 
     it('should reject invalid ZIP data', async () => {
@@ -209,6 +257,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -227,6 +279,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -250,6 +306,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -266,6 +326,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -286,6 +350,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -307,6 +375,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -329,6 +401,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -346,6 +422,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -362,6 +442,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -408,6 +492,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -451,6 +539,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -504,6 +596,10 @@ describe('Config Import Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 

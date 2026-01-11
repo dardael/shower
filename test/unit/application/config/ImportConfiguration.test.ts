@@ -25,6 +25,10 @@ describe('ImportConfiguration', () => {
         pageContentCount: 3,
         settingsCount: 10,
         socialNetworkCount: 2,
+        productCount: 0,
+        categoryCount: 0,
+        activityCount: 0,
+        hasAvailability: false,
         imageCount: 1,
         totalSizeBytes: 1024,
       },
@@ -83,6 +87,10 @@ describe('ImportConfiguration', () => {
           pageContents: 3,
           settings: 10,
           socialNetworks: 2,
+          products: 0,
+          categories: 0,
+          activities: 0,
+          hasAvailability: false,
           images: 1,
         },
       };
@@ -99,6 +107,10 @@ describe('ImportConfiguration', () => {
         pageContents: 3,
         settings: 10,
         socialNetworks: 2,
+        products: 0,
+        categories: 0,
+        activities: 0,
+        hasAvailability: false,
         images: 1,
       });
     });

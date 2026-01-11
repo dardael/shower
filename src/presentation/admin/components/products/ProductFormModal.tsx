@@ -233,8 +233,8 @@ export function ProductFormModal({
                           textAlign="center"
                           transition="all 0.2s"
                           _hover={{
-                            borderColor: `${themeColor}.400`,
-                            bg: `${themeColor}.50`,
+                            borderColor: `${themeColor}.border`,
+                            bg: `${themeColor}.muted`,
                           }}
                         >
                           <VStack gap={2}>

@@ -22,7 +22,14 @@ import { LuCheck, LuX, LuCopy } from 'react-icons/lu';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 
 interface EmailTemplateFormProps {
-  type: 'admin' | 'purchaser';
+  type:
+    | 'admin'
+    | 'purchaser'
+    | 'appointment-booking'
+    | 'appointment-admin-confirmation'
+    | 'appointment-admin-new'
+    | 'appointment-reminder'
+    | 'appointment-cancellation';
   title: string;
   description: string;
 }
@@ -84,7 +91,9 @@ export function EmailTemplateForm({
 
   const fetchPlaceholders = useCallback(async (): Promise<void> => {
     try {
-      const response = await fetch('/api/admin/email/placeholders');
+      const response = await fetch(
+        `/api/admin/email/placeholders?type=${type}`
+      );
       if (response.ok) {
         const data = await response.json();
         setPlaceholders(data.placeholders || []);
@@ -92,7 +101,7 @@ export function EmailTemplateForm({
     } catch {
       // Placeholders are optional, ignore errors
     }
-  }, []);
+  }, [type]);
 
   useEffect(() => {
     const loadData = async (): Promise<void> => {

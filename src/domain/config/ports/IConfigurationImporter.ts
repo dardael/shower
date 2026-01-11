@@ -29,6 +29,10 @@ export interface ImportResult {
     pageContents: number;
     settings: number;
     socialNetworks: number;
+    products: number;
+    categories: number;
+    activities: number;
+    hasAvailability: boolean;
     images: number;
   };
 }

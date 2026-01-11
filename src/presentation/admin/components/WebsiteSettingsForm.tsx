@@ -22,6 +22,7 @@ import { HeaderMenuTextColorSelector } from '@/presentation/admin/components/Hea
 import { FontSelector } from '@/presentation/admin/components/FontSelector';
 import { ThemeModeSelector } from '@/presentation/admin/components/ThemeModeSelector';
 import { SellingToggleSelector } from '@/presentation/admin/components/SellingToggleSelector';
+import { AppointmentToggleSelector } from '@/presentation/admin/components/AppointmentToggleSelector';
 import { LoaderBackgroundColorSelector } from '@/presentation/admin/components/LoaderBackgroundColorSelector';
 import { useDynamicTheme } from '@/presentation/shared/DynamicThemeProvider';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
@@ -30,6 +31,7 @@ import { useBackgroundColorContext } from '@/presentation/shared/contexts/Backgr
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import { useThemeModeConfig } from '@/presentation/shared/hooks/useThemeModeConfig';
 import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
+import { useAppointmentModule } from '@/presentation/shared/contexts/AppointmentModuleContext';
 import { useIconManagement } from '@/presentation/admin/hooks/useIconManagement';
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
 
@@ -88,6 +90,11 @@ export default function WebsiteSettingsForm({
     updateSellingEnabled: updateSellingEnabledConfig,
     isLoading: sellingLoading,
   } = useSellingConfig();
+  const {
+    isEnabled: appointmentEnabled,
+    toggle: toggleAppointment,
+    isLoading: appointmentLoading,
+  } = useAppointmentModule();
   const [loaderBackgroundColor, setLoaderBackgroundColor] = useState<
     string | null
   >(null);
@@ -545,6 +552,24 @@ export default function WebsiteSettingsForm({
           }}
           disabled={false}
           isLoading={sellingLoading}
+        />
+
+        <AppointmentToggleSelector
+          appointmentEnabled={appointmentEnabled}
+          onToggle={async (enabled) => {
+            try {
+              if (enabled !== appointmentEnabled) {
+                await toggleAppointment();
+              }
+            } catch {
+              showToast(
+                'Échec de la mise à jour du module rendez-vous',
+                'error'
+              );
+            }
+          }}
+          disabled={false}
+          isLoading={appointmentLoading}
         />
 
         <Field.Root>

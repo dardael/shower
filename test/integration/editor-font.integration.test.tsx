@@ -3,6 +3,18 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TiptapEditor from '@/presentation/admin/components/PageContentEditor/TiptapEditor';
 import PublicPageContent from '@/presentation/shared/components/PublicPageContent/PublicPageContent';
 import { SellingConfigProvider } from '@/presentation/shared/contexts/SellingConfigContext';
+import { AppointmentModuleProvider } from '@/presentation/shared/contexts/AppointmentModuleContext';
+
+// Mock BroadcastChannel
+const mockBroadcastChannel = {
+  postMessage: jest.fn(),
+  close: jest.fn(),
+  onmessage: null as ((event: MessageEvent) => void) | null,
+};
+
+global.BroadcastChannel = jest.fn().mockImplementation(() => ({
+  ...mockBroadcastChannel,
+}));
 
 // Mock fetch for API calls
 const mockFetch = jest.fn();
@@ -31,7 +43,11 @@ afterAll(() => {
 
 // Simple wrapper component for tests
 const TestWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <SellingConfigProvider>{children}</SellingConfigProvider>;
+  return (
+    <AppointmentModuleProvider>
+      <SellingConfigProvider>{children}</SellingConfigProvider>
+    </AppointmentModuleProvider>
+  );
 };
 
 describe('Editor Font Integration Tests', () => {

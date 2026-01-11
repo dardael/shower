@@ -51,7 +51,7 @@ describe('Root Page Content Display Integration Tests', () => {
       render(<PublicPageContent content="" />);
 
       expect(
-        screen.getByText('This page has no content yet.')
+        screen.getByText("Cette page n'a pas encore de contenu.")
       ).toBeInTheDocument();
     });
   });
@@ -162,7 +162,9 @@ describe('Root Page Content Display Integration Tests', () => {
     it('should display styled empty state message', () => {
       render(<PublicPageContent content="" />);
 
-      const emptyMessage = screen.getByText('This page has no content yet.');
+      const emptyMessage = screen.getByText(
+        "Cette page n'a pas encore de contenu."
+      );
       expect(emptyMessage).toBeInTheDocument();
     });
   });

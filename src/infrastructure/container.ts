@@ -472,6 +472,169 @@ container.register<IBackupScheduler>('IBackupScheduler', {
   useClass: BackupSchedulerService,
 });
 
+// Register appointment services
+import type { IActivityRepository } from '@/domain/appointment/repositories/IActivityRepository';
+import type { IAvailabilityRepository } from '@/domain/appointment/repositories/IAvailabilityRepository';
+import type { IAppointmentRepository } from '@/domain/appointment/repositories/IAppointmentRepository';
+import { MongooseActivityRepository } from '@/infrastructure/appointment/repositories/MongooseActivityRepository';
+import { MongooseAvailabilityRepository } from '@/infrastructure/appointment/repositories/MongooseAvailabilityRepository';
+import { MongooseAppointmentRepository } from '@/infrastructure/appointment/repositories/MongooseAppointmentRepository';
+import { SendAppointmentConfirmation } from '@/application/appointment/SendAppointmentConfirmation';
+import { SendAppointmentAdminConfirmation } from '@/application/appointment/SendAppointmentAdminConfirmation';
+import { SendAppointmentCancellationEmail } from '@/application/appointment/SendAppointmentCancellationEmail';
+import { SendAppointmentReminderEmail } from '@/application/appointment/SendAppointmentReminderEmail';
+import type { IAppointmentReminderScheduler } from '@/infrastructure/appointment/services/AppointmentReminderScheduler';
+import { AppointmentReminderScheduler } from '@/infrastructure/appointment/services/AppointmentReminderScheduler';
+import {
+  CreateAppointment,
+  GetAllAppointments,
+  GetAppointmentById,
+  ConfirmAppointment,
+  CancelAppointment,
+  DeleteAppointment,
+  GetAppointmentsByDateRange,
+  GetCalendarEvents,
+  type IGetCalendarEvents,
+} from '@/application/appointment/AppointmentUseCases';
+import {
+  CreateActivity,
+  GetAllActivities,
+  GetActivityById,
+  UpdateActivity,
+  DeleteActivity,
+} from '@/application/appointment/ActivityUseCases';
+import {
+  GetAvailability,
+  UpdateAvailability,
+  GetAvailableSlots,
+} from '@/application/appointment/AvailabilityUseCases';
+import {
+  GetAppointmentModuleEnabled,
+  UpdateAppointmentModuleEnabled,
+} from '@/application/appointment/AppointmentModuleUseCases';
+
+container.register<IActivityRepository>('IActivityRepository', {
+  useClass: MongooseActivityRepository,
+});
+
+container.register<IAvailabilityRepository>('IAvailabilityRepository', {
+  useClass: MongooseAvailabilityRepository,
+});
+
+container.register<IAppointmentRepository>('IAppointmentRepository', {
+  useClass: MongooseAppointmentRepository,
+});
+
+// Register appointment email services
+container.register<SendAppointmentConfirmation>(SendAppointmentConfirmation, {
+  useClass: SendAppointmentConfirmation,
+});
+
+container.register<SendAppointmentAdminConfirmation>(
+  SendAppointmentAdminConfirmation,
+  {
+    useClass: SendAppointmentAdminConfirmation,
+  }
+);
+
+container.register<SendAppointmentCancellationEmail>(
+  SendAppointmentCancellationEmail,
+  {
+    useClass: SendAppointmentCancellationEmail,
+  }
+);
+
+container.register<SendAppointmentReminderEmail>(SendAppointmentReminderEmail, {
+  useClass: SendAppointmentReminderEmail,
+});
+
+// Register appointment reminder scheduler
+container.register<IAppointmentReminderScheduler>(
+  'IAppointmentReminderScheduler',
+  {
+    useClass: AppointmentReminderScheduler,
+  }
+);
+
+// Register appointment use cases
+container.register<CreateAppointment>('CreateAppointment', {
+  useClass: CreateAppointment,
+});
+
+container.register<GetAllAppointments>('GetAllAppointments', {
+  useClass: GetAllAppointments,
+});
+
+container.register<GetAppointmentById>('GetAppointmentById', {
+  useClass: GetAppointmentById,
+});
+
+container.register<ConfirmAppointment>('ConfirmAppointment', {
+  useClass: ConfirmAppointment,
+});
+
+container.register<CancelAppointment>('CancelAppointment', {
+  useClass: CancelAppointment,
+});
+
+container.register<DeleteAppointment>('DeleteAppointment', {
+  useClass: DeleteAppointment,
+});
+
+container.register<GetAppointmentsByDateRange>('GetAppointmentsByDateRange', {
+  useClass: GetAppointmentsByDateRange,
+});
+
+container.register<IGetCalendarEvents>('IGetCalendarEvents', {
+  useClass: GetCalendarEvents,
+});
+
+// Register activity use cases
+container.register<CreateActivity>('CreateActivity', {
+  useClass: CreateActivity,
+});
+
+container.register<GetAllActivities>('GetAllActivities', {
+  useClass: GetAllActivities,
+});
+
+container.register<GetActivityById>('GetActivityById', {
+  useClass: GetActivityById,
+});
+
+container.register<UpdateActivity>('UpdateActivity', {
+  useClass: UpdateActivity,
+});
+
+container.register<DeleteActivity>('DeleteActivity', {
+  useClass: DeleteActivity,
+});
+
+// Register availability use cases
+container.register<GetAvailability>('GetAvailability', {
+  useClass: GetAvailability,
+});
+
+container.register<UpdateAvailability>('UpdateAvailability', {
+  useClass: UpdateAvailability,
+});
+
+container.register<GetAvailableSlots>('GetAvailableSlots', {
+  useClass: GetAvailableSlots,
+});
+
+// Register appointment module use cases
+container.register<GetAppointmentModuleEnabled>('GetAppointmentModuleEnabled', {
+  useClass: GetAppointmentModuleEnabled,
+});
+
+container.register<UpdateAppointmentModuleEnabled>(
+  'UpdateAppointmentModuleEnabled',
+  {
+    useClass: UpdateAppointmentModuleEnabled,
+  }
+);
+
 // Service locator pattern for server components
 export class AuthServiceLocator {
   static getAuthorizeAdminAccess(): IAuthorizeAdminAccess {
@@ -742,6 +905,20 @@ export class BackupServiceLocator {
 
   static getBackupScheduler(): IBackupScheduler {
     return container.resolve('IBackupScheduler');
+  }
+}
+
+export class AppointmentServiceLocator {
+  static getActivityRepository(): IActivityRepository {
+    return container.resolve('IActivityRepository');
+  }
+
+  static getAvailabilityRepository(): IAvailabilityRepository {
+    return container.resolve('IAvailabilityRepository');
+  }
+
+  static getAppointmentRepository(): IAppointmentRepository {
+    return container.resolve('IAppointmentRepository');
   }
 }
 

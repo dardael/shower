@@ -13,6 +13,7 @@ import {
   CustomTableCell,
   CustomTableHeader,
   ProductList,
+  AppointmentBooking,
 } from './extensions';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
@@ -35,6 +36,7 @@ import {
   LuListOrdered,
   LuUnfoldHorizontal,
   LuShoppingBag,
+  LuCalendarPlus,
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
@@ -49,6 +51,7 @@ import { OverlayToolbar } from './OverlayToolbar';
 import { ProductListToolbar } from './ProductListToolbar';
 import { TableInsertDialog } from './TableInsertDialog';
 import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
+import { useAppointmentModule } from '@/presentation/shared/contexts/AppointmentModuleContext';
 import { TableToolbar } from './TableToolbar';
 import { FiType } from 'react-icons/fi';
 import { DEFAULT_OVERLAY_TEXT } from '@/domain/pages/types/ImageOverlay';
@@ -249,6 +252,7 @@ export default function TiptapEditor({
   >(null);
   const [isInTable, setIsInTable] = useState(false);
   const { sellingEnabled } = useSellingConfig();
+  const { isEnabled: appointmentModuleEnabled } = useAppointmentModule();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Editor | null>(null);
 
@@ -352,6 +356,7 @@ export default function TiptapEditor({
       CustomTableCell,
       CustomTableHeader,
       ProductList,
+      AppointmentBooking,
     ],
     content,
     editable: !disabled,
@@ -830,6 +835,22 @@ export default function TiptapEditor({
               disabled={disabled}
             >
               <LuShoppingBag />
+            </IconButton>
+          </Tooltip>
+        )}
+        {appointmentModuleEnabled && (
+          <Tooltip content="Insérer un formulaire de prise de rendez-vous">
+            <IconButton
+              aria-label="Insérer un formulaire de prise de rendez-vous"
+              size="sm"
+              variant="ghost"
+              color="fg"
+              onClick={() =>
+                editor?.chain().focus().insertAppointmentBooking().run()
+              }
+              disabled={disabled}
+            >
+              <LuCalendarPlus />
             </IconButton>
           </Tooltip>
         )}

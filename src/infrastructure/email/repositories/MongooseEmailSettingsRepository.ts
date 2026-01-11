@@ -108,11 +108,59 @@ export class MongooseEmailSettingsRepository
             body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_ADMIN_BODY,
             enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_ADMIN_ENABLED,
           }
-        : {
-            subject: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
-            body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
-            enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
-          };
+        : type === 'purchaser'
+          ? {
+              subject: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
+              body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
+              enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
+            }
+          : type === 'appointment-booking'
+            ? {
+                subject:
+                  VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_SUBJECT,
+                body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_BODY,
+                enabled:
+                  VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_ENABLED,
+              }
+            : type === 'appointment-admin-new'
+              ? {
+                  subject:
+                    VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_SUBJECT,
+                  body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_BODY,
+                  enabled:
+                    VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_ENABLED,
+                }
+              : type === 'appointment-admin-confirmation'
+                ? {
+                    subject:
+                      VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_SUBJECT,
+                    body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_BODY,
+                    enabled:
+                      VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_ENABLED,
+                  }
+                : type === 'appointment-reminder'
+                  ? {
+                      subject:
+                        VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_SUBJECT,
+                      body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_BODY,
+                      enabled:
+                        VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_ENABLED,
+                    }
+                  : type === 'appointment-cancellation'
+                    ? {
+                        subject:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_SUBJECT,
+                        body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_BODY,
+                        enabled:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_ENABLED,
+                      }
+                    : {
+                        subject:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
+                        body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
+                        enabled:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
+                      };
 
     const [subject, body, enabled] = await Promise.all([
       this.settingsRepository.getByKey(keys.subject),
@@ -141,11 +189,59 @@ export class MongooseEmailSettingsRepository
             body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_ADMIN_BODY,
             enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_ADMIN_ENABLED,
           }
-        : {
-            subject: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
-            body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
-            enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
-          };
+        : template.type === 'purchaser'
+          ? {
+              subject: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
+              body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
+              enabled: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
+            }
+          : template.type === 'appointment-booking'
+            ? {
+                subject:
+                  VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_SUBJECT,
+                body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_BODY,
+                enabled:
+                  VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_ENABLED,
+              }
+            : template.type === 'appointment-admin-new'
+              ? {
+                  subject:
+                    VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_SUBJECT,
+                  body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_BODY,
+                  enabled:
+                    VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_ENABLED,
+                }
+              : template.type === 'appointment-admin-confirmation'
+                ? {
+                    subject:
+                      VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_SUBJECT,
+                    body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_BODY,
+                    enabled:
+                      VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_ENABLED,
+                  }
+                : template.type === 'appointment-reminder'
+                  ? {
+                      subject:
+                        VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_SUBJECT,
+                      body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_BODY,
+                      enabled:
+                        VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_REMINDER_ENABLED,
+                    }
+                  : template.type === 'appointment-cancellation'
+                    ? {
+                        subject:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_SUBJECT,
+                        body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_BODY,
+                        enabled:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_ENABLED,
+                      }
+                    : {
+                        subject:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_SUBJECT,
+                        body: VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_BODY,
+                        enabled:
+                          VALID_SETTING_KEYS.EMAIL_TEMPLATE_PURCHASER_ENABLED,
+                      };
 
     await Promise.all([
       this.settingsRepository.setByKey(keys.subject, template.subject),

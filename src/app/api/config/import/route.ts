@@ -6,6 +6,8 @@ import {
   MenuServiceLocator,
   PagesServiceLocator,
   SettingsServiceLocator,
+  ProductServiceLocator,
+  AppointmentServiceLocator,
   LoggerServiceLocator,
 } from '@/infrastructure/container';
 import { ILogger } from '@/application/shared/ILogger';
@@ -27,6 +29,11 @@ function createImportDependencies(): ImportDependencies {
     SettingsServiceLocator.getWebsiteSettingsRepository();
   const socialNetworkRepository =
     SettingsServiceLocator.getSocialNetworkRepository();
+  const productRepository = ProductServiceLocator.getProductRepository();
+  const categoryRepository = ProductServiceLocator.getCategoryRepository();
+  const activityRepository = AppointmentServiceLocator.getActivityRepository();
+  const availabilityRepository =
+    AppointmentServiceLocator.getAvailabilityRepository();
   const logger = LoggerServiceLocator.getBaseLogger();
 
   const importer = new ZipImporter(
@@ -34,6 +41,10 @@ function createImportDependencies(): ImportDependencies {
     pageContentRepository,
     websiteSettingsRepository,
     socialNetworkRepository,
+    productRepository,
+    categoryRepository,
+    activityRepository,
+    availabilityRepository,
     logger
   );
 

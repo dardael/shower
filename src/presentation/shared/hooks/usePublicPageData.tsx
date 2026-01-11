@@ -157,7 +157,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
 
         const timeoutError: PageLoadError = {
           message:
-            'This page is taking longer than expected to load. Please try again.',
+            'Le chargement de cette page prend plus de temps que prévu. Veuillez réessayer.',
           failedSources:
             failedSources.length > 0
               ? failedSources

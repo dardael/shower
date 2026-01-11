@@ -50,7 +50,7 @@
 
 - [x] T002 [P] [US1] Add beige semantic tokens (solid, muted, subtle, fg, contrast, border) to createDynamicThemeConfig() in src/presentation/shared/theme.ts
 - [x] T003 [P] [US1] Add beige entry to BACKGROUND_COLOR_MAP with light (#cdb99d) and dark (#a89070) values in src/presentation/shared/components/ui/provider.tsx
-- [x] T004 [US1] Verify beige color square displays in ThemeColorSelector component (auto-renders from THEME_COLOR_PALETTE) _(Manual: requires browser)_
+- [x] T004 [US1] Verify beige color square displays in ThemeColorSelector component (auto-renders from THEME*COLOR_PALETTE) *(Manual: requires browser)\_
 - [x] T005 [US1] Verify beige theme color applies correctly to public website accent elements in light mode _(Manual: requires browser)_
 - [x] T006 [US1] Verify beige theme color applies correctly to public website accent elements in dark mode _(Manual: requires browser)_
 
@@ -68,7 +68,7 @@
 
 - [x] T007 [P] [US2] Add cream semantic tokens (solid, muted, subtle, fg, contrast, border) to createDynamicThemeConfig() in src/presentation/shared/theme.ts
 - [x] T008 [P] [US2] Add cream entry to BACKGROUND_COLOR_MAP with light (#ede6dd) and dark (#3d3830) values in src/presentation/shared/components/ui/provider.tsx
-- [x] T009 [US2] Verify cream color square displays in BackgroundColorSelector component (auto-renders from THEME_COLOR_PALETTE) _(Manual: requires browser)_
+- [x] T009 [US2] Verify cream color square displays in BackgroundColorSelector component (auto-renders from THEME*COLOR_PALETTE) *(Manual: requires browser)\_
 - [x] T010 [US2] Verify cream background color applies correctly to public website in light mode _(Manual: requires browser)_
 - [x] T011 [US2] Verify cream background color applies correctly to public website in dark mode _(Manual: requires browser)_
 

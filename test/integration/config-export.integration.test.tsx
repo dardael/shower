@@ -21,6 +21,22 @@ const mockSocialNetworkRepository = {
   getAllSocialNetworks: jest.fn(),
 };
 
+const mockProductRepository = {
+  getAll: jest.fn(),
+};
+
+const mockCategoryRepository = {
+  getAll: jest.fn(),
+};
+
+const mockActivityRepository = {
+  findAll: jest.fn(),
+};
+
+const mockAvailabilityRepository = {
+  find: jest.fn(),
+};
+
 const mockLogger = {
   logInfo: jest.fn(),
   logError: jest.fn(),
@@ -103,6 +119,12 @@ describe('Config Export Integration', () => {
       },
     ]);
 
+    // Mock product/category/activity/availability repositories
+    mockProductRepository.getAll.mockResolvedValue([]);
+    mockCategoryRepository.getAll.mockResolvedValue([]);
+    mockActivityRepository.findAll.mockResolvedValue([]);
+    mockAvailabilityRepository.find.mockResolvedValue(null);
+
     // Mock fs functions
     (fs.existsSync as jest.Mock).mockReturnValue(true);
     (fs.promises.readdir as jest.Mock).mockResolvedValue([]);
@@ -116,6 +138,10 @@ describe('Config Export Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -141,6 +167,10 @@ describe('Config Export Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -149,7 +179,7 @@ describe('Config Export Integration', () => {
       const manifestEntry = zip.getEntry('manifest.json');
       const manifest = JSON.parse(manifestEntry!.getData().toString('utf8'));
 
-      expect(manifest.schemaVersion).toBe('1.1');
+      expect(manifest.schemaVersion).toBe('1.2');
       expect(manifest.exportDate).toBeDefined();
       expect(manifest.summary).toBeDefined();
       expect(manifest.summary.menuItemCount).toBe(1);
@@ -162,6 +192,10 @@ describe('Config Export Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -182,6 +216,10 @@ describe('Config Export Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -190,7 +228,7 @@ describe('Config Export Integration', () => {
       expect(exportPackage.summary.menuItemCount).toBe(1);
       expect(exportPackage.summary.pageContentCount).toBe(1);
       expect(exportPackage.summary.socialNetworkCount).toBe(1);
-      expect(exportPackage.schemaVersion.toString()).toBe('1.1');
+      expect(exportPackage.schemaVersion.toString()).toBe('1.2');
     });
   });
 });

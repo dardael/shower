@@ -11,8 +11,9 @@ export class PackageVersion {
   /**
    * Current application schema version.
    * Increment major for breaking changes, minor for compatible additions.
+   * v1.2: Added products, categories, activities, and availability export/import
    */
-  static readonly CURRENT = new PackageVersion(1, 1);
+  static readonly CURRENT = new PackageVersion(1, 2);
 
   static create(major: number, minor: number): PackageVersion {
     if (major < 0 || minor < 0) {

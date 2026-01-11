@@ -23,6 +23,29 @@ const mockSocialNetworkRepository = {
   updateSocialNetworks: jest.fn(),
 };
 
+const mockProductRepository = {
+  getAll: jest.fn(),
+  create: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockCategoryRepository = {
+  getAll: jest.fn(),
+  create: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockActivityRepository = {
+  findAll: jest.fn(),
+  save: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockAvailabilityRepository = {
+  find: jest.fn(),
+  save: jest.fn(),
+};
+
 const mockLogger = {
   logInfo: jest.fn(),
   logError: jest.fn(),
@@ -131,6 +154,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -152,6 +179,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -168,6 +199,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -184,6 +219,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -220,13 +259,17 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
       const result = await importer.validatePackage(zip.toBuffer());
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('Incompatible package version');
+      expect(result.error).toContain('Version de package incompatible');
     });
 
     it('should return error for missing manifest', async () => {
@@ -238,13 +281,17 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
       const result = await importer.validatePackage(zip.toBuffer());
 
       expect(result.valid).toBe(false);
-      expect(result.error).toContain('missing manifest.json');
+      expect(result.error).toContain('manifest.json manquant');
     });
 
     it('should return error for corrupt ZIP', async () => {
@@ -253,6 +300,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 
@@ -277,6 +328,10 @@ describe('Config Preview Integration', () => {
         mockPageContentRepository as never,
         mockWebsiteSettingsRepository as never,
         mockSocialNetworkRepository as never,
+        mockProductRepository as never,
+        mockCategoryRepository as never,
+        mockActivityRepository as never,
+        mockAvailabilityRepository as never,
         mockLogger as never
       );
 

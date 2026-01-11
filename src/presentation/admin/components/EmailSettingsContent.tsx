@@ -15,7 +15,8 @@ export default function EmailSettingsContent(): React.ReactElement {
           <Box>
             <Heading size="lg">Configuration des emails</Heading>
             <Text color="gray.600" mt={2}>
-              Configurez les notifications par email pour les commandes.
+              Configurez les notifications par email pour les commandes et
+              rendez-vous.
             </Text>
           </Box>
 
@@ -28,6 +29,21 @@ export default function EmailSettingsContent(): React.ReactElement {
               </Tabs.Trigger>
               <Tabs.Trigger value="purchaser-template">
                 Notification acheteur
+              </Tabs.Trigger>
+              <Tabs.Trigger value="appointment-booking">
+                Confirmation rendez-vous
+              </Tabs.Trigger>
+              <Tabs.Trigger value="appointment-admin-new">
+                Notification admin nouveau RDV
+              </Tabs.Trigger>
+              <Tabs.Trigger value="appointment-admin-confirmation">
+                Confirmation admin RDV
+              </Tabs.Trigger>
+              <Tabs.Trigger value="appointment-reminder">
+                Rappel rendez-vous
+              </Tabs.Trigger>
+              <Tabs.Trigger value="appointment-cancellation">
+                Annulation rendez-vous
               </Tabs.Trigger>
               <Tabs.Trigger value="logs">Historique</Tabs.Trigger>
             </Tabs.List>
@@ -60,6 +76,56 @@ export default function EmailSettingsContent(): React.ReactElement {
                   type="purchaser"
                   title="Notification acheteur"
                   description="Email envoyé à l'acheteur pour confirmer sa commande."
+                />
+              </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="appointment-booking">
+              <Box pt={6}>
+                <EmailTemplateForm
+                  type="appointment-booking"
+                  title="Confirmation de rendez-vous"
+                  description="Email envoyé au client pour confirmer son rendez-vous."
+                />
+              </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="appointment-admin-new">
+              <Box pt={6}>
+                <EmailTemplateForm
+                  type="appointment-admin-new"
+                  title="Notification nouveau rendez-vous"
+                  description="Email envoyé à l'administrateur lorsqu'un nouveau rendez-vous est pris."
+                />
+              </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="appointment-admin-confirmation">
+              <Box pt={6}>
+                <EmailTemplateForm
+                  type="appointment-admin-confirmation"
+                  title="Confirmation de rendez-vous par l'admin"
+                  description="Email envoyé au client lorsque l'administrateur confirme son rendez-vous."
+                />
+              </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="appointment-reminder">
+              <Box pt={6}>
+                <EmailTemplateForm
+                  type="appointment-reminder"
+                  title="Rappel de rendez-vous"
+                  description="Email de rappel envoyé au client avant son rendez-vous."
+                />
+              </Box>
+            </Tabs.Content>
+
+            <Tabs.Content value="appointment-cancellation">
+              <Box pt={6}>
+                <EmailTemplateForm
+                  type="appointment-cancellation"
+                  title="Annulation de rendez-vous"
+                  description="Email envoyé au client lors de l'annulation de son rendez-vous."
                 />
               </Box>
             </Tabs.Content>

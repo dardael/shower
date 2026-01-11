@@ -32,6 +32,11 @@ const formatProductsList = (order: Order): string => {
     .join('\n');
 };
 
+export interface AppointmentPlaceholderDefinition {
+  syntax: string;
+  description: string;
+}
+
 export const PLACEHOLDER_DEFINITIONS: PlaceholderDefinition[] = [
   {
     syntax: '{{order_id}}',
@@ -74,6 +79,42 @@ export const PLACEHOLDER_DEFINITIONS: PlaceholderDefinition[] = [
     resolver: formatProductsList,
   },
 ];
+
+export const APPOINTMENT_PLACEHOLDER_DEFINITIONS: AppointmentPlaceholderDefinition[] =
+  [
+    {
+      syntax: '{{appointment_activity}}',
+      description: "Nom de l'activité du rendez-vous",
+    },
+    {
+      syntax: '{{appointment_date}}',
+      description: 'Date du rendez-vous',
+    },
+    {
+      syntax: '{{appointment_time}}',
+      description: 'Heure du rendez-vous',
+    },
+    {
+      syntax: '{{appointment_duration}}',
+      description: 'Durée du rendez-vous en minutes',
+    },
+    {
+      syntax: '{{customer_name}}',
+      description: 'Nom complet du client',
+    },
+    {
+      syntax: '{{customer_email}}',
+      description: 'Adresse email du client',
+    },
+    {
+      syntax: '{{customer_phone}}',
+      description: 'Numéro de téléphone du client',
+    },
+    {
+      syntax: '{{customer_notes}}',
+      description: 'Notes du client',
+    },
+  ];
 
 export class PlaceholderReplacer {
   replacePlaceholders(template: string, order: Order): string {

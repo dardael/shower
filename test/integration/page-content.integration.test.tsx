@@ -128,7 +128,7 @@ describe('Page Content Public Display Integration Tests', () => {
       render(<PublicPageContent content="" />);
 
       expect(
-        screen.getByText('This page has no content yet.')
+        screen.getByText("Cette page n'a pas encore de contenu.")
       ).toBeInTheDocument();
     });
 
@@ -136,7 +136,7 @@ describe('Page Content Public Display Integration Tests', () => {
       render(<PublicPageContent content="" />);
 
       expect(
-        screen.getByText('This page has no content yet.')
+        screen.getByText("Cette page n'a pas encore de contenu.")
       ).toBeInTheDocument();
     });
   });
@@ -191,7 +191,7 @@ describe('Page Content Public Display Integration Tests', () => {
       render(<PublicPageContent content="" />);
 
       expect(
-        screen.getByText('This page has no content yet.')
+        screen.getByText("Cette page n'a pas encore de contenu.")
       ).toBeInTheDocument();
     });
 

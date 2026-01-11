@@ -1,7 +1,6 @@
 ---
 description: fix eslint, prettier and typescript strict mode issues
 agent: build
-model: zai-coding-plan/glm-4.6
 ---
 
 Here are the current eslint, prettier and typescript command execution output: !`docker compose run --rm app sh -c "npm run lint && npm run format:check && npm run build:strict"`

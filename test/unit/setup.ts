@@ -10,6 +10,7 @@ process.setMaxListeners(50);
 
 // Suppress React act() warnings for renderHook async operations
 const originalError = console.error;
+const originalWarn = console.warn;
 const suppressedPatterns = [
   'was not wrapped in act',
   'not configured to support act',
@@ -24,6 +25,17 @@ const suppressedPatterns = [
   'passed it from a parent component',
   'not valid as a React child',
   'Theme toggle failed:',
+  'unique "key" prop',
+  'Each child in a list should have a unique',
+  'Error creating appointment',
+  'Créneau déjà réservé',
+];
+
+const suppressedWarningPatterns = [
+  'Paramètres email non configurés',
+  'email de rappel ignoré',
+  "email d'annulation ignoré",
+  'notification admin ignorée',
 ];
 
 beforeAll(() => {
@@ -34,10 +46,21 @@ beforeAll(() => {
     }
     originalError.call(console, ...args);
   };
+
+  console.warn = (...args: unknown[]) => {
+    const message = args.map((arg) => String(arg)).join(' ');
+    if (
+      suppressedWarningPatterns.some((pattern) => message.includes(pattern))
+    ) {
+      return;
+    }
+    originalWarn.call(console, ...args);
+  };
 });
 
 afterAll(() => {
   console.error = originalError;
+  console.warn = originalWarn;
 });
 
 // Polyfill structuredClone for test environment

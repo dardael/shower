@@ -6,6 +6,8 @@ import {
   MenuServiceLocator,
   PagesServiceLocator,
   SettingsServiceLocator,
+  ProductServiceLocator,
+  AppointmentServiceLocator,
   LoggerServiceLocator,
 } from '@/infrastructure/container';
 import type { Logger } from '@/application/shared/Logger';
@@ -26,6 +28,11 @@ function createExportDependencies(): ExportDependencies {
     SettingsServiceLocator.getWebsiteSettingsRepository();
   const socialNetworkRepository =
     SettingsServiceLocator.getSocialNetworkRepository();
+  const productRepository = ProductServiceLocator.getProductRepository();
+  const categoryRepository = ProductServiceLocator.getCategoryRepository();
+  const activityRepository = AppointmentServiceLocator.getActivityRepository();
+  const availabilityRepository =
+    AppointmentServiceLocator.getAvailabilityRepository();
   const logger = LoggerServiceLocator.getBaseLogger() as Logger;
 
   const exporter = new ZipExporter(
@@ -33,6 +40,10 @@ function createExportDependencies(): ExportDependencies {
     pageContentRepository,
     websiteSettingsRepository,
     socialNetworkRepository,
+    productRepository,
+    categoryRepository,
+    activityRepository,
+    availabilityRepository,
     logger
   );
 

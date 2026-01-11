@@ -28,6 +28,39 @@ export const VALID_SETTING_KEYS = {
   EMAIL_TEMPLATE_PURCHASER_SUBJECT: 'email-template-purchaser-subject',
   EMAIL_TEMPLATE_PURCHASER_BODY: 'email-template-purchaser-body',
   EMAIL_TEMPLATE_PURCHASER_ENABLED: 'email-template-purchaser-enabled',
+  // Appointment Module
+  APPOINTMENT_MODULE_ENABLED: 'appointment-module-enabled',
+  // Appointment Email Templates
+  EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_SUBJECT:
+    'email-template-appointment-confirmation-subject',
+  EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_BODY:
+    'email-template-appointment-confirmation-body',
+  EMAIL_TEMPLATE_APPOINTMENT_CONFIRMATION_ENABLED:
+    'email-template-appointment-confirmation-enabled',
+  EMAIL_TEMPLATE_APPOINTMENT_REMINDER_SUBJECT:
+    'email-template-appointment-reminder-subject',
+  EMAIL_TEMPLATE_APPOINTMENT_REMINDER_BODY:
+    'email-template-appointment-reminder-body',
+  EMAIL_TEMPLATE_APPOINTMENT_REMINDER_ENABLED:
+    'email-template-appointment-reminder-enabled',
+  EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_SUBJECT:
+    'email-template-appointment-cancellation-subject',
+  EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_BODY:
+    'email-template-appointment-cancellation-body',
+  EMAIL_TEMPLATE_APPOINTMENT_CANCELLATION_ENABLED:
+    'email-template-appointment-cancellation-enabled',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_SUBJECT:
+    'email-template-appointment-admin-new-subject',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_BODY:
+    'email-template-appointment-admin-new-body',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_NEW_ENABLED:
+    'email-template-appointment-admin-new-enabled',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_SUBJECT:
+    'email-template-appointment-admin-confirmation-subject',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_BODY:
+    'email-template-appointment-admin-confirmation-body',
+  EMAIL_TEMPLATE_APPOINTMENT_ADMIN_CONFIRMATION_ENABLED:
+    'email-template-appointment-admin-confirmation-enabled',
 } as const;
 
 export const VALID_SETTING_KEY_VALUES = Object.values(

@@ -113,6 +113,7 @@ you must use docker compose to run all commands in order to have the same enviro
 ```
 
 ## Active Technologies
+
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), existing FileStorageService, existing settings infrastructure (034-custom-loader)
 - MongoDB via Mongoose (settings), local filesystem (`public/loaders/`) (034-custom-loader)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, existing PublicPageLoader component, existing settings context providers (ThemeColorContext, BackgroundColorContext, ThemeModeContext, FontProvider) (035-admin-loading-screen)
@@ -141,6 +142,8 @@ you must use docker compose to run all commands in order to have the same enviro
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, React Context, tsyringe (DI) (050-header-menu-text-color)
 - TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, tsyringe (DI), existing BackgroundColorSelector component pattern, existing settings infrastructure (051-loader-bgcolor-config)
 - MongoDB via Mongoose (WebsiteSetting collection with key-value pattern) (051-loader-bgcolor-config)
+- TypeScript 5.0+ with Next.js 15 App Router + React 19 + Chakra UI v3, FullCalendar (@fullcalendar/react, @fullcalendar/daygrid, @fullcalendar/timegrid, @fullcalendar/interaction), Tiptap, tsyringe (DI), node-cron (052-appointment-booking)
+- MongoDB via Mongoose (Activity, Availability, Appointment collections) (052-appointment-booking)
 
 - TypeScript 5.0+ with Next.js 15 App Router + React 19, Chakra UI v3, existing data fetching hooks/utilities (025-public-loading-page)
 - N/A (data fetched from existing APIs) (025-public-loading-page)

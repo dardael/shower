@@ -3,7 +3,14 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IEmailLogDocument extends Document {
   logId: string;
   orderId: string;
-  type: 'admin' | 'purchaser';
+  type:
+    | 'admin'
+    | 'purchaser'
+    | 'appointment-booking'
+    | 'appointment-admin-confirmation'
+    | 'appointment-admin-new'
+    | 'appointment-reminder'
+    | 'appointment-cancellation';
   recipient: string;
   subject: string;
   status: 'sent' | 'failed';
@@ -15,7 +22,19 @@ const EmailLogSchema = new Schema<IEmailLogDocument>(
   {
     logId: { type: String, required: true, unique: true },
     orderId: { type: String, required: true, index: true },
-    type: { type: String, required: true, enum: ['admin', 'purchaser'] },
+    type: {
+      type: String,
+      required: true,
+      enum: [
+        'admin',
+        'purchaser',
+        'appointment-booking',
+        'appointment-admin-confirmation',
+        'appointment-admin-new',
+        'appointment-reminder',
+        'appointment-cancellation',
+      ],
+    },
     recipient: { type: String, required: true },
     subject: { type: String, required: true },
     status: {

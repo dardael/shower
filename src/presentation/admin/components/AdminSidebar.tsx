@@ -15,6 +15,7 @@ import { AdminMenuItem } from '@/presentation/admin/components/AdminMenuItem';
 import { FocusTrap } from '@/presentation/shared/utils/focusTrap';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
+import { useAppointmentModule } from '@/presentation/shared/contexts/AppointmentModuleContext';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import LogoutButton from '@/presentation/shared/components/LogoutButton';
 
@@ -45,6 +46,11 @@ const menuItems = [
     description: 'Gérer les produits et catégories',
   },
   {
+    href: '/admin/appointments',
+    label: 'Rendez-vous',
+    description: 'Gérer les rendez-vous et disponibilités',
+  },
+  {
     href: '/admin/email',
     label: 'Notifications email',
     description: "Configurer les paramètres et modèles d'email",
@@ -64,12 +70,16 @@ const menuItems = [
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const logger = useLogger();
   const { sellingEnabled } = useSellingConfig();
+  const { isEnabled: appointmentModuleEnabled } = useAppointmentModule();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // Filter menu items based on selling enabled state
+  // Filter menu items based on module enabled states
   const visibleMenuItems = menuItems.filter((item) => {
     if (item.href === '/admin/products') {
       return sellingEnabled;
+    }
+    if (item.href === '/admin/appointments') {
+      return appointmentModuleEnabled;
     }
     return true;
   });
