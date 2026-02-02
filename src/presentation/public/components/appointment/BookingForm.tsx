@@ -112,6 +112,8 @@ export function BookingForm({
             Nom complet *
           </Text>
           <Input
+            fontSize={{ base: '16px', md: '14px' }}
+            h={{ base: '48px', md: '40px' }}
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="Jean Dupont"
@@ -129,6 +131,8 @@ export function BookingForm({
           </Text>
           <Input
             type="email"
+            fontSize={{ base: '16px', md: '14px' }}
+            h={{ base: '48px', md: '40px' }}
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             placeholder="jean@example.com"
@@ -147,6 +151,8 @@ export function BookingForm({
             </Text>
             <Input
               type="tel"
+              fontSize={{ base: '16px', md: '14px' }}
+              h={{ base: '48px', md: '40px' }}
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="06 12 34 56 78"
@@ -165,6 +171,8 @@ export function BookingForm({
               Adresse *
             </Text>
             <Input
+              fontSize={{ base: '16px', md: '14px' }}
+              h={{ base: '48px', md: '40px' }}
               value={formData.address}
               onChange={(e) => handleChange('address', e.target.value)}
               placeholder="123 Rue de Paris, 75001 Paris"
@@ -183,6 +191,8 @@ export function BookingForm({
               {requiredFields.customFieldLabel || 'Information complémentaire'} *
             </Text>
             <Input
+              fontSize={{ base: '16px', md: '14px' }}
+              h={{ base: '48px', md: '40px' }}
               value={formData.customFieldValue}
               onChange={(e) => handleChange('customFieldValue', e.target.value)}
             />

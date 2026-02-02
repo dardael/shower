@@ -18,6 +18,12 @@ const eslintConfig = [
     },
     rules: {
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-require-imports': [
+        'error',
+        {
+          allow: ['jest.requireActual'],
+        },
+      ],
     },
   },
   {

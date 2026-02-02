@@ -167,7 +167,9 @@ export function SlotPicker({
     <VStack gap={4} align="stretch">
       <HStack justify="space-between" align="center">
         <Button
-          size="sm"
+          minH="44px"
+          minW="44px"
+          size={{ base: 'md', md: 'sm' }}
           variant="ghost"
           onClick={goToPreviousWeek}
           aria-label="Semaine précédente"
@@ -176,7 +178,9 @@ export function SlotPicker({
         </Button>
         <Text fontWeight="medium">{headerText}</Text>
         <Button
-          size="sm"
+          minH="44px"
+          minW="44px"
+          size={{ base: 'md', md: 'sm' }}
           variant="ghost"
           onClick={goToNextWeek}
           aria-label="Semaine suivante"
@@ -185,72 +189,102 @@ export function SlotPicker({
         </Button>
       </HStack>
 
-      <SimpleGrid columns={7} gap={2} role="grid" aria-label="Sélection de la date">
-        {weekDays.map((day) => {
-          const dayLabel = `${FRENCH_DAY_NAMES_SHORT[day.getDay()]} ${day.getDate()} ${FRENCH_MONTH_NAMES[day.getMonth()]}`;
-          const isSelected = selectedDay && isSameDay(day, selectedDay);
-          const isPast = isPastDate(day);
-          const dateStr = day.toISOString().split('T')[0];
-          const hasSlots = availableDates.has(dateStr) && !isPast;
-          const isDisabled = isPast || !hasSlots;
+      {/* T010-T015: Responsive horizontal scroll container for date picker */}
+      <Box
+        overflowX={{ base: 'auto', md: 'visible' }}
+        css={{
+          scrollSnapType: { base: 'x mandatory', md: 'none' },
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': { display: 'none' },
+        }}
+      >
+        <HStack
+          gap={2}
+          minW={{
+            base: 'calc(100% * 7 / 3)',
+            sm: 'calc(100% * 7 / 4)',
+            md: 'auto',
+          }}
+          flexWrap={{ md: 'nowrap' }}
+          role="grid"
+          aria-label="Sélection de la date"
+        >
+          {weekDays.map((day) => {
+            const dayLabel = `${FRENCH_DAY_NAMES_SHORT[day.getDay()]} ${day.getDate()} ${FRENCH_MONTH_NAMES[day.getMonth()]}`;
+            const isSelected = selectedDay && isSameDay(day, selectedDay);
+            const isPast = isPastDate(day);
+            const dateStr = day.toISOString().split('T')[0];
+            const hasSlots = availableDates.has(dateStr) && !isPast;
+            const isDisabled = isPast || !hasSlots;
 
-          return (
-            <Box
-              key={day.toISOString()}
-              p={2}
-              textAlign="center"
-              borderRadius="md"
-              cursor={isDisabled ? 'not-allowed' : 'pointer'}
-              opacity={isDisabled ? 0.5 : 1}
-              bg={
-                isSelected
-                  ? `${themeColor}.solid`
-                  : isToday(day)
-                  ? `${themeColor}.muted`
-                  : 'gray.50'
-              }
-              _dark={{
-                bg: isSelected
-                  ? `${themeColor}.solid`
-                  : isToday(day)
-                  ? `${themeColor}.muted`
-                  : 'gray.700',
-              }}
-              color={isSelected ? 'white' : 'inherit'}
-              onClick={() => handleDayClick(day)}
-              _hover={
-                !isDisabled
-                  ? {
-                      bg: isSelected ? `${themeColor}.solid` : `${themeColor}.muted`,
-                      _dark: { bg: `${themeColor}.muted` },
-                    }
-                  : {}
-              }
-              role="gridcell"
-              aria-label={dayLabel}
-              aria-selected={isSelected || false}
-              aria-disabled={isDisabled}
-              tabIndex={isDisabled ? -1 : 0}
-              onKeyDown={(e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
-                  e.preventDefault();
-                  handleDayClick(day);
+            return (
+              <Box
+                key={day.toISOString()}
+                flexShrink={0}
+                w={{
+                  base: 'calc(100% / 3)',
+                  sm: 'calc(100% / 4)',
+                  md: 'auto',
+                }}
+                flex={{ md: 1 }}
+                minH="44px"
+                scrollSnapAlign="start"
+                p={2}
+                textAlign="center"
+                borderRadius="md"
+                cursor={isDisabled ? 'not-allowed' : 'pointer'}
+                opacity={isDisabled ? 0.5 : 1}
+                bg={
+                  isSelected
+                    ? `${themeColor}.solid`
+                    : isToday(day)
+                    ? `${themeColor}.muted`
+                    : 'gray.50'
                 }
-              }}
-            >
-              <Text
-                fontSize="xs"
-                color={isSelected ? 'white' : 'gray.500'}
+                _dark={{
+                  bg: isSelected
+                    ? `${themeColor}.solid`
+                    : isToday(day)
+                    ? `${themeColor}.muted`
+                    : 'gray.700',
+                }}
+                color={isSelected ? 'white' : 'inherit'}
+                onClick={() => handleDayClick(day)}
+                _hover={
+                  !isDisabled
+                    ? {
+                        bg: isSelected ? `${themeColor}.solid` : `${themeColor}.muted`,
+                        _dark: { bg: `${themeColor}.muted` },
+                      }
+                    : {}
+                }
+                role="gridcell"
+                aria-label={dayLabel}
+                aria-selected={isSelected || false}
+                aria-disabled={isDisabled}
+                tabIndex={isDisabled ? -1 : 0}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+                    e.preventDefault();
+                    handleDayClick(day);
+                  }
+                }}
               >
-                {FRENCH_DAY_NAMES_SHORT[day.getDay()]}
-              </Text>
-              <Text fontWeight="semibold">
-                {day.getDate()}
-              </Text>
-            </Box>
-          );
-        })}
-      </SimpleGrid>
+                <Text
+                  fontSize="xs"
+                  color={isSelected ? 'white' : 'gray.500'}
+                >
+                  {FRENCH_DAY_NAMES_SHORT[day.getDay()]}
+                </Text>
+                <Text fontWeight="semibold">
+                  {day.getDate()}
+                </Text>
+              </Box>
+            );
+          })}
+        </HStack>
+      </Box>
 
       {selectedDay && (
         <Box mt={4}>
@@ -268,12 +302,13 @@ export function SlotPicker({
           ) : slots.length === 0 ? (
             <Text color="gray.500">Aucun créneau disponible pour cette date</Text>
           ) : (
-            <SimpleGrid columns={{ base: 3, md: 4, lg: 6 }} gap={2}>
+            <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} gap={2}>
               {slots.map((slot) => {
                 return (
                   <Button
                     key={`${slot.startTime}-${slot.endTime}`}
-                    size="sm"
+                    minH="44px"
+                    size={{ base: 'md', md: 'sm' }}
                     variant={
                       selectedSlot?.startTime === slot.startTime
                         ? 'solid'

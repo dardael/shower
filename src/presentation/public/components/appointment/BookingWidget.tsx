@@ -5,11 +5,12 @@ import {
   Box,
   Button,
   Heading,
-  HStack,
   Text,
   VStack,
+  useBreakpointValue,
 } from '@chakra-ui/react';
-import { FiCheck, FiArrowRight } from 'react-icons/fi';
+import { Steps } from '@chakra-ui/react';
+import { FiCheck } from 'react-icons/fi';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { ActivitySelector } from './ActivitySelector';
@@ -34,6 +35,12 @@ export function BookingWidget(): React.ReactElement {
     customFieldValue?: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // T005: Add responsive orientation state
+  const orientation = useBreakpointValue({
+    base: 'vertical',
+    md: 'horizontal',
+  }) as 'vertical' | 'horizontal';
 
   const handleActivitySelect = (activity: Activity): void => {
     setSelectedActivity(activity);
@@ -135,62 +142,31 @@ export function BookingWidget(): React.ReactElement {
     <Box maxW="800px" mx="auto" p={4}>
       <VStack gap={4} align="stretch" mb={6}>
         {step !== 'success' && (
-          <HStack gap={6} justify="center" align="flex-start">
-            {steps.map((s, index) => (
-              <HStack key={s.id} gap={0} align="flex-start">
-                <VStack gap={1} align="center">
-                  <Box
-                    w={8}
-                    h={8}
-                    borderRadius="full"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontWeight="bold"
-                    fontSize="sm"
-                    bg={
-                      index <= currentStepIndex
-                        ? `${themeColor}.solid`
-                        : 'gray.200'
-                    }
-                    color={index <= currentStepIndex ? 'white' : 'gray.800'}
-                    _dark={{
-                      bg:
-                        index <= currentStepIndex
-                          ? `${themeColor}.solid`
-                          : 'gray.700',
-                      color: index <= currentStepIndex ? 'white' : 'gray.200',
-                    }}
-                    cursor={index <= currentStepIndex && index !== currentStepIndex ? 'pointer' : 'default'}
+          <Steps.Root
+            orientation={orientation}
+            step={currentStepIndex}
+            colorPalette={themeColor}
+          >
+            <Steps.List>
+              {steps.map((s, index) => (
+                <Steps.Item key={s.id} index={index}>
+                  <Steps.Trigger
                     onClick={() => handleStepClick(s.id as BookingStep)}
-                    _hover={index <= currentStepIndex && index !== currentStepIndex ? { bg: index <= currentStepIndex ? `${themeColor}.emphasized` : `${themeColor}.solid` } : {}}
+                    cursor={index < currentStepIndex ? 'pointer' : 'default'}
+                    _hover={
+                      index < currentStepIndex
+                        ? { opacity: 0.8 }
+                        : {}
+                    }
                   >
-                    {index + 1}
-                  </Box>
-                  <Text
-                    fontSize="xs"
-                    color={index <= currentStepIndex ? 'gray.800' : 'gray.400'}
-                    _dark={{
-                      color: index <= currentStepIndex ? 'gray.200' : 'gray.500',
-                    }}
-                    textAlign="center"
-                    maxW="100px"
-                  >
-                    {s.label}
-                  </Text>
-                </VStack>
-                {index < steps.length - 1 && (
-                  <Box alignSelf="center" display="flex" alignItems="center">
-                    <FiArrowRight
-                      color={
-                        index < currentStepIndex ? `${themeColor}.solid` : 'gray.400'
-                      }
-                    />
-                  </Box>
-                )}
-              </HStack>
-            ))}
-          </HStack>
+                    <Steps.Indicator />
+                    <Steps.Title>{s.label}</Steps.Title>
+                  </Steps.Trigger>
+                  <Steps.Separator />
+                </Steps.Item>
+              ))}
+            </Steps.List>
+          </Steps.Root>
         )}
       </VStack>
 

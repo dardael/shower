@@ -22,6 +22,62 @@ jest.mock('@/presentation/shared/utils/ThemeColorStorage', () => ({
   },
 }));
 
+jest.mock('@chakra-ui/react', () => {
+  const originalModule = jest.requireActual('@chakra-ui/react');
+  const React = jest.requireActual('react');
+
+  const StepsContext = React.createContext({ index: 0 });
+
+  const Steps = {
+    Root: (props: { children?: React.ReactNode; [key: string]: unknown }) => {
+      const { children, ...rest } = props;
+      return React.createElement('div', { className: 'steps-root', ...rest }, children);
+    },
+    List: (props: { children?: React.ReactNode }) => {
+      return React.createElement('div', { className: 'steps-list' }, props.children);
+    },
+    Item: (props: { children?: React.ReactNode; index: number }) => {
+      const { children, index } = props;
+      return React.createElement(
+        StepsContext.Provider,
+        { value: { index } },
+        React.createElement('div', { className: 'steps-item' }, children),
+      );
+    },
+    Trigger: (props: { children?: React.ReactNode; [key: string]: unknown }) => {
+      const { children, ...rest } = props;
+      return React.createElement('button', { className: 'steps-trigger', ...rest }, children);
+    },
+    Indicator: () => {
+      const { index } = React.useContext(StepsContext);
+      return React.createElement('div', { className: 'steps-indicator' }, String(index + 1));
+    },
+    Title: (props: { children?: React.ReactNode }) => {
+      return React.createElement('span', { className: 'steps-title' }, props.children);
+    },
+    Separator: () => React.createElement('div', { className: 'steps-separator' }),
+  };
+
+  return {
+    ...originalModule,
+    Steps,
+  };
+});
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 const mockActivities = [
   {
     id: 'activity-1',
