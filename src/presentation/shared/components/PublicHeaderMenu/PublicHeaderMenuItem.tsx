@@ -35,13 +35,19 @@ export function PublicHeaderMenuItem({
   return (
     <ChakraLink
       asChild
-      px={3}
+      px={{ base: 3, md: 4 }}
       py={2}
+      borderRadius="full"
       outline="none"
       boxShadow="none"
+      transition="background 0.15s ease, color 0.15s ease"
       _focus={{ outline: 'none', boxShadow: 'none' }}
       _focusVisible={{ outline: 'none', boxShadow: 'none' }}
       _active={{ outline: 'none', boxShadow: 'none' }}
+      _hover={{
+        bg: { base: 'rgba(0,0,0,0.06)', _dark: 'rgba(255,255,255,0.08)' },
+        textDecoration: 'none',
+      }}
       css={{
         '&:focus': { outline: 'none' },
         '&:focus-visible': { outline: 'none' },
@@ -49,10 +55,10 @@ export function PublicHeaderMenuItem({
     >
       <Link href={url}>
         <Text
-          fontSize="md"
-          fontWeight="medium"
+          fontSize="sm"
+          fontWeight="400"
+          letterSpacing="0.01em"
           color={colorStyle}
-          _hover={{ textDecoration: 'underline' }}
         >
           {text}
         </Text>

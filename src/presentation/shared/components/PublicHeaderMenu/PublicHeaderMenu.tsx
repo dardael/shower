@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Box, Flex, Text, Image, useBreakpointValue } from '@chakra-ui/react';
+import { Box, Flex, Image, useBreakpointValue } from '@chakra-ui/react';
 import DarkModeToggle from '@/presentation/shared/components/DarkModeToggle';
 import { PublicHeaderMenuItem } from './PublicHeaderMenuItem';
 import { MobileMenuToggle } from './MobileMenuToggle';
@@ -13,11 +13,9 @@ import type { PublicHeaderMenuProps } from './types';
 
 /**
  * PublicHeaderMenu component
- * Displays configured menu items in a horizontal layout with optional logo
+ * Apple-inspired glassmorphism sticky header
  * On mobile (< 768px): Shows hamburger icon that opens slide-in drawer
  * On desktop (>= 768px): Shows full horizontal menu
- * Uses semantic color tokens for light/dark mode support
- * Uses colorPalette for theme color styling
  */
 export function PublicHeaderMenu({
   menuItems,
@@ -55,17 +53,29 @@ export function PublicHeaderMenu({
     setIsCartOpen(false);
   };
 
-  // Empty menu state - show hamburger on mobile, message on desktop
+  const glassStyles = {
+    backdropFilter: 'blur(24px) saturate(200%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+  };
+
+  // Empty menu state
   if (!menuItems || menuItems.length === 0) {
     return (
       <>
         <Box
           as="header"
           data-testid="public-header-menu"
-          bg="bg.subtle"
+          position="sticky"
+          top={0}
+          zIndex={100}
+          style={glassStyles}
+          bg={{ base: 'rgba(255,255,255,0.78)', _dark: 'rgba(22,22,24,0.78)' }}
           borderBottomWidth="1px"
-          borderColor="border"
-          py={{ base: 3, md: 4 }}
+          borderColor={{
+            base: 'rgba(0,0,0,0.1)',
+            _dark: 'rgba(255,255,255,0.1)',
+          }}
+          py={{ base: '10px', md: '12px' }}
           px={{ base: 4, md: 8 }}
           width="full"
           role="banner"
@@ -79,11 +89,11 @@ export function PublicHeaderMenu({
           >
             <Flex align="center" gap={{ base: 2, md: 4 }}>
               {logo && !logoError && (
-                <Link href="/" aria-label="Go to homepage">
+                <Link href="/" aria-label="Aller à l'accueil">
                   <Image
                     src={logo.url}
-                    alt="Site logo"
-                    h={{ base: '64px', md: '80px' }}
+                    alt="Logo du site"
+                    h={{ base: '40px', md: '44px' }}
                     w="auto"
                     objectFit="contain"
                     cursor="pointer"
@@ -91,30 +101,24 @@ export function PublicHeaderMenu({
                   />
                 </Link>
               )}
-              {!isMobile && (
-                <Text color="fg.muted" fontSize="sm">
-                  No menu items configured yet
-                </Text>
-              )}
             </Flex>
             <Flex align="center" gap={2}>
               {!isMobile && <DarkModeToggle size="sm" variant="ghost" />}
               {isMobile && (
                 <MobileMenuToggle
                   onClick={handleOpenMenu}
-                  colorPalette="blue"
+                  colorPalette={colorPalette}
                 />
               )}
             </Flex>
           </Flex>
         </Box>
 
-        {/* Mobile drawer for empty state */}
         <MobileMenuDrawer
           isOpen={isMenuOpen}
           onClose={handleCloseMenu}
           menuItems={[]}
-          colorPalette="blue"
+          colorPalette={colorPalette}
         />
       </>
     );
@@ -125,11 +129,17 @@ export function PublicHeaderMenu({
       <Box
         as="header"
         data-testid="public-header-menu"
-        colorPalette={colorPalette}
-        bg="colorPalette.solid"
+        position="sticky"
+        top={0}
+        zIndex={100}
+        style={glassStyles}
+        bg={{ base: 'rgba(255,255,255,0.78)', _dark: 'rgba(22,22,24,0.78)' }}
         borderBottomWidth="1px"
-        borderColor="colorPalette.emphasized"
-        py={{ base: 3, md: 4 }}
+        borderColor={{
+          base: 'rgba(0,0,0,0.1)',
+          _dark: 'rgba(255,255,255,0.1)',
+        }}
+        py={{ base: '10px', md: '12px' }}
         px={{ base: 4, md: 8 }}
         width="full"
         role="banner"
@@ -141,57 +151,56 @@ export function PublicHeaderMenu({
           maxW="container.xl"
           mx="auto"
         >
-          <Flex align="center" gap={{ base: 2, md: 4 }}>
-            {/* Logo - always visible */}
+          {/* Left: Logo */}
+          <Flex align="center" flexShrink={0}>
             {logo && !logoError && (
-              <Link href="/" aria-label="Go to homepage">
+              <Link href="/" aria-label="Aller à l'accueil">
                 <Image
                   src={logo.url}
-                  alt="Site logo"
-                  h={{ base: '64px', md: '80px' }}
+                  alt="Logo du site"
+                  h={{ base: '40px', md: '44px' }}
                   w="auto"
                   objectFit="contain"
-                  flexShrink={0}
                   cursor="pointer"
                   onError={() => setLogoError(true)}
                 />
               </Link>
             )}
-
-            {/* Desktop: Horizontal menu items */}
-            {!isMobile && (
-              <Flex
-                as="nav"
-                align="center"
-                gap={{ base: 2, md: 4 }}
-                flexWrap="wrap"
-                role="navigation"
-                aria-label="Main navigation"
-              >
-                {menuItems.map((item) => (
-                  <PublicHeaderMenuItem
-                    key={item.id}
-                    text={item.text}
-                    url={item.url}
-                    textColor={headerMenuTextColor}
-                  />
-                ))}
-              </Flex>
-            )}
           </Flex>
 
-          <Flex align="center" gap={2}>
-            {/* Cart Icon - visible on all viewports */}
+          {/* Center: Desktop navigation */}
+          {!isMobile && (
+            <Flex
+              as="nav"
+              align="center"
+              gap={{ base: 1, md: 2 }}
+              position="absolute"
+              left="50%"
+              transform="translateX(-50%)"
+              role="navigation"
+              aria-label="Navigation principale"
+            >
+              {menuItems.map((item) => (
+                <PublicHeaderMenuItem
+                  key={item.id}
+                  text={item.text}
+                  url={item.url}
+                  textColor={headerMenuTextColor}
+                />
+              ))}
+            </Flex>
+          )}
+
+          {/* Right: Actions */}
+          <Flex align="center" gap={1}>
             <CartIcon onClick={handleOpenCart} />
 
-            {/* Desktop: Dark mode toggle in header */}
             {!isMobile && (
-              <Box color={headerMenuTextColor}>
+              <Box color={headerMenuTextColor || undefined}>
                 <DarkModeToggle size="sm" variant="ghost" />
               </Box>
             )}
 
-            {/* Mobile: Hamburger menu toggle */}
             {isMobile && (
               <MobileMenuToggle
                 onClick={handleOpenMenu}

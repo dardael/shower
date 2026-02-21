@@ -21,8 +21,7 @@ export interface MobileMenuDrawerProps {
 
 /**
  * MobileMenuDrawer component
- * Slide-in navigation panel for mobile devices
- * Slides from right, 280px width, with backdrop overlay
+ * Apple-inspired glassmorphism slide-in navigation panel for mobile devices
  */
 export function MobileMenuDrawer({
   isOpen,
@@ -53,7 +52,7 @@ export function MobileMenuDrawer({
 
     const focusTrap = new FocusTrap({
       containerSelector: '[data-testid="mobile-menu-drawer"]',
-      onEscape: undefined, // Escape is handled by the separate effect above
+      onEscape: undefined,
     });
 
     focusTrap.activate();
@@ -67,6 +66,11 @@ export function MobileMenuDrawer({
     return null;
   }
 
+  const glassStyles = {
+    backdropFilter: 'blur(24px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+  };
+
   return (
     <>
       {/* Drawer panel - slides from right */}
@@ -76,32 +80,43 @@ export function MobileMenuDrawer({
         right={0}
         h="100vh"
         w="280px"
-        bg="bg.subtle"
+        style={glassStyles}
+        bg={{ base: 'rgba(255,255,255,0.82)', _dark: 'rgba(28,28,30,0.88)' }}
         borderLeft="1px solid"
-        borderLeftColor="border"
-        style={{ zIndex: 1001 }}
+        borderLeftColor={{
+          base: 'rgba(0,0,0,0.08)',
+          _dark: 'rgba(255,255,255,0.1)',
+        }}
+        zIndex={1001}
         data-testid="mobile-menu-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label="Menu de navigation"
         transform={isOpen ? 'translateX(0)' : 'translateX(100%)'}
-        transition="transform 0.3s ease-in-out"
+        transition="transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
       >
-        <VStack align="stretch" h="full" p={4} gap={4}>
+        <VStack align="stretch" h="full" p={5} gap={4}>
           {/* Header with close button */}
           <HStack justify="flex-end">
             <IconButton
-              aria-label="Close menu"
+              aria-label="Fermer le menu"
               variant="ghost"
               size="lg"
               minW="44px"
               minH="44px"
               onClick={onClose}
               color="fg.muted"
-              _hover={{ bg: 'bg.muted', color: 'fg' }}
+              borderRadius="full"
+              _hover={{
+                bg: {
+                  base: 'rgba(0,0,0,0.06)',
+                  _dark: 'rgba(255,255,255,0.08)',
+                },
+                color: 'fg',
+              }}
               data-testid="mobile-menu-close"
             >
-              <FiX size={24} />
+              <FiX size={20} />
             </IconButton>
           </HStack>
 
@@ -109,26 +124,32 @@ export function MobileMenuDrawer({
           <VStack
             as="nav"
             align="stretch"
-            gap={2}
+            gap={1}
             flex={1}
             role="navigation"
-            aria-label="Mobile navigation"
+            aria-label="Navigation mobile"
             colorPalette={colorPalette}
           >
             {menuItems.length === 0 ? (
               <Text color="fg.muted" fontSize="sm" textAlign="center" py={4}>
-                No menu items configured
+                Aucun élément de menu configuré
               </Text>
             ) : (
               menuItems.map((item) => (
                 <Box
                   key={item.id}
                   onClick={onClose}
-                  py={2}
-                  px={3}
-                  borderRadius="md"
-                  _hover={{ bg: 'bg.muted' }}
+                  py={3}
+                  px={4}
+                  borderRadius="xl"
+                  _hover={{
+                    bg: {
+                      base: 'rgba(0,0,0,0.05)',
+                      _dark: 'rgba(255,255,255,0.07)',
+                    },
+                  }}
                   cursor="pointer"
+                  transition="background 0.15s ease"
                   overflow="hidden"
                   textOverflow="ellipsis"
                   whiteSpace="nowrap"
@@ -144,7 +165,10 @@ export function MobileMenuDrawer({
             justify="center"
             py={4}
             borderTop="1px solid"
-            borderTopColor="border"
+            borderTopColor={{
+              base: 'rgba(0,0,0,0.06)',
+              _dark: 'rgba(255,255,255,0.08)',
+            }}
           >
             <DarkModeToggle size="md" variant="ghost" />
           </HStack>
@@ -155,8 +179,14 @@ export function MobileMenuDrawer({
       <Box
         position="fixed"
         inset={0}
-        bg="blackAlpha.600"
-        style={{ zIndex: 1000 }}
+        bg="blackAlpha.500"
+        style={
+          {
+            backdropFilter: 'blur(2px)',
+            WebkitBackdropFilter: 'blur(2px)',
+          } as React.CSSProperties
+        }
+        zIndex={1000}
         onClick={onClose}
         data-testid="mobile-menu-backdrop"
         aria-hidden="true"
