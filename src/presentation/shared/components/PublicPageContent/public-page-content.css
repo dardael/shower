@@ -345,3 +345,22 @@
     min-width: 100px;
   }
 }
+
+/* Button Link styles */
+.public-page-content .button-link {
+  display: inline-block;
+  padding: 12px 32px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.public-page-content .button-link:hover {
+  opacity: 0.8;
+}

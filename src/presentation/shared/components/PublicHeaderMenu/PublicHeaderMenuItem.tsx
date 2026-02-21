@@ -55,7 +55,7 @@ export function PublicHeaderMenuItem({
     >
       <Link href={url}>
         <Text
-          fontSize="sm"
+          fontSize="md"
           fontWeight="400"
           letterSpacing="0.01em"
           color={colorStyle}

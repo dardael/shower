@@ -1,0 +1,79 @@
+.hero-text-editor .tiptap {
+  min-height: 120px;
+  padding: 16px;
+  outline: none;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  border-radius: 4px;
+  line-height: 1.6;
+  font-size: 16px;
+  text-align: center;
+}
+
+.hero-text-editor .tiptap p {
+  font-size: 1em;
+}
+
+/* Les paragraphes vides doivent avoir une hauteur visible */
+.hero-text-editor .tiptap p {
+  margin-bottom: 0.4em;
+  min-height: 1.4em;
+  line-height: 1.6;
+}
+
+/* Tailles des titres visibles dans l'éditeur */
+.hero-text-editor .tiptap h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 0.4em;
+  line-height: 1.2;
+}
+
+.hero-text-editor .tiptap h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 0.4em;
+  line-height: 1.3;
+}
+
+.hero-text-editor .tiptap h3 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 0.4em;
+  line-height: 1.4;
+}
+
+/* Le wrapper du bouton est centré */
+.hero-text-editor .tiptap .button-link-wrapper {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.hero-text-editor .tiptap .button-link {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  color: inherit;
+  margin-top: 0.5em;
+}
+
+.hero-text-editor .tiptap .button-link:hover {
+  opacity: 0.8;
+}
+
+.hero-text-editor
+  .tiptap
+  .button-link-wrapper.ProseMirror-selectednode
+  .button-link,
+.hero-text-editor .tiptap .button-link.ProseMirror-selectednode {
+  outline: 2px solid var(--chakra-colors-blue-500);
+  outline-offset: 2px;
+}

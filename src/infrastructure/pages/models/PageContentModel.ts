@@ -3,6 +3,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IPageContent extends Document {
   menuItemId: mongoose.Types.ObjectId;
   content: string;
+  heroMediaUrl: string | null;
+  heroMediaType: 'image' | 'video' | null;
+  heroText: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,6 +21,20 @@ export const PageContentSchema = new Schema<IPageContent>(
       type: String,
       required: true,
       maxlength: 100000,
+    },
+    heroMediaUrl: {
+      type: String,
+      default: null,
+    },
+    heroMediaType: {
+      type: String,
+      enum: ['image', 'video', null],
+      default: null,
+    },
+    heroText: {
+      type: String,
+      default: null,
+      maxlength: 50000,
     },
   },
   {

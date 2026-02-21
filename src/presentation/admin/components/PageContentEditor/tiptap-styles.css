@@ -391,3 +391,28 @@ span[data-theme-color] {
   cursor: col-resize;
   z-index: 10;
 }
+
+/* Button Link Styles */
+.tiptap-editor-wrapper .tiptap .button-link {
+  display: inline-block;
+  padding: 12px 32px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: inherit;
+}
+
+.tiptap-editor-wrapper .tiptap .button-link:hover {
+  opacity: 0.8;
+}
+
+.tiptap-editor-wrapper .tiptap .button-link.ProseMirror-selectednode {
+  outline: 2px solid var(--chakra-colors-color-palette-solid);
+  outline-offset: 2px;
+}

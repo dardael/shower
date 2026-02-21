@@ -19,6 +19,14 @@ export interface ICustomLoaderMetadata {
   uploadedAt: string;
 }
 
+export interface IHeroMediaMetadata {
+  type: 'image' | 'video';
+  filename: string;
+  mimeType: string;
+  size: number;
+  uploadedAt: string;
+}
+
 export type SettingValue =
   | string
   | { url: string; metadata: IIconMetadata }

@@ -32,6 +32,9 @@ export interface PageContentDTO {
   id: string;
   menuItemId: string;
   content: string;
+  heroMediaUrl?: string | null;
+  heroMediaType?: string | null;
+  heroText?: string | null;
 }
 
 /**
@@ -64,11 +67,22 @@ export interface CustomLoaderDTO {
 /**
  * Container for all successfully loaded data sources
  */
+export interface HeroMediaDTO {
+  type: 'image' | 'video';
+  url: string;
+}
+
+export interface HeroDataDTO {
+  media: HeroMediaDTO | null;
+  text: string | null;
+}
+
 export interface PublicPageData {
   menuData: MenuItemDTO[];
   footerData: WebsiteSettingsData;
   pageContent: PageContentDTO;
   logo: PublicLogoDTO | null;
+  heroData: HeroDataDTO | null;
 }
 
 /**

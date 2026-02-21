@@ -51,6 +51,7 @@ const IMAGES_DIR = path.join(process.cwd(), 'public', 'page-content-images');
 const ICONS_DIR = path.join(process.cwd(), 'public', 'icons');
 const LOADERS_DIR = path.join(process.cwd(), 'public', 'loaders');
 const PRODUCT_IMAGES_DIR = path.join(process.cwd(), 'public', 'product-images');
+const HERO_MEDIA_DIR = path.join(process.cwd(), 'public', 'hero-media');
 
 export class ZipImporter implements IConfigurationImporter {
   constructor(
@@ -258,6 +259,18 @@ export class ZipImporter implements IConfigurationImporter {
     } catch {
       // Directory doesn't exist, nothing to clear
     }
+
+    // Clear hero media directory
+    try {
+      const files = await fs.readdir(HERO_MEDIA_DIR);
+      for (const file of files) {
+        if (file !== '.gitkeep') {
+          await fs.unlink(path.join(HERO_MEDIA_DIR, file));
+        }
+      }
+    } catch {
+      // Directory doesn't exist, nothing to clear
+    }
   }
 
   private async importMenuItems(zip: AdmZip): Promise<number> {
@@ -297,12 +310,19 @@ export class ZipImporter implements IConfigurationImporter {
 
     for (const page of pages) {
       const content = PageContentBody.create(page.content);
+
+      // Preserve hero media URL (stored as relative /api/hero-media/filename)
+      const heroMediaUrl = page.heroMediaUrl || null;
+
       const pageContent = PageContent.reconstitute(
         page.id,
         page.menuItemId,
         content,
         new Date(page.createdAt),
-        new Date(page.updatedAt)
+        new Date(page.updatedAt),
+        heroMediaUrl,
+        (page.heroMediaType as 'image' | 'video') || null,
+        page.heroText || null
       );
       await this.pageContentRepository.save(pageContent);
     }
@@ -616,11 +636,29 @@ export class ZipImporter implements IConfigurationImporter {
       }
     }
 
+    // Import hero media files
+    const heroMediaEntries = zip.getEntries().filter((entry) => {
+      return (
+        entry.entryName.startsWith('images/hero-media/') && !entry.isDirectory
+      );
+    });
+
+    if (heroMediaEntries.length > 0) {
+      await fs.mkdir(HERO_MEDIA_DIR, { recursive: true });
+
+      for (const entry of heroMediaEntries) {
+        const filename = path.basename(entry.entryName);
+        const targetPath = path.join(HERO_MEDIA_DIR, filename);
+        await fs.writeFile(targetPath, entry.getData());
+      }
+    }
+
     return (
       pageContentImageEntries.length +
       iconEntries.length +
       loaderEntries.length +
-      productImageEntries.length
+      productImageEntries.length +
+      heroMediaEntries.length
     );
   }
 }

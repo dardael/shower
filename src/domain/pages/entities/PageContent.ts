@@ -1,9 +1,14 @@
 import { PageContentBody } from '@/domain/pages/value-objects/PageContentBody';
 
+export type HeroMediaType = 'image' | 'video';
+
 export class PageContent {
   private readonly _id: string | null;
   private readonly _menuItemId: string;
   private readonly _content: PageContentBody;
+  private readonly _heroMediaUrl: string | null;
+  private readonly _heroMediaType: HeroMediaType | null;
+  private readonly _heroText: string | null;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
@@ -12,11 +17,17 @@ export class PageContent {
     menuItemId: string,
     content: PageContentBody,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    heroMediaUrl: string | null = null,
+    heroMediaType: HeroMediaType | null = null,
+    heroText: string | null = null
   ) {
     this._id = id;
     this._menuItemId = menuItemId;
     this._content = content;
+    this._heroMediaUrl = heroMediaUrl;
+    this._heroMediaType = heroMediaType;
+    this._heroText = heroText;
     this._createdAt = createdAt;
     this._updatedAt = updatedAt;
   }
@@ -48,13 +59,32 @@ export class PageContent {
     return this._updatedAt;
   }
 
+  get heroMediaUrl(): string | null {
+    return this._heroMediaUrl;
+  }
+
+  get heroMediaType(): HeroMediaType | null {
+    return this._heroMediaType;
+  }
+
+  get heroText(): string | null {
+    return this._heroText;
+  }
+
+  get hasHero(): boolean {
+    return this._heroMediaUrl !== null && this._heroMediaType !== null;
+  }
+
   withId(id: string): PageContent {
     return new PageContent(
       id,
       this._menuItemId,
       this._content,
       this._createdAt,
-      this._updatedAt
+      this._updatedAt,
+      this._heroMediaUrl,
+      this._heroMediaType,
+      this._heroText
     );
   }
 
@@ -64,7 +94,27 @@ export class PageContent {
       this._menuItemId,
       content,
       this._createdAt,
-      new Date()
+      new Date(),
+      this._heroMediaUrl,
+      this._heroMediaType,
+      this._heroText
+    );
+  }
+
+  withHero(
+    heroMediaUrl: string | null,
+    heroMediaType: HeroMediaType | null,
+    heroText: string | null
+  ): PageContent {
+    return new PageContent(
+      this._id,
+      this._menuItemId,
+      this._content,
+      this._createdAt,
+      new Date(),
+      heroMediaUrl,
+      heroMediaType,
+      heroText
     );
   }
 
@@ -78,9 +128,24 @@ export class PageContent {
     return this._id === other._id;
   }
 
-  static create(menuItemId: string, content: PageContentBody): PageContent {
+  static create(
+    menuItemId: string,
+    content: PageContentBody,
+    heroMediaUrl: string | null = null,
+    heroMediaType: HeroMediaType | null = null,
+    heroText: string | null = null
+  ): PageContent {
     const now = new Date();
-    return new PageContent(null, menuItemId, content, now, now);
+    return new PageContent(
+      null,
+      menuItemId,
+      content,
+      now,
+      now,
+      heroMediaUrl,
+      heroMediaType,
+      heroText
+    );
   }
 
   static reconstitute(
@@ -88,8 +153,20 @@ export class PageContent {
     menuItemId: string,
     content: PageContentBody,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
+    heroMediaUrl: string | null = null,
+    heroMediaType: HeroMediaType | null = null,
+    heroText: string | null = null
   ): PageContent {
-    return new PageContent(id, menuItemId, content, createdAt, updatedAt);
+    return new PageContent(
+      id,
+      menuItemId,
+      content,
+      createdAt,
+      updatedAt,
+      heroMediaUrl,
+      heroMediaType,
+      heroText
+    );
   }
 }

@@ -40,6 +40,9 @@ export const POST = withApi(
         id: pageContent.id,
         menuItemId: pageContent.menuItemId,
         content: pageContent.content.value,
+        heroMediaUrl: pageContent.heroMediaUrl,
+        heroMediaType: pageContent.heroMediaType,
+        heroText: pageContent.heroText,
         createdAt: pageContent.createdAt.toISOString(),
         updatedAt: pageContent.updatedAt.toISOString(),
       };

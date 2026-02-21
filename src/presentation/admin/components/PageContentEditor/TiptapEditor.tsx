@@ -14,6 +14,7 @@ import {
   CustomTableHeader,
   ProductList,
   AppointmentBooking,
+  ButtonLink,
 } from './extensions';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
@@ -37,6 +38,7 @@ import {
   LuUnfoldHorizontal,
   LuShoppingBag,
   LuCalendarPlus,
+  LuMousePointerClick,
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
@@ -244,6 +246,9 @@ export default function TiptapEditor({
 }: TiptapEditorProps) {
   const [linkUrl, setLinkUrl] = useState('');
   const [showLinkInput, setShowLinkInput] = useState(false);
+  const [showButtonLinkInput, setShowButtonLinkInput] = useState(false);
+  const [buttonLinkText, setButtonLinkText] = useState('');
+  const [buttonLinkUrl, setButtonLinkUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImagePos, setSelectedImagePos] = useState<number | null>(null);
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
@@ -357,6 +362,7 @@ export default function TiptapEditor({
       CustomTableHeader,
       ProductList,
       AppointmentBooking,
+      ButtonLink,
     ],
     content,
     editable: !disabled,
@@ -546,6 +552,19 @@ export default function TiptapEditor({
       setShowLinkInput(false);
     }
   }, [editor, linkUrl]);
+
+  const handleInsertButtonLink = useCallback(() => {
+    if (buttonLinkText && buttonLinkUrl && editor) {
+      editor
+        .chain()
+        .focus()
+        .insertButtonLink(buttonLinkText, buttonLinkUrl)
+        .run();
+      setButtonLinkText('');
+      setButtonLinkUrl('');
+      setShowButtonLinkInput(false);
+    }
+  }, [editor, buttonLinkText, buttonLinkUrl]);
 
   const handleAddOverlay = useCallback(() => {
     if (editor && selectedImagePos !== null && selectedNodeType === 'image') {
@@ -808,11 +827,27 @@ export default function TiptapEditor({
           color={showLinkInput ? 'colorPalette.fg' : 'fg'}
           onClick={() => {
             setShowLinkInput(!showLinkInput);
+            setShowButtonLinkInput(false);
           }}
           disabled={disabled}
         >
           <FiLink />
         </IconButton>
+        <Tooltip content="Insérer un bouton lien">
+          <IconButton
+            aria-label="Insérer un bouton lien"
+            size="sm"
+            variant={showButtonLinkInput ? 'solid' : 'ghost'}
+            color={showButtonLinkInput ? 'colorPalette.fg' : 'fg'}
+            onClick={() => {
+              setShowButtonLinkInput(!showButtonLinkInput);
+              setShowLinkInput(false);
+            }}
+            disabled={disabled}
+          >
+            <LuMousePointerClick />
+          </IconButton>
+        </Tooltip>
         <IconButton
           aria-label="Télécharger une image"
           size="sm"
@@ -963,6 +998,44 @@ export default function TiptapEditor({
             disabled={!linkUrl}
           >
             <FiLink />
+          </IconButton>
+        </HStack>
+      )}
+
+      {showButtonLinkInput && (
+        <HStack
+          p={2}
+          borderBottomWidth="1px"
+          borderColor="border"
+          bg="bg.subtle"
+        >
+          <Input
+            placeholder="Texte du bouton"
+            size="sm"
+            value={buttonLinkText}
+            onChange={(e) => setButtonLinkText(e.target.value)}
+          />
+          <Input
+            placeholder="URL de destination"
+            size="sm"
+            value={buttonLinkUrl}
+            onChange={(e) => setButtonLinkUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleInsertButtonLink();
+              }
+            }}
+          />
+          <IconButton
+            aria-label="Insérer le bouton"
+            size="sm"
+            variant="solid"
+            color="colorPalette.fg"
+            onClick={handleInsertButtonLink}
+            disabled={!buttonLinkText || !buttonLinkUrl}
+          >
+            <LuMousePointerClick />
           </IconButton>
         </HStack>
       )}

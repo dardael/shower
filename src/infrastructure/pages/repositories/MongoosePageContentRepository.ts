@@ -41,6 +41,9 @@ export class MongoosePageContentRepository implements IPageContentRepository {
 
     if (existingDocument) {
       existingDocument.content = pageContent.content.value;
+      existingDocument.heroMediaUrl = pageContent.heroMediaUrl;
+      existingDocument.heroMediaType = pageContent.heroMediaType;
+      existingDocument.heroText = pageContent.heroText;
       await existingDocument.save();
       return pageContent.hasId
         ? pageContent
@@ -52,9 +55,15 @@ export class MongoosePageContentRepository implements IPageContentRepository {
       _id?: string;
       menuItemId: string;
       content: string;
+      heroMediaUrl: string | null;
+      heroMediaType: 'image' | 'video' | null;
+      heroText: string | null;
     } = {
       menuItemId: pageContent.menuItemId,
       content: pageContent.content.value,
+      heroMediaUrl: pageContent.heroMediaUrl,
+      heroMediaType: pageContent.heroMediaType,
+      heroText: pageContent.heroText,
     };
 
     if (pageContent.hasId) {
@@ -81,6 +90,9 @@ export class MongoosePageContentRepository implements IPageContentRepository {
     _id: unknown;
     menuItemId: unknown;
     content: string;
+    heroMediaUrl?: string | null;
+    heroMediaType?: 'image' | 'video' | null;
+    heroText?: string | null;
     createdAt: Date;
     updatedAt: Date;
   }): PageContent {
@@ -91,7 +103,10 @@ export class MongoosePageContentRepository implements IPageContentRepository {
         String(doc.menuItemId),
         content,
         doc.createdAt,
-        doc.updatedAt
+        doc.updatedAt,
+        doc.heroMediaUrl ?? null,
+        doc.heroMediaType ?? null,
+        doc.heroText ?? null
       );
     } catch (error) {
       this.logger.logErrorWithObject(

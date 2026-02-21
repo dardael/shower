@@ -35,4 +35,5 @@ export interface PublicHeaderMenuProps {
   menuItems?: PublicMenuItem[];
   logo?: PublicLogo | null;
   colorPalette?: ThemeColorToken;
+  transparent?: boolean;
 }

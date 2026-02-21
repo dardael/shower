@@ -11,7 +11,11 @@ export class UpdatePageContent implements IUpdatePageContent {
     private readonly pageContentRepository: IPageContentRepository
   ) {}
 
-  async execute(menuItemId: string, content: string): Promise<PageContent> {
+  async execute(
+    menuItemId: string,
+    content: string,
+    heroText?: string | null
+  ): Promise<PageContent> {
     const existingContent =
       await this.pageContentRepository.findByMenuItemId(menuItemId);
     if (!existingContent) {
@@ -19,7 +23,15 @@ export class UpdatePageContent implements IUpdatePageContent {
     }
 
     const contentBody = PageContentBody.create(content);
-    const updatedPageContent = existingContent.withContent(contentBody);
+    let updatedPageContent = existingContent.withContent(contentBody);
+
+    if (heroText !== undefined) {
+      updatedPageContent = updatedPageContent.withHero(
+        updatedPageContent.heroMediaUrl,
+        updatedPageContent.heroMediaType,
+        heroText
+      );
+    }
 
     return this.pageContentRepository.save(updatedPageContent);
   }

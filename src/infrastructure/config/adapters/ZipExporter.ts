@@ -42,6 +42,8 @@ const PRODUCT_IMAGES_PATH = path.join(
   'product-images'
 );
 
+const HERO_MEDIA_PATH = path.join(process.cwd(), 'public', 'hero-media');
+
 interface CollectedData {
   menuItems: SerializedMenuItem[];
   pageContents: SerializedPageContent[];
@@ -55,6 +57,7 @@ interface CollectedData {
   iconFiles: string[];
   loaderFiles: string[];
   productImageFiles: string[];
+  heroMediaFiles: string[];
 }
 
 /**
@@ -96,13 +99,15 @@ export class ZipExporter implements IConfigurationExporter {
       totalSizeBytes: 0,
     };
 
+    summary.imageCount += data.heroMediaFiles.length;
+
     const exportPackage = ExportPackage.create({ summary });
     const manifest = exportPackage.toManifest();
 
     const buffer = await this.createZipBuffer(manifest, data);
 
     this.logger.logInfo(
-      `Export complete: ${data.menuItems.length} menu items, ${data.pageContents.length} pages, ${data.settings.length} settings, ${data.socialNetworks.length} social networks, ${data.products.length} products, ${data.categories.length} categories, ${data.activities.length} activities, ${data.imageFiles.length + data.iconFiles.length + data.productImageFiles.length} images`
+      `Export complete: ${data.menuItems.length} menu items, ${data.pageContents.length} pages, ${data.settings.length} settings, ${data.socialNetworks.length} social networks, ${data.products.length} products, ${data.categories.length} categories, ${data.activities.length} activities, ${data.imageFiles.length + data.iconFiles.length + data.productImageFiles.length + data.heroMediaFiles.length} images`
     );
 
     return buffer;
@@ -129,7 +134,8 @@ export class ZipExporter implements IConfigurationExporter {
         data.imageFiles,
         data.iconFiles,
         data.loaderFiles,
-        data.productImageFiles
+        data.productImageFiles,
+        data.heroMediaFiles
       ),
     };
 
@@ -150,6 +156,7 @@ export class ZipExporter implements IConfigurationExporter {
       iconFiles,
       loaderFiles,
       productImageFiles,
+      heroMediaFiles,
     ] = await Promise.all([
       this.collectMenuItems(),
       this.collectPageContents(),
@@ -163,6 +170,7 @@ export class ZipExporter implements IConfigurationExporter {
       this.collectIconFiles(),
       this.collectLoaderFiles(),
       this.collectProductImageFiles(),
+      this.collectHeroMediaFiles(),
     ]);
 
     return {
@@ -178,6 +186,7 @@ export class ZipExporter implements IConfigurationExporter {
       iconFiles,
       loaderFiles,
       productImageFiles,
+      heroMediaFiles,
     };
   }
 
@@ -206,6 +215,9 @@ export class ZipExporter implements IConfigurationExporter {
           id: pageContent.id,
           menuItemId: pageContent.menuItemId,
           content: pageContent.content.value,
+          heroMediaUrl: pageContent.heroMediaUrl,
+          heroMediaType: pageContent.heroMediaType,
+          heroText: pageContent.heroText,
           createdAt: pageContent.createdAt.toISOString(),
           updatedAt: pageContent.updatedAt.toISOString(),
         });
@@ -352,7 +364,8 @@ export class ZipExporter implements IConfigurationExporter {
     imageFiles: string[],
     iconFiles: string[],
     loaderFiles: string[],
-    productImageFiles: string[]
+    productImageFiles: string[],
+    heroMediaFiles: string[]
   ): Promise<number> {
     let totalSize = 0;
 
@@ -388,6 +401,16 @@ export class ZipExporter implements IConfigurationExporter {
 
     for (const file of productImageFiles) {
       const filePath = path.join(PRODUCT_IMAGES_PATH, file);
+      try {
+        const stats = await fs.stat(filePath);
+        totalSize += stats.size;
+      } catch {
+        // File doesn't exist
+      }
+    }
+
+    for (const file of heroMediaFiles) {
+      const filePath = path.join(HERO_MEDIA_PATH, file);
       try {
         const stats = await fs.stat(filePath);
         totalSize += stats.size;
@@ -488,7 +511,27 @@ export class ZipExporter implements IConfigurationExporter {
         });
       }
 
+      // Add hero media files
+      for (const heroMediaFile of data.heroMediaFiles) {
+        const heroMediaFilePath = path.join(HERO_MEDIA_PATH, heroMediaFile);
+        archive.file(heroMediaFilePath, {
+          name: `images/hero-media/${heroMediaFile}`,
+        });
+      }
+
       archive.finalize();
     });
+  }
+
+  private async collectHeroMediaFiles(): Promise<string[]> {
+    try {
+      const files = await fs.readdir(HERO_MEDIA_PATH);
+      return files.filter((f: string) =>
+        /\.(jpg|jpeg|png|gif|webp|mp4|webm)$/i.test(f)
+      );
+    } catch {
+      // Directory doesn't exist
+      return [];
+    }
   }
 }

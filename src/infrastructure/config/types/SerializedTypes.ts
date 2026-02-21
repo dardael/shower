@@ -20,6 +20,9 @@ export interface SerializedPageContent {
   id: string;
   menuItemId: string;
   content: string;
+  heroMediaUrl: string | null;
+  heroMediaType: 'image' | 'video' | null;
+  heroText: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,7 +34,10 @@ export interface SerializedSetting {
   key: string;
   value:
     | string
-    | { url: string; metadata?: IIconMetadata | ICustomLoaderMetadata }
+    | {
+        url: string;
+        metadata?: IIconMetadata | ICustomLoaderMetadata;
+      }
     | null;
 }
 

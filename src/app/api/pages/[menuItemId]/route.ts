@@ -27,6 +27,9 @@ export const GET = withApiParams<RouteParams, NextResponse>(
         id: pageContent.id,
         menuItemId: pageContent.menuItemId,
         content: pageContent.content.value,
+        heroMediaUrl: pageContent.heroMediaUrl,
+        heroMediaType: pageContent.heroMediaType,
+        heroText: pageContent.heroText,
       };
 
       return NextResponse.json(response);

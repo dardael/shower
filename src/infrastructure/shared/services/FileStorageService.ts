@@ -3,7 +3,10 @@ import path from 'path';
 import { inject, injectable } from 'tsyringe';
 import type { ILogger } from '@/application/shared/ILogger';
 import { IIconMetadata } from '@/domain/settings/types/IconMetadata';
-import { ICustomLoaderMetadata } from '@/domain/settings/entities/WebsiteSetting';
+import {
+  ICustomLoaderMetadata,
+  IHeroMediaMetadata,
+} from '@/domain/settings/entities/WebsiteSetting';
 import { CUSTOM_LOADER_MAX_SIZE_BYTES } from '@/domain/settings/constants/SettingKeys';
 
 export interface IFileStorageService {
@@ -19,6 +22,10 @@ export interface IFileStorageService {
     file: File
   ): Promise<{ url: string; metadata: ICustomLoaderMetadata }>;
   deleteCustomLoader(filename: string): Promise<void>;
+  uploadHeroMedia(
+    file: File
+  ): Promise<{ url: string; metadata: IHeroMediaMetadata }>;
+  deleteHeroMedia(filename: string): Promise<void>;
 }
 
 interface UploadConfig {
@@ -89,6 +96,24 @@ const CUSTOM_LOADER_CONFIG: UploadConfig = {
   entityName: 'custom loader',
 };
 
+const HERO_MEDIA_CONFIG: UploadConfig = {
+  allowedTypes: [
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/webp',
+    'video/mp4',
+    'video/webm',
+  ],
+  maxSizeBytes: 20 * 1024 * 1024,
+  filenamePrefix: 'hero',
+  defaultExtension: 'jpg',
+  typeErrorMessage:
+    'Type de fichier invalide. Seuls les fichiers PNG, JPG, GIF, WebP, MP4 et WebM sont autorisés.',
+  sizeErrorMessage: 'La taille du fichier doit être inférieure à 20 Mo.',
+  entityName: 'hero media',
+};
+
 @injectable()
 export class LocalFileStorageService implements IFileStorageService {
   private readonly iconsDir = path.join(process.cwd(), 'public', 'icons');
@@ -98,6 +123,11 @@ export class LocalFileStorageService implements IFileStorageService {
     'page-content-images'
   );
   private readonly loadersDir = path.join(process.cwd(), 'public', 'loaders');
+  private readonly heroMediaDir = path.join(
+    process.cwd(),
+    'public',
+    'hero-media'
+  );
 
   constructor(@inject('ILogger') private readonly logger: ILogger) {}
 
@@ -333,5 +363,74 @@ export class LocalFileStorageService implements IFileStorageService {
 
   async deleteCustomLoader(filename: string): Promise<void> {
     return this.deleteImage(filename, 'custom loader', this.loadersDir);
+  }
+
+  async uploadHeroMedia(
+    file: File
+  ): Promise<{ url: string; metadata: IHeroMediaMetadata }> {
+    await this.ensureDirectory(this.heroMediaDir);
+
+    if (!HERO_MEDIA_CONFIG.allowedTypes.includes(file.type)) {
+      throw new Error(HERO_MEDIA_CONFIG.typeErrorMessage);
+    }
+
+    if (file.size > HERO_MEDIA_CONFIG.maxSizeBytes) {
+      throw new Error(HERO_MEDIA_CONFIG.sizeErrorMessage);
+    }
+
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const extension =
+      file.name.split('.').pop() || HERO_MEDIA_CONFIG.defaultExtension;
+    const filename = `${HERO_MEDIA_CONFIG.filenamePrefix}-${timestamp}-${randomString}.${extension}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const filePath = path.join(this.heroMediaDir, filename);
+    try {
+      await fs.writeFile(filePath, buffer);
+      this.logger.logDebug('Hero media file saved successfully', {
+        filename,
+        filePath,
+        size: file.size,
+      });
+    } catch (writeError) {
+      this.logger.logError('Failed to write hero media file to disk', {
+        filename,
+        filePath,
+        error: writeError,
+      });
+      throw new Error(
+        `Failed to save hero media file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`
+      );
+    }
+
+    const url = `/api/hero-media/${filename}`;
+    const mediaType: 'image' | 'video' = file.type.startsWith('video/')
+      ? 'video'
+      : 'image';
+
+    const metadata: IHeroMediaMetadata = {
+      type: mediaType,
+      filename,
+      mimeType: file.type,
+      size: file.size,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    this.logger.logDebug('Created hero media metadata', {
+      filename,
+      type: mediaType,
+      mimeType: file.type,
+      size: file.size,
+      url,
+    });
+
+    return { url, metadata };
+  }
+
+  async deleteHeroMedia(filename: string): Promise<void> {
+    return this.deleteImage(filename, 'hero media', this.heroMediaDir);
   }
 }

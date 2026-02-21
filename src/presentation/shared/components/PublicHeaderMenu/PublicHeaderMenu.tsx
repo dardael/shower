@@ -21,6 +21,7 @@ export function PublicHeaderMenu({
   menuItems,
   logo,
   colorPalette = 'blue',
+  transparent = false,
 }: PublicHeaderMenuProps): React.ReactElement {
   const [logoError, setLogoError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,10 +54,16 @@ export function PublicHeaderMenu({
     setIsCartOpen(false);
   };
 
-  const glassStyles = {
-    backdropFilter: 'blur(24px) saturate(200%)',
-    WebkitBackdropFilter: 'blur(24px) saturate(200%)',
-  };
+  const glassStyles = transparent
+    ? {}
+    : {
+        backdropFilter: 'blur(24px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+      };
+
+  const effectiveTextColor = transparent
+    ? 'white'
+    : headerMenuTextColor || undefined;
 
   // Empty menu state
   if (!menuItems || menuItems.length === 0) {
@@ -93,7 +100,7 @@ export function PublicHeaderMenu({
                   <Image
                     src={logo.url}
                     alt="Logo du site"
-                    h={{ base: '40px', md: '44px' }}
+                    h={{ base: '52px', md: '60px' }}
                     w="auto"
                     objectFit="contain"
                     cursor="pointer"
@@ -129,16 +136,24 @@ export function PublicHeaderMenu({
       <Box
         as="header"
         data-testid="public-header-menu"
-        position="sticky"
+        position={transparent ? 'relative' : 'sticky'}
         top={0}
         zIndex={100}
         style={glassStyles}
-        bg={{ base: 'rgba(255,255,255,0.78)', _dark: 'rgba(22,22,24,0.78)' }}
-        borderBottomWidth="1px"
-        borderColor={{
-          base: 'rgba(0,0,0,0.1)',
-          _dark: 'rgba(255,255,255,0.1)',
-        }}
+        bg={
+          transparent
+            ? 'transparent'
+            : { base: 'rgba(255,255,255,0.78)', _dark: 'rgba(22,22,24,0.78)' }
+        }
+        borderBottomWidth={transparent ? '0' : '1px'}
+        borderColor={
+          transparent
+            ? undefined
+            : {
+                base: 'rgba(0,0,0,0.1)',
+                _dark: 'rgba(255,255,255,0.1)',
+              }
+        }
         py={{ base: '10px', md: '12px' }}
         px={{ base: 4, md: 8 }}
         width="full"
@@ -158,7 +173,7 @@ export function PublicHeaderMenu({
                 <Image
                   src={logo.url}
                   alt="Logo du site"
-                  h={{ base: '40px', md: '44px' }}
+                  h={{ base: '52px', md: '60px' }}
                   w="auto"
                   objectFit="contain"
                   cursor="pointer"
@@ -168,35 +183,33 @@ export function PublicHeaderMenu({
             )}
           </Flex>
 
-          {/* Center: Desktop navigation */}
-          {!isMobile && (
-            <Flex
-              as="nav"
-              align="center"
-              gap={{ base: 1, md: 2 }}
-              position="absolute"
-              left="50%"
-              transform="translateX(-50%)"
-              role="navigation"
-              aria-label="Navigation principale"
-            >
-              {menuItems.map((item) => (
-                <PublicHeaderMenuItem
-                  key={item.id}
-                  text={item.text}
-                  url={item.url}
-                  textColor={headerMenuTextColor}
-                />
-              ))}
-            </Flex>
-          )}
+          {/* Right section: Desktop navigation + Actions */}
+          <Flex align="center" gap={{ base: 1, md: 2 }}>
+            {/* Desktop navigation */}
+            {!isMobile && (
+              <Flex
+                as="nav"
+                align="center"
+                gap={{ base: 1, md: 2 }}
+                role="navigation"
+                aria-label="Navigation principale"
+              >
+                {menuItems.map((item) => (
+                  <PublicHeaderMenuItem
+                    key={item.id}
+                    text={item.text}
+                    url={item.url}
+                    textColor={effectiveTextColor}
+                  />
+                ))}
+              </Flex>
+            )}
 
-          {/* Right: Actions */}
-          <Flex align="center" gap={1}>
+            {/* Actions */}
             <CartIcon onClick={handleOpenCart} />
 
             {!isMobile && (
-              <Box color={headerMenuTextColor || undefined}>
+              <Box color={effectiveTextColor}>
                 <DarkModeToggle size="sm" variant="ghost" />
               </Box>
             )}
@@ -205,6 +218,7 @@ export function PublicHeaderMenu({
               <MobileMenuToggle
                 onClick={handleOpenMenu}
                 colorPalette={colorPalette}
+                transparent={transparent}
               />
             )}
           </Flex>

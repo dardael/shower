@@ -32,6 +32,9 @@ export const GET = withApiParams<RouteParams, NextResponse>(
         id: pageContent.id,
         menuItemId: pageContent.menuItemId,
         content: pageContent.content.value,
+        heroMediaUrl: pageContent.heroMediaUrl,
+        heroMediaType: pageContent.heroMediaType,
+        heroText: pageContent.heroText,
         createdAt: pageContent.createdAt.toISOString(),
         updatedAt: pageContent.updatedAt.toISOString(),
       };
@@ -55,7 +58,7 @@ export const PATCH = withApiParams<RouteParams, NextResponse>(
 
     try {
       const body = await request.json();
-      const { content } = body;
+      const { content, heroText } = body;
 
       if (typeof content !== 'string') {
         return NextResponse.json(
@@ -66,12 +69,19 @@ export const PATCH = withApiParams<RouteParams, NextResponse>(
 
       const updatePageContent =
         container.resolve<UpdatePageContent>('IUpdatePageContent');
-      const pageContent = await updatePageContent.execute(menuItemId, content);
+      const pageContent = await updatePageContent.execute(
+        menuItemId,
+        content,
+        heroText !== undefined ? heroText : undefined
+      );
 
       const response: PageContentResponse = {
         id: pageContent.id,
         menuItemId: pageContent.menuItemId,
         content: pageContent.content.value,
+        heroMediaUrl: pageContent.heroMediaUrl,
+        heroMediaType: pageContent.heroMediaType,
+        heroText: pageContent.heroText,
         createdAt: pageContent.createdAt.toISOString(),
         updatedAt: pageContent.updatedAt.toISOString(),
       };

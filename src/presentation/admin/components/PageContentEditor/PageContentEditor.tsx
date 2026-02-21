@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   VStack,
@@ -13,6 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { FiSave, FiTrash2 } from 'react-icons/fi';
 import TiptapEditor from './TiptapEditor';
+import { HeroSectionConfig } from '@/presentation/admin/components/HeroSectionConfig/HeroSectionConfig';
 import { useLogger } from '@/presentation/shared/hooks/useLogger';
 import { useToastNotifications } from '@/presentation/admin/hooks/useToastNotifications';
 
@@ -29,11 +30,16 @@ export default function PageContentEditor({
   const { showToast } = useToastNotifications();
   const [content, setContent] = useState('');
   const [originalContent, setOriginalContent] = useState('');
+  const [heroText, setHeroText] = useState<string | null>(null);
+  const [originalHeroText, setOriginalHeroText] = useState<string | null>(null);
+  const [heroMediaUrl, setHeroMediaUrl] = useState<string | null>(null);
+  const [heroMediaType, setHeroMediaType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hasExistingContent, setHasExistingContent] = useState(false);
+  const heroTextRef = useRef<string | null>(null);
 
   const fetchContent = useCallback(async () => {
     try {
@@ -44,10 +50,20 @@ export default function PageContentEditor({
         const data = await response.json();
         setContent(data.content);
         setOriginalContent(data.content);
+        setHeroText(data.heroText || null);
+        setOriginalHeroText(data.heroText || null);
+        heroTextRef.current = data.heroText || null;
+        setHeroMediaUrl(data.heroMediaUrl || null);
+        setHeroMediaType(data.heroMediaType || null);
         setHasExistingContent(true);
       } else if (response.status === 404) {
         setContent('');
         setOriginalContent('');
+        setHeroText(null);
+        setOriginalHeroText(null);
+        heroTextRef.current = null;
+        setHeroMediaUrl(null);
+        setHeroMediaType(null);
         setHasExistingContent(false);
       } else {
         showToast('Échec du chargement du contenu de la page', 'error');
@@ -78,7 +94,10 @@ export default function PageContentEditor({
         : '/api/settings/pages';
       const method = hasExistingContent ? 'PATCH' : 'POST';
 
-      const body = hasExistingContent ? { content } : { menuItemId, content };
+      const currentHeroText = heroTextRef.current;
+      const body = hasExistingContent
+        ? { content, heroText: currentHeroText }
+        : { menuItemId, content, heroText: currentHeroText };
 
       const response = await fetch(endpoint, {
         method,
@@ -89,6 +108,7 @@ export default function PageContentEditor({
       if (response.ok) {
         const data = await response.json();
         setOriginalContent(data.content);
+        setOriginalHeroText(data.heroText || null);
         setHasExistingContent(true);
         showToast('Contenu de la page enregistré avec succès', 'success');
       } else {
@@ -132,7 +152,13 @@ export default function PageContentEditor({
     }
   };
 
-  const hasChanges = content !== originalContent;
+  const handleHeroTextChange = useCallback((text: string): void => {
+    setHeroText(text);
+    heroTextRef.current = text;
+  }, []);
+
+  const hasChanges =
+    content !== originalContent || heroText !== originalHeroText;
 
   return (
     <Box
@@ -182,6 +208,13 @@ export default function PageContentEditor({
           <Text color="fg.muted">Chargement du contenu...</Text>
         ) : (
           <>
+            <HeroSectionConfig
+              menuItemId={menuItemId}
+              initialMediaUrl={heroMediaUrl}
+              initialMediaType={heroMediaType}
+              initialHeroText={heroText}
+              onHeroTextChange={handleHeroTextChange}
+            />
             <TiptapEditor
               content={content}
               onChange={setContent}

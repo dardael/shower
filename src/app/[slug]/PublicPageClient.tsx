@@ -36,7 +36,12 @@ export function PublicPageClient(): React.ReactElement {
   // Show complete page only when all data is loaded
   if (state.isComplete && data) {
     return (
-      <PublicPageLayout data={data} themeColor={themeColor} logo={data.logo} />
+      <PublicPageLayout
+        data={data}
+        themeColor={themeColor}
+        logo={data.logo}
+        heroData={data.heroData}
+      />
     );
   }
 

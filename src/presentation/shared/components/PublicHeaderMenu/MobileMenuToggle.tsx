@@ -11,6 +11,7 @@ import type { ThemeColorToken } from '@/domain/settings/constants/ThemeColorPale
 export interface MobileMenuToggleProps {
   onClick: () => void;
   colorPalette?: ThemeColorToken;
+  transparent?: boolean;
 }
 
 /**
@@ -21,6 +22,7 @@ export interface MobileMenuToggleProps {
 export function MobileMenuToggle({
   onClick,
   colorPalette = 'blue',
+  transparent = false,
 }: MobileMenuToggleProps): React.ReactElement {
   return (
     <IconButton
@@ -32,12 +34,16 @@ export function MobileMenuToggle({
       borderRadius="full"
       onClick={onClick}
       colorPalette={colorPalette}
-      color={{ base: 'gray.700', _dark: 'gray.200' }}
+      color={transparent ? 'white' : { base: 'gray.700', _dark: 'gray.200' }}
       _hover={{
-        bg: { base: 'rgba(0,0,0,0.06)', _dark: 'rgba(255,255,255,0.08)' },
+        bg: transparent
+          ? 'rgba(255,255,255,0.15)'
+          : { base: 'rgba(0,0,0,0.06)', _dark: 'rgba(255,255,255,0.08)' },
       }}
       _active={{
-        bg: { base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.12)' },
+        bg: transparent
+          ? 'rgba(255,255,255,0.25)'
+          : { base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.12)' },
       }}
       data-testid="mobile-menu-toggle"
     >

@@ -12,6 +12,7 @@ import type {
   PageContentDTO,
   PublicLogoDTO,
   CustomLoaderDTO,
+  HeroDataDTO,
 } from '@/types/page-load-state';
 
 const TIMEOUT_MS = 10000; // 10 seconds
@@ -219,11 +220,15 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
       });
 
       // Set data - provide empty content if content fetch failed
+      // Extract hero data from page content response (per-page hero)
+      const heroData = buildHeroDataFromPageContent(pageContent);
+
       setData({
         menuData: menuData || [],
         footerData,
         pageContent: pageContent || { id: '', content: '', menuItemId: '' },
         logo: logoResult.status === 'fulfilled' ? logoResult.value : null,
+        heroData,
       });
     } catch {
       // Catch any unexpected errors during data fetching
@@ -442,4 +447,29 @@ function preloadImage(url: string): Promise<void> {
     img.onerror = () => resolve(); // Resolve even on error to not block loading
     img.src = url;
   });
+}
+
+/**
+ * Build hero data from page content response (per-page hero configuration)
+ */
+function buildHeroDataFromPageContent(
+  pageContent: PageContentDTO | null
+): HeroDataDTO | null {
+  if (!pageContent) {
+    return null;
+  }
+
+  const { heroMediaUrl, heroMediaType } = pageContent;
+
+  if (!heroMediaUrl || !heroMediaType) {
+    return null;
+  }
+
+  return {
+    media: {
+      type: heroMediaType as 'image' | 'video',
+      url: heroMediaUrl,
+    },
+    text: pageContent.heroText || null,
+  };
 }

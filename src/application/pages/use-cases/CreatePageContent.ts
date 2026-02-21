@@ -14,7 +14,11 @@ export class CreatePageContent implements ICreatePageContent {
     private readonly menuItemRepository: MenuItemRepository
   ) {}
 
-  async execute(menuItemId: string, content: string): Promise<PageContent> {
+  async execute(
+    menuItemId: string,
+    content: string,
+    heroText?: string | null
+  ): Promise<PageContent> {
     const menuItem = await this.menuItemRepository.findById(menuItemId);
     if (!menuItem) {
       throw new Error('Menu item not found');
@@ -27,7 +31,13 @@ export class CreatePageContent implements ICreatePageContent {
     }
 
     const contentBody = PageContentBody.create(content);
-    const pageContent = PageContent.create(menuItemId, contentBody);
+    const pageContent = PageContent.create(
+      menuItemId,
+      contentBody,
+      null,
+      null,
+      heroText ?? null
+    );
 
     return this.pageContentRepository.save(pageContent);
   }
