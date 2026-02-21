@@ -31,7 +31,7 @@ describe('SocialNetworksFooter', () => {
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
     expect(
-      screen.getByText('No social networks configured yet')
+      screen.getByText('Aucun réseau social configuré')
     ).toBeInTheDocument();
   });
 
@@ -41,7 +41,7 @@ describe('SocialNetworksFooter', () => {
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
     expect(
-      screen.getByText('No social networks configured yet')
+      screen.getByText('Aucun réseau social configuré')
     ).toBeInTheDocument();
   });
 
@@ -51,7 +51,7 @@ describe('SocialNetworksFooter', () => {
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
     expect(
-      screen.getByText('No social networks configured yet')
+      screen.getByText('Aucun réseau social configuré')
     ).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('SocialNetworksFooter', () => {
 
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
-    expect(footer).toHaveAttribute('aria-label', 'Social networks footer');
+    expect(footer).toHaveAttribute('aria-label', 'Pied de page');
   });
 
   it('should render default title when showTitle is true', () => {
@@ -87,10 +87,7 @@ describe('SocialNetworksFooter', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Follow Us' })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Connect with us on your favorite platforms')
+      screen.getByRole('heading', { name: 'Suivez-nous' })
     ).toBeInTheDocument();
   });
 
@@ -127,9 +124,6 @@ describe('SocialNetworksFooter', () => {
     );
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('Connect with us on your favorite platforms')
-    ).not.toBeInTheDocument();
   });
 
   it('should render all social network items', () => {

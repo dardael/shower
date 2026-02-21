@@ -33,7 +33,7 @@ describe('SocialNetworksFooterContainer', () => {
     // Check for loading spinner using data-testid
     const spinner = screen.getByTestId('social-networks-footer');
     expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveAttribute('aria-label', 'Social networks footer');
+    expect(spinner).toHaveAttribute('aria-label', 'Pied de page');
   });
 
   it('should not render on error', () => {
@@ -70,7 +70,7 @@ describe('SocialNetworksFooterContainer', () => {
     // Check for footer
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
-    expect(footer).toHaveAttribute('aria-label', 'Social networks footer');
+    expect(footer).toHaveAttribute('aria-label', 'Pied de page');
   });
 
   it('should render placeholder when no social networks', () => {
@@ -86,7 +86,7 @@ describe('SocialNetworksFooterContainer', () => {
     const footer = screen.getByRole('contentinfo');
     expect(footer).toBeInTheDocument();
     expect(
-      screen.getByText('No social networks configured yet')
+      screen.getByText('Aucun réseau social configuré')
     ).toBeInTheDocument();
   });
 });
