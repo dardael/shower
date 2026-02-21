@@ -4,14 +4,19 @@
     ".specify/memory/constitution.md",
     ".opencode/rules/standards/*.md"
   ],
-  "model": "github-copilot/claude-opus-4.5",
+  "model": "github-copilot/claude-sonnet-4.6",
+  "small_model": "zai-coding-plan/glm-5",
   "agent": {
     "explore": {
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "zai-coding-plan/glm-5"
     },
     "general": {
-      "model": "zai-coding-plan/glm-4.7"
+      "model": "zai-coding-plan/glm-5"
     }
+  },
+  "compaction": {
+    "auto": false,
+    "prune": true
   },
   "mcp": {
     "browsermcp": {
