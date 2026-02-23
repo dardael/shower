@@ -364,3 +364,119 @@
 .public-page-content .button-link:hover {
   opacity: 0.8;
 }
+
+/* ===== Card Grid ===== */
+.public-page-content .card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.public-page-content .card-item {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.public-page-content .card-item:hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.public-page-content .card-title {
+  padding: 16px 20px 12px;
+  font-weight: bold;
+}
+
+.public-page-content .card-title:empty {
+  display: none;
+}
+
+.public-page-content .card-title:not(:empty) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.public-page-content .card-title img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.public-page-content .card-title img[data-text-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.public-page-content .card-title img[data-text-align='right'] {
+  margin-left: auto;
+}
+
+.public-page-content .card-body {
+  padding: 12px 20px 16px;
+}
+
+.public-page-content .card-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.public-page-content .card-body img[data-text-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.public-page-content .card-body img[data-text-align='right'] {
+  margin-left: auto;
+}
+
+.public-page-content .card-body .button-link-wrapper {
+  margin: 8px 0;
+}
+
+.public-page-content .card-body .button-link {
+  display: inline-block;
+  padding: 8px 24px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: inherit;
+}
+
+.public-page-content .card-body .button-link:hover {
+  opacity: 0.8;
+}
+
+/* Responsive: stack cards on small screens */
+@media (max-width: 480px) {
+  .public-page-content .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-page-content .card-item {
+    grid-row: span 2;
+  }
+}

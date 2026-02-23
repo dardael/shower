@@ -416,3 +416,137 @@ span[data-theme-color] {
   outline: 2px solid var(--chakra-colors-color-palette-solid);
   outline-offset: 2px;
 }
+
+/* ===== Card Grid ===== */
+.tiptap-editor-wrapper .tiptap .card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+  padding: 8px;
+  border: 2px dashed var(--chakra-colors-border);
+  border-radius: 8px;
+}
+
+.tiptap-editor-wrapper .tiptap .card-grid.ProseMirror-selectednode {
+  border-color: var(--chakra-colors-color-palette-solid);
+}
+
+.tiptap-editor-wrapper .tiptap .card-item {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 2;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.tiptap-editor-wrapper .tiptap .card-item:hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.tiptap-editor-wrapper .tiptap .card-title {
+  padding: 16px 20px 12px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  min-height: 20px;
+}
+
+.tiptap-editor-wrapper .tiptap .card-title:empty::before {
+  content: 'Titre (optionnel)';
+  color: var(--chakra-colors-fg-subtle);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.tiptap-editor-wrapper .tiptap .card-title p.is-empty:first-child::before {
+  content: 'Titre (optionnel)';
+  color: var(--chakra-colors-fg-subtle);
+  font-style: italic;
+  float: left;
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap-editor-wrapper .tiptap .card-title img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.tiptap-editor-wrapper .tiptap .card-title img[data-text-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .card-title img[data-text-align='right'] {
+  margin-left: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body {
+  padding: 12px 20px 16px;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body:empty::before {
+  content: 'Contenu de la carte...';
+  color: var(--chakra-colors-fg-subtle);
+  font-style: italic;
+  pointer-events: none;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body p.is-empty:first-child::before {
+  content: 'Contenu de la carte...';
+  color: var(--chakra-colors-fg-subtle);
+  font-style: italic;
+  float: left;
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body img[data-text-align='center'] {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body img[data-text-align='right'] {
+  margin-left: auto;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body .button-link-wrapper {
+  margin: 8px 0;
+}
+
+.tiptap-editor-wrapper .tiptap .card-body .button-link {
+  display: inline-block;
+  padding: 8px 24px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: inherit;
+}

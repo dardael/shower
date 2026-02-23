@@ -4,3 +4,7 @@ export { CustomTableHeader } from './CustomTableHeader';
 export { ProductList } from './ProductList';
 export { AppointmentBooking } from './AppointmentBooking';
 export { ButtonLink } from './ButtonLink';
+export { CardGrid } from './CardGrid';
+export { Card } from './Card';
+export { CardTitle } from './CardTitle';
+export { CardBody } from './CardBody';

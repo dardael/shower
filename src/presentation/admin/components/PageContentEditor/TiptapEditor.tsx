@@ -15,6 +15,10 @@ import {
   ProductList,
   AppointmentBooking,
   ButtonLink,
+  CardGrid,
+  Card,
+  CardTitle,
+  CardBody,
 } from './extensions';
 import { NodeSelection } from '@tiptap/pm/state';
 import { Box, HStack, IconButton, Input, Spinner } from '@chakra-ui/react';
@@ -39,6 +43,7 @@ import {
   LuShoppingBag,
   LuCalendarPlus,
   LuMousePointerClick,
+  LuLayoutGrid,
 } from 'react-icons/lu';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
@@ -55,6 +60,7 @@ import { TableInsertDialog } from './TableInsertDialog';
 import { useSellingConfig } from '@/presentation/shared/contexts/SellingConfigContext';
 import { useAppointmentModule } from '@/presentation/shared/contexts/AppointmentModuleContext';
 import { TableToolbar } from './TableToolbar';
+import { CardToolbar } from './CardToolbar';
 import { FiType } from 'react-icons/fi';
 import { DEFAULT_OVERLAY_TEXT } from '@/domain/pages/types/ImageOverlay';
 
@@ -256,6 +262,7 @@ export default function TiptapEditor({
     number | null
   >(null);
   const [isInTable, setIsInTable] = useState(false);
+  const [isInCardGrid, setIsInCardGrid] = useState(false);
   const { sellingEnabled } = useSellingConfig();
   const { isEnabled: appointmentModuleEnabled } = useAppointmentModule();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -363,6 +370,10 @@ export default function TiptapEditor({
       ProductList,
       AppointmentBooking,
       ButtonLink,
+      CardGrid,
+      Card,
+      CardTitle,
+      CardBody,
     ],
     content,
     editable: !disabled,
@@ -381,6 +392,11 @@ export default function TiptapEditor({
         ed.state.selection
       );
       setIsInTable(!!tableNode);
+      // Check if we're in a card grid
+      const cardGridNode = findParentNode(
+        (node) => node.type.name === 'cardGrid'
+      )(ed.state.selection);
+      setIsInCardGrid(!!cardGridNode);
     },
     onSelectionUpdate: ({ editor: ed }) => {
       // Check if we're in a table on selection change
@@ -388,6 +404,11 @@ export default function TiptapEditor({
         ed.state.selection
       );
       setIsInTable(!!tableNode);
+      // Check if we're in a card grid on selection change
+      const cardGridNode = findParentNode(
+        (node) => node.type.name === 'cardGrid'
+      )(ed.state.selection);
+      setIsInCardGrid(!!cardGridNode);
 
       // Track selected image position and type
       const { selection } = ed.state;
@@ -889,6 +910,18 @@ export default function TiptapEditor({
             </IconButton>
           </Tooltip>
         )}
+        <Tooltip content="Insérer des cartes">
+          <IconButton
+            aria-label="Insérer des cartes"
+            size="sm"
+            variant="ghost"
+            color="fg"
+            onClick={() => editor?.chain().focus().insertCardGrid(2).run()}
+            disabled={disabled}
+          >
+            <LuLayoutGrid />
+          </IconButton>
+        </Tooltip>
         {/* Add Text Overlay button - only visible when plain image is selected */}
         {selectedImagePos !== null && selectedNodeType === 'image' && (
           <Tooltip content="Ajouter un texte superposé">
@@ -959,6 +992,9 @@ export default function TiptapEditor({
 
       {/* Table toolbar - visible when cursor is in a table */}
       {isInTable && <TableToolbar editor={editor} disabled={disabled} />}
+
+      {/* Card toolbar - visible when cursor is in a card grid */}
+      {isInCardGrid && <CardToolbar editor={editor} disabled={disabled} />}
 
       {/* Product list toolbar - visible when productList is selected */}
       {selectedProductListPos !== null &&
