@@ -16,17 +16,16 @@ export function PublicPageClient(): React.ReactElement {
   const slug = params?.slug as string;
 
   // Use custom hook to manage loading state and data fetching
-  const { state, data, retry, customLoader, loaderBackgroundColor } =
+  const { state, data, customLoader, loaderBackgroundColor } =
     usePublicPageData(slug);
   const { themeColor } = useThemeColor();
 
   // Show loading indicator while data is being fetched
-  if (state.isLoading || state.error) {
+  if (state.isLoading) {
     return (
       <PublicPageLoader
         isLoading={state.isLoading}
-        error={state.error}
-        onRetry={retry}
+        error={null}
         customLoader={customLoader}
         backgroundColor={loaderBackgroundColor}
       />

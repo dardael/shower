@@ -15,8 +15,6 @@ import type {
   HeroDataDTO,
 } from '@/types/page-load-state';
 
-const TIMEOUT_MS = 10000; // 10 seconds
-
 interface SocialNetworkDTO {
   type: SocialNetworkType;
   url: string;
@@ -113,15 +111,11 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
     setData(null);
 
     try {
-      // Create abort controller for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
       // Fetch all data sources in parallel using Promise.allSettled
       const [menuResult, footerResult, logoResult] = await Promise.allSettled([
-        fetchMenuData(controller.signal),
-        fetchFooterData(controller.signal),
-        fetchLogoData(controller.signal),
+        fetchMenuData(),
+        fetchFooterData(),
+        fetchLogoData(),
       ]);
 
       // Get menu data to find the page content
@@ -136,44 +130,12 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
           }
           return {
             status: 'fulfilled' as const,
-            value: await fetchPageContentWithMenu(
-              slug,
-              menuData,
-              controller.signal
-            ),
+            value: await fetchPageContentWithMenu(slug, menuData),
           };
         } catch (error) {
           return { status: 'rejected' as const, reason: error };
         }
       })();
-
-      clearTimeout(timeoutId);
-
-      // Check if timeout occurred (using abort signal status)
-      if (controller.signal.aborted) {
-        const failedSources: Array<'menu' | 'footer' | 'content'> = [];
-        if (menuResult.status === 'rejected') failedSources.push('menu');
-        if (footerResult.status === 'rejected') failedSources.push('footer');
-        if (contentResult.status === 'rejected') failedSources.push('content');
-
-        const timeoutError: PageLoadError = {
-          message:
-            'Le chargement de cette page prend plus de temps que prévu. Veuillez réessayer.',
-          failedSources:
-            failedSources.length > 0
-              ? failedSources
-              : ['menu', 'footer', 'content'],
-          isTimeout: true,
-          timestamp: Date.now(),
-        };
-
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: timeoutError,
-        }));
-        return;
-      }
 
       // Check for critical failures (menu is required)
       const failures: Array<'menu' | 'footer' | 'content'> = [];
@@ -270,13 +232,12 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
 /**
  * Fetch menu data from API
  */
-async function fetchMenuData(signal: AbortSignal): Promise<MenuItemDTO[]> {
+async function fetchMenuData(): Promise<MenuItemDTO[]> {
   const response = await fetch('/api/public/menu', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    signal,
   });
 
   if (!response.ok) {
@@ -295,16 +256,13 @@ async function fetchMenuData(signal: AbortSignal): Promise<MenuItemDTO[]> {
 /**
  * Fetch footer data (website settings and social networks) from API
  */
-async function fetchFooterData(
-  signal: AbortSignal
-): Promise<WebsiteSettingsData> {
+async function fetchFooterData(): Promise<WebsiteSettingsData> {
   // Fetch social networks
   const socialResponse = await fetch('/api/public/social-networks', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    signal,
   });
 
   if (!socialResponse.ok) {
@@ -334,7 +292,6 @@ async function fetchFooterData(
     headers: {
       'Content-Type': 'application/json',
     },
-    signal,
   });
 
   let websiteName = '';
@@ -357,8 +314,7 @@ async function fetchFooterData(
  */
 async function fetchPageContentWithMenu(
   slug: string,
-  menuItems: MenuItemDTO[],
-  signal: AbortSignal
+  menuItems: MenuItemDTO[]
 ): Promise<PageContentDTO> {
   if (menuItems.length === 0) {
     throw new Error('No menu items available');
@@ -388,7 +344,6 @@ async function fetchPageContentWithMenu(
     headers: {
       'Content-Type': 'application/json',
     },
-    signal,
   });
 
   if (!response.ok) {
@@ -407,15 +362,12 @@ async function fetchPageContentWithMenu(
 /**
  * Fetch logo data from public API and preload the image
  */
-async function fetchLogoData(
-  signal: AbortSignal
-): Promise<PublicLogoDTO | null> {
+async function fetchLogoData(): Promise<PublicLogoDTO | null> {
   const response = await fetch('/api/public/logo', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    signal,
   });
 
   if (!response.ok) {

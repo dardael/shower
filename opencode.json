@@ -5,13 +5,13 @@
     ".opencode/rules/standards/*.md"
   ],
   "model": "github-copilot/claude-sonnet-4.6",
-  "small_model": "zai-coding-plan/glm-5",
+  "small_model": "github-copilot/claude-haiku-4.5",
   "agent": {
     "explore": {
-      "model": "zai-coding-plan/glm-5"
+      "model": "github-copilot/claude-haiku-4.5"
     },
     "general": {
-      "model": "zai-coding-plan/glm-5"
+      "model": "github-copilot/claude-haiku-4.5"
     }
   },
   "compaction": {

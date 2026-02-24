@@ -10,8 +10,6 @@ import type {
   CustomLoaderDTO,
 } from '@/types/page-load-state';
 
-const TIMEOUT_MS = 10000;
-
 interface SocialNetworkDTO {
   type: SocialNetworkType;
   url: string;
@@ -31,7 +29,6 @@ interface LayoutData {
 interface UsePublicLayoutDataReturn {
   state: PageLoadState;
   data: LayoutData | null;
-  retry: () => void;
   customLoader: CustomLoaderDTO | null;
 }
 
@@ -94,33 +91,11 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     setData(null);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
       const [menuResult, footerResult, logoResult] = await Promise.allSettled([
-        fetchMenuData(controller.signal),
-        fetchFooterData(controller.signal),
-        fetchLogoData(controller.signal),
+        fetchMenuData(),
+        fetchFooterData(),
+        fetchLogoData(),
       ]);
-
-      clearTimeout(timeoutId);
-
-      if (controller.signal.aborted) {
-        const timeoutError: PageLoadError = {
-          message:
-            'Cette page met plus de temps que prévu à charger. Veuillez réessayer.',
-          failedSources: ['menu', 'footer'],
-          isTimeout: true,
-          timestamp: Date.now(),
-        };
-
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: timeoutError,
-        }));
-        return;
-      }
 
       const failures: Array<'menu' | 'footer'> = [];
       if (menuResult.status === 'rejected') failures.push('menu');
@@ -185,10 +160,6 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     }
   }, []);
 
-  const retry = useCallback(() => {
-    fetchAllData();
-  }, [fetchAllData]);
-
   useEffect(() => {
     fetchAllData();
   }, [fetchAllData]);
@@ -196,16 +167,14 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
   return {
     state,
     data,
-    retry,
     customLoader,
   };
 }
 
-async function fetchMenuData(signal: AbortSignal): Promise<MenuItemDTO[]> {
+async function fetchMenuData(): Promise<MenuItemDTO[]> {
   const response = await fetch('/api/public/menu', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    signal,
   });
 
   if (!response.ok) {
@@ -221,14 +190,13 @@ async function fetchMenuData(signal: AbortSignal): Promise<MenuItemDTO[]> {
   return result.data || [];
 }
 
-async function fetchFooterData(signal: AbortSignal): Promise<{
+async function fetchFooterData(): Promise<{
   name: string;
   socialNetworks: SocialNetworkDTO[];
 }> {
   const socialResponse = await fetch('/api/public/social-networks', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    signal,
   });
 
   if (!socialResponse.ok) {
@@ -255,7 +223,6 @@ async function fetchFooterData(signal: AbortSignal): Promise<{
   const nameResponse = await fetch('/api/public/website-name', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    signal,
   });
 
   let websiteName = '';
@@ -272,13 +239,10 @@ async function fetchFooterData(signal: AbortSignal): Promise<{
   };
 }
 
-async function fetchLogoData(
-  signal: AbortSignal
-): Promise<PublicLogoDTO | null> {
+async function fetchLogoData(): Promise<PublicLogoDTO | null> {
   const response = await fetch('/api/public/logo', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    signal,
   });
 
   if (!response.ok) {

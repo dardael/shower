@@ -1,10 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Container, VStack, Heading, Text } from '@chakra-ui/react';
 import { PublicPageLoader } from '@/presentation/shared/components/PublicPageLoader';
-import { PublicHeaderMenu } from '@/presentation/shared/components/PublicHeaderMenu/PublicHeaderMenu';
-import { SocialNetworksFooter } from '@/presentation/shared/components/SocialNetworksFooter/SocialNetworksFooter';
 import { PublicPageLayout } from '@/presentation/shared/components/PublicPageLayout/PublicPageLayout';
 import { usePublicPageData } from '@/presentation/shared/hooks/usePublicPageData';
 import { useThemeColor } from '@/presentation/shared/hooks/useThemeColor';
@@ -17,7 +14,7 @@ import { useThemeColor } from '@/presentation/shared/hooks/useThemeColor';
  */
 export function HomePageClient(): React.ReactElement {
   // Use special 'home' slug to signal home page loading
-  const { state, data, retry, customLoader } = usePublicPageData('home');
+  const { state, data, customLoader } = usePublicPageData('home');
   const { themeColor } = useThemeColor();
 
   // Show loading indicator while data is being fetched
@@ -25,49 +22,7 @@ export function HomePageClient(): React.ReactElement {
     return (
       <PublicPageLoader
         isLoading={state.isLoading}
-        error={state.error}
-        onRetry={retry}
-        customLoader={customLoader}
-      />
-    );
-  }
-
-  // Handle error state - if no menu items, show friendly message
-  if (state.error) {
-    // Check if error is due to no menu items
-    const isNoMenuItems =
-      state.error.failedSources.includes('menu') ||
-      state.error.failedSources.includes('content');
-
-    if (isNoMenuItems) {
-      return (
-        <>
-          <PublicHeaderMenu
-            menuItems={[]}
-            logo={undefined}
-            colorPalette={themeColor}
-          />
-          <Container maxW="container.lg" py={8}>
-            <VStack gap={4} textAlign="center">
-              <Heading as="h2" size="lg">
-                No Content Available
-              </Heading>
-              <Text fontSize="md">
-                Please add your first menu item to get started.
-              </Text>
-            </VStack>
-          </Container>
-          <SocialNetworksFooter socialNetworks={[]} />
-        </>
-      );
-    }
-
-    // Other errors - show error with retry
-    return (
-      <PublicPageLoader
-        isLoading={false}
-        error={state.error}
-        onRetry={retry}
+        error={null}
         customLoader={customLoader}
       />
     );

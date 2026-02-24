@@ -37,7 +37,7 @@ interface OrderDetails {
 export default function ConfirmationClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
-  const { state, data, retry, customLoader } = usePublicLayoutData();
+  const { state, data, customLoader } = usePublicLayoutData();
   const { themeColor } = useThemeColor();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [isOrderLoading, setIsOrderLoading] = useState(true);
@@ -79,13 +79,12 @@ export default function ConfirmationClient(): React.JSX.Element {
     );
   }
 
-  // Show error if layout failed
+  // Show error if layout failed - just show loader
   if (state.error) {
     return (
       <PublicPageLoader
         isLoading={false}
-        error={state.error}
-        onRetry={retry}
+        error={null}
         customLoader={customLoader}
       />
     );
