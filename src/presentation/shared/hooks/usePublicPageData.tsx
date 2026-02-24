@@ -30,6 +30,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
   customLoader: CustomLoaderDTO | null;
   loaderBackgroundColor: string | null;
   loaderChecked: boolean;
+  minLoaderElapsed: boolean;
 } {
   // Initialize loading state
   const [state, setState] = useState<PageLoadState>({
@@ -57,6 +58,21 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
 
   // True once the loader API call has completed (success or failure)
   const [loaderChecked, setLoaderChecked] = useState(false);
+
+  // True once the minimum display time (1s) has elapsed for the custom loader
+  const [minLoaderElapsed, setMinLoaderElapsed] = useState(false);
+
+  // Start minimum display timer once custom loader is confirmed
+  useEffect(() => {
+    if (!loaderChecked) return;
+    if (!customLoader) {
+      // No custom loader: no minimum display time needed
+      setMinLoaderElapsed(true);
+      return;
+    }
+    const timer = setTimeout(() => setMinLoaderElapsed(true), 1000);
+    return () => clearTimeout(timer);
+  }, [loaderChecked, customLoader]);
 
   // Fetch custom loader immediately on mount (before other data)
   useEffect(() => {
@@ -233,6 +249,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
     customLoader,
     loaderBackgroundColor,
     loaderChecked,
+    minLoaderElapsed,
   };
 }
 

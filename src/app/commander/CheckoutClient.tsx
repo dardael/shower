@@ -31,7 +31,8 @@ interface CustomerFormData {
 export function CheckoutClient(): React.ReactElement {
   const router = useRouter();
   const { items, itemCount, clearCart, isLoading: cartLoading } = useCart();
-  const { state, data, customLoader, loaderChecked } = usePublicLayoutData();
+  const { state, data, customLoader, loaderChecked, minLoaderElapsed } =
+    usePublicLayoutData();
   const { themeColor } = useThemeColor();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,11 +132,11 @@ export function CheckoutClient(): React.ReactElement {
     }
   };
 
-  // Show loader while fetching layout data (menu, footer, theme)
-  if (state.isLoading || cartLoading) {
+  // Show loader while fetching layout data (menu, footer, theme) or minimum loader time hasn't elapsed
+  if (state.isLoading || cartLoading || !minLoaderElapsed) {
     return (
       <PublicPageLoader
-        isLoading={state.isLoading || cartLoading}
+        isLoading={true}
         error={null}
         customLoader={customLoader}
         loaderChecked={loaderChecked}

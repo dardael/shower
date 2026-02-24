@@ -37,7 +37,8 @@ interface OrderDetails {
 export default function ConfirmationClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
-  const { state, data, customLoader, loaderChecked } = usePublicLayoutData();
+  const { state, data, customLoader, loaderChecked, minLoaderElapsed } =
+    usePublicLayoutData();
   const { themeColor } = useThemeColor();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [isOrderLoading, setIsOrderLoading] = useState(true);
@@ -68,8 +69,8 @@ export default function ConfirmationClient(): React.JSX.Element {
     fetchOrder();
   }, [orderId]);
 
-  // Show loader while layout or order is loading
-  if (state.isLoading || isOrderLoading) {
+  // Show loader while layout or order is loading, or minimum loader time hasn't elapsed
+  if (state.isLoading || isOrderLoading || !minLoaderElapsed) {
     return (
       <PublicPageLoader
         isLoading={true}

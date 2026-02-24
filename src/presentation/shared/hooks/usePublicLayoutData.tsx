@@ -31,6 +31,7 @@ interface UsePublicLayoutDataReturn {
   data: LayoutData | null;
   customLoader: CustomLoaderDTO | null;
   loaderChecked: boolean;
+  minLoaderElapsed: boolean;
 }
 
 /**
@@ -54,6 +55,20 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     null
   );
   const [loaderChecked, setLoaderChecked] = useState(false);
+
+  // True once the minimum display time (1s) has elapsed for the custom loader
+  const [minLoaderElapsed, setMinLoaderElapsed] = useState(false);
+
+  // Start minimum display timer once custom loader is confirmed
+  useEffect(() => {
+    if (!loaderChecked) return;
+    if (!customLoader) {
+      setMinLoaderElapsed(true);
+      return;
+    }
+    const timer = setTimeout(() => setMinLoaderElapsed(true), 1000);
+    return () => clearTimeout(timer);
+  }, [loaderChecked, customLoader]);
 
   // Fetch custom loader immediately
   useEffect(() => {
@@ -173,6 +188,7 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     data,
     customLoader,
     loaderChecked,
+    minLoaderElapsed,
   };
 }
 

@@ -14,15 +14,15 @@ import { useThemeColor } from '@/presentation/shared/hooks/useThemeColor';
  */
 export function HomePageClient(): React.ReactElement {
   // Use special 'home' slug to signal home page loading
-  const { state, data, customLoader, loaderChecked } =
+  const { state, data, customLoader, loaderChecked, minLoaderElapsed } =
     usePublicPageData('home');
   const { themeColor } = useThemeColor();
 
-  // Show loading indicator while data is being fetched
-  if (state.isLoading) {
+  // Show loading indicator while data is being fetched or minimum loader time hasn't elapsed
+  if (state.isLoading || !minLoaderElapsed) {
     return (
       <PublicPageLoader
-        isLoading={state.isLoading}
+        isLoading={true}
         error={null}
         customLoader={customLoader}
         loaderChecked={loaderChecked}
@@ -30,7 +30,7 @@ export function HomePageClient(): React.ReactElement {
     );
   }
 
-  // Show complete page only when all data is loaded
+  // Show complete page only when all data is loaded and minimum loader time has elapsed
   if (state.isComplete && data) {
     return (
       <PublicPageLayout

@@ -16,15 +16,21 @@ export function PublicPageClient(): React.ReactElement {
   const slug = params?.slug as string;
 
   // Use custom hook to manage loading state and data fetching
-  const { state, data, customLoader, loaderBackgroundColor, loaderChecked } =
-    usePublicPageData(slug);
+  const {
+    state,
+    data,
+    customLoader,
+    loaderBackgroundColor,
+    loaderChecked,
+    minLoaderElapsed,
+  } = usePublicPageData(slug);
   const { themeColor } = useThemeColor();
 
-  // Show loading indicator while data is being fetched
-  if (state.isLoading) {
+  // Show loading indicator while data is being fetched or minimum loader time hasn't elapsed
+  if (state.isLoading || !minLoaderElapsed) {
     return (
       <PublicPageLoader
-        isLoading={state.isLoading}
+        isLoading={true}
         error={null}
         customLoader={customLoader}
         backgroundColor={loaderBackgroundColor}
@@ -33,7 +39,7 @@ export function PublicPageClient(): React.ReactElement {
     );
   }
 
-  // Show complete page only when all data is loaded
+  // Show complete page only when all data is loaded and minimum loader time has elapsed
   if (state.isComplete && data) {
     return (
       <PublicPageLayout
