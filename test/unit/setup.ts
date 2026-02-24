@@ -144,7 +144,7 @@ const chakraStyleProps = [
   'loading',
   'colorPalette',
   'boxSize',
-
+  'invalid',
   'asChild',
 ];
 
@@ -217,6 +217,12 @@ jest.mock('@chakra-ui/react', () => {
     SimpleGrid: ({ children, ...props }: ComponentProps) => {
       return React.createElement('div', filterChakraProps(props), children);
     },
+    Grid: ({ children, ...props }: ComponentProps) => {
+      return React.createElement('div', filterChakraProps(props), children);
+    },
+    Icon: ({ children, ...props }: ComponentProps) => {
+      return React.createElement('span', filterChakraProps(props), children);
+    },
     Popover: {
       Root: ({ children, open }: ComponentProps & { open?: boolean }) =>
         open
@@ -264,6 +270,12 @@ jest.mock('@chakra-ui/react', () => {
         React.createElement('label', filterChakraProps(props), children),
       HelperText: ({ children, ...props }: ComponentProps) =>
         React.createElement('span', filterChakraProps(props), children),
+      ErrorText: ({ children, ...props }: ComponentProps) =>
+        React.createElement(
+          'span',
+          { ...filterChakraProps(props), role: 'alert' },
+          children
+        ),
     },
     AbsoluteCenter: ({ children, ...props }: ComponentProps) =>
       React.createElement('div', filterChakraProps(props), children),

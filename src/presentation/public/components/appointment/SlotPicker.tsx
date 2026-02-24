@@ -1,21 +1,24 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
-  HStack,
-  SimpleGrid,
+  Grid,
+  Heading,
   Text,
   VStack,
+  HStack,
 } from '@chakra-ui/react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import {
-  FRENCH_DAY_NAMES_SHORT,
-  FRENCH_MONTH_NAMES,
-} from '@/domain/appointment/constants/FrenchLocale';
 import { frontendLog } from '@/infrastructure/shared/services/FrontendLog';
 import type { TimeSlot } from '@/presentation/shared/types/appointment';
+
+const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+const MONTHS_FR = [
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+];
 
 interface SlotPickerProps {
   activityId: string;
@@ -25,6 +28,24 @@ interface SlotPickerProps {
   themeColor: string;
 }
 
+function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  // Start on Monday
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
 export function SlotPicker({
   activityId,
   onSelect,
@@ -32,302 +53,320 @@ export function SlotPicker({
   selectedSlot,
   themeColor,
 }: SlotPickerProps): React.ReactElement {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [weekStart, setWeekStart] = useState<Date>(() => getWeekStart(today));
   const [selectedDay, setSelectedDay] = useState<Date | null>(selectedDate || null);
   const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const getWeekDays = (startDate: Date): Date[] => {
-    const days: Date[] = [];
-    const start = new Date(startDate);
-    start.setDate(start.getDate() - start.getDay() + 1);
+  // Compute the 7 days of current week
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    return d;
+  });
 
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(start);
-      day.setDate(start.getDate() + i);
-      days.push(day);
-    }
-    return days;
-  };
+  // Compute prev week for navigation
+  const prevWeekStart = new Date(weekStart);
+  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+  const isPrevWeekInPast = false; // Always allow navigation, individual days are marked as past
 
-  const weekDays = useMemo(() => getWeekDays(currentDate), [currentDate]);
-
-  const goToPreviousWeek = (): void => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() - 7);
-    setCurrentDate(newDate);
-  };
-
-  const goToNextWeek = (): void => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + 7);
-    setCurrentDate(newDate);
-  };
-
-  const isPastDate = (date: Date): boolean => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const isSameDay = (date1: Date, date2: Date): boolean => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  };
-
-  const fetchWeekAvailability = useCallback(async (days: Date[]): Promise<void> => {
-    const newAvailableDates = new Set<string>();
-
-    await Promise.all(
-      days.map(async (day) => {
-        if (isPastDate(day)) return;
-
-        const dateStr = day.toISOString().split('T')[0];
-        try {
-          const response = await fetch(
-            `/api/appointments/availability/slots?activityId=${activityId}&date=${dateStr}`
-          );
-          if (response.ok) {
-            const data = await response.json();
-            if (data && data.length > 0) {
-              newAvailableDates.add(dateStr);
-            }
-          }
-        } catch (error) {
-          frontendLog.error('Erreur lors de la vérification de disponibilité:', error instanceof Error ? { message: error.message, stack: error.stack } : { error });
-        }
-      })
-    );
-
-    setAvailableDates(newAvailableDates);
-  }, [activityId]);
-
-  useEffect(() => {
-    if (!selectedDay) return;
-
-    const fetchSlots = async (): Promise<void> => {
-      setIsLoadingSlots(true);
+  const fetchSlots = useCallback(
+    async (date: Date): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
+      setSlots([]);
       try {
-        const dateStr = selectedDay.toISOString().split('T')[0];
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         const response = await fetch(
           `/api/appointments/availability/slots?activityId=${activityId}&date=${dateStr}`
         );
-        if (response.ok) {
-          const data = await response.json();
-          setSlots(data);
-        } else {
-          setSlots([]);
-        }
-      } catch (error) {
-        frontendLog.error('Erreur lors du chargement des créneaux:', error instanceof Error ? { message: error.message, stack: error.stack } : { error });
-        setSlots([]);
+        if (!response.ok) throw new Error('Impossible de charger les créneaux');
+        const data = await response.json();
+        setSlots(Array.isArray(data) ? data : (data.slots || []));
+      } catch (err) {
+        frontendLog.error('Erreur chargement créneaux:', err instanceof Error ? { message: err.message } : { error: err });
+        setError('Impossible de charger les créneaux disponibles');
       } finally {
-        setIsLoadingSlots(false);
+        setIsLoading(false);
       }
-    };
+    },
+    [activityId]
+  );
 
-    fetchSlots();
-  }, [activityId, selectedDay]);
-
+  // Fetch slots for the first non-past day of the week on mount
   useEffect(() => {
-    fetchWeekAvailability(weekDays);
-  }, [fetchWeekAvailability, weekDays]);
+    const firstAvailableDay = weekDays.find((d) => d >= today);
+    if (firstAvailableDay) {
+      setSelectedDay(firstAvailableDay);
+      fetchSlots(firstAvailableDay);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Initial fetch if a date was already selected (e.g., navigating back)
+  useEffect(() => {
+    if (selectedDate && !weekDays.find((d) => isSameDay(d, selectedDate))) {
+      fetchSlots(selectedDate);
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDayClick = (day: Date): void => {
-    if (isPastDate(day)) return;
-    const dateStr = day.toISOString().split('T')[0];
-    if (!availableDates.has(dateStr)) return;
+    if (day < today) return;
     setSelectedDay(day);
+    fetchSlots(day);
   };
 
-  const handleSlotClick = (slot: TimeSlot): void => {
-    if (selectedDay) {
-      onSelect(selectedDay, slot);
-    }
+  const handlePrevWeek = (): void => {
+    setWeekStart((prev) => {
+      const newStart = new Date(prev);
+      newStart.setDate(newStart.getDate() - 7);
+      return newStart;
+    });
+  };
+  const handleNextWeek = (): void => {
+    const newStart = new Date(weekStart);
+    newStart.setDate(newStart.getDate() + 7);
+    setWeekStart(newStart);
   };
 
-  const weekStart = weekDays[0];
-  const weekEnd = weekDays[6];
-  const headerText = `${weekStart.getDate()} ${FRENCH_MONTH_NAMES[weekStart.getMonth()]} - ${weekEnd.getDate()} ${FRENCH_MONTH_NAMES[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  // Always show full date range for the week
+  const startMonth = weekDays[0].getMonth();
+  const endMonth = weekDays[6].getMonth();
+  const monthLabel = `${weekDays[0].getDate()} ${MONTHS_FR[startMonth]} - ${weekDays[6].getDate()} ${MONTHS_FR[endMonth]} ${weekDays[6].getFullYear()}`;
 
   return (
-    <VStack gap={4} align="stretch">
-      <HStack justify="space-between" align="center">
-        <Button
-          minH="44px"
-          minW="44px"
-          size={{ base: 'md', md: 'sm' }}
-          variant="ghost"
-          onClick={goToPreviousWeek}
-          aria-label="Semaine précédente"
-        >
-          <FiChevronLeft />
-        </Button>
-        <Text fontWeight="medium">{headerText}</Text>
-        <Button
-          minH="44px"
-          minW="44px"
-          size={{ base: 'md', md: 'sm' }}
-          variant="ghost"
-          onClick={goToNextWeek}
-          aria-label="Semaine suivante"
-        >
-          <FiChevronRight />
-        </Button>
-      </HStack>
+    <VStack gap={5} align="stretch">
+      <Heading as="h3" size="md" fontWeight="semibold">
+        Choisissez une date et un créneau
+      </Heading>
 
-      {/* T010-T015: Responsive horizontal scroll container for date picker */}
+      {/* Week navigation */}
       <Box
-        overflowX={{ base: 'auto', md: 'visible' }}
-        css={{
-          scrollSnapType: { base: 'x mandatory', md: 'none' },
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          '&::-webkit-scrollbar': { display: 'none' },
-        }}
+        borderRadius="xl"
+        border="1px solid"
+        borderColor="whiteAlpha.300"
+        bg="whiteAlpha.400"
+        _dark={{ borderColor: 'whiteAlpha.100', bg: 'blackAlpha.300' }}
+        backdropFilter="blur(12px)"
+        style={{ WebkitBackdropFilter: 'blur(12px)' }}
+        overflow="hidden"
       >
+        {/* Week header */}
         <HStack
-          gap={2}
-          minW={{
-            base: 'calc(100% * 7 / 3)',
-            sm: 'calc(100% * 7 / 4)',
-            md: 'auto',
-          }}
-          flexWrap={{ md: 'nowrap' }}
-          role="grid"
-          aria-label="Sélection de la date"
+          px={4}
+          py={3}
+          borderBottom="1px solid"
+          borderColor="whiteAlpha.200"
+          justify="space-between"
         >
-          {weekDays.map((day) => {
-            const dayLabel = `${FRENCH_DAY_NAMES_SHORT[day.getDay()]} ${day.getDate()} ${FRENCH_MONTH_NAMES[day.getMonth()]}`;
-            const isSelected = selectedDay && isSameDay(day, selectedDay);
-            const isPast = isPastDate(day);
-            const dateStr = day.toISOString().split('T')[0];
-            const hasSlots = availableDates.has(dateStr) && !isPast;
-            const isDisabled = isPast || !hasSlots;
+          <Button
+            variant="ghost"
+            size="sm"
+            borderRadius="lg"
+            onClick={handlePrevWeek}
+            disabled={isPrevWeekInPast}
+            aria-label="Semaine précédente"
+          >
+            <FiChevronLeft />
+          </Button>
+          <span
+            style={{ fontSize: '14px', fontWeight: 600 }}
+          >
+            {monthLabel}
+          </span>          <Button
+            variant="ghost"
+            size="sm"
+            borderRadius="lg"
+            onClick={handleNextWeek}
+            aria-label="Semaine suivante"
+          >
+            <FiChevronRight />
+          </Button>
+        </HStack>
+
+        {/* Day selector */}
+        <Grid templateColumns="repeat(7, 1fr)" gap={0}>
+          {weekDays.map((day, idx) => {
+            const isPast = day < today;
+            const isToday = isSameDay(day, today);
+            const isSelected = selectedDay ? isSameDay(day, selectedDay) : false;
 
             return (
               <Box
-                key={day.toISOString()}
-                flexShrink={0}
-                w={{
-                  base: 'calc(100% / 3)',
-                  sm: 'calc(100% / 4)',
-                  md: 'auto',
-                }}
-                flex={{ md: 1 }}
-                minH="44px"
-                scrollSnapAlign="start"
-                p={2}
-                textAlign="center"
-                borderRadius="md"
-                cursor={isDisabled ? 'not-allowed' : 'pointer'}
-                opacity={isDisabled ? 0.5 : 1}
-                bg={
-                  isSelected
-                    ? `${themeColor}.solid`
-                    : isToday(day)
-                    ? `${themeColor}.muted`
-                    : 'gray.50'
-                }
-                _dark={{
-                  bg: isSelected
-                    ? `${themeColor}.solid`
-                    : isToday(day)
-                    ? `${themeColor}.muted`
-                    : 'gray.700',
-                }}
-                color={isSelected ? 'white' : 'inherit'}
+                key={idx}
+                role="button"
+                tabIndex={isPast ? -1 : 0}
+                aria-disabled={isPast}
                 onClick={() => handleDayClick(day)}
-                _hover={
-                  !isDisabled
-                    ? {
-                        bg: isSelected ? `${themeColor}.solid` : `${themeColor}.muted`,
-                        _dark: { bg: `${themeColor}.muted` },
-                      }
-                    : {}
-                }
-                role="gridcell"
-                aria-label={dayLabel}
-                aria-selected={isSelected || false}
-                aria-disabled={isDisabled}
-                tabIndex={isDisabled ? -1 : 0}
                 onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+                  if ((e.key === 'Enter' || e.key === ' ') && !isPast) {
                     e.preventDefault();
                     handleDayClick(day);
                   }
                 }}
+                cursor={isPast ? 'not-allowed' : 'pointer'}
+                py={3}
+                px={1}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={1}
+                opacity={isPast ? 0.3 : 1}
+                transition="all 0.15s"
+                bg={isSelected ? `${themeColor}.solid` : 'transparent'}
+                _hover={
+                  !isPast && !isSelected
+                    ? { bg: `${themeColor}.subtle` }
+                    : {}
+                }
+                borderRight={idx < 6 ? '1px solid' : 'none'}
+                borderColor="whiteAlpha.200"
               >
                 <Text
-                  fontSize="xs"
-                  color={isSelected ? 'white' : 'gray.500'}
+                  fontSize={{ base: '9px', md: 'xs' }}
+                  fontWeight="medium"
+                  color={isSelected ? 'white' : 'fg.muted'}
+                  textTransform="uppercase"
+                  letterSpacing="wide"
                 >
-                  {FRENCH_DAY_NAMES_SHORT[day.getDay()]}
+                  {DAYS_FR[day.getDay()]}
                 </Text>
-                <Text fontWeight="semibold">
-                  {day.getDate()}
-                </Text>
+                <Box
+                  w={{ base: 7, md: 8 }}
+                  h={{ base: 7, md: 8 }}
+                  borderRadius="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  border={isToday && !isSelected ? '2px solid' : 'none'}
+                  borderColor={`${themeColor}.solid`}
+                >
+                  <Text
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight={isToday || isSelected ? 'bold' : 'normal'}
+                    color={isSelected ? 'white' : isToday ? `${themeColor}.solid` : 'fg'}
+                  >
+                    {day.getDate()}
+                  </Text>
+                </Box>
               </Box>
             );
           })}
-        </HStack>
+        </Grid>
       </Box>
 
+      {/* Slots area */}
+      {!selectedDay && (
+        <Box py={6} textAlign="center">
+          <Text color="fg.muted" fontSize="sm">Sélectionnez un jour pour voir les créneaux disponibles.</Text>
+        </Box>
+      )}
+
       {selectedDay && (
-        <Box mt={4}>
-          <Text fontWeight="medium" mb={2}>
-            Créneaux disponibles pour le{' '}
-            {selectedDay.toLocaleDateString('fr-FR', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-            })}
+        <Box>
+          <Text fontSize="sm" fontWeight="medium" mb={3} color="fg.muted">
+            Créneaux disponibles —{' '}
+            <Box as="span" color="fg" fontWeight="semibold">
+              {selectedDay.toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+            </Box>
           </Text>
 
-          {isLoadingSlots ? (
-            <Text>Chargement des créneaux...</Text>
-          ) : slots.length === 0 ? (
-            <Text color="gray.500">Aucun créneau disponible pour cette date</Text>
-          ) : (
-            <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} gap={2}>
-              {slots.map((slot) => {
+          {isLoading && (
+            <HStack py={8} justify="center" gap={3}>
+              <Box
+                w={4}
+                h={4}
+                border="2px solid"
+                borderColor={`${themeColor}.solid`}
+                borderTopColor="transparent"
+                borderRadius="full"
+                style={{ animation: 'spin 0.8s linear infinite' }}
+                aria-hidden="true"
+              />
+              <Text fontSize="sm" color="fg.muted">Chargement des créneaux...</Text>
+            </HStack>
+          )}
+
+          {!isLoading && error && (
+            <Box
+              py={4}
+              px={4}
+              borderRadius="xl"
+              bg="red.subtle"
+              border="1px solid"
+              borderColor="red.subtle"
+            >
+              <Text color="red.solid" fontSize="sm">{error}</Text>
+            </Box>
+          )}
+
+          {!isLoading && !error && slots.length === 0 && (
+            <Box
+              py={8}
+              textAlign="center"
+              borderRadius="xl"
+              border="1px dashed"
+              borderColor="whiteAlpha.300"
+              _dark={{ borderColor: 'whiteAlpha.100' }}
+            >
+              <Text color="fg.muted" fontSize="sm">Aucun créneau disponible pour cette date</Text>
+            </Box>
+          )}
+
+          {!isLoading && !error && slots.length > 0 && (
+            <Grid
+              templateColumns={{
+                base: 'repeat(2, 1fr)',
+                sm: 'repeat(3, 1fr)',
+                md: 'repeat(4, 1fr)',
+              }}
+              gap={2}
+            >
+              {slots.map((slot, idx) => {
+                const startTime = slot.startTime.substring(11, 16);
+                const endTime = slot.endTime.substring(11, 16);
+                const isSelectedSlot =
+                  selectedSlot?.startTime === slot.startTime;
+
                 return (
-                  <Button
-                    key={`${slot.startTime}-${slot.endTime}`}
-                    minH="44px"
-                    size={{ base: 'md', md: 'sm' }}
-                    variant={
-                      selectedSlot?.startTime === slot.startTime
-                        ? 'solid'
-                        : 'outline'
-                    }
-                    colorPalette={
-                      selectedSlot?.startTime === slot.startTime
-                        ? themeColor
-                        : 'gray'
-                    }
-                    onClick={() => handleSlotClick(slot)}
-                    aria-label={`Créneau de ${slot.startTime} à ${slot.endTime}`}
-                    aria-pressed={selectedSlot?.startTime === slot.startTime}
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => onSelect(selectedDay, slot)}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '0.75rem 0.5rem',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: 'transparent',
+                      border: `1px solid ${isSelectedSlot ? 'var(--chakra-colors-color-palette-solid)' : 'var(--chakra-colors-whiteAlpha-300)'}`,
+                      borderRadius: '0.75rem',
+                    }}
+                    aria-pressed={isSelectedSlot}
                   >
-                    {slot.startTime.substring(11, 16)} - {slot.endTime.substring(11, 16)}
-                  </Button>
+                    <Text
+                      fontSize="sm"
+                      fontWeight={isSelectedSlot ? 'bold' : 'semibold'}
+                      color={isSelectedSlot ? `${themeColor}.solid` : 'fg'}
+                    >
+                      {startTime} - {endTime}
+                    </Text>
+                  </button>
                 );
               })}
-            </SimpleGrid>
+            </Grid>
           )}
         </Box>
       )}

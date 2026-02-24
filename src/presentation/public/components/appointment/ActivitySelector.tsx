@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
+  Grid,
   Heading,
-  SimpleGrid,
   Text,
   VStack,
+  HStack,
+  Spinner,
 } from '@chakra-ui/react';
-import { FiClock } from 'react-icons/fi';
+import { FiClock, FiDollarSign, FiChevronRight } from 'react-icons/fi';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
+import { frontendLog } from '@/infrastructure/shared/services/FrontendLog';
 import type { Activity } from '@/presentation/shared/types/appointment';
 
 interface ActivitySelectorProps {
@@ -30,98 +33,150 @@ export function ActivitySelector({
     const fetchActivities = async (): Promise<void> => {
       try {
         const response = await fetch('/api/appointments/activities/public');
-        if (response.ok) {
-          const data = await response.json();
-          setActivities(data);
-        } else {
-          setError('Impossible de charger les activités');
-        }
-      } catch {
-        setError('Erreur de connexion');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        setActivities(Array.isArray(data) ? data : (data.activities || []));
+      } catch (err) {
+        frontendLog.error('Erreur chargement activités:', err instanceof Error ? { message: err.message } : { error: err });
+        const message = err instanceof Error && err.message.startsWith('HTTP')
+          ? 'Impossible de charger les activités'
+          : 'Erreur de connexion';
+        setError(message);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchActivities();
   }, []);
 
   if (isLoading) {
     return (
-      <Box p={4}>
-        <Text>Chargement des activités...</Text>
-      </Box>
+      <VStack py={12} gap={3} align="center">
+        <Spinner color={`${themeColor}.solid`} size="lg" />
+        <Text color="fg.muted" fontSize="sm">Chargement des activités...</Text>
+      </VStack>
     );
   }
 
   if (error) {
     return (
-      <Box p={4}>
-        <Text color="red.500">{error}</Text>
+      <Box
+        py={8}
+        px={4}
+        textAlign="center"
+        borderRadius="xl"
+        bg="red.subtle"
+        border="1px solid"
+        borderColor="red.subtle"
+      >
+        <Text color="red.solid" fontWeight="medium">{error}</Text>
       </Box>
     );
   }
 
   if (activities.length === 0) {
     return (
-      <Box p={4}>
-        <Text>Aucune activité disponible pour le moment</Text>
+      <Box py={8} textAlign="center">
+        <Text color="fg.muted">Aucune activité disponible pour le moment</Text>
       </Box>
     );
   }
 
   return (
-    <VStack gap={4} align="stretch">
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-        {activities.map((activity) => (
-          <Box
-            key={activity.id}
-            p={4}
-            borderRadius="lg"
-            bg={selectedActivityId === activity.id ? `${themeColor}.muted` : 'white'}
-            _dark={{
-              bg: selectedActivityId === activity.id ? `${themeColor}.muted` : 'gray.800',
-            }}
-            cursor="pointer"
-            onClick={() => onSelect(activity)}
-            _hover={{
-              transform: 'translateY(-2px)',
-              shadow: 'md',
-            }}
-            transition="all 0.2s"
-            role="button"
-            tabIndex={0}
-            aria-pressed={selectedActivityId === activity.id}
-            aria-label={`Sélectionner l'activité ${activity.name}`}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelect(activity);
-              }
-            }}
-          >
-            <VStack align="start" gap={2}>
-              <Heading as="h4" size="md" mt={2}>{activity.name}</Heading>
-              {activity.description && (
-                <Text fontSize="sm" color="gray.600" _dark={{ color: 'gray.400' }}>
-                  {activity.description}
-                </Text>
-              )}
-              <Box display="flex" alignItems="center" gap={2}>
-                <Text fontSize="sm" display="flex" alignItems="center">
-                  <FiClock />
-                </Text>
-                <Text fontSize="sm">{activity.durationMinutes} min</Text>
-                {activity.price !== undefined && activity.price > 0 && (
-                  <Text fontSize="sm" fontWeight="semibold" ml={2}>
-                    {activity.price.toFixed(2)} €
+    <VStack gap={5} align="stretch">
+      <Heading as="h3" size="md" fontWeight="semibold">
+        Choisissez une activité
+      </Heading>
+
+      <Grid
+        templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)' }}
+        gap={3}
+      >
+        {activities.map((activity) => {
+          const isSelected = activity.id === selectedActivityId;
+          const accentColor = activity.color || `var(--chakra-colors-${themeColor}-solid)`;
+
+          return (
+            <Box
+              key={activity.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Sélectionner ${activity.name}`}
+              aria-pressed={isSelected}
+              onClick={() => onSelect(activity)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelect(activity);
+                }
+              }}
+              cursor="pointer"
+              borderRadius="xl"
+              border="1px solid"
+              borderColor={isSelected ? `${themeColor}.solid` : 'whiteAlpha.300'}
+              bg={isSelected ? `${themeColor}.subtle` : 'whiteAlpha.400'}
+              _dark={{
+                borderColor: isSelected ? `${themeColor}.solid` : 'whiteAlpha.100',
+                bg: isSelected ? `${themeColor}.subtle` : 'blackAlpha.300',
+              }}
+              backdropFilter="blur(12px)"
+              style={{ WebkitBackdropFilter: 'blur(12px)' }}
+              p={4}
+              transition="all 0.2s ease"
+              _hover={{
+                borderColor: `${themeColor}.solid`,
+                bg: `${themeColor}.subtle`,
+                transform: 'translateY(-2px)',
+                boxShadow: 'md',
+              }}
+              position="relative"
+              overflow="hidden"
+            >
+              {/* Color band */}
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                w="4px"
+                h="full"
+                bg={accentColor}
+                borderRadius="xl 0 0 xl"
+              />
+
+              <VStack align="start" gap={2} pl={2}>
+                <HStack justify="space-between" w="full">
+                  <Text fontWeight="bold" fontSize="sm" lineClamp={2}>
+                    {activity.name}
+                  </Text>
+                  <FiChevronRight
+                    color={isSelected ? `var(--chakra-colors-${themeColor}-solid)` : 'var(--chakra-colors-fg-muted)'}
+                    size={16}
+                  />
+                </HStack>
+
+                {activity.description && (
+                  <Text fontSize="xs" color="fg.muted" lineClamp={2}>
+                    {activity.description}
                   </Text>
                 )}
-              </Box>
-            </VStack>
-          </Box>
-        ))}
-      </SimpleGrid>
+
+                <HStack gap={3} mt={1}>
+                  <HStack gap={1}>
+                    <FiClock size={11} color="var(--chakra-colors-fg-muted)" />
+                    <Text fontSize="xs" color="fg.muted">{activity.durationMinutes} min</Text>
+                  </HStack>
+                  {activity.price !== undefined && activity.price > 0 && (
+                    <HStack gap={1}>
+                      <FiDollarSign size={11} color="var(--chakra-colors-fg-muted)" />
+                      <Text fontSize="xs" color="fg.muted">{activity.price.toFixed(2)} €</Text>
+                    </HStack>
+                  )}
+                </HStack>
+              </VStack>
+            </Box>
+          );
+        })}
+      </Grid>
     </VStack>
   );
 }

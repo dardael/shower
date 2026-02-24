@@ -7,10 +7,10 @@ import {
   Heading,
   Text,
   VStack,
-  useBreakpointValue,
+  HStack,
+  Icon,
 } from '@chakra-ui/react';
-import { Steps } from '@chakra-ui/react';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiCalendar, FiUser, FiClock, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { ActivitySelector } from './ActivitySelector';
@@ -21,6 +21,110 @@ import type { Activity, TimeSlot } from '@/presentation/shared/types/appointment
 
 type BookingStep = 'activity' | 'slot' | 'form' | 'confirm' | 'success';
 
+const STEPS: { id: BookingStep; label: string; shortLabel: string }[] = [
+  { id: 'activity', label: 'Activité', shortLabel: 'Activité' },
+  { id: 'slot', label: 'Créneau', shortLabel: 'Créneau' },
+  { id: 'form', label: 'Informations', shortLabel: 'Infos' },
+  { id: 'confirm', label: 'Confirmation', shortLabel: 'Confirm.' },
+];
+
+interface StepIndicatorProps {
+  steps: typeof STEPS;
+  currentStep: BookingStep;
+  onStepClick: (step: BookingStep) => void;
+  themeColor: string;
+}
+
+function StepIndicator({ steps, currentStep, onStepClick, themeColor }: StepIndicatorProps): React.ReactElement {
+  const currentIndex = steps.findIndex((s) => s.id === currentStep);
+
+  return (
+    <Box
+      px={{ base: 4, md: 8 }}
+      py={4}
+      borderBottom="1px solid"
+      borderColor="whiteAlpha.200"
+      _dark={{ borderColor: 'whiteAlpha.100' }}
+    >
+      <HStack justify="space-between" gap={0}>
+        {steps.map((step, index) => {
+          const isDone = index < currentIndex;
+          const isActive = index === currentIndex;
+          const isClickable = isDone;
+
+          return (
+            <HStack key={step.id} flex={1} gap={0} align="center">
+              {/* Step circle + label */}
+              <Box
+                flex="none"
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                gap={1}
+                cursor={isClickable ? 'pointer' : 'default'}
+                onClick={() => isClickable && onStepClick(step.id)}
+                opacity={!isActive && !isDone ? 0.4 : 1}
+                transition="opacity 0.2s"
+              >
+                <Box
+                  w={{ base: 7, md: 8 }}
+                  h={{ base: 7, md: 8 }}
+                  borderRadius="full"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="xs"
+                  fontWeight="bold"
+                  transition="all 0.3s"
+                  bg={
+                    isDone
+                      ? `${themeColor}.solid`
+                      : isActive
+                      ? `${themeColor}.solid`
+                      : 'whiteAlpha.200'
+                  }
+                  color={isDone || isActive ? 'white' : 'fg'}
+                  boxShadow={isActive ? `0 0 0 3px var(--chakra-colors-${themeColor}-subtle)` : 'none'}
+                >
+                  {isDone ? (
+                    <>
+                      <FiCheck size={12} aria-hidden="true" />
+                      <Text srOnly>{index + 1}</Text>
+                    </>
+                  ) : (
+                    <Text fontSize="xs">{index + 1}</Text>
+                  )}
+                </Box>
+                <Text
+                  fontSize={{ base: '9px', md: 'xs' }}
+                  fontWeight={isActive ? 'semibold' : 'normal'}
+                  color={isActive ? `${themeColor}.solid` : 'fg.muted'}
+                  whiteSpace="nowrap"
+                >
+                  <Box as="span" display={{ base: 'none', sm: 'inline' }}>{step.label}</Box>
+                  <Box as="span" display={{ base: 'inline', sm: 'none' }}>{step.shortLabel}</Box>
+                </Text>
+              </Box>
+
+              {/* Connector line */}
+              {index < steps.length - 1 && (
+                <Box
+                  flex={1}
+                  h="1px"
+                  mx={1}
+                  mb={4}
+                  bg={isDone ? `${themeColor}.solid` : 'whiteAlpha.200'}
+                  transition="background 0.3s"
+                />
+              )}
+            </HStack>
+          );
+        })}
+      </HStack>
+    </Box>
+  );
+}
+
 export function BookingWidget(): React.ReactElement {
   const { themeColor } = useThemeColorContext();
   const [step, setStep] = useState<BookingStep>('activity');
@@ -30,17 +134,11 @@ export function BookingWidget(): React.ReactElement {
   const [formData, setFormData] = useState<{
     name: string;
     email: string;
-    phone?: string;
-    address?: string;
-    customFieldValue?: string;
+    phone: string;
+    address: string;
+    customFieldValue: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // T005: Add responsive orientation state
-  const orientation = useBreakpointValue({
-    base: 'vertical',
-    md: 'horizontal',
-  }) as 'vertical' | 'horizontal';
 
   const handleActivitySelect = (activity: Activity): void => {
     setSelectedActivity(activity);
@@ -56,38 +154,34 @@ export function BookingWidget(): React.ReactElement {
   const handleFormSubmit = (data: {
     name: string;
     email: string;
-    phone?: string;
-    address?: string;
-    customFieldValue?: string;
+    phone: string;
+    address: string;
+    customFieldValue: string;
   }): void => {
     setFormData(data);
     setStep('confirm');
   };
 
   const handleConfirmBooking = async (): Promise<void> => {
-    if (!selectedActivity || !selectedDate || !selectedSlot || !formData) {
-      return;
-    }
+    if (!selectedActivity || !selectedDate || !selectedSlot || !formData) return;
 
     setIsSubmitting(true);
     try {
-      // selectedSlot.startTime is already an ISO string from the API
       const dateTime = new Date(selectedSlot.startTime);
-
       const response = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          activityId: selectedActivity.id,
-          dateTime: dateTime.toISOString(),
-          clientInfo: {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-            customField: formData.customFieldValue,
-          },
-        }),
+          body: JSON.stringify({
+            activityId: selectedActivity.id,
+            dateTime: dateTime.toISOString(),
+            clientInfo: {
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone || undefined,
+              address: formData.address || undefined,
+              customField: formData.customFieldValue || undefined,
+            },
+          }),
       });
 
       if (response.ok) {
@@ -101,7 +195,7 @@ export function BookingWidget(): React.ReactElement {
         });
       }
     } catch (err) {
-      frontendLog.error('Erreur réservation:', err instanceof Error ? { message: err.message, stack: err.stack } : { error: err });
+      frontendLog.error('Erreur réservation:', err instanceof Error ? { message: err.message } : { error: err });
       toaster.error({
         title: 'Erreur de réservation',
         description: 'Impossible de réserver le créneau: ' + (err instanceof Error ? err.message : 'Erreur inconnue'),
@@ -120,162 +214,271 @@ export function BookingWidget(): React.ReactElement {
   };
 
   const handleStepClick = (targetStep: BookingStep): void => {
-    // Only allow going back to previous steps, not forward
-    const currentIndex = steps.findIndex((s) => s.id === step);
-    const targetIndex = steps.findIndex((s) => s.id === targetStep);
-    
-    if (targetIndex < currentIndex) {
-      setStep(targetStep);
-    }
+    const currentIndex = STEPS.findIndex((s) => s.id === step);
+    const targetIndex = STEPS.findIndex((s) => s.id === targetStep);
+    if (targetIndex < currentIndex) setStep(targetStep);
   };
 
-  const steps = [
-    { id: 'activity', label: 'Choisissez une activité' },
-    { id: 'slot', label: 'Choisissez une date et un créneau' },
-    { id: 'form', label: 'Vos informations' },
-    { id: 'confirm', label: 'Confirmer votre rendez-vous' },
-  ];
-
-  const currentStepIndex = steps.findIndex((s) => s.id === step);
-
+  // Glassmorphism container matching header/footer style
   return (
-    <Box maxW="800px" mx="auto" p={4}>
-      <VStack gap={4} align="stretch" mb={6}>
-        {step !== 'success' && (
-          <Steps.Root
-            orientation={orientation}
-            step={currentStepIndex}
-            colorPalette={themeColor}
-          >
-            <Steps.List>
-              {steps.map((s, index) => (
-                <Steps.Item key={s.id} index={index}>
-                  <Steps.Trigger
-                    onClick={() => handleStepClick(s.id as BookingStep)}
-                    cursor={index < currentStepIndex ? 'pointer' : 'default'}
-                    _hover={
-                      index < currentStepIndex
-                        ? { opacity: 0.8 }
-                        : {}
-                    }
-                  >
-                    <Steps.Indicator />
-                    <Steps.Title>{s.label}</Steps.Title>
-                  </Steps.Trigger>
-                  <Steps.Separator />
-                </Steps.Item>
-              ))}
-            </Steps.List>
-          </Steps.Root>
-        )}
-      </VStack>
-
-      {step === 'activity' && (
-        <ActivitySelector
-          onSelect={handleActivitySelect}
-          selectedActivityId={selectedActivity?.id}
-        />
-      )}
-
-      {step === 'slot' && selectedActivity && (
-        <SlotPicker
-          activityId={selectedActivity.id}
-          onSelect={handleSlotSelect}
-          selectedDate={selectedDate || undefined}
-          selectedSlot={selectedSlot || undefined}
+    <Box
+      maxW="860px"
+      mx="auto"
+      borderRadius={{ base: 'xl', md: '2xl' }}
+      overflow="hidden"
+      backdropFilter="blur(24px) saturate(200%)"
+      style={{ WebkitBackdropFilter: 'blur(24px) saturate(200%)' }}
+      bg="whiteAlpha.700"
+      border="1px solid"
+      borderColor="whiteAlpha.400"
+      _dark={{ bg: 'blackAlpha.500', borderColor: 'whiteAlpha.100' }}
+      boxShadow="0 8px 32px rgba(0,0,0,0.10)"
+    >
+      {/* Steps indicator */}
+      {step !== 'success' && (
+        <StepIndicator
+          steps={STEPS}
+          currentStep={step}
+          onStepClick={handleStepClick}
           themeColor={themeColor}
         />
       )}
 
-      {step === 'form' && selectedActivity && selectedDate && selectedSlot && (
-        <BookingForm
-          activity={selectedActivity}
-          date={selectedDate}
-          slot={selectedSlot}
-          onSuccess={handleFormSubmit}
-        />
-      )}
+      {/* Content area */}
+      <Box p={{ base: 4, md: 8 }}>
+        {step === 'activity' && (
+          <ActivitySelector
+            onSelect={handleActivitySelect}
+            selectedActivityId={selectedActivity?.id}
+          />
+        )}
 
-      {step === 'confirm' && selectedActivity && selectedDate && selectedSlot && formData && (
-        <VStack gap={4} align="stretch">
-          <Box p={4} bg={`${themeColor}.muted`} _dark={{ bg: `${themeColor}.muted` }} borderRadius="md">
-            <VStack gap={2} align="start">
-              <Text fontWeight="semibold" fontSize="sm">{selectedActivity.name}</Text>
-              <Text fontSize="sm">
-                {selectedDate.toLocaleDateString('fr-FR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}{' '}
-                {selectedSlot.startTime.substring(11, 16)} - {selectedSlot.endTime.substring(11, 16)}
-                {' '} ({selectedActivity.durationMinutes} min)
-              </Text>
-              {selectedActivity.price && selectedActivity.price > 0 && (
-                <Text fontWeight="semibold" fontSize="sm">{selectedActivity.price.toFixed(2)} €</Text>
-              )}
-            </VStack>
-          </Box>
+        {step === 'slot' && selectedActivity && (
+          <SlotPicker
+            activityId={selectedActivity.id}
+            onSelect={handleSlotSelect}
+            selectedDate={selectedDate || undefined}
+            selectedSlot={selectedSlot || undefined}
+            themeColor={themeColor}
+          />
+        )}
 
-          <Box p={4} bg="gray.50" _dark={{ bg: 'gray.800' }} borderRadius="md">
-            <VStack gap={2} align="start">
-              <Text fontWeight="semibold" fontSize="sm">Vos informations</Text>
-              <Text fontSize="sm">Nom: {formData.name}</Text>
-              <Text fontSize="sm">Email: {formData.email}</Text>
-              {formData.phone && selectedActivity.requiredFields?.fields.includes('phone') && (
-                <Text fontSize="sm">Téléphone: {formData.phone}</Text>
-              )}
-              {formData.address && selectedActivity.requiredFields?.fields.includes('address') && (
-                <Text fontSize="sm">Adresse: {formData.address}</Text>
-              )}
-              {formData.customFieldValue && selectedActivity.requiredFields?.fields.includes('custom') && (
-                <Text fontSize="sm">
-                  {selectedActivity.requiredFields?.customFieldLabel || 'Information complémentaire'}:{' '}
-                  {formData.customFieldValue}
-                </Text>
-              )}
-            </VStack>
-          </Box>
+        {step === 'form' && selectedActivity && selectedDate && selectedSlot && (
+          <BookingForm
+            activity={selectedActivity}
+            date={selectedDate}
+            slot={selectedSlot}
+            onSuccess={handleFormSubmit}
+          />
+        )}
 
-          <Box display="flex" justifyContent="center" mt={4}>
-            <Button
-              colorPalette={themeColor}
-              onClick={handleConfirmBooking}
-              loading={isSubmitting}
-              width="full"
-              maxW="400px"
-            >
-              Confirmer le rendez-vous
-            </Button>
-          </Box>
-        </VStack>
-      )}
+        {step === 'confirm' && selectedActivity && selectedDate && selectedSlot && formData && (
+          <ConfirmStep
+            activity={selectedActivity}
+            date={selectedDate}
+            slot={selectedSlot}
+            formData={formData}
+            themeColor={themeColor}
+            isSubmitting={isSubmitting}
+            onConfirm={handleConfirmBooking}
+          />
+        )}
 
-      {step === 'success' && (
-        <VStack gap={4} py={8} textAlign="center">
-          <Box
-            fontSize="4xl"
-            color="green.500"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <FiCheck />
-          </Box>
-          <Heading as="h4" size="lg" fontWeight="semibold">Rendez-vous confirmé !</Heading>
-          <Box color="gray.600" _dark={{ color: 'gray.400' }}>
-            Vous recevrez un email de confirmation avec les détails de votre
-            rendez-vous.
-          </Box>
-          <Button
-            mt={4}
-            colorPalette={themeColor}
-            onClick={handleReset}
-            size="lg"
-          >
-            Prendre un autre rendez-vous
-          </Button>
-        </VStack>
-      )}
+        {step === 'success' && (
+          <SuccessStep themeColor={themeColor} onReset={handleReset} />
+        )}
+      </Box>
     </Box>
+  );
+}
+
+// ─── Confirm step ────────────────────────────────────────────────────────────
+
+interface ConfirmStepProps {
+  activity: Activity;
+  date: Date;
+  slot: TimeSlot;
+  formData: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    customFieldValue: string;
+  };
+  themeColor: string;
+  isSubmitting: boolean;
+  onConfirm: () => void;
+}
+
+function ConfirmStep({
+  activity,
+  date,
+  slot,
+  formData,
+  themeColor,
+  isSubmitting,
+  onConfirm,
+}: ConfirmStepProps): React.ReactElement {
+  return (
+    <VStack gap={5} align="stretch">
+      <Heading as="h3" size="md" fontWeight="semibold">
+        Récapitulatif
+      </Heading>
+
+      {/* Appointment summary card */}
+      <Box
+        borderRadius="xl"
+        border="1px solid"
+        borderColor={`${themeColor}.subtle`}
+        overflow="hidden"
+      >
+        {/* Colored header band */}
+        <Box
+          px={5}
+          py={3}
+          bg={`${themeColor}.subtle`}
+          borderBottom="1px solid"
+          borderColor={`${themeColor}.subtle`}
+        >
+          <Text fontWeight="bold" fontSize="md">{activity.name}</Text>
+        </Box>
+
+        <Box px={5} py={4}>
+          <VStack align="start" gap={3}>
+            <HStack gap={3}>
+              <Icon color={`${themeColor}.solid`}><FiCalendar /></Icon>
+              <Text fontSize="sm">
+                {date.toLocaleDateString('fr-FR', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </Text>
+            </HStack>
+            <HStack gap={3}>
+              <Icon color={`${themeColor}.solid`}><FiClock /></Icon>
+              <Text fontSize="sm">
+                {slot.startTime.substring(11, 16)} – {slot.endTime.substring(11, 16)}
+                {' '}({activity.durationMinutes} min)
+              </Text>
+            </HStack>
+            {activity.price && activity.price > 0 && (
+              <HStack gap={3}>
+                <Box w={4} />
+                <Text fontSize="sm" fontWeight="semibold">{activity.price.toFixed(2)} €</Text>
+              </HStack>
+            )}
+          </VStack>
+        </Box>
+      </Box>
+
+      {/* Client info card */}
+      <Box
+        borderRadius="xl"
+        border="1px solid"
+      borderColor="whiteAlpha.300"
+      _dark={{ borderColor: 'whiteAlpha.100', bg: 'blackAlpha.300' }}
+        px={5}
+        py={4}
+      >
+        <Text fontWeight="semibold" fontSize="sm" mb={3} color="fg.muted">
+          Vos informations
+        </Text>
+        <VStack align="start" gap={2}>
+          <HStack gap={3}>
+            <Icon color="fg.muted"><FiUser /></Icon>
+            <Text fontSize="sm">{formData.name}</Text>
+          </HStack>
+          <HStack gap={3}>
+            <Icon color="fg.muted"><FiMail /></Icon>
+            <Text fontSize="sm">{formData.email}</Text>
+          </HStack>
+          {formData.phone && activity.requiredFields?.fields.includes('phone') && (
+            <HStack gap={3}>
+              <Icon color="fg.muted"><FiPhone /></Icon>
+              <Text fontSize="sm">{formData.phone}</Text>
+            </HStack>
+          )}
+          {formData.address && activity.requiredFields?.fields.includes('address') && (
+            <HStack gap={3}>
+              <Icon color="fg.muted"><FiMapPin /></Icon>
+              <Text fontSize="sm">{formData.address}</Text>
+            </HStack>
+          )}
+          {formData.customFieldValue && activity.requiredFields?.fields.includes('custom') && (
+            <HStack gap={3} align="start">
+              <Box w={4} flex="none" />
+              <Text fontSize="sm">
+                <Text as="span" fontWeight="medium">
+                  {activity.requiredFields?.customFieldLabel || 'Information complémentaire'} :{' '}
+                </Text>
+                {formData.customFieldValue}
+              </Text>
+            </HStack>
+          )}
+        </VStack>
+      </Box>
+
+      <Button
+        colorPalette={themeColor}
+        onClick={onConfirm}
+        loading={isSubmitting}
+        size="lg"
+        borderRadius="xl"
+        w="full"
+      >
+        Confirmer le rendez-vous
+      </Button>
+    </VStack>
+  );
+}
+
+// ─── Success step ─────────────────────────────────────────────────────────────
+
+interface SuccessStepProps {
+  themeColor: string;
+  onReset: () => void;
+}
+
+function SuccessStep({ themeColor, onReset }: SuccessStepProps): React.ReactElement {
+  return (
+    <VStack gap={6} py={{ base: 8, md: 12 }} textAlign="center" align="center">
+      {/* Animated check circle */}
+      <Box
+        w={20}
+        h={20}
+        borderRadius="full"
+        bg={`${themeColor}.subtle`}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        border="2px solid"
+        borderColor={`${themeColor}.solid`}
+      >
+        <Icon color={`${themeColor}.solid`} fontSize="2xl">
+          <FiCheck />
+        </Icon>
+      </Box>
+
+      <VStack gap={2}>
+        <Heading as="h3" size="lg" fontWeight="bold">
+          Rendez-vous confirmé !
+        </Heading>
+        <Text color="fg.muted" maxW="360px" fontSize="sm">
+          Un email de confirmation avec les détails de votre rendez-vous vous sera envoyé prochainement.
+        </Text>
+      </VStack>
+
+      <Button
+        colorPalette={themeColor}
+        variant="outline"
+        onClick={onReset}
+        size="lg"
+        borderRadius="xl"
+      >
+        Prendre un autre rendez-vous
+      </Button>
+    </VStack>
   );
 }
