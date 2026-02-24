@@ -16,7 +16,7 @@ export function PublicPageClient(): React.ReactElement {
   const slug = params?.slug as string;
 
   // Use custom hook to manage loading state and data fetching
-  const { state, data, customLoader, loaderBackgroundColor } =
+  const { state, data, customLoader, loaderBackgroundColor, loaderChecked } =
     usePublicPageData(slug);
   const { themeColor } = useThemeColor();
 
@@ -28,6 +28,7 @@ export function PublicPageClient(): React.ReactElement {
         error={null}
         customLoader={customLoader}
         backgroundColor={loaderBackgroundColor}
+        loaderChecked={loaderChecked}
       />
     );
   }
@@ -51,6 +52,7 @@ export function PublicPageClient(): React.ReactElement {
       error={null}
       customLoader={customLoader}
       backgroundColor={loaderBackgroundColor}
+      loaderChecked={loaderChecked}
     />
   );
 }

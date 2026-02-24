@@ -29,6 +29,7 @@ interface SocialNetworkDTO {
 export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
   customLoader: CustomLoaderDTO | null;
   loaderBackgroundColor: string | null;
+  loaderChecked: boolean;
 } {
   // Initialize loading state
   const [state, setState] = useState<PageLoadState>({
@@ -54,6 +55,9 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
     string | null
   >(null);
 
+  // True once the loader API call has completed (success or failure)
+  const [loaderChecked, setLoaderChecked] = useState(false);
+
   // Fetch custom loader immediately on mount (before other data)
   useEffect(() => {
     const fetchLoader = async () => {
@@ -70,6 +74,8 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
         }
       } catch {
         // Loader is optional, ignore errors
+      } finally {
+        setLoaderChecked(true);
       }
     };
     const fetchLoaderBackgroundColor = async () => {
@@ -226,6 +232,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
     retry,
     customLoader,
     loaderBackgroundColor,
+    loaderChecked,
   };
 }
 

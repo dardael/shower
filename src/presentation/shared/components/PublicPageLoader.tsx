@@ -16,6 +16,7 @@ export interface PublicPageLoaderProps {
   onRetry?: () => void;
   customLoader?: CustomLoaderData | null;
   backgroundColor?: string | null;
+  loaderChecked?: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ export function PublicPageLoader({
   onRetry,
   customLoader,
   backgroundColor,
+  loaderChecked = true,
 }: PublicPageLoaderProps): React.ReactElement {
   // Track if custom loader failed to load - fallback to default spinner
   const [loaderError, setLoaderError] = useState(false);
@@ -73,6 +75,12 @@ export function PublicPageLoader({
 
   // Show loading state
   if (isLoading) {
+    // Wait until we know whether a custom loader exists before rendering anything.
+    // This prevents the generic spinner from flashing before the custom loader appears.
+    if (!loaderChecked) {
+      return <></>;
+    }
+
     const showCustomLoader = customLoader && !loaderError;
 
     return (

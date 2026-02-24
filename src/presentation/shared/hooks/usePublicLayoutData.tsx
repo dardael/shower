@@ -30,6 +30,7 @@ interface UsePublicLayoutDataReturn {
   state: PageLoadState;
   data: LayoutData | null;
   customLoader: CustomLoaderDTO | null;
+  loaderChecked: boolean;
 }
 
 /**
@@ -52,6 +53,7 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
   const [customLoader, setCustomLoader] = useState<CustomLoaderDTO | null>(
     null
   );
+  const [loaderChecked, setLoaderChecked] = useState(false);
 
   // Fetch custom loader immediately
   useEffect(() => {
@@ -69,6 +71,8 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
         }
       } catch {
         // Loader is optional
+      } finally {
+        setLoaderChecked(true);
       }
     };
     fetchLoader();
@@ -168,6 +172,7 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     state,
     data,
     customLoader,
+    loaderChecked,
   };
 }
 
