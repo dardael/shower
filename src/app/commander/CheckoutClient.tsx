@@ -31,8 +31,14 @@ interface CustomerFormData {
 export function CheckoutClient(): React.ReactElement {
   const router = useRouter();
   const { items, itemCount, clearCart, isLoading: cartLoading } = useCart();
-  const { state, data, customLoader, loaderChecked, minLoaderElapsed } =
-    usePublicLayoutData();
+  const {
+    state,
+    data,
+    customLoader,
+    loaderChecked,
+    minLoaderElapsed,
+    loaderBackgroundColor,
+  } = usePublicLayoutData();
   const { themeColor } = useThemeColor();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -140,6 +146,7 @@ export function CheckoutClient(): React.ReactElement {
         error={null}
         customLoader={customLoader}
         loaderChecked={loaderChecked}
+        backgroundColor={loaderBackgroundColor}
       />
     );
   }
@@ -237,6 +244,7 @@ export function CheckoutClient(): React.ReactElement {
       isLoading={true}
       error={null}
       customLoader={customLoader}
+      backgroundColor={loaderBackgroundColor}
     />
   );
 }

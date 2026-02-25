@@ -32,6 +32,7 @@ interface UsePublicLayoutDataReturn {
   customLoader: CustomLoaderDTO | null;
   loaderChecked: boolean;
   minLoaderElapsed: boolean;
+  loaderBackgroundColor: string | null;
 }
 
 /**
@@ -55,6 +56,9 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     null
   );
   const [loaderChecked, setLoaderChecked] = useState(false);
+  const [loaderBackgroundColor, setLoaderBackgroundColor] = useState<
+    string | null
+  >(null);
 
   // True once the minimum display time (1s) has elapsed for the custom loader
   const [minLoaderElapsed, setMinLoaderElapsed] = useState(false);
@@ -74,15 +78,30 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
   useEffect(() => {
     const fetchLoader = async (): Promise<void> => {
       try {
-        const response = await fetch('/api/public/loader', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (response.ok) {
-          const result = await response.json();
+        const [loaderResponse, bgColorResponse] = await Promise.allSettled([
+          fetch('/api/public/loader', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }),
+          fetch('/api/public/loader-background-color', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        ]);
+
+        if (loaderResponse.status === 'fulfilled' && loaderResponse.value.ok) {
+          const result = await loaderResponse.value.json();
           if (result.loader) {
             setCustomLoader(result.loader);
           }
+        }
+
+        if (
+          bgColorResponse.status === 'fulfilled' &&
+          bgColorResponse.value.ok
+        ) {
+          const result = await bgColorResponse.value.json();
+          setLoaderBackgroundColor(result.value ?? null);
         }
       } catch {
         // Loader is optional
@@ -189,6 +208,7 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
     customLoader,
     loaderChecked,
     minLoaderElapsed,
+    loaderBackgroundColor,
   };
 }
 

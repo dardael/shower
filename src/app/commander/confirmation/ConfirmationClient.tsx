@@ -37,8 +37,14 @@ interface OrderDetails {
 export default function ConfirmationClient(): React.JSX.Element {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('id');
-  const { state, data, customLoader, loaderChecked, minLoaderElapsed } =
-    usePublicLayoutData();
+  const {
+    state,
+    data,
+    customLoader,
+    loaderChecked,
+    minLoaderElapsed,
+    loaderBackgroundColor,
+  } = usePublicLayoutData();
   const { themeColor } = useThemeColor();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [isOrderLoading, setIsOrderLoading] = useState(true);
@@ -76,6 +82,7 @@ export default function ConfirmationClient(): React.JSX.Element {
         isLoading={true}
         error={null}
         customLoader={customLoader}
+        backgroundColor={loaderBackgroundColor}
       />
     );
   }
@@ -88,6 +95,7 @@ export default function ConfirmationClient(): React.JSX.Element {
         error={null}
         customLoader={customLoader}
         loaderChecked={loaderChecked}
+        backgroundColor={loaderBackgroundColor}
       />
     );
   }
@@ -228,6 +236,7 @@ export default function ConfirmationClient(): React.JSX.Element {
       isLoading={true}
       error={null}
       customLoader={customLoader}
+      backgroundColor={loaderBackgroundColor}
     />
   );
 }
