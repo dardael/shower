@@ -546,7 +546,10 @@ export class ZipImporter implements IConfigurationImporter {
 
     const exceptions = availabilityData.exceptions.map((exc) =>
       AvailabilityException.create({
-        date: new Date(exc.date),
+        startDate: new Date(exc.startDate),
+        endDate: new Date(exc.endDate),
+        startTime: exc.startTime,
+        endTime: exc.endTime,
         reason: exc.reason,
       })
     );

@@ -21,7 +21,10 @@ export class MongooseAvailabilityRepository implements IAvailabilityRepository {
 
     const exceptions = doc.exceptions.map((exc) =>
       AvailabilityException.create({
-        date: exc.date,
+        startDate: exc.startDate,
+        endDate: exc.endDate,
+        startTime: exc.startTime,
+        endTime: exc.endTime,
         reason: exc.reason,
       })
     );
@@ -55,8 +58,6 @@ export class MongooseAvailabilityRepository implements IAvailabilityRepository {
   }
 
   async update(availability: Availability): Promise<Availability> {
-    // Use findOneAndUpdate with upsert to make it atomic
-    // This handles both create and update cases atomically
     const filter = availability.id ? { _id: availability.id } : {};
 
     const updated = await AvailabilityModel.findOneAndUpdate(

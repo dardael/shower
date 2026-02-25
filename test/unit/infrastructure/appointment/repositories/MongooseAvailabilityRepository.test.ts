@@ -36,7 +36,13 @@ describe('MongooseAvailabilityRepository', () => {
       { dayOfWeek: 1, startTime: '09:00', endTime: '12:00' },
       { dayOfWeek: 1, startTime: '14:00', endTime: '18:00' },
     ],
-    exceptions: [{ date: new Date('2024-12-25'), reason: 'Noël' }],
+    exceptions: [
+      {
+        startDate: new Date('2024-12-25'),
+        endDate: new Date('2024-12-25'),
+        reason: 'Noël',
+      },
+    ],
     updatedAt: new Date('2024-01-01'),
     ...overrides,
   });
@@ -58,7 +64,8 @@ describe('MongooseAvailabilityRepository', () => {
       ],
       exceptions: [
         AvailabilityException.create({
-          date: new Date('2024-12-25'),
+          startDate: new Date('2024-12-25'),
+          endDate: new Date('2024-12-25'),
           reason: 'Noël',
         }),
       ],
@@ -188,7 +195,11 @@ describe('MongooseAvailabilityRepository', () => {
     it('should correctly map exceptions', async () => {
       const mockDoc = createMockAvailabilityDoc({
         exceptions: [
-          { date: new Date('2024-07-14'), reason: 'Fête nationale' },
+          {
+            startDate: new Date('2024-07-14'),
+            endDate: new Date('2024-07-14'),
+            reason: 'Fête nationale',
+          },
         ],
       });
       mockAvailabilityModel.findOne.mockReturnValue({

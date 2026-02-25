@@ -3,6 +3,7 @@ import {
   GetAvailability,
   UpdateAvailability,
   GetAvailableSlots,
+  GetAvailableDaysInWeek,
 } from '@/application/appointment/AvailabilityUseCases';
 import type { IAvailabilityRepository } from '@/domain/appointment/repositories/IAvailabilityRepository';
 import type { IActivityRepository } from '@/domain/appointment/repositories/IActivityRepository';
@@ -39,7 +40,8 @@ describe('AvailabilityUseCases', () => {
       ],
       exceptions: [
         AvailabilityException.create({
-          date: new Date('2024-12-25'),
+          startDate: new Date('2024-12-25'),
+          endDate: new Date('2024-12-25'),
           reason: 'Noël',
         }),
       ],
@@ -170,7 +172,9 @@ describe('AvailabilityUseCases', () => {
 
       const result = await useCase.execute({
         weeklySlots: [{ dayOfWeek: 1, startTime: '09:00', endTime: '17:00' }],
-        exceptions: [{ date: '2024-12-25', reason: 'Noël' }],
+        exceptions: [
+          { startDate: '2024-12-25', endDate: '2024-12-25', reason: 'Noël' },
+        ],
       });
 
       expect(mockAvailabilityRepository.save).toHaveBeenCalled();
@@ -236,7 +240,8 @@ describe('AvailabilityUseCases', () => {
       const availability = createMockAvailability({
         exceptions: [
           AvailabilityException.create({
-            date: new Date('2024-06-15'),
+            startDate: new Date('2024-06-15'),
+            endDate: new Date('2024-06-15'),
             reason: 'Fermé',
           }),
         ],
@@ -310,8 +315,12 @@ describe('AvailabilityUseCases', () => {
         date: futureMonday,
       });
 
-      // 09:00-11:00 with 60min duration and 30min intervals: 09:00, 09:30, 10:00
-      expect(result.length).toBeGreaterThanOrEqual(1);
+      // 09:00-11:00 with 60min duration: 09:00, 10:00
+      expect(result.length).toBe(2);
+      const startTimes = result.map((slot: { startTime: Date }) =>
+        slot.startTime.getHours()
+      );
+      expect(startTimes).toEqual([9, 10]);
     });
 
     it('should exclude slots with existing appointments', async () => {
@@ -410,6 +419,179 @@ describe('AvailabilityUseCases', () => {
 
       // The slot should still be available since the appointment is cancelled
       expect(result.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('GetAvailableDaysInWeek', () => {
+    let useCase: GetAvailableDaysInWeek;
+
+    // Monday 2024-06-10 (week with monday available at 09:00-12:00)
+    const mondayWeekStart = new Date('2024-06-10T00:00:00.000Z');
+
+    beforeEach(() => {
+      useCase = new GetAvailableDaysInWeek(
+        mockAvailabilityRepository,
+        mockActivityRepository,
+        mockAppointmentRepository
+      );
+    });
+
+    it("devrait retourner une erreur si l'activité n'est pas trouvée", async () => {
+      mockActivityRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        useCase.execute({ activityId: 'unknown', weekStart: mondayWeekStart })
+      ).rejects.toThrow('Activité non trouvée');
+    });
+
+    it('devrait retourner un tableau vide si aucune disponibilité', async () => {
+      mockActivityRepository.findById.mockResolvedValue(createMockActivity());
+      mockAvailabilityRepository.find.mockResolvedValue(null);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      expect(result).toEqual([]);
+    });
+
+    it('devrait retourner un tableau vide si aucun jour de la semaine a de créneaux configurés', async () => {
+      mockActivityRepository.findById.mockResolvedValue(createMockActivity());
+      const availability = Availability.create({
+        id: 'availability-123',
+        weeklySlots: [],
+        exceptions: [],
+      });
+      mockAvailabilityRepository.find.mockResolvedValue(availability);
+      mockAppointmentRepository.findByDateRange.mockResolvedValue([]);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      expect(result).toEqual([]);
+    });
+
+    it('devrait retourner les jours qui ont au moins un créneau disponible', async () => {
+      mockActivityRepository.findById.mockResolvedValue(createMockActivity());
+      const availability = createMockAvailability(); // lundi 09:00-12:00 et 14:00-18:00
+      mockAvailabilityRepository.find.mockResolvedValue(availability);
+      mockAppointmentRepository.findByDateRange.mockResolvedValue([]);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      // La semaine contient le lundi 2024-06-10 qui a des créneaux configurés
+      expect(result).toContain('2024-06-10');
+      // Les autres jours (mardi-dimanche) n'ont pas de créneaux configurés
+      expect(result).not.toContain('2024-06-11');
+    });
+
+    it('devrait exclure les jours marqués comme exceptions', async () => {
+      mockActivityRepository.findById.mockResolvedValue(createMockActivity());
+      const availability = Availability.create({
+        id: 'availability-123',
+        weeklySlots: [
+          WeeklySlot.create({
+            dayOfWeek: 1,
+            startTime: '09:00',
+            endTime: '12:00',
+          }),
+        ],
+        exceptions: [
+          AvailabilityException.create({
+            startDate: new Date('2024-06-10T00:00:00.000Z'),
+            endDate: new Date('2024-06-10T00:00:00.000Z'),
+            reason: 'Férié',
+          }),
+        ],
+      });
+      mockAvailabilityRepository.find.mockResolvedValue(availability);
+      mockAppointmentRepository.findByDateRange.mockResolvedValue([]);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      expect(result).not.toContain('2024-06-10');
+    });
+
+    it('devrait exclure un jour dont tous les créneaux sont occupés par des rendez-vous', async () => {
+      mockActivityRepository.findById.mockResolvedValue(
+        createMockActivity({
+          durationMinutes: 60,
+          minimumBookingNoticeHours: 0,
+        })
+      );
+      const availability = Availability.create({
+        id: 'availability-123',
+        weeklySlots: [
+          WeeklySlot.create({
+            dayOfWeek: 1,
+            startTime: '09:00',
+            endTime: '10:00',
+          }),
+        ],
+        exceptions: [],
+      });
+      mockAvailabilityRepository.find.mockResolvedValue(availability);
+
+      // Le seul créneau possible (09:00-10:00) est occupé
+      const appointment = createMockAppointment({
+        dateTime: new Date('2024-06-10T09:00:00.000Z'),
+        status: AppointmentStatus.confirmed(),
+      });
+      mockAppointmentRepository.findByDateRange.mockResolvedValue([
+        appointment,
+      ]);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      expect(result).not.toContain('2024-06-10');
+    });
+
+    it('devrait inclure un jour dont les rendez-vous annulés libèrent les créneaux', async () => {
+      mockActivityRepository.findById.mockResolvedValue(
+        createMockActivity({
+          durationMinutes: 60,
+          minimumBookingNoticeHours: 0,
+        })
+      );
+      const availability = Availability.create({
+        id: 'availability-123',
+        weeklySlots: [
+          WeeklySlot.create({
+            dayOfWeek: 1,
+            startTime: '09:00',
+            endTime: '10:00',
+          }),
+        ],
+        exceptions: [],
+      });
+      mockAvailabilityRepository.find.mockResolvedValue(availability);
+
+      const cancelledAppointment = createMockAppointment({
+        dateTime: new Date('2024-06-10T09:00:00.000Z'),
+        status: AppointmentStatus.cancelled(),
+      });
+      mockAppointmentRepository.findByDateRange.mockResolvedValue([
+        cancelledAppointment,
+      ]);
+
+      const result = await useCase.execute({
+        activityId: 'activity-123',
+        weekStart: mondayWeekStart,
+      });
+
+      expect(result).toContain('2024-06-10');
     });
   });
 });

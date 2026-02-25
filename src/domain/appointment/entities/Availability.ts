@@ -75,33 +75,16 @@ export class Availability {
     return new Availability(this._id, filtered, this._exceptions, new Date());
   }
 
-  addException(exception: AvailabilityException): Availability {
-    const hasDuplicate = this._exceptions.some((e) =>
-      e.isOnDate(exception.date)
-    );
-    if (hasDuplicate) {
-      throw new Error('Une exception existe déjà pour cette date');
-    }
-
-    return new Availability(
-      this._id,
-      this._weeklySlots,
-      [...this._exceptions, exception],
-      new Date()
-    );
-  }
-
-  removeException(date: Date): Availability {
-    const filtered = this._exceptions.filter((e) => !e.isOnDate(date));
-    return new Availability(this._id, this._weeklySlots, filtered, new Date());
-  }
-
-  isDateExcluded(date: Date): boolean {
-    return this._exceptions.some((e) => e.isOnDate(date));
-  }
-
   getSlotsForDay(dayOfWeek: number): WeeklySlot[] {
     return this._weeklySlots.filter((s) => s.dayOfWeek === dayOfWeek);
+  }
+
+  isDateFullyExcluded(date: Date): boolean {
+    return this._exceptions.some((e) => e.isAllDay && e.coversDate(date));
+  }
+
+  getExceptionsForDate(date: Date): AvailabilityException[] {
+    return this._exceptions.filter((e) => e.coversDate(date));
   }
 
   update(props: {

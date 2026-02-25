@@ -115,7 +115,10 @@ export interface SerializedWeeklySlot {
  * Serialized representation of an availability exception for export/import.
  */
 export interface SerializedAvailabilityException {
-  date: string;
+  startDate: string;
+  endDate: string;
+  startTime?: string;
+  endTime?: string;
   reason?: string;
 }
 

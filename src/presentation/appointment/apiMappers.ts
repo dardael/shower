@@ -46,8 +46,11 @@ export interface AvailabilityResponse {
     endTime: string;
   }>;
   exceptions: Array<{
-    date: string;
-    reason: string;
+    startDate: string;
+    endDate: string;
+    startTime?: string;
+    endTime?: string;
+    reason?: string;
   }>;
 }
 
@@ -106,7 +109,10 @@ export function availabilityToResponse(
     id: availability.id,
     weeklySlots: availability.weeklySlots.map((slot) => slot.toObject()),
     exceptions: availability.exceptions.map((exception) => ({
-      date: exception.date.toISOString().split('T')[0],
+      startDate: exception.startDate.toISOString().split('T')[0],
+      endDate: exception.endDate.toISOString().split('T')[0],
+      startTime: exception.startTime,
+      endTime: exception.endTime,
       reason: exception.reason || '',
     })),
   };

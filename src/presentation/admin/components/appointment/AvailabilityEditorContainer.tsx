@@ -14,13 +14,22 @@ interface WeeklySlotData {
 }
 
 interface ExceptionData {
-  date: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
   reason: string;
 }
 
-interface AvailabilityData {
+interface AvailabilityApiResponse {
   weeklySlots: WeeklySlotData[];
-  exceptions: ExceptionData[];
+  exceptions: Array<{
+    startDate: string;
+    endDate: string;
+    startTime?: string;
+    endTime?: string;
+    reason?: string;
+  }>;
 }
 
 export function AvailabilityEditorContainer(): React.ReactElement {
@@ -35,14 +44,14 @@ export function AvailabilityEditorContainer(): React.ReactElement {
     try {
       const response = await fetch('/api/appointments/availability');
       if (response.ok) {
-        const data: AvailabilityData = await response.json();
+        const data: AvailabilityApiResponse = await response.json();
         setWeeklySlots(data.weeklySlots || []);
         setExceptions(
           (data.exceptions || []).map((e) => ({
-            date:
-              typeof e.date === 'string'
-                ? e.date.split('T')[0]
-                : new Date(e.date).toISOString().split('T')[0],
+            startDate: e.startDate,
+            endDate: e.endDate,
+            startTime: e.startTime || '',
+            endTime: e.endTime || '',
             reason: e.reason || '',
           }))
         );
@@ -80,7 +89,10 @@ export function AvailabilityEditorContainer(): React.ReactElement {
         body: JSON.stringify({
           weeklySlots,
           exceptions: exceptions.map((e) => ({
-            date: new Date(e.date),
+            startDate: e.startDate,
+            endDate: e.endDate || e.startDate,
+            startTime: e.startTime || undefined,
+            endTime: e.endTime || undefined,
             reason: e.reason || undefined,
           })),
         }),

@@ -507,6 +507,7 @@ import {
   GetAvailability,
   UpdateAvailability,
   GetAvailableSlots,
+  GetAvailableDaysInWeek,
 } from '@/application/appointment/AvailabilityUseCases';
 import {
   GetAppointmentModuleEnabled,
@@ -621,6 +622,10 @@ container.register<UpdateAvailability>('UpdateAvailability', {
 
 container.register<GetAvailableSlots>('GetAvailableSlots', {
   useClass: GetAvailableSlots,
+});
+
+container.register<GetAvailableDaysInWeek>('GetAvailableDaysInWeek', {
+  useClass: GetAvailableDaysInWeek,
 });
 
 // Register appointment module use cases

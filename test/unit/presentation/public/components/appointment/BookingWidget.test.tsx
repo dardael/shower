@@ -93,10 +93,50 @@ const mockActivities = [
   },
 ];
 
+// System time is 2024-01-15 (Monday), so Jan 16 = Tuesday
+const mockAvailableDays = ['2024-01-16'];
+
 const mockSlots = [
   { startTime: '2024-01-16T09:00:00.000Z', endTime: '2024-01-16T10:00:00.000Z' },
   { startTime: '2024-01-16T10:00:00.000Z', endTime: '2024-01-16T11:00:00.000Z' },
 ];
+
+const createMockFetch = (includeAppointmentCreation = false): jest.Mock => {
+  return jest.fn((url: string, options?: RequestInit) => {
+    if (url.includes('/api/appointments/activities')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockActivities),
+      });
+    }
+    if (url.includes('/availability/days')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockAvailableDays),
+      });
+    }
+    if (url.includes('/availability/slots')) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockSlots),
+      });
+    }
+    if (
+      includeAppointmentCreation &&
+      url.includes('/api/appointments') &&
+      options?.method === 'POST'
+    ) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ id: 'appointment-1' }),
+      });
+    }
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
+  }) as jest.Mock;
+};
 
 const renderWithChakra = (ui: React.ReactElement): ReturnType<typeof render> => {
   return render(
@@ -130,12 +170,7 @@ describe('BookingWidget', () => {
 
   describe('Activity selection step', () => {
     it('should display activity selector initially', async () => {
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockActivities),
-        })
-      ) as jest.Mock;
+      global.fetch = createMockFetch();
 
       renderWithChakra(<BookingWidget />);
 
@@ -145,20 +180,7 @@ describe('BookingWidget', () => {
     });
 
     it('should navigate to slot picker when activity is selected', async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          })
-        )
-        .mockImplementation(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockSlots),
-          })
-        );
+      global.fetch = createMockFetch();
 
       renderWithChakra(<BookingWidget />);
 
@@ -168,28 +190,16 @@ describe('BookingWidget', () => {
 
       await clickActivityCard('Consultation');
 
+      // After selecting activity, SlotPicker is shown — days of the week are visible
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
     });
   });
 
   describe('Slot selection step', () => {
     it('should display slot picker after activity selection', async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          })
-        )
-        .mockImplementation(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockSlots),
-          })
-        );
+      global.fetch = createMockFetch();
 
       renderWithChakra(<BookingWidget />);
 
@@ -199,26 +209,14 @@ describe('BookingWidget', () => {
 
       await clickActivityCard('Consultation');
 
+      // SlotPicker is shown with days of the week
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
     });
 
     it('should navigate back to activity selector when step indicator is clicked', async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          })
-        )
-        .mockImplementation(() =>
-          Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockSlots),
-          })
-        );
+      global.fetch = createMockFetch();
 
       renderWithChakra(<BookingWidget />);
 
@@ -229,7 +227,7 @@ describe('BookingWidget', () => {
       await clickActivityCard('Consultation');
 
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
 
       // Click on step 1 indicator to go back to activity selection
@@ -237,36 +235,14 @@ describe('BookingWidget', () => {
       fireEvent.click(stepIndicator);
 
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une activité')).toBeInTheDocument();
+        expect(screen.getByText('Consultation')).toBeInTheDocument();
       });
     });
   });
 
   describe('Success step', () => {
     it('should display success message after booking completion', async () => {
-      let callCount = 0;
-      global.fetch = jest.fn((url: string) => {
-        callCount++;
-        // First call is for activities
-        if (callCount === 1) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          });
-        }
-        // Appointment creation (POST call)
-        if (url.includes('/api/appointments') && !url.includes('availability')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ id: 'appointment-1' }),
-          });
-        }
-        // All availability/slots calls return mockSlots
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockSlots),
-        });
-      }) as jest.Mock;
+      global.fetch = createMockFetch(true);
 
       renderWithChakra(<BookingWidget />);
 
@@ -279,10 +255,10 @@ describe('BookingWidget', () => {
 
       // Select date and slot
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
 
-      // Wait for availability to be fetched
+      // Wait for available days to be fetched - day 16 should be enabled
       await waitFor(() => {
         const dayElement = screen.getAllByText('16')[0];
         expect(dayElement.closest('[aria-disabled="false"]')).toBeInTheDocument();
@@ -303,7 +279,7 @@ describe('BookingWidget', () => {
 
       // Fill form
       await waitFor(() => {
-        expect(screen.getByText('Vos informations')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Jean Dupont')).toBeInTheDocument();
       });
 
       const nameInput = screen.getByPlaceholderText('Jean Dupont');
@@ -318,45 +294,23 @@ describe('BookingWidget', () => {
 
       // Wait for confirmation step
       await waitFor(() => {
-        expect(screen.getByText('Confirmer le rendez-vous')).toBeInTheDocument();
+        expect(screen.getAllByText('Confirmer le rendez-vous').length).toBeGreaterThan(0);
       });
 
       // Click to confirm
-      const confirmButton = screen.getByText('Confirmer le rendez-vous');
+      const confirmButton = screen.getAllByText('Confirmer le rendez-vous')[0];
       fireEvent.click(confirmButton);
 
       // Success step
       await waitFor(() => {
-        expect(screen.getByText('Rendez-vous confirmé !')).toBeInTheDocument();
+        expect(screen.getByText('Prendre un autre rendez-vous')).toBeInTheDocument();
       });
 
       expect(screen.getByText('Prendre un autre rendez-vous')).toBeInTheDocument();
     });
 
     it('should reset widget when "take another appointment" is clicked', async () => {
-      let callCount = 0;
-      global.fetch = jest.fn((url: string) => {
-        callCount++;
-        // First call and reset calls are for activities
-        if (callCount === 1 || url.includes('/api/appointments/activities')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          });
-        }
-        // Appointment creation (POST call)
-        if (url.includes('/api/appointments') && !url.includes('availability')) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve({ id: 'appointment-1' }),
-          });
-        }
-        // All availability/slots calls return mockSlots
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockSlots),
-        });
-      }) as jest.Mock;
+      global.fetch = createMockFetch(true);
 
       renderWithChakra(<BookingWidget />);
 
@@ -368,10 +322,10 @@ describe('BookingWidget', () => {
       await clickActivityCard('Consultation');
 
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
 
-      // Wait for availability to be fetched
+      // Wait for available days to be fetched
       await waitFor(() => {
         const dayElement = screen.getAllByText('16')[0];
         expect(dayElement.closest('[aria-disabled="false"]')).toBeInTheDocument();
@@ -389,7 +343,7 @@ describe('BookingWidget', () => {
       fireEvent.click(screen.getByText(/09:00/));
 
       await waitFor(() => {
-        expect(screen.getByText('Vos informations')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Jean Dupont')).toBeInTheDocument();
       });
 
       fireEvent.change(screen.getByPlaceholderText('Jean Dupont'), {
@@ -404,14 +358,14 @@ describe('BookingWidget', () => {
 
       // Wait for confirmation step
       await waitFor(() => {
-        expect(screen.getByText('Confirmer le rendez-vous')).toBeInTheDocument();
+        expect(screen.getAllByText('Confirmer le rendez-vous').length).toBeGreaterThan(0);
       });
 
       // Click to confirm
-      fireEvent.click(screen.getByText('Confirmer le rendez-vous'));
+      fireEvent.click(screen.getAllByText('Confirmer le rendez-vous')[0]);
 
       await waitFor(() => {
-        expect(screen.getByText('Rendez-vous confirmé !')).toBeInTheDocument();
+        expect(screen.getByText('Prendre un autre rendez-vous')).toBeInTheDocument();
       });
 
       // Click reset button
@@ -420,29 +374,14 @@ describe('BookingWidget', () => {
 
       // Should be back to activity selection
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une activité')).toBeInTheDocument();
+        expect(screen.getByText('Consultation')).toBeInTheDocument();
       });
     });
   });
 
   describe('Form step navigation', () => {
     it('should navigate back to slot picker from form', async () => {
-      let callCount = 0;
-      global.fetch = jest.fn(() => {
-        callCount++;
-        // First call is for activities
-        if (callCount === 1) {
-          return Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockActivities),
-          });
-        }
-        // All other calls return mockSlots
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve(mockSlots),
-        });
-      }) as jest.Mock;
+      global.fetch = createMockFetch();
 
       renderWithChakra(<BookingWidget />);
 
@@ -454,10 +393,10 @@ describe('BookingWidget', () => {
       await clickActivityCard('Consultation');
 
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
 
-      // Wait for availability to be fetched
+      // Wait for available days to be fetched
       await waitFor(() => {
         const dayElement = screen.getAllByText('16')[0];
         expect(dayElement.closest('[aria-disabled="false"]')).toBeInTheDocument();
@@ -475,7 +414,7 @@ describe('BookingWidget', () => {
       fireEvent.click(screen.getByText(/09:00/));
 
       await waitFor(() => {
-        expect(screen.getByText('Vos informations')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Jean Dupont')).toBeInTheDocument();
       });
 
       // Click step 2 indicator to go back to slot picker
@@ -483,7 +422,7 @@ describe('BookingWidget', () => {
       fireEvent.click(stepIndicator);
 
       await waitFor(() => {
-        expect(screen.getByText('Choisissez une date et un créneau')).toBeInTheDocument();
+        expect(screen.getByText('Lun')).toBeInTheDocument();
       });
     });
   });

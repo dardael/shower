@@ -32,7 +32,10 @@ interface WeeklySlotData {
 }
 
 interface ExceptionData {
-  date: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
   reason: string;
 }
 
@@ -44,6 +47,31 @@ interface AvailabilityEditorProps {
   isLoading?: boolean;
 }
 
+function formatDateFr(dateStr: string): string {
+  const date = new Date(dateStr + 'T00:00:00');
+  return date.toLocaleDateString('fr-FR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+function formatException(exception: ExceptionData): string {
+  const isSingleDay = exception.startDate === exception.endDate;
+  const hasTime = exception.startTime && exception.endTime;
+
+  const dateLabel = isSingleDay
+    ? formatDateFr(exception.startDate)
+    : `du ${formatDateFr(exception.startDate)} au ${formatDateFr(exception.endDate)}`;
+
+  if (hasTime) {
+    return `${dateLabel} · ${exception.startTime} – ${exception.endTime}`;
+  }
+
+  return dateLabel;
+}
+
 export function AvailabilityEditor({
   weeklySlots,
   exceptions,
@@ -52,13 +80,17 @@ export function AvailabilityEditor({
   isLoading = false,
 }: AvailabilityEditorProps): React.ReactElement {
   const { themeColor } = useThemeColorContext();
+
   const [newSlot, setNewSlot] = useState<WeeklySlotData>({
     dayOfWeek: 1,
     startTime: '09:00',
     endTime: '17:00',
   });
   const [newException, setNewException] = useState<ExceptionData>({
-    date: '',
+    startDate: '',
+    endDate: '',
+    startTime: '',
+    endTime: '',
     reason: '',
   });
   const [slotError, setSlotError] = useState<string>('');
@@ -88,55 +120,83 @@ export function AvailabilityEditor({
   };
 
   const handleRemoveSlot = (slotToRemove: WeeklySlotData): void => {
-    const updatedSlots = weeklySlots.filter(
-      (slot) =>
-        !(
-          slot.dayOfWeek === slotToRemove.dayOfWeek &&
-          slot.startTime === slotToRemove.startTime &&
-          slot.endTime === slotToRemove.endTime
-        )
+    onSlotsChange(
+      weeklySlots.filter(
+        (slot) =>
+          !(
+            slot.dayOfWeek === slotToRemove.dayOfWeek &&
+            slot.startTime === slotToRemove.startTime &&
+            slot.endTime === slotToRemove.endTime
+          )
+      )
     );
-    onSlotsChange(updatedSlots);
   };
 
   const handleAddException = (): void => {
     setExceptionError('');
 
-    if (!newException.date) {
-      setExceptionError('Une date est requise');
+    if (!newException.startDate) {
+      setExceptionError('Une date de début est requise');
       return;
     }
 
-    const hasDuplicate = exceptions.some((e) => e.date === newException.date);
-    if (hasDuplicate) {
-      setExceptionError('Une exception existe déjà pour cette date');
+    const endDate = newException.endDate || newException.startDate;
+
+    if (endDate < newException.startDate) {
+      setExceptionError('La date de fin doit être après la date de début');
       return;
     }
 
-    onExceptionsChange([...exceptions, { ...newException }]);
-    setNewException({ date: '', reason: '' });
+    const hasTime = !!(newException.startTime && newException.endTime);
+    if (hasTime && newException.endTime <= newException.startTime) {
+      setExceptionError("L'heure de fin doit être après l'heure de début");
+      return;
+    }
+
+    if (
+      (newException.startTime && !newException.endTime) ||
+      (!newException.startTime && newException.endTime)
+    ) {
+      setExceptionError(
+        "L'heure de début et l'heure de fin doivent être fournies ensemble"
+      );
+      return;
+    }
+
+    const exception: ExceptionData = {
+      startDate: newException.startDate,
+      endDate: endDate,
+      startTime: newException.startTime,
+      endTime: newException.endTime,
+      reason: newException.reason,
+    };
+
+    onExceptionsChange([...exceptions, exception]);
+    setNewException({
+      startDate: '',
+      endDate: '',
+      startTime: '',
+      endTime: '',
+      reason: '',
+    });
   };
 
-  const handleRemoveException = (exceptionToRemove: ExceptionData): void => {
-    const updatedExceptions = exceptions.filter(
-      (exception) => exception.date !== exceptionToRemove.date
-    );
-    onExceptionsChange(updatedExceptions);
+  const handleRemoveException = (index: number): void => {
+    onExceptionsChange(exceptions.filter((_, i) => i !== index));
   };
 
   const sortedSlots = [...weeklySlots].sort((a, b) => {
-    if (a.dayOfWeek !== b.dayOfWeek) {
-      return a.dayOfWeek - b.dayOfWeek;
-    }
+    if (a.dayOfWeek !== b.dayOfWeek) return a.dayOfWeek - b.dayOfWeek;
     return a.startTime.localeCompare(b.startTime);
   });
 
-  const sortedExceptions = [...exceptions].sort((a, b) =>
-    a.date.localeCompare(b.date)
-  );
+  const sortedExceptions = exceptions
+    .map((e, i) => ({ ...e, originalIndex: i }))
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
   return (
     <VStack gap={6} align="stretch">
+      {/* Créneaux hebdomadaires */}
       <Box>
         <Heading size="md" mb={4}>
           Créneaux hebdomadaires
@@ -160,7 +220,7 @@ export function AvailabilityEditor({
                     {FRENCH_DAY_NAMES[slot.dayOfWeek]}
                   </Text>
                   <Text>
-                    {slot.startTime} - {slot.endTime}
+                    {slot.startTime} – {slot.endTime}
                   </Text>
                 </HStack>
                 <IconButton
@@ -259,10 +319,15 @@ export function AvailabilityEditor({
         </Box>
       </Box>
 
+      {/* Exceptions */}
       <Box>
-        <Heading size="md" mb={4}>
-          Exceptions (jours fermés)
+        <Heading size="md" mb={1}>
+          Exceptions
         </Heading>
+        <Text fontSize="sm" color="gray.500" mb={4}>
+          Définissez les périodes où vous n&apos;êtes pas disponible (journées
+          entières ou plages horaires).
+        </Text>
 
         <VStack gap={3} align="stretch" mb={4}>
           {sortedExceptions.length === 0 ? (
@@ -270,32 +335,27 @@ export function AvailabilityEditor({
           ) : (
             sortedExceptions.map((exception) => (
               <Flex
-                key={exception.date}
+                key={`${exception.startDate}-${exception.endDate}-${exception.startTime}-${exception.endTime}`}
                 align="center"
                 justify="space-between"
                 p={3}
                 borderWidth={1}
                 borderRadius="md"
               >
-                <HStack gap={4}>
-                  <Text fontWeight="medium">
-                    {new Date(exception.date).toLocaleDateString('fr-FR', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </Text>
+                <VStack align="start" gap={0}>
+                  <Text fontWeight="medium">{formatException(exception)}</Text>
                   {exception.reason && (
-                    <Text color="gray.500">({exception.reason})</Text>
+                    <Text fontSize="sm" color="gray.500">
+                      {exception.reason}
+                    </Text>
                   )}
-                </HStack>
+                </VStack>
                 <IconButton
                   aria-label="Supprimer l'exception"
                   size="sm"
                   colorPalette="red"
                   variant="solid"
-                  onClick={() => handleRemoveException(exception)}
+                  onClick={() => handleRemoveException(exception.originalIndex)}
                   disabled={isLoading}
                 >
                   <FiTrash2 color="white" />
@@ -318,17 +378,69 @@ export function AvailabilityEditor({
           <Flex gap={3} wrap="wrap" align="flex-end">
             <Box>
               <Text fontSize="sm" mb={1}>
-                Date
+                Date de début
               </Text>
               <Input
                 type="date"
-                value={newException.date}
+                value={newException.startDate}
                 onChange={(e) =>
-                  setNewException({ ...newException, date: e.target.value })
+                  setNewException({
+                    ...newException,
+                    startDate: e.target.value,
+                  })
                 }
                 disabled={isLoading}
                 size="sm"
                 width="160px"
+              />
+            </Box>
+            <Box>
+              <Text fontSize="sm" mb={1}>
+                Date de fin
+              </Text>
+              <Input
+                type="date"
+                value={newException.endDate}
+                min={newException.startDate}
+                onChange={(e) =>
+                  setNewException({ ...newException, endDate: e.target.value })
+                }
+                disabled={isLoading}
+                size="sm"
+                width="160px"
+              />
+            </Box>
+            <Box>
+              <Text fontSize="sm" mb={1}>
+                Heure de début (optionnel)
+              </Text>
+              <Input
+                type="time"
+                value={newException.startTime}
+                onChange={(e) =>
+                  setNewException({
+                    ...newException,
+                    startTime: e.target.value,
+                  })
+                }
+                disabled={isLoading}
+                size="sm"
+                width="120px"
+              />
+            </Box>
+            <Box>
+              <Text fontSize="sm" mb={1}>
+                Heure de fin (optionnel)
+              </Text>
+              <Input
+                type="time"
+                value={newException.endTime}
+                onChange={(e) =>
+                  setNewException({ ...newException, endTime: e.target.value })
+                }
+                disabled={isLoading}
+                size="sm"
+                width="120px"
               />
             </Box>
             <Box>
@@ -341,7 +453,7 @@ export function AvailabilityEditor({
                 onChange={(e) =>
                   setNewException({ ...newException, reason: e.target.value })
                 }
-                placeholder="Ex: Jour férié"
+                placeholder="Ex: Congés, Réunion…"
                 disabled={isLoading}
                 size="sm"
                 width="200px"

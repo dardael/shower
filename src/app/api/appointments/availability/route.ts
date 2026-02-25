@@ -18,7 +18,10 @@ function availabilityToResponse(
       endTime: slot.endTime,
     })),
     exceptions: availability.exceptions.map((exception) => ({
-      date: exception.date.toISOString().split('T')[0],
+      startDate: exception.startDate.toISOString().split('T')[0],
+      endDate: exception.endDate.toISOString().split('T')[0],
+      startTime: exception.startTime,
+      endTime: exception.endTime,
       reason: exception.reason,
     })),
   };

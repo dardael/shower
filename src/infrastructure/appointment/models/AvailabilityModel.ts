@@ -8,7 +8,10 @@ interface IWeeklySlot {
 }
 
 interface IException {
-  date: Date;
+  startDate: Date;
+  endDate: Date;
+  startTime?: string;
+  endTime?: string;
   reason?: string;
 }
 
@@ -43,9 +46,21 @@ const WeeklySlotSchema = new Schema<IWeeklySlot>(
 
 const ExceptionSchema = new Schema<IException>(
   {
-    date: {
+    startDate: {
       type: Date,
       required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+    },
+    startTime: {
+      type: String,
+      match: TIME_REGEX,
+    },
+    endTime: {
+      type: String,
+      match: TIME_REGEX,
     },
     reason: {
       type: String,
@@ -72,16 +87,11 @@ const AvailabilitySchema = new Schema<IAvailabilityDocument>(
   }
 );
 
-// Indexes for efficient queries
-AvailabilitySchema.index({ 'exceptions.date': 1 });
+AvailabilitySchema.index({ 'exceptions.startDate': 1 });
 AvailabilitySchema.index({ 'weeklySlots.dayOfWeek': 1 });
 
-// Singleton constraint - ensures only one availability document can exist
-// We create a unique index on a constant field that doesn't exist in the schema
-// This forces all documents to have the same value and thus only one can exist
 AvailabilitySchema.index({ singleton: 1 }, { unique: true, sparse: false });
 
-// Pre-save hook to ensure singleton constraint
 AvailabilitySchema.pre('save', function (next) {
   this.singleton = 1;
   next();

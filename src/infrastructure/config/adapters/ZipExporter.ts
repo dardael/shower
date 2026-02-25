@@ -307,7 +307,10 @@ export class ZipExporter implements IConfigurationExporter {
       id: availability.id,
       weeklySlots: availability.weeklySlots.map((slot) => slot.toObject()),
       exceptions: availability.exceptions.map((exception) => ({
-        date: exception.date.toISOString(),
+        startDate: exception.startDate.toISOString().split('T')[0],
+        endDate: exception.endDate.toISOString().split('T')[0],
+        startTime: exception.startTime,
+        endTime: exception.endTime,
         reason: exception.reason,
       })),
       updatedAt: availability.updatedAt.toISOString(),

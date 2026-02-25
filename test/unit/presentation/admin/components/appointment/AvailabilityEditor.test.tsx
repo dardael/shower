@@ -49,7 +49,7 @@ describe('AvailabilityEditor', () => {
     it('should render exceptions section', () => {
       renderWithChakra(<AvailabilityEditor {...defaultProps} />);
 
-      expect(screen.getByText('Exceptions (jours fermés)')).toBeInTheDocument();
+      expect(screen.getByText('Exceptions')).toBeInTheDocument();
       expect(screen.getByText('Ajouter une exception')).toBeInTheDocument();
     });
 
@@ -76,18 +76,26 @@ describe('AvailabilityEditor', () => {
       );
 
       expect(screen.getAllByText('Lundi').length).toBeGreaterThanOrEqual(2);
-      expect(screen.getByText('09:00 - 12:00')).toBeInTheDocument();
-      expect(screen.getByText('14:00 - 18:00')).toBeInTheDocument();
+      expect(screen.getByText('09:00 – 12:00')).toBeInTheDocument();
+      expect(screen.getByText('14:00 – 18:00')).toBeInTheDocument();
     });
 
     it('should display existing exceptions with reason', () => {
-      const exceptions = [{ date: '2024-12-25', reason: 'Noël' }];
+      const exceptions = [
+        {
+          startDate: '2024-12-25',
+          endDate: '2024-12-25',
+          startTime: '',
+          endTime: '',
+          reason: 'Noël',
+        },
+      ];
 
       renderWithChakra(
         <AvailabilityEditor {...defaultProps} exceptions={exceptions} />
       );
 
-      expect(screen.getByText('(Noël)')).toBeInTheDocument();
+      expect(screen.getByText('Noël')).toBeInTheDocument();
     });
   });
 
@@ -201,7 +209,13 @@ describe('AvailabilityEditor', () => {
       fireEvent.click(addButtons[1]);
 
       expect(mockOnExceptionsChange).toHaveBeenCalledWith([
-        { date: '2024-12-25', reason: '' },
+        {
+          startDate: '2024-12-25',
+          endDate: '2024-12-25',
+          startTime: '',
+          endTime: '',
+          reason: '',
+        },
       ]);
     });
 
@@ -211,29 +225,8 @@ describe('AvailabilityEditor', () => {
       const addButtons = screen.getAllByText('Ajouter');
       fireEvent.click(addButtons[1]);
 
-      expect(screen.getByText('Une date est requise')).toBeInTheDocument();
-      expect(mockOnExceptionsChange).not.toHaveBeenCalled();
-    });
-
-    it('should show error when exception already exists for date', () => {
-      const exceptions = [{ date: '2024-12-25', reason: 'Noël' }];
-
-      renderWithChakra(
-        <AvailabilityEditor {...defaultProps} exceptions={exceptions} />
-      );
-
-      const dateInputs = screen.getAllByDisplayValue('');
-      const dateInput = dateInputs.find(
-        (input) => input.getAttribute('type') === 'date'
-      );
-
-      fireEvent.change(dateInput!, { target: { value: '2024-12-25' } });
-
-      const addButtons = screen.getAllByText('Ajouter');
-      fireEvent.click(addButtons[1]);
-
       expect(
-        screen.getByText('Une exception existe déjà pour cette date')
+        screen.getByText('Une date de début est requise')
       ).toBeInTheDocument();
       expect(mockOnExceptionsChange).not.toHaveBeenCalled();
     });
@@ -242,8 +235,20 @@ describe('AvailabilityEditor', () => {
   describe('Removing Exceptions', () => {
     it('should call onExceptionsChange when removing an exception', () => {
       const exceptions = [
-        { date: '2024-01-01', reason: 'Nouvel an' },
-        { date: '2024-12-25', reason: 'Noël' },
+        {
+          startDate: '2024-01-01',
+          endDate: '2024-01-01',
+          startTime: '',
+          endTime: '',
+          reason: 'Nouvel an',
+        },
+        {
+          startDate: '2024-12-25',
+          endDate: '2024-12-25',
+          startTime: '',
+          endTime: '',
+          reason: 'Noël',
+        },
       ];
 
       renderWithChakra(
@@ -255,7 +260,13 @@ describe('AvailabilityEditor', () => {
       fireEvent.click(deleteButtons[0]);
 
       expect(mockOnExceptionsChange).toHaveBeenCalledWith([
-        { date: '2024-12-25', reason: 'Noël' },
+        {
+          startDate: '2024-12-25',
+          endDate: '2024-12-25',
+          startTime: '',
+          endTime: '',
+          reason: 'Noël',
+        },
       ]);
     });
   });
@@ -289,7 +300,6 @@ describe('AvailabilityEditor', () => {
         <AvailabilityEditor {...defaultProps} weeklySlots={weeklySlots} />
       );
 
-      // Each day name appears in slot display + in dropdown, so use getAllByText
       expect(screen.getAllByText('Dimanche').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Lundi').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Mardi').length).toBeGreaterThanOrEqual(1);

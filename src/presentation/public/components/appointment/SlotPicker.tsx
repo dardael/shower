@@ -59,6 +59,8 @@ export function SlotPicker({
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [availableDays, setAvailableDays] = useState<Set<string>>(new Set());
+  const [isDaysLoading, setIsDaysLoading] = useState(false);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
@@ -68,13 +70,38 @@ export function SlotPicker({
 
   const isPrevWeekInPast = false;
 
+  function toDateString(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  const fetchAvailableDays = useCallback(
+    async (weekStartDate: Date): Promise<void> => {
+      setIsDaysLoading(true);
+      try {
+        const weekStartStr = toDateString(weekStartDate);
+        const response = await fetch(
+          `/api/appointments/availability/days?activityId=${activityId}&weekStart=${weekStartStr}`
+        );
+        if (!response.ok) throw new Error('Impossible de charger les jours disponibles');
+        const data: string[] = await response.json();
+        setAvailableDays(new Set(data));
+      } catch (err) {
+        frontendLog.error('Erreur chargement jours disponibles:', err instanceof Error ? { message: err.message } : { error: err });
+        setAvailableDays(new Set());
+      } finally {
+        setIsDaysLoading(false);
+      }
+    },
+    [activityId]
+  );
+
   const fetchSlots = useCallback(
     async (date: Date): Promise<void> => {
       setIsLoading(true);
       setError(null);
       setSlots([]);
       try {
-        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const dateStr = toDateString(date);
         const response = await fetch(
           `/api/appointments/availability/slots?activityId=${activityId}&date=${dateStr}`
         );
@@ -92,6 +119,11 @@ export function SlotPicker({
   );
 
   useEffect(() => {
+    fetchAvailableDays(weekStart);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekStart, activityId]);
+
+  useEffect(() => {
     const firstAvailableDay = weekDays.find((d) => d >= today);
     if (firstAvailableDay) {
       setSelectedDay(firstAvailableDay);
@@ -107,8 +139,14 @@ export function SlotPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const isDayDisabled = (day: Date): boolean => {
+    if (day < today) return true;
+    if (isDaysLoading) return true;
+    return !availableDays.has(toDateString(day));
+  };
+
   const handleDayClick = (day: Date): void => {
-    if (day < today) return;
+    if (isDayDisabled(day)) return;
     setSelectedDay(day);
     fetchSlots(day);
   };
@@ -196,7 +234,7 @@ export function SlotPicker({
         {/* Day selector */}
         <Grid templateColumns="repeat(7, 1fr)" gap={0}>
           {weekDays.map((day, idx) => {
-            const isPast = day < today;
+            const disabled = isDayDisabled(day);
             const isToday = isSameDay(day, today);
             const isSelected = selectedDay ? isSameDay(day, selectedDay) : false;
 
@@ -204,27 +242,27 @@ export function SlotPicker({
               <Box
                 key={idx}
                 role="button"
-                tabIndex={isPast ? -1 : 0}
-                aria-disabled={isPast}
+                tabIndex={disabled ? -1 : 0}
+                aria-disabled={disabled}
                 onClick={() => handleDayClick(day)}
                 onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && !isPast) {
+                  if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
                     e.preventDefault();
                     handleDayClick(day);
                   }
                 }}
-                cursor={isPast ? 'not-allowed' : 'pointer'}
+                cursor={disabled ? 'not-allowed' : 'pointer'}
                 py={3}
                 px={1}
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
                 gap={1}
-                opacity={isPast ? 0.3 : 1}
+                opacity={disabled ? 0.3 : 1}
                 transition="all 0.15s"
                 bg={isSelected ? `${themeColor}.solid` : 'transparent'}
                 _hover={
-                  !isPast && !isSelected
+                  !disabled && !isSelected
                     ? { bg: `${themeColor}.subtle` }
                     : {}
                 }
