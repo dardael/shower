@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { CustomLoaderData } from '@/presentation/shared/components/PublicPageLoader';
 import { useLoaderBackgroundColorContext } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
-const MIN_LOADING_DISPLAY_MS = 1000;
+const MIN_LOADING_DISPLAY_MS = 3000;
 
 export interface UseAdminLoadStateReturn {
   isLoading: boolean;

@@ -70,7 +70,7 @@ export function usePublicLayoutData(): UsePublicLayoutDataReturn {
       setMinLoaderElapsed(true);
       return;
     }
-    const timer = setTimeout(() => setMinLoaderElapsed(true), 1000);
+    const timer = setTimeout(() => setMinLoaderElapsed(true), 3000);
     return () => clearTimeout(timer);
   }, [loaderChecked, customLoader]);
 
