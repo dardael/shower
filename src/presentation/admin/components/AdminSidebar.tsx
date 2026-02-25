@@ -69,17 +69,23 @@ const menuItems = [
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const logger = useLogger();
-  const { sellingEnabled } = useSellingConfig();
-  const { isEnabled: appointmentModuleEnabled } = useAppointmentModule();
+  const { sellingEnabled, isLoading: sellingLoading } = useSellingConfig();
+  const { isEnabled: appointmentModuleEnabled, isLoading: appointmentLoading } =
+    useAppointmentModule();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   // Filter menu items based on module enabled states
+  // While loading, show email menu to avoid flash of missing content
+  const modulesLoading = sellingLoading || appointmentLoading;
   const visibleMenuItems = menuItems.filter((item) => {
     if (item.href === '/admin/products') {
       return sellingEnabled;
     }
     if (item.href === '/admin/appointments') {
       return appointmentModuleEnabled;
+    }
+    if (item.href === '/admin/email') {
+      return modulesLoading || sellingEnabled || appointmentModuleEnabled;
     }
     return true;
   });
