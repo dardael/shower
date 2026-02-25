@@ -93,7 +93,7 @@ export function PublicPageLoader({
         aria-live="polite"
         aria-label="Loading page content"
         data-testid="page-loading-spinner"
-        style={backgroundColor ? { backgroundColor } : undefined}
+        background={backgroundColor ?? undefined}
       >
         {showCustomLoader ? (
           customLoader.type === 'gif' ? (

@@ -76,16 +76,33 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
 
   // Fetch custom loader immediately on mount (before other data)
   useEffect(() => {
-    const fetchLoader = async () => {
+    const fetchLoaderData = async () => {
       try {
-        const response = await fetch('/api/public/loader', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (response.ok) {
-          const result = await response.json();
+        const [loaderResponse, bgColorResponse] = await Promise.allSettled([
+          fetch('/api/public/loader', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }),
+          fetch('/api/public/loader-background-color', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        ]);
+
+        if (loaderResponse.status === 'fulfilled' && loaderResponse.value.ok) {
+          const result = await loaderResponse.value.json();
           if (result.loader) {
             setCustomLoader(result.loader);
+          }
+        }
+
+        if (
+          bgColorResponse.status === 'fulfilled' &&
+          bgColorResponse.value.ok
+        ) {
+          const result = await bgColorResponse.value.json();
+          if (result.value) {
+            setLoaderBackgroundColor(result.value);
           }
         }
       } catch {
@@ -94,24 +111,7 @@ export function usePublicPageData(slug: string): UsePublicPageDataReturn & {
         setLoaderChecked(true);
       }
     };
-    const fetchLoaderBackgroundColor = async () => {
-      try {
-        const response = await fetch('/api/public/loader-background-color', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (response.ok) {
-          const result = await response.json();
-          if (result.value) {
-            setLoaderBackgroundColor(result.value);
-          }
-        }
-      } catch {
-        // Loader background color is optional, ignore errors
-      }
-    };
-    fetchLoader();
-    fetchLoaderBackgroundColor();
+    fetchLoaderData();
   }, []);
 
   // Fetch all data sources in parallel
