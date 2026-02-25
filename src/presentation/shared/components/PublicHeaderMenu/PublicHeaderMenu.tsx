@@ -96,7 +96,11 @@ export function PublicHeaderMenu({
           >
             <Flex align="center" gap={{ base: 2, md: 4 }}>
               {logo && !logoError && (
-                <Link href="/" aria-label="Aller à l'accueil">
+                <Link
+                  href="/"
+                  aria-label="Aller à l'accueil"
+                  style={{ background: 'transparent' }}
+                >
                   <Image
                     src={logo.url}
                     alt="Logo du site"
@@ -104,6 +108,7 @@ export function PublicHeaderMenu({
                     w="auto"
                     objectFit="contain"
                     cursor="pointer"
+                    bg="transparent"
                     onError={() => setLogoError(true)}
                   />
                 </Link>
@@ -169,7 +174,11 @@ export function PublicHeaderMenu({
           {/* Left: Logo */}
           <Flex align="center" flexShrink={0}>
             {logo && !logoError && (
-              <Link href="/" aria-label="Aller à l'accueil">
+              <Link
+                href="/"
+                aria-label="Aller à l'accueil"
+                style={{ background: 'transparent' }}
+              >
                 <Image
                   src={logo.url}
                   alt="Logo du site"
@@ -177,6 +186,7 @@ export function PublicHeaderMenu({
                   w="auto"
                   objectFit="contain"
                   cursor="pointer"
+                  bg="transparent"
                   onError={() => setLogoError(true)}
                 />
               </Link>
