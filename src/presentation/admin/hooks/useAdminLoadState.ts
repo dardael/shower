@@ -5,41 +5,32 @@ import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorC
 import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
 import { useThemeModeConfig } from '@/presentation/shared/contexts/ThemeModeContext';
 import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
-import type { PageLoadError } from '@/types/page-load-state';
 import type { CustomLoaderData } from '@/presentation/shared/components/PublicPageLoader';
 import { useLoaderBackgroundColorContext } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
-// Timeout duration for loading - consistent with public side (PublicPageLoader)
-const TIMEOUT_MS = 10000;
 // Minimum display time ensures custom loader is visible even when settings load instantly from cache
-const MIN_LOADING_DISPLAY_MS = 500;
+const MIN_LOADING_DISPLAY_MS = 1000;
 
 export interface UseAdminLoadStateReturn {
   isLoading: boolean;
-  isError: boolean;
-  error: PageLoadError | null;
   customLoader: CustomLoaderData | null;
   loaderBackgroundColor: string | null;
-  retry: () => void;
 }
 
 /**
  * Hook that aggregates loading states from all essential admin settings contexts.
- * Fetches custom loader configuration and provides timeout/error handling.
+ * Fetches custom loader configuration.
+ * Only shows the loading screen if a custom loader is configured.
+ * Ensures the loader is displayed for at least MIN_LOADING_DISPLAY_MS.
  */
 export function useAdminLoadState(): UseAdminLoadStateReturn {
-  const { isLoading: themeColorLoading, refreshThemeColor } =
-    useThemeColorContext();
-  const { isLoading: backgroundColorLoading, refreshBackgroundColor } =
-    useBackgroundColorContext();
-  const { isLoading: themeModeLoading, refreshThemeMode } =
-    useThemeModeConfig();
-  const { isLoading: fontLoading, refreshWebsiteFont } =
-    useWebsiteFontContext();
+  const { isLoading: themeColorLoading } = useThemeColorContext();
+  const { isLoading: backgroundColorLoading } = useBackgroundColorContext();
+  const { isLoading: themeModeLoading } = useThemeModeConfig();
+  const { isLoading: fontLoading } = useWebsiteFontContext();
   const {
     value: loaderBackgroundColor,
     isLoading: loaderBackgroundColorLoading,
-    refreshValue: refreshLoaderBackgroundColor,
   } = useLoaderBackgroundColorContext();
 
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
@@ -47,9 +38,7 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
   );
   const [loaderFetched, setLoaderFetched] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-  const [error, setError] = useState<PageLoadError | null>(null);
-  const [timedOut, setTimedOut] = useState(false);
-  const hasShownLoader = useRef(false);
+  const minTimerStarted = useRef(false);
 
   const fetchCustomLoader = useCallback(async (): Promise<void> => {
     try {
@@ -71,20 +60,18 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     fetchCustomLoader();
   }, [fetchCustomLoader]);
 
-  // Ensure minimum display time for loading screen on first load
+  // Start minimum display timer only once a custom loader is confirmed
   useEffect(() => {
-    if (!hasShownLoader.current) {
-      hasShownLoader.current = true;
-      const timer = setTimeout(() => {
-        setMinTimeElapsed(true);
-      }, MIN_LOADING_DISPLAY_MS);
-      return () => clearTimeout(timer);
-    } else {
-      setMinTimeElapsed(true);
+    if (!loaderFetched || !customLoader || minTimerStarted.current) {
+      return;
     }
-  }, []);
+    minTimerStarted.current = true;
+    const timer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, MIN_LOADING_DISPLAY_MS);
+    return () => clearTimeout(timer);
+  }, [loaderFetched, customLoader]);
 
-  // Settings are loading if any context is still loading
   const settingsLoading =
     themeColorLoading ||
     backgroundColorLoading ||
@@ -92,60 +79,15 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     fontLoading ||
     loaderBackgroundColorLoading;
 
-  // Show loading screen until:
-  // 1. Custom loader is fetched
-  // 2. AND minimum display time has elapsed (so user can see the loader)
-  // 3. AND settings are done loading
-  const isLoading = !loaderFetched || !minTimeElapsed || settingsLoading;
-
-  useEffect(() => {
-    if (!isLoading) {
-      setTimedOut(false);
-      setError(null);
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      if (isLoading) {
-        setTimedOut(true);
-        setError({
-          message: 'Loading timed out. Please try again.',
-          failedSources: [],
-          isTimeout: true,
-          timestamp: Date.now(),
-        });
-      }
-    }, TIMEOUT_MS);
-
-    return (): void => {
-      clearTimeout(timeout);
-    };
-  }, [isLoading]);
-
-  const retry = useCallback((): void => {
-    setError(null);
-    setTimedOut(false);
-    refreshThemeColor();
-    refreshBackgroundColor();
-    refreshThemeMode();
-    refreshWebsiteFont();
-    refreshLoaderBackgroundColor();
-    fetchCustomLoader();
-  }, [
-    refreshThemeColor,
-    refreshBackgroundColor,
-    refreshThemeMode,
-    refreshWebsiteFont,
-    refreshLoaderBackgroundColor,
-    fetchCustomLoader,
-  ]);
+  // Only show loading screen if a custom loader is configured,
+  // and keep it until min time elapsed and settings are done
+  const isLoading =
+    !loaderFetched ||
+    (customLoader !== null && (!minTimeElapsed || settingsLoading));
 
   return {
-    isLoading: isLoading && !timedOut,
-    isError: timedOut,
-    error,
+    isLoading,
     customLoader,
     loaderBackgroundColor,
-    retry,
   };
 }

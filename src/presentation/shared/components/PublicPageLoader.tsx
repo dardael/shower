@@ -101,11 +101,11 @@ export function PublicPageLoader({
               src={customLoader.url}
               alt="Loading"
               data-testid="custom-loader-gif"
-              width={150}
-              height={150}
+              width={300}
+              height={300}
               style={{
-                maxHeight: '150px',
-                maxWidth: '150px',
+                maxHeight: '300px',
+                maxWidth: '300px',
                 objectFit: 'contain',
               }}
               unoptimized
@@ -120,7 +120,7 @@ export function PublicPageLoader({
               muted
               playsInline
               data-testid="custom-loader-video"
-              style={{ maxHeight: '150px', maxWidth: '150px' }}
+              style={{ maxHeight: '300px', maxWidth: '300px' }}
               onError={() => setLoaderError(true)}
             />
           )

@@ -10,27 +10,20 @@ export interface AdminLoadingScreenProps {
 
 /**
  * Wrapper component that displays a loading screen while essential admin settings are being fetched.
- * Uses the custom loader if configured, otherwise falls back to the default spinner.
- * Shows error state with retry option if loading times out.
+ * Only shows the loading screen if a custom loader is configured.
+ * Ensures the loader is displayed for at least 1 second.
  */
 export function AdminLoadingScreen({
   children,
 }: AdminLoadingScreenProps): ReactNode {
-  const {
-    isLoading,
-    isError,
-    error,
-    customLoader,
-    loaderBackgroundColor,
-    retry,
-  } = useAdminLoadState();
+  const { isLoading, customLoader, loaderBackgroundColor } =
+    useAdminLoadState();
 
-  if (isLoading || isError) {
+  if (isLoading && customLoader) {
     return (
       <PublicPageLoader
         isLoading={isLoading}
-        error={error}
-        onRetry={retry}
+        error={null}
         customLoader={customLoader}
         backgroundColor={loaderBackgroundColor}
       />
