@@ -1,10 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
-import { useBackgroundColorContext } from '@/presentation/shared/contexts/BackgroundColorContext';
-import { useThemeModeConfig } from '@/presentation/shared/contexts/ThemeModeContext';
-import { useWebsiteFontContext } from '@/presentation/shared/contexts/WebsiteFontContext';
 import type { CustomLoaderData } from '@/presentation/shared/components/PublicPageLoader';
 import { useLoaderBackgroundColorContext } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
@@ -18,20 +14,12 @@ export interface UseAdminLoadStateReturn {
 }
 
 /**
- * Hook that aggregates loading states from all essential admin settings contexts.
- * Fetches custom loader configuration.
+ * Hook that fetches custom loader configuration.
  * Only shows the loading screen if a custom loader is configured.
  * Ensures the loader is displayed for at least MIN_LOADING_DISPLAY_MS.
  */
 export function useAdminLoadState(): UseAdminLoadStateReturn {
-  const { isLoading: themeColorLoading } = useThemeColorContext();
-  const { isLoading: backgroundColorLoading } = useBackgroundColorContext();
-  const { isLoading: themeModeLoading } = useThemeModeConfig();
-  const { isLoading: fontLoading } = useWebsiteFontContext();
-  const {
-    value: loaderBackgroundColor,
-    isLoading: loaderBackgroundColorLoading,
-  } = useLoaderBackgroundColorContext();
+  const { value: loaderBackgroundColor } = useLoaderBackgroundColorContext();
 
   const [customLoader, setCustomLoader] = useState<CustomLoaderData | null>(
     null
@@ -60,7 +48,7 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     fetchCustomLoader();
   }, [fetchCustomLoader]);
 
-  // Start minimum display timer only once a custom loader is confirmed
+  // Start minimum display timer once a custom loader is confirmed
   useEffect(() => {
     if (!loaderFetched || !customLoader || minTimerStarted.current) {
       return;
@@ -72,18 +60,9 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     return () => clearTimeout(timer);
   }, [loaderFetched, customLoader]);
 
-  const settingsLoading =
-    themeColorLoading ||
-    backgroundColorLoading ||
-    themeModeLoading ||
-    fontLoading ||
-    loaderBackgroundColorLoading;
-
-  // Only show loading screen if a custom loader is configured,
-  // and keep it until min time elapsed and settings are done
+  // Show loader only if a custom loader exists, until min time has elapsed
   const isLoading =
-    !loaderFetched ||
-    (customLoader !== null && (!minTimeElapsed || settingsLoading));
+    !loaderFetched || (customLoader !== null && !minTimeElapsed);
 
   return {
     isLoading,
