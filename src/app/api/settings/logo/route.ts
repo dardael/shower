@@ -65,9 +65,9 @@ export const POST = withApi(
         );
       }
 
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         return NextResponse.json(
-          { error: 'File size too large. Maximum size is 2MB.' },
+          { error: 'File size too large. Maximum size is 10MB.' },
           { status: 400 }
         );
       }

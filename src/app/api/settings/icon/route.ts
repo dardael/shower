@@ -70,10 +70,10 @@ export const POST = withApi(
         );
       }
 
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
         return NextResponse.json(
-          { error: 'File size too large. Maximum size is 5MB.' },
+          { error: 'File size too large. Maximum size is 10MB.' },
           { status: 400 }
         );
       }
