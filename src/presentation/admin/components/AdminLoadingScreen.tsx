@@ -19,7 +19,11 @@ export function AdminLoadingScreen({
   const { isLoading, customLoader, loaderBackgroundColor } =
     useAdminLoadState();
 
-  if (isLoading && customLoader) {
+  if (isLoading) {
+    if (!customLoader) {
+      // Fetch not done yet — render nothing to avoid flash of unstyled content
+      return null;
+    }
     return (
       <PublicPageLoader
         isLoading={isLoading}

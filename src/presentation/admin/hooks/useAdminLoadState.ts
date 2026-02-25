@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { CustomLoaderData } from '@/presentation/shared/components/PublicPageLoader';
 import { useLoaderBackgroundColorContext } from '@/presentation/shared/contexts/LoaderBackgroundColorContext';
 
-// Minimum display time ensures custom loader is visible even when settings load instantly from cache
 const MIN_LOADING_DISPLAY_MS = 1000;
 
 export interface UseAdminLoadStateReturn {
@@ -16,6 +15,8 @@ export interface UseAdminLoadStateReturn {
 /**
  * Hook that fetches custom loader configuration.
  * Only shows the loading screen if a custom loader is configured.
+ * Starts the timer immediately on mount so the loader appears before
+ * the page content, ensuring no flash of unstyled content.
  * Ensures the loader is displayed for at least MIN_LOADING_DISPLAY_MS.
  */
 export function useAdminLoadState(): UseAdminLoadStateReturn {
@@ -26,7 +27,14 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
   );
   const [loaderFetched, setLoaderFetched] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-  const minTimerStarted = useRef(false);
+
+  // Start minimum display timer immediately on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, MIN_LOADING_DISPLAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   const fetchCustomLoader = useCallback(async (): Promise<void> => {
     try {
@@ -48,19 +56,8 @@ export function useAdminLoadState(): UseAdminLoadStateReturn {
     fetchCustomLoader();
   }, [fetchCustomLoader]);
 
-  // Start minimum display timer once a custom loader is confirmed
-  useEffect(() => {
-    if (!loaderFetched || !customLoader || minTimerStarted.current) {
-      return;
-    }
-    minTimerStarted.current = true;
-    const timer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, MIN_LOADING_DISPLAY_MS);
-    return () => clearTimeout(timer);
-  }, [loaderFetched, customLoader]);
-
-  // Show loader only if a custom loader exists, until min time has elapsed
+  // Show loader until both the fetch is done AND the min time has elapsed.
+  // If no custom loader is configured, stop loading immediately after fetch.
   const isLoading =
     !loaderFetched || (customLoader !== null && !minTimeElapsed);
 
