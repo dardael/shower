@@ -109,7 +109,6 @@ export function PublicHeaderMenu({
                     objectFit="contain"
                     cursor="pointer"
                     bg="transparent"
-                    style={{ mixBlendMode: 'multiply' }}
                     onError={() => setLogoError(true)}
                   />
                 </Link>
@@ -188,7 +187,6 @@ export function PublicHeaderMenu({
                   objectFit="contain"
                   cursor="pointer"
                   bg="transparent"
-                  style={{ mixBlendMode: 'multiply' }}
                   onError={() => setLogoError(true)}
                 />
               </Link>
