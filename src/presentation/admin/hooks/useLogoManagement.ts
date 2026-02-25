@@ -121,7 +121,7 @@ export function useLogoManagement(options: UseLogoManagementOptions = {}) {
 
   const logoConfig: ImageManagerConfig = {
     acceptedFormats: ['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp'],
-    maxFileSize: 2 * 1024 * 1024, // 2MB limit for logos
+    maxFileSize: 10 * 1024 * 1024, // 10MB limit for logos
     previewSize: { width: '120px', height: '60px' },
   };
 
@@ -132,7 +132,7 @@ export function useLogoManagement(options: UseLogoManagementOptions = {}) {
     replaceButton: 'Replace Logo',
     deleteButton: 'Remove Logo',
     dragDropText: 'Drag and drop your logo here',
-    sizeLimitText: 'Maximum file size: 2MB',
+    sizeLimitText: 'Maximum file size: 10MB',
     formatText: 'Supported formats: PNG, JPG, SVG, GIF, WebP',
   };
 

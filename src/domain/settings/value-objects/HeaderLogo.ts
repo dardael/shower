@@ -16,7 +16,7 @@ const HEADER_LOGO_CONSTRAINTS: ImageConstraints = {
     'image/gif',
     'image/webp',
   ],
-  maxSizeBytes: 2 * 1024 * 1024,
+  maxSizeBytes: 10 * 1024 * 1024,
   entityName: 'Header logo',
 };
 

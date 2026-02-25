@@ -65,12 +65,12 @@ const LOGO_UPLOAD_CONFIG: UploadConfig = {
     'image/gif',
     'image/webp',
   ],
-  maxSizeBytes: 2 * 1024 * 1024,
+  maxSizeBytes: 10 * 1024 * 1024,
   filenamePrefix: 'logo',
   defaultExtension: 'png',
   typeErrorMessage:
     'Invalid file type. Only PNG, JPG, SVG, GIF, and WebP formats are allowed.',
-  sizeErrorMessage: 'File size too large. Maximum size is 2MB.',
+  sizeErrorMessage: 'File size too large. Maximum size is 10MB.',
   entityName: 'logo',
 };
 

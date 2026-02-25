@@ -309,7 +309,7 @@ export default function ImageManager({
           {showFormatInfo && (
             <Text>Supported formats: ICO, PNG, JPG, SVG, GIF, WebP</Text>
           )}
-          <Text>Maximum file size: 2MB</Text>
+          <Text>Maximum file size: 10MB</Text>
         </VStack>
       </VStack>
     </Box>
