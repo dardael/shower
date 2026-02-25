@@ -1,16 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
   Box,
-  Button,
-  Heading,
   Text,
   VStack,
   HStack,
   Icon,
 } from '@chakra-ui/react';
-import { FiCheck, FiCalendar, FiUser, FiClock, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiCheck, FiCalendar, FiClock, FiUser, FiMail, FiPhone, FiMapPin, FiInfo } from 'react-icons/fi';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import { toaster } from '@/presentation/shared/components/ui/toaster';
 import { ActivitySelector } from './ActivitySelector';
@@ -46,14 +44,14 @@ function StepIndicator({ steps, currentStep, onStepClick, themeColor }: StepIndi
       borderColor="whiteAlpha.200"
       _dark={{ borderColor: 'whiteAlpha.100' }}
     >
-      <HStack justify="space-between" gap={0}>
+      <HStack justify="center" align="flex-start" gap={0} maxW="480px" mx="auto" w="full">
         {steps.map((step, index) => {
           const isDone = index < currentIndex;
           const isActive = index === currentIndex;
           const isClickable = isDone;
 
           return (
-            <HStack key={step.id} flex={1} gap={0} align="center">
+            <Fragment key={step.id}>
               {/* Step circle + label */}
               <Box
                 flex="none"
@@ -65,6 +63,7 @@ function StepIndicator({ steps, currentStep, onStepClick, themeColor }: StepIndi
                 onClick={() => isClickable && onStepClick(step.id)}
                 opacity={!isActive && !isDone ? 0.4 : 1}
                 transition="opacity 0.2s"
+                minW={{ base: 10, md: 12 }}
               >
                 <Box
                   w={{ base: 7, md: 8 }}
@@ -92,7 +91,7 @@ function StepIndicator({ steps, currentStep, onStepClick, themeColor }: StepIndi
                       <Text srOnly>{index + 1}</Text>
                     </>
                   ) : (
-                    <Text fontSize="xs">{index + 1}</Text>
+                    <Box as="span" fontSize="xs" fontWeight="bold" lineHeight="1">{index + 1}</Box>
                   )}
                 </Box>
                 <Text
@@ -106,18 +105,19 @@ function StepIndicator({ steps, currentStep, onStepClick, themeColor }: StepIndi
                 </Text>
               </Box>
 
-              {/* Connector line */}
+              {/* Connector line between circles — mt aligns with circle center (circle h=32px → 16px - 1px) */}
               {index < steps.length - 1 && (
                 <Box
                   flex={1}
-                  h="1px"
-                  mx={1}
-                  mb={4}
-                  bg={isDone ? `${themeColor}.solid` : 'whiteAlpha.200'}
+                  h="2px"
+                  mt={{ base: '13px', md: '15px' }}
+                  bg={isDone ? `${themeColor}.solid` : 'gray.200'}
+                  _dark={{ bg: isDone ? `${themeColor}.solid` : 'whiteAlpha.200' }}
+                  borderRadius="full"
                   transition="background 0.3s"
                 />
               )}
-            </HStack>
+            </Fragment>
           );
         })}
       </HStack>
@@ -321,9 +321,6 @@ function ConfirmStep({
 }: ConfirmStepProps): React.ReactElement {
   return (
     <VStack gap={5} align="stretch">
-      <Heading as="h3" size="md" fontWeight="semibold">
-        Récapitulatif
-      </Heading>
 
       {/* Appointment summary card */}
       <Box
@@ -340,14 +337,14 @@ function ConfirmStep({
           borderBottom="1px solid"
           borderColor={`${themeColor}.subtle`}
         >
-          <Text fontWeight="bold" fontSize="md">{activity.name}</Text>
+          <Text fontWeight="400" letterSpacing="0.01em" fontSize="md">{activity.name}</Text>
         </Box>
 
         <Box px={5} py={4}>
-          <VStack align="start" gap={3}>
+          <VStack align="start" gap={4}>
             <HStack gap={3}>
-              <Icon color={`${themeColor}.solid`}><FiCalendar /></Icon>
-              <Text fontSize="sm">
+              <Icon color={`${themeColor}.solid`} flexShrink={0}><FiCalendar /></Icon>
+              <Text as="span" fontSize="sm">
                 {date.toLocaleDateString('fr-FR', {
                   weekday: 'long',
                   day: 'numeric',
@@ -357,16 +354,16 @@ function ConfirmStep({
               </Text>
             </HStack>
             <HStack gap={3}>
-              <Icon color={`${themeColor}.solid`}><FiClock /></Icon>
-              <Text fontSize="sm">
+              <Icon color={`${themeColor}.solid`} flexShrink={0}><FiClock /></Icon>
+              <Text as="span" fontSize="sm">
                 {slot.startTime.substring(11, 16)} – {slot.endTime.substring(11, 16)}
                 {' '}({activity.durationMinutes} min)
               </Text>
             </HStack>
             {activity.price && activity.price > 0 && (
               <HStack gap={3}>
-                <Box w={4} />
-                <Text fontSize="sm" fontWeight="semibold">{activity.price.toFixed(2)} €</Text>
+                <Icon flexShrink={0} opacity={0} aria-hidden><FiClock /></Icon>
+                <Text as="span" fontSize="sm" fontWeight="semibold">{activity.price.toFixed(2)} €</Text>
               </HStack>
             )}
           </VStack>
@@ -377,39 +374,39 @@ function ConfirmStep({
       <Box
         borderRadius="xl"
         border="1px solid"
-      borderColor="whiteAlpha.300"
-      _dark={{ borderColor: 'whiteAlpha.100', bg: 'blackAlpha.300' }}
+        borderColor="whiteAlpha.300"
+        _dark={{ borderColor: 'whiteAlpha.100', bg: 'blackAlpha.300' }}
         px={5}
         py={4}
       >
-        <Text fontWeight="semibold" fontSize="sm" mb={3} color="fg.muted">
+        <Text as="span" fontWeight="400" letterSpacing="0.01em" fontSize="sm" color="fg.muted" mb={5} display="block">
           Vos informations
         </Text>
-        <VStack align="start" gap={2}>
+        <VStack align="start" gap={4}>
           <HStack gap={3}>
-            <Icon color="fg.muted"><FiUser /></Icon>
-            <Text fontSize="sm">{formData.name}</Text>
+            <Icon color={`${themeColor}.solid`} flexShrink={0}><FiUser /></Icon>
+            <Text as="span" fontSize="sm">{formData.name}</Text>
           </HStack>
           <HStack gap={3}>
-            <Icon color="fg.muted"><FiMail /></Icon>
-            <Text fontSize="sm">{formData.email}</Text>
+            <Icon color={`${themeColor}.solid`} flexShrink={0}><FiMail /></Icon>
+            <Text as="span" fontSize="sm">{formData.email}</Text>
           </HStack>
           {formData.phone && activity.requiredFields?.fields.includes('phone') && (
             <HStack gap={3}>
-              <Icon color="fg.muted"><FiPhone /></Icon>
-              <Text fontSize="sm">{formData.phone}</Text>
+              <Icon color={`${themeColor}.solid`} flexShrink={0}><FiPhone /></Icon>
+              <Text as="span" fontSize="sm">{formData.phone}</Text>
             </HStack>
           )}
           {formData.address && activity.requiredFields?.fields.includes('address') && (
             <HStack gap={3}>
-              <Icon color="fg.muted"><FiMapPin /></Icon>
-              <Text fontSize="sm">{formData.address}</Text>
+              <Icon color={`${themeColor}.solid`} flexShrink={0}><FiMapPin /></Icon>
+              <Text as="span" fontSize="sm">{formData.address}</Text>
             </HStack>
           )}
           {formData.customFieldValue && activity.requiredFields?.fields.includes('custom') && (
             <HStack gap={3} align="start">
-              <Box w={4} flex="none" />
-              <Text fontSize="sm">
+              <Icon color={`${themeColor}.solid`} flexShrink={0} mt="2px"><FiInfo /></Icon>
+              <Text as="span" fontSize="sm">
                 <Text as="span" fontWeight="medium">
                   {activity.requiredFields?.customFieldLabel || 'Information complémentaire'} :{' '}
                 </Text>
@@ -420,16 +417,36 @@ function ConfirmStep({
         </VStack>
       </Box>
 
-      <Button
-        colorPalette={themeColor}
+      <Box
+        as="button"
         onClick={onConfirm}
-        loading={isSubmitting}
-        size="lg"
-        borderRadius="xl"
-        w="full"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        minH="44px"
+        px={6}
+        py={2}
+        borderRadius="full"
+        border="1px solid"
+        borderColor={{ base: `rgba(0,0,0,0.1)`, _dark: 'rgba(255,255,255,0.15)' }}
+        bg={{ base: 'rgba(255,255,255,0.5)', _dark: 'rgba(255,255,255,0.06)' }}
+        style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', width: '100%', cursor: isSubmitting ? 'wait' : 'pointer' }}
+        transition="all 0.2s ease"
+        _hover={{
+          bg: { base: 'rgba(255,255,255,0.85)', _dark: 'rgba(255,255,255,0.12)' },
+          borderColor: { base: 'rgba(0,0,0,0.2)', _dark: 'rgba(255,255,255,0.25)' },
+          transform: 'translateY(-1px)',
+          boxShadow: { base: '0 4px 16px rgba(0,0,0,0.1)', _dark: '0 4px 16px rgba(0,0,0,0.4)' },
+        }}
+        aria-label="Confirmer le rendez-vous"
+        aria-busy={isSubmitting}
+        fontSize="sm"
+        fontWeight="400"
+        letterSpacing="0.01em"
+        color="fg"
       >
-        Confirmer le rendez-vous
-      </Button>
+        {isSubmitting ? 'Confirmation en cours...' : 'Confirmer le rendez-vous'}
+      </Box>
     </VStack>
   );
 }
@@ -462,23 +479,38 @@ function SuccessStep({ themeColor, onReset }: SuccessStepProps): React.ReactElem
       </Box>
 
       <VStack gap={2}>
-        <Heading as="h3" size="lg" fontWeight="bold">
-          Rendez-vous confirmé !
-        </Heading>
-        <Text color="fg.muted" maxW="360px" fontSize="sm">
+        <Text color="fg" maxW="360px" fontSize="sm" fontWeight="400" letterSpacing="0.01em">
           Un email de confirmation avec les détails de votre rendez-vous vous sera envoyé prochainement.
         </Text>
       </VStack>
 
-      <Button
-        colorPalette={themeColor}
-        variant="outline"
+      <Box
+        as="button"
         onClick={onReset}
-        size="lg"
-        borderRadius="xl"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        minH="44px"
+        px={6}
+        py={2}
+        borderRadius="full"
+        border="1px solid"
+        borderColor={{ base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.15)' }}
+        bg={{ base: 'rgba(255,255,255,0.5)', _dark: 'rgba(255,255,255,0.06)' }}
+        style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', cursor: 'pointer' }}
+        transition="all 0.2s ease"
+        _hover={{
+          bg: { base: 'rgba(255,255,255,0.85)', _dark: 'rgba(255,255,255,0.12)' },
+          borderColor: { base: 'rgba(0,0,0,0.2)', _dark: 'rgba(255,255,255,0.25)' },
+          transform: 'translateY(-1px)',
+          boxShadow: { base: '0 4px 16px rgba(0,0,0,0.1)', _dark: '0 4px 16px rgba(0,0,0,0.4)' },
+        }}
+        aria-label="Prendre un autre rendez-vous"
       >
-        Prendre un autre rendez-vous
-      </Button>
+        <Text as="span" fontSize="sm" fontWeight="400" letterSpacing="0.01em" color="fg">
+          Prendre un autre rendez-vous
+        </Text>
+      </Box>
     </VStack>
   );
 }

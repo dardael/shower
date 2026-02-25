@@ -4,11 +4,10 @@ import { useState } from 'react';
 import {
   Box,
   Button,
-  Heading,
+  Field,
   Input,
   Text,
   VStack,
-  Field,
 } from '@chakra-ui/react';
 import { useThemeColorContext } from '@/presentation/shared/contexts/ThemeColorContext';
 import type { Activity, TimeSlot } from '@/presentation/shared/types/appointment';
@@ -92,9 +91,6 @@ export function BookingForm({
 
   return (
     <VStack gap={5} align="stretch">
-      <Heading as="h3" size="md" fontWeight="semibold">
-        Vos informations
-      </Heading>
 
       {/* Summary chip */}
       <Box
@@ -105,7 +101,7 @@ export function BookingForm({
         border="1px solid"
         borderColor={`${themeColor}.subtle`}
       >
-        <Text fontSize="sm" fontWeight="medium">
+        <Text as="span" display="block" fontSize="sm" fontWeight="400" letterSpacing="0.01em">
           {activity.name}
           <Text as="span" color="fg.muted" fontWeight="normal">
             {' '}—{' '}
@@ -119,7 +115,7 @@ export function BookingForm({
         <VStack gap={4} align="stretch">
           {/* Name */}
           <Field.Root invalid={errors.name ? true : undefined} required>
-            <Field.Label fontSize="sm" fontWeight="medium">
+            <Field.Label fontSize="sm" fontWeight="400" letterSpacing="0.01em">
               Nom complet *
             </Field.Label>
             <Input
@@ -143,7 +139,7 @@ export function BookingForm({
 
           {/* Email */}
           <Field.Root invalid={errors.email ? true : undefined} required>
-            <Field.Label fontSize="sm" fontWeight="medium">
+            <Field.Label fontSize="sm" fontWeight="400" letterSpacing="0.01em">
               Email *
             </Field.Label>
             <Input
@@ -169,7 +165,7 @@ export function BookingForm({
           {/* Phone */}
           {requiresPhone && (
             <Field.Root invalid={errors.phone ? true : undefined} required>
-              <Field.Label fontSize="sm" fontWeight="medium">
+              <Field.Label fontSize="sm" fontWeight="400" letterSpacing="0.01em">
                 Téléphone *
               </Field.Label>
               <Input
@@ -196,7 +192,7 @@ export function BookingForm({
           {/* Address */}
           {requiresAddress && (
             <Field.Root invalid={errors.address ? true : undefined} required>
-              <Field.Label fontSize="sm" fontWeight="medium">
+              <Field.Label fontSize="sm" fontWeight="400" letterSpacing="0.01em">
                 Adresse *
               </Field.Label>
               <textarea
@@ -228,7 +224,7 @@ export function BookingForm({
           {/* Custom field */}
           {requiresCustom && (
             <Field.Root invalid={errors.customFieldValue ? true : undefined} required>
-              <Field.Label fontSize="sm" fontWeight="medium">
+              <Field.Label fontSize="sm" fontWeight="400" letterSpacing="0.01em">
                 {customLabel} *
               </Field.Label>
               <Input
@@ -253,11 +249,28 @@ export function BookingForm({
 
           <Button
             type="submit"
-            colorPalette={themeColor}
-            size="lg"
-            borderRadius="xl"
-            w="full"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            minH="44px"
+            px={6}
+            borderRadius="full"
+            border="1px solid"
+            borderColor={{ base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.15)' }}
+            bg={{ base: 'rgba(255,255,255,0.5)', _dark: 'rgba(255,255,255,0.06)' }}
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', width: '100%' }}
             mt={1}
+            transition="all 0.2s ease"
+            _hover={{
+              bg: { base: 'rgba(255,255,255,0.85)', _dark: 'rgba(255,255,255,0.12)' },
+              borderColor: { base: 'rgba(0,0,0,0.2)', _dark: 'rgba(255,255,255,0.25)' },
+              transform: 'translateY(-1px)',
+              boxShadow: { base: '0 4px 16px rgba(0,0,0,0.1)', _dark: '0 4px 16px rgba(0,0,0,0.4)' },
+            }}
+            color="fg"
+            fontWeight="400"
+            letterSpacing="0.01em"
+            fontSize="sm"
           >
             {requiresPhone || requiresAddress || requiresCustom
               ? 'Continuer'

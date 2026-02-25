@@ -327,9 +327,7 @@ export default function PublicPageContent({ content }: PublicPageContentProps) {
         ) {
           return (
             <Box key={index} className="public-page-content" my={4}>
-              <AppointmentBookingRenderer
-                title={segment.appointmentConfig.title}
-              />
+              <AppointmentBookingRenderer />
             </Box>
           );
         }

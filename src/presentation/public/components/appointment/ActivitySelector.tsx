@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
-  Heading,
+  HStack,
   Text,
   VStack,
-  HStack,
   Spinner,
 } from '@chakra-ui/react';
 import { FiClock, FiDollarSign, FiChevronRight } from 'react-icons/fi';
@@ -84,9 +83,6 @@ export function ActivitySelector({
 
   return (
     <VStack gap={5} align="stretch">
-      <Heading as="h3" size="md" fontWeight="semibold">
-        Choisissez une activité
-      </Heading>
 
       <Grid
         templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)' }}
@@ -143,9 +139,9 @@ export function ActivitySelector({
                 borderRadius="xl 0 0 xl"
               />
 
-              <VStack align="start" gap={2} pl={2}>
+              <VStack align="start" gap={2} pl={3}>
                 <HStack justify="space-between" w="full">
-                  <Text fontWeight="bold" fontSize="sm" lineClamp={2}>
+                  <Text fontWeight="400" letterSpacing="0.01em" fontSize="sm" lineClamp={2}>
                     {activity.name}
                   </Text>
                   <FiChevronRight
@@ -161,14 +157,14 @@ export function ActivitySelector({
                 )}
 
                 <HStack gap={3} mt={1}>
-                  <HStack gap={1}>
-                    <FiClock size={11} color="var(--chakra-colors-fg-muted)" />
-                    <Text fontSize="xs" color="fg.muted">{activity.durationMinutes} min</Text>
+                  <HStack gap={1} color="fg.muted" alignItems="center">
+                    <Box display="flex" alignItems="center"><FiClock size={12} /></Box>
+                    <span style={{ fontSize: '0.75rem' }}>{activity.durationMinutes} min</span>
                   </HStack>
                   {activity.price !== undefined && activity.price > 0 && (
-                    <HStack gap={1}>
-                      <FiDollarSign size={11} color="var(--chakra-colors-fg-muted)" />
-                      <Text fontSize="xs" color="fg.muted">{activity.price.toFixed(2)} €</Text>
+                    <HStack gap={1} color="fg.muted" alignItems="center">
+                      <Box display="flex" alignItems="center"><FiDollarSign size={12} /></Box>
+                      <span style={{ fontSize: '0.75rem' }}>{activity.price.toFixed(2)} €</span>
                     </HStack>
                   )}
                 </HStack>

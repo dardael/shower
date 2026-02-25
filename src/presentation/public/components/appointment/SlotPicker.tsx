@@ -5,10 +5,9 @@ import {
   Box,
   Button,
   Grid,
-  Heading,
+  HStack,
   Text,
   VStack,
-  HStack,
 } from '@chakra-ui/react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { frontendLog } from '@/infrastructure/shared/services/FrontendLog';
@@ -31,7 +30,6 @@ interface SlotPickerProps {
 function getWeekStart(date: Date): Date {
   const d = new Date(date);
   const day = d.getDay();
-  // Start on Monday
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
@@ -62,17 +60,13 @@ export function SlotPicker({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Compute the 7 days of current week
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + i);
     return d;
   });
 
-  // Compute prev week for navigation
-  const prevWeekStart = new Date(weekStart);
-  prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-  const isPrevWeekInPast = false; // Always allow navigation, individual days are marked as past
+  const isPrevWeekInPast = false;
 
   const fetchSlots = useCallback(
     async (date: Date): Promise<void> => {
@@ -97,23 +91,19 @@ export function SlotPicker({
     [activityId]
   );
 
-  // Fetch slots for the first non-past day of the week on mount
   useEffect(() => {
     const firstAvailableDay = weekDays.find((d) => d >= today);
     if (firstAvailableDay) {
       setSelectedDay(firstAvailableDay);
       fetchSlots(firstAvailableDay);
     }
-    // Only run on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Initial fetch if a date was already selected (e.g., navigating back)
   useEffect(() => {
     if (selectedDate && !weekDays.find((d) => isSameDay(d, selectedDate))) {
       fetchSlots(selectedDate);
     }
-    // Only run on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -136,18 +126,14 @@ export function SlotPicker({
     setWeekStart(newStart);
   };
 
-  // Always show full date range for the week
   const startMonth = weekDays[0].getMonth();
   const endMonth = weekDays[6].getMonth();
   const monthLabel = `${weekDays[0].getDate()} ${MONTHS_FR[startMonth]} - ${weekDays[6].getDate()} ${MONTHS_FR[endMonth]} ${weekDays[6].getFullYear()}`;
 
   return (
     <VStack gap={5} align="stretch">
-      <Heading as="h3" size="md" fontWeight="semibold">
-        Choisissez une date et un créneau
-      </Heading>
 
-      {/* Week navigation */}
+      {/* Week navigation — glassmorphisme comme les activity cards */}
       <Box
         borderRadius="xl"
         border="1px solid"
@@ -157,6 +143,7 @@ export function SlotPicker({
         backdropFilter="blur(12px)"
         style={{ WebkitBackdropFilter: 'blur(12px)' }}
         overflow="hidden"
+        boxShadow="0 4px 16px rgba(0,0,0,0.06)"
       >
         {/* Week header */}
         <HStack
@@ -169,23 +156,38 @@ export function SlotPicker({
           <Button
             variant="ghost"
             size="sm"
-            borderRadius="lg"
+            borderRadius="full"
+            border="1px solid"
+            borderColor={{ base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.15)' }}
+            bg={{ base: 'rgba(255,255,255,0.5)', _dark: 'rgba(255,255,255,0.06)' }}
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={handlePrevWeek}
             disabled={isPrevWeekInPast}
             aria-label="Semaine précédente"
+            _hover={{
+              bg: { base: 'rgba(255,255,255,0.85)', _dark: 'rgba(255,255,255,0.12)' },
+              borderColor: { base: 'rgba(0,0,0,0.2)', _dark: 'rgba(255,255,255,0.25)' },
+            }}
           >
             <FiChevronLeft />
           </Button>
-          <span
-            style={{ fontSize: '14px', fontWeight: 600 }}
-          >
+          <span style={{ fontSize: '14px', fontWeight: 400, letterSpacing: '0.05em' }}>
             {monthLabel}
-          </span>          <Button
+          </span>
+          <Button
             variant="ghost"
             size="sm"
-            borderRadius="lg"
+            borderRadius="full"
+            border="1px solid"
+            borderColor={{ base: 'rgba(0,0,0,0.1)', _dark: 'rgba(255,255,255,0.15)' }}
+            bg={{ base: 'rgba(255,255,255,0.5)', _dark: 'rgba(255,255,255,0.06)' }}
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={handleNextWeek}
             aria-label="Semaine suivante"
+            _hover={{
+              bg: { base: 'rgba(255,255,255,0.85)', _dark: 'rgba(255,255,255,0.12)' },
+              borderColor: { base: 'rgba(0,0,0,0.2)', _dark: 'rgba(255,255,255,0.25)' },
+            }}
           >
             <FiChevronRight />
           </Button>
@@ -229,15 +231,18 @@ export function SlotPicker({
                 borderRight={idx < 6 ? '1px solid' : 'none'}
                 borderColor="whiteAlpha.200"
               >
-                <Text
-                  fontSize={{ base: '9px', md: 'xs' }}
-                  fontWeight="medium"
-                  color={isSelected ? 'white' : 'fg.muted'}
-                  textTransform="uppercase"
-                  letterSpacing="wide"
-                >
+                {/* Day name */}
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  color: isSelected ? 'white' : 'var(--chakra-colors-fg-muted)',
+                }}>
                   {DAYS_FR[day.getDay()]}
-                </Text>
+                </span>
+
+                {/* Day number circle */}
                 <Box
                   w={{ base: 7, md: 8 }}
                   h={{ base: 7, md: 8 }}
@@ -247,14 +252,16 @@ export function SlotPicker({
                   justifyContent="center"
                   border={isToday && !isSelected ? '2px solid' : 'none'}
                   borderColor={`${themeColor}.solid`}
+                  flexShrink={0}
                 >
-                  <Text
-                    fontSize={{ base: 'xs', md: 'sm' }}
-                    fontWeight={isToday || isSelected ? 'bold' : 'normal'}
-                    color={isSelected ? 'white' : isToday ? `${themeColor}.solid` : 'fg'}
-                  >
+                  <span style={{
+                    fontSize: '13px',
+                    fontWeight: isToday || isSelected ? 700 : 400,
+                    color: isSelected ? 'white' : isToday ? `var(--chakra-colors-${themeColor}-solid)` : 'inherit',
+                    lineHeight: 1,
+                  }}>
                     {day.getDate()}
-                  </Text>
+                  </span>
                 </Box>
               </Box>
             );
@@ -271,9 +278,9 @@ export function SlotPicker({
 
       {selectedDay && (
         <Box>
-          <Text fontSize="sm" fontWeight="medium" mb={3} color="fg.muted">
+          <Text fontSize="sm" fontWeight="400" letterSpacing="0.01em" mb={3} color="fg.muted">
             Créneaux disponibles —{' '}
-            <Box as="span" color="fg" fontWeight="semibold">
+            <Box as="span" color="fg" fontWeight="400">
               {selectedDay.toLocaleDateString('fr-FR', {
                 weekday: 'long',
                 day: 'numeric',
@@ -282,8 +289,9 @@ export function SlotPicker({
             </Box>
           </Text>
 
+          {/* Loader aligné */}
           {isLoading && (
-            <HStack py={8} justify="center" gap={3}>
+            <HStack py={8} justify="center" gap={3} alignItems="center">
               <Box
                 w={4}
                 h={4}
@@ -291,10 +299,13 @@ export function SlotPicker({
                 borderColor={`${themeColor}.solid`}
                 borderTopColor="transparent"
                 borderRadius="full"
+                flexShrink={0}
                 style={{ animation: 'spin 0.8s linear infinite' }}
                 aria-hidden="true"
               />
-              <Text fontSize="sm" color="fg.muted">Chargement des créneaux...</Text>
+              <span style={{ fontSize: '0.875rem', color: 'var(--chakra-colors-fg-muted)' }}>
+                Chargement des créneaux...
+              </span>
             </HStack>
           )}
 
@@ -324,6 +335,7 @@ export function SlotPicker({
             </Box>
           )}
 
+          {/* Créneaux — style glassmorphisme comme les activity cards */}
           {!isLoading && !error && slots.length > 0 && (
             <Grid
               templateColumns={{
@@ -331,39 +343,67 @@ export function SlotPicker({
                 sm: 'repeat(3, 1fr)',
                 md: 'repeat(4, 1fr)',
               }}
-              gap={2}
+              gap={3}
             >
               {slots.map((slot, idx) => {
                 const startTime = slot.startTime.substring(11, 16);
                 const endTime = slot.endTime.substring(11, 16);
-                const isSelectedSlot =
-                  selectedSlot?.startTime === slot.startTime;
+                const isSelectedSlot = selectedSlot?.startTime === slot.startTime;
 
                 return (
-                  <button
+                  <Box
                     key={idx}
-                    type="button"
+                    as="button"
                     onClick={() => onSelect(selectedDay, slot)}
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      padding: '0.75rem 0.5rem',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      background: 'transparent',
-                      border: `1px solid ${isSelectedSlot ? 'var(--chakra-colors-color-palette-solid)' : 'var(--chakra-colors-whiteAlpha-300)'}`,
-                      borderRadius: '0.75rem',
-                    }}
                     aria-pressed={isSelectedSlot}
+                    position="relative"
+                    overflow="hidden"
+                    borderRadius="xl"
+                    border="1px solid"
+                    borderColor={isSelectedSlot ? `${themeColor}.solid` : 'whiteAlpha.300'}
+                    bg={isSelectedSlot ? `${themeColor}.subtle` : 'whiteAlpha.400'}
+                    backdropFilter="blur(12px)"
+                    style={{ WebkitBackdropFilter: 'blur(12px)' }}
+                    _dark={{
+                      borderColor: isSelectedSlot ? `${themeColor}.solid` : 'whiteAlpha.100',
+                      bg: isSelectedSlot ? `${themeColor}.subtle` : 'blackAlpha.300',
+                    }}
+                    _hover={{
+                      borderColor: `${themeColor}.solid`,
+                      bg: `${themeColor}.subtle`,
+                      transform: 'translateY(-2px)',
+                      boxShadow: 'md',
+                    }}
+                    transition="all 0.15s"
+                    cursor="pointer"
+                    py={3}
+                    px={2}
+                    w="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    boxShadow="0 2px 8px rgba(0,0,0,0.05)"
                   >
-                    <Text
-                      fontSize="sm"
-                      fontWeight={isSelectedSlot ? 'bold' : 'semibold'}
-                      color={isSelectedSlot ? `${themeColor}.solid` : 'fg'}
-                    >
+                    {/* Accent bar */}
+                    <Box
+                      position="absolute"
+                      top={0}
+                      left={0}
+                      w="3px"
+                      h="full"
+                      bg={isSelectedSlot ? `${themeColor}.solid` : `${themeColor}.muted`}
+                      borderRadius="xl 0 0 xl"
+                      opacity={isSelectedSlot ? 1 : 0.4}
+                    />
+                    <span style={{
+                      fontSize: '0.8125rem',
+                      fontWeight: 400,
+                      letterSpacing: '0.01em',
+                      color: isSelectedSlot ? `var(--chakra-colors-${themeColor}-solid)` : 'inherit',
+                    }}>
                       {startTime} - {endTime}
-                    </Text>
-                  </button>
+                    </span>
+                  </Box>
                 );
               })}
             </Grid>
