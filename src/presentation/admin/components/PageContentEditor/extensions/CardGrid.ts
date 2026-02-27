@@ -1,4 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -6,6 +7,7 @@ declare module '@tiptap/core' {
       insertCardGrid: (cardCount?: number) => ReturnType;
       addCardToGrid: () => ReturnType;
       removeCardFromGrid: () => ReturnType;
+      moveCardInGrid: (direction: 'left' | 'right') => ReturnType;
     };
   }
 }
@@ -131,6 +133,69 @@ export const CardGrid = Node.create({
               cardPos,
               cardPos + (cardNode as unknown as { nodeSize: number }).nodeSize
             );
+            dispatch(tr);
+          }
+
+          return true;
+        },
+
+      moveCardInGrid:
+        (direction) =>
+        ({ state, dispatch }) => {
+          const { selection } = state;
+          let cardPos = -1;
+          let cardNode: ProseMirrorNode | undefined;
+          let gridPos = -1;
+          let gridNode: ProseMirrorNode | undefined;
+
+          state.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+            if (node.type.name === 'cardGrid') {
+              gridPos = pos;
+              gridNode = node;
+            }
+            if (node.type.name === 'card') {
+              cardPos = pos;
+              cardNode = node;
+              return false;
+            }
+            return true;
+          });
+
+          if (!cardNode || !gridNode || cardPos < 0 || gridPos < 0) {
+            return false;
+          }
+
+          // Find the index of the current card within the grid
+          let cardIndex = 0;
+          let offset = gridPos + 1;
+          for (let i = 0; i < gridNode.childCount; i++) {
+            if (offset === cardPos) {
+              cardIndex = i;
+              break;
+            }
+            offset += gridNode.child(i).nodeSize;
+          }
+
+          const targetIndex =
+            direction === 'left' ? cardIndex - 1 : cardIndex + 1;
+          if (targetIndex < 0 || targetIndex >= gridNode.childCount) {
+            return false;
+          }
+
+          if (dispatch) {
+            const tr = state.tr;
+            const targetCard = gridNode.child(targetIndex);
+
+            if (direction === 'left') {
+              const targetPos = cardPos - targetCard.nodeSize;
+              tr.delete(cardPos, cardPos + cardNode.nodeSize);
+              tr.insert(targetPos, cardNode);
+            } else {
+              const targetPos = cardPos + cardNode.nodeSize;
+              tr.insert(targetPos + targetCard.nodeSize, cardNode);
+              tr.delete(cardPos, cardPos + cardNode.nodeSize);
+            }
+
             dispatch(tr);
           }
 

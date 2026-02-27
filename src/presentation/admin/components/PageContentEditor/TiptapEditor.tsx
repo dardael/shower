@@ -263,6 +263,8 @@ export default function TiptapEditor({
   >(null);
   const [isInTable, setIsInTable] = useState(false);
   const [isInCardGrid, setIsInCardGrid] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [totalCardsInGrid, setTotalCardsInGrid] = useState(0);
   const { sellingEnabled } = useSellingConfig();
   const { isEnabled: appointmentModuleEnabled } = useAppointmentModule();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -397,6 +399,24 @@ export default function TiptapEditor({
         (node) => node.type.name === 'cardGrid'
       )(ed.state.selection);
       setIsInCardGrid(!!cardGridNode);
+      if (cardGridNode) {
+        const cardNode = findParentNode((node) => node.type.name === 'card')(
+          ed.state.selection
+        );
+        setTotalCardsInGrid(cardGridNode.node.childCount);
+        if (cardNode) {
+          let index = 0;
+          let offset = cardGridNode.pos + 1;
+          for (let i = 0; i < cardGridNode.node.childCount; i++) {
+            if (offset === cardNode.pos) {
+              index = i;
+              break;
+            }
+            offset += cardGridNode.node.child(i).nodeSize;
+          }
+          setCurrentCardIndex(index);
+        }
+      }
     },
     onSelectionUpdate: ({ editor: ed }) => {
       // Check if we're in a table on selection change
@@ -409,6 +429,24 @@ export default function TiptapEditor({
         (node) => node.type.name === 'cardGrid'
       )(ed.state.selection);
       setIsInCardGrid(!!cardGridNode);
+      if (cardGridNode) {
+        const cardNode = findParentNode((node) => node.type.name === 'card')(
+          ed.state.selection
+        );
+        setTotalCardsInGrid(cardGridNode.node.childCount);
+        if (cardNode) {
+          let index = 0;
+          let offset = cardGridNode.pos + 1;
+          for (let i = 0; i < cardGridNode.node.childCount; i++) {
+            if (offset === cardNode.pos) {
+              index = i;
+              break;
+            }
+            offset += cardGridNode.node.child(i).nodeSize;
+          }
+          setCurrentCardIndex(index);
+        }
+      }
 
       // Track selected image position and type
       const { selection } = ed.state;
@@ -994,7 +1032,14 @@ export default function TiptapEditor({
       {isInTable && <TableToolbar editor={editor} disabled={disabled} />}
 
       {/* Card toolbar - visible when cursor is in a card grid */}
-      {isInCardGrid && <CardToolbar editor={editor} disabled={disabled} />}
+      {isInCardGrid && (
+        <CardToolbar
+          editor={editor}
+          disabled={disabled}
+          currentCardIndex={currentCardIndex}
+          totalCardsInGrid={totalCardsInGrid}
+        />
+      )}
 
       {/* Product list toolbar - visible when productList is selected */}
       {selectedProductListPos !== null &&

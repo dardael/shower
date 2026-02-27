@@ -3,16 +3,26 @@
 import type { Editor } from '@tiptap/react';
 import { HStack, IconButton, Text } from '@chakra-ui/react';
 import { Tooltip } from '@/presentation/shared/components/ui/tooltip';
-import { LuPlus, LuMinus, LuTrash2 } from 'react-icons/lu';
+import {
+  LuPlus,
+  LuMinus,
+  LuTrash2,
+  LuChevronLeft,
+  LuChevronRight,
+} from 'react-icons/lu';
 
 interface CardToolbarProperties {
   editor: Editor;
   disabled: boolean;
+  currentCardIndex: number;
+  totalCardsInGrid: number;
 }
 
 export function CardToolbar({
   editor,
   disabled,
+  currentCardIndex,
+  totalCardsInGrid,
 }: CardToolbarProperties): React.ReactElement {
   return (
     <HStack
@@ -37,6 +47,32 @@ export function CardToolbar({
           disabled={disabled}
         >
           <LuPlus />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip content="Déplacer la carte vers la gauche">
+        <IconButton
+          aria-label="Déplacer la carte vers la gauche"
+          size="sm"
+          variant="ghost"
+          color="fg"
+          onClick={() => editor.chain().focus().moveCardInGrid('left').run()}
+          disabled={disabled || currentCardIndex <= 0}
+        >
+          <LuChevronLeft />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip content="Déplacer la carte vers la droite">
+        <IconButton
+          aria-label="Déplacer la carte vers la droite"
+          size="sm"
+          variant="ghost"
+          color="fg"
+          onClick={() => editor.chain().focus().moveCardInGrid('right').run()}
+          disabled={disabled || currentCardIndex >= totalCardsInGrid - 1}
+        >
+          <LuChevronRight />
         </IconButton>
       </Tooltip>
 
